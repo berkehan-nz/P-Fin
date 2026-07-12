@@ -1,0 +1,22 @@
+# Sırlar — repoya asla girmez
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Üretim / geçici çıktılar
+out/
+*.log
+.DS_Store
+
+# Panel (opsiyonel node build)
+panel/node_modules/
+panel/dist/

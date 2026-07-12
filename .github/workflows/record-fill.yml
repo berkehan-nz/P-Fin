@@ -1,0 +1,64 @@
+name: İşlem Kaydı (Fill)
+
+# §3.6: Midas'ta yapılan GERÇEK işlemi sisteme gir. Gerçekleşen fiyat esastır.
+# GitHub UI'dan "Run workflow" formuyla tetiklenir (düşük sürtünme MVP).
+on:
+  workflow_dispatch:
+    inputs:
+      symbol:   { description: "Sembol (ör. THYAO)", required: true }
+      market:   { description: "Pazar", required: true, type: choice, options: [BIST, US, TEFAS] }
+      side:     { description: "Yön", required: true, type: choice, options: [buy, sell] }
+      shares:   { description: "Adet", required: true }
+      price:    { description: "Gerçekleşen fiyat", required: true }
+      stop:     { description: "Stop (yeni alımda zorunlu)", required: false }
+      thesis:   { description: "Tez (yeni alımda zorunlu)", required: false }
+      refuter:  { description: "Çürütücü (yeni alımda zorunlu)", required: false }
+      source:   { description: "Kaynak linki", required: false }
+
+permissions:
+  contents: write
+
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: İşlemi kaydet
+        # Girdiler env üzerinden geçer (shell enjeksiyonu/tırnak sorununu önler).
+        env:
+          IN_SYMBOL: ${{ inputs.symbol }}
+          IN_MARKET: ${{ inputs.market }}
+          IN_SIDE: ${{ inputs.side }}
+          IN_SHARES: ${{ inputs.shares }}
+          IN_PRICE: ${{ inputs.price }}
+          IN_STOP: ${{ inputs.stop }}
+          IN_THESIS: ${{ inputs.thesis }}
+          IN_REFUTER: ${{ inputs.refuter }}
+          IN_SOURCE: ${{ inputs.source }}
+        run: |
+          if [ ! -f state.json ]; then PYTHONPATH=src python -m pfin.cli init-state --cash 50000; fi
+          args=(--symbol "$IN_SYMBOL" --market "$IN_MARKET" --side "$IN_SIDE" \
+                --shares "$IN_SHARES" --price "$IN_PRICE")
+          [ -n "$IN_STOP" ]    && args+=(--stop "$IN_STOP")
+          [ -n "$IN_THESIS" ]  && args+=(--thesis "$IN_THESIS")
+          [ -n "$IN_REFUTER" ] && args+=(--refuter "$IN_REFUTER")
+          [ -n "$IN_SOURCE" ]  && args+=(--source "$IN_SOURCE")
+          PYTHONPATH=src python -m pfin.cli record-fill "${args[@]}"
+
+      - name: state.json'ı commit'le
+        run: |
+          git config user.name  "pfin-bot"
+          git config user.email "pfin-bot@users.noreply.github.com"
+          git add state.json
+          if git diff --cached --quiet; then
+            echo "değişiklik yok"
+          else
+            git commit -m "chore: işlem kaydı ${{ inputs.side }} ${{ inputs.symbol }} [skip ci]"
+            git push
+          fi

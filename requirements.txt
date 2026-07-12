@@ -1,0 +1,8 @@
+# Kişisel Finans Ajanı — Python bağımlılıkları
+anthropic>=0.40.0        # Opus 4.8 + web_search/web_fetch + prompt caching
+borsapy>=0.10.2          # BIST fiyat/bilanço, TEFAS, XU100, TÜFE/TCMB (anahtarsız çoğu yol)
+yfinance>=0.2.40         # ABD temel/bilanço verisi (anahtarsız Yahoo)
+requests>=2.31.0         # Twelve Data REST (ABD fiyat) ve KAP
+pydantic>=2.6.0          # hafıza şeması (state.json)
+PyYAML>=6.0              # config.yaml
+Jinja2>=3.1.0            # mail şablonu (HTML)

@@ -1,0 +1,52 @@
+name: Nöbetçi
+
+# §3.1: Sık koşar, LLM YOK (~$0). Eşik izler, gerekirse acil mail atar.
+# BIST saatleri ~10:00-18:00 TR = 07:00-15:00 UTC, hafta içi, 15 dk'da bir.
+# Taşınabilir: zamanlayıcı değişse kod değişmez, yalnız bu tetik değişir (§3.1).
+on:
+  schedule:
+    - cron: "*/15 7-15 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pfin-sentinel
+  cancel-in-progress: false
+
+jobs:
+  sentinel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Bağımlılıklar
+        run: pip install -r requirements.txt
+
+      - name: Nöbetçi taraması
+        env:
+          TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: |
+          if [ ! -f state.json ]; then echo "state.json yok — nöbetçi atlandı"; exit 0; fi
+          PYTHONPATH=src python -m pfin.cli sentinel-run
+
+      - name: state.json'ı commit'le
+        run: |
+          git config user.name  "pfin-bot"
+          git config user.email "pfin-bot@users.noreply.github.com"
+          git add state.json
+          if git diff --cached --quiet; then
+            echo "değişiklik yok"
+          else
+            git commit -m "chore: nöbetçi state güncellemesi [skip ci]"
+            git push
+          fi

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finans Ajanı Paneli</title>
+  <!-- Kurulumsuz önizleme: React + Babel CDN. state.json ile aynı klasörde servis edin:
+       cd panel && python3 -m http.server 8000  → http://localhost:8000
+       (Kendi React uygulamanız için finans-ajani-panel.jsx dosyasını import edin.) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>body{margin:0;background:#f6f7fb}</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" data-presets="react">
+    const { useEffect, useState } = React;
+    const fmt = (v,d=2)=> v==null||Number.isNaN(v) ? "—" :
+      Number(v).toLocaleString("tr-TR",{minimumFractionDigits:d,maximumFractionDigits:d});
+    const pct = (v)=> v==null ? "—" : `%${fmt(v)}`;
+    const card={background:"#fff",border:"1px solid #e6e6ef",borderRadius:12,padding:16,marginBottom:16};
+
+    function App(){
+      const [s,setS]=useState(null); const [err,setErr]=useState(null);
+      useEffect(()=>{ fetch("./state.json",{cache:"no-store"})
+        .then(r=>{if(!r.ok)throw new Error("state.json okunamadı ("+r.status+")");return r.json();})
+        .then(setS).catch(e=>setErr(e.message)); },[]);
+      if(err) return <div style={{color:"#b00",padding:24}}>Hata: {err}<br/><small>state.json'ı bu klasöre koyup HTTP ile servis edin.</small></div>;
+      if(!s) return <div style={{padding:24,color:"#888"}}>Yükleniyor…</div>;
+      const open=(s.positions||[]).filter(p=>p.status==="open");
+      const posVal=open.reduce((a,p)=>a+(p.current_price??p.entry_price)*p.shares,0);
+      const pv=(s.cash_try||0)+posVal;
+      const perf=s.performance||[]; let bench=null;
+      if(perf.length>=2){const f=perf[0],l=perf[perf.length-1];
+        const pr=f.portfolio_value_try?(l.portfolio_value_try/f.portfolio_value_try-1)*100:null;
+        const xr=(f.xu100&&l.xu100)?(l.xu100/f.xu100-1)*100:null;
+        bench={pr,xr,rel:(pr!=null&&xr!=null)?pr-xr:null,tufe:l.tufe_yoy};}
+      return (
+        <div style={{fontFamily:"-apple-system,Segoe UI,Roboto,sans-serif",maxWidth:900,margin:"0 auto",padding:16,color:"#1a1a2e"}}>
+          <h1 style={{fontSize:22,marginBottom:4}}>Finans Ajanı Paneli</h1>
+          <div style={{color:"#888",fontSize:13,marginBottom:16}}>Son tur: {s.meta&&s.meta.last_run_at||"—"}</div>
+          <div style={{...card,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12}}>
+            <M l="Portföy" v={fmt(pv)+" ₺"}/>
+            <M l="Nakit" v={fmt(s.cash_try)+" ₺"}/>
+            <M l="Gerçekleşen P&L" v={fmt(s.realized_pnl_try||0)+" ₺"} c={(s.realized_pnl_try||0)>=0?"#0a7d2c":"#b00"}/>
+            <M l="Açık pozisyon" v={open.length}/>
+            <M l="Bu ay API" v={"$"+fmt(s.budget&&s.budget.spend_usd||0)} c={s.budget&&s.budget.throttled?"#b00":"#333"}/>
+          </div>
+          <div style={card}>
+            <h3 style={{marginTop:0}}>Kıyas (XU100 / TÜFE)</h3>
+            {bench? <div style={{display:"flex",gap:24,flexWrap:"wrap",fontSize:14}}>
+              <span>Portföy: <b>{pct(bench.pr)}</b></span><span>XU100: <b>{pct(bench.xr)}</b></span>
+              <span>Göreli: <b style={{color:(bench.rel??0)>=0?"#0a7d2c":"#b00"}}>{pct(bench.rel)}</b></span>
+              <span>TÜFE: <b>{pct(bench.tufe)}</b></span></div>
+              : <div style={{color:"#888"}}>Kıyas için en az 2 performans noktası gerekir.</div>}
+          </div>
+          <div style={card}>
+            <h3 style={{marginTop:0}}>Açık Pozisyonlar</h3>
+            {open.length===0? <div style={{color:"#888"}}>Açık pozisyon yok.</div> :
+            <table style={{width:"100%",borderCollapse:"collapse",fontSize:13}}>
+              <thead><tr style={{textAlign:"left",background:"#f3f3fb"}}>
+                <th style={c1}>Sembol</th><th style={c1}>Giriş</th><th style={c1}>Son</th>
+                <th style={c1}>P&L</th><th style={c1}>Stop</th><th style={c1}>Tez / Çürütücü</th></tr></thead>
+              <tbody>{open.map(p=>{const mv=(p.current_price??p.entry_price)*p.shares;const pnl=mv-p.entry_price*p.shares;
+                return <tr key={p.id} style={{borderBottom:"1px solid #eee"}}>
+                  <td style={c2}><b>{p.symbol}</b> <span style={{color:"#999"}}>{p.market}</span></td>
+                  <td style={c2}>{fmt(p.entry_price)}</td>
+                  <td style={c2}>{p.current_price!=null?fmt(p.current_price):"—"}</td>
+                  <td style={{...c2,color:pnl>=0?"#0a7d2c":"#b00"}}>{fmt(pnl,0)} ₺</td>
+                  <td style={c2}>{fmt(p.stop)}</td>
+                  <td style={c2}><div>{p.thesis}</div><div style={{color:"#b06",fontSize:12}}>↯ {p.refuter}</div></td>
+                </tr>;})}</tbody>
+            </table>}
+          </div>
+          <div style={card}>
+            <h3 style={{marginTop:0}}>Ajan Günlüğü</h3>
+            <div style={{maxHeight:220,overflowY:"auto",fontSize:13}}>
+              {(s.log||[]).slice().reverse().map((l,i)=>
+                <div key={i} style={{padding:"4px 0",borderBottom:"1px solid #f2f2f2"}}>
+                  <b style={{color:"#446"}}>[{l.kind}]</b> <span style={{color:"#999",fontSize:11}}>{l.ts}</span>
+                  <div>{l.message}</div></div>)}
+              {(s.log||[]).length===0 && <div style={{color:"#888"}}>Henüz kayıt yok.</div>}
+            </div>
+          </div>
+          <div style={{color:"#aaa",fontSize:12,textAlign:"center"}}>Bu bir modelin önerisidir, finansal danışmanlık değildir.</div>
+        </div>);
+    }
+    function M({l,v,c="#1a1a2e"}){return <div><div style={{color:"#888",fontSize:12}}>{l}</div>
+      <div style={{fontSize:20,fontWeight:700,color:c}}>{v}</div></div>;}
+    const c1={padding:"8px 6px"}, c2={padding:"8px 6px",verticalAlign:"top"};
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
+</body>
+</html>

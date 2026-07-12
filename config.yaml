@@ -1,0 +1,57 @@
+# Kişisel Finans Ajanı — yapılandırma (sır DEĞİL; sırlar .env / GitHub Secrets'ta).
+# Değişirse kod değil bu dosya güncellenir.
+
+capital_try: 50000            # başlangıç sermayesi (₺) — bilgi amaçlı; gerçek nakit state.json'da
+
+# --- Yatırım evreni / izleme listesi ---
+universe:
+  bist: [ASELS, THYAO, SISE, KCHOL, FROTO, TUPRS, EREGL, BIMAS]
+  us:   [AAPL, MSFT, NVDA, GOOGL]
+  tefas: []                   # ör. [AFA, TTE] — TEFAS fon kodları
+watchlist: []                 # ajanın önerdiği adaylar buraya birikir
+
+# --- Korkuluk katmanı (§3.3) — model ne derse desin uygulanır ---
+guardrails:
+  max_position_pct: 0.20      # tek pozisyon <= portföyün %20'si
+  min_cash_pct: 0.15          # her zaman >= %15 nakit tamponu
+  max_open_positions: 6       # aynı anda en fazla 6 açık pozisyon
+  min_confidence: 0.55        # altındaki öneriler "DÜŞÜK GÜVEN" damgası
+
+# --- Nöbetçi (§3.1) — deterministik eşikler, LLM yok ---
+sentinel:
+  intraday_move_pct: 0.07     # gün içi sert hareket eşiği (±%7)
+  abnormal_volume_mult: 3.0   # ortalama hacmin katı → anormal hacim
+  kap_lookback_hours: 24      # KAP bildirim tarama penceresi
+
+# --- Kıyas (§2.6) ---
+benchmarks:
+  index_symbol: XU100         # ana kıyas endeksi
+  inflation: tufe             # TÜFE (yıllık) — EVDS anahtarı ister
+
+# --- Model + araç sürümleri (parametrik; API değişirse burayı güncelle) ---
+model:
+  id: claude-opus-4-8
+  max_tokens: 8000
+  web_search_tool: web_search_20250305
+  web_fetch_tool: web_fetch_20250910
+  web_search_max_uses: 8
+  web_fetch_max_uses: 6
+
+# --- Maliyet / bütçe (§6) — Opus 4.8 fiyatlaması (USD / 1M token) ---
+budget:
+  monthly_cap_usd: 50.0
+  price_input_per_mtok: 5.0
+  price_output_per_mtok: 25.0
+  price_cache_write_per_mtok: 6.25   # 5m cache write ~ 1.25x input
+  price_cache_read_per_mtok: 0.50    # cache read ~ 0.1x input
+  throttle_action: sparse            # tavan aşılırsa derin turu seyreltir
+
+# --- Twelve Data ücretsiz katman limitleri (ABD fiyat) ---
+twelvedata:
+  calls_per_minute: 8
+  calls_per_day: 800
+
+# --- Mail ---
+mail:
+  subject_prefix: "[Finans Ajanı]"
+  timezone: Europe/Istanbul
