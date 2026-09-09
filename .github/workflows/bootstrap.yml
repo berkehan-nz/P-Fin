@@ -1,0 +1,74 @@
+# ILK DOLUM — tohum listesindeki 36 sirket icin kart uretir.
+# Elle calistirilir (Actions -> Bootstrap -> Run workflow).
+# Bu is akisi calisana kadar dashboard bos gorunur.
+name: Bootstrap (tohum listesi)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: 'Alt kume (virgulle, bos = 36 tohum sirketin hepsi)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: SEC/fiyat onbellegini geri yukle
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: nexizon-cache-${{ github.run_id }}
+          restore-keys: nexizon-cache-
+
+      - name: Tohum kartlarini uret
+        env:
+          SEC_USER_AGENT:  ${{ secrets.SEC_USER_AGENT }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FRED_API_KEY:    ${{ secrets.FRED_API_KEY }}
+        run: |
+          if [ -z "$SEC_USER_AGENT" ]; then
+            echo "::error::SEC_USER_AGENT secret'i tanimli degil. SEC User-Agent olmadan 403 doner."
+            echo "::error::Settings -> Secrets -> Actions -> New secret: SEC_USER_AGENT = 'Ad Soyad eposta@ornek.com'"
+            exit 1
+          fi
+          if [ -n "${{ inputs.tickers }}" ]; then
+            python -m src.run_seed --tickers "${{ inputs.tickers }}"
+          else
+            python -m src.run_seed
+          fi
+
+      - name: Ozet
+        run: |
+          echo "### Uretilen kartlar" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          ls -1 data/cards/*.json 2>/dev/null | wc -l | xargs -I{} echo "{} kart" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Commit
+        run: |
+          git config user.name  "nexizon-bot"
+          git config user.email "actions@github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "Degisiklik yok — commit atlanmadi."
+          else
+            git commit -m "veri: tohum listesi kartlari (bootstrap)"
+            git push
+          fi

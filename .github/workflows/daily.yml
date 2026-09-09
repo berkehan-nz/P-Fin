@@ -1,0 +1,56 @@
+# GUNLUK — hafta ici 07:00 TSI (04:00 UTC).
+# Fiyat, momentum, haber, kazanc takvimi, portfoy degerleri + merge_story().
+# Huni CALISMAZ (o haftalik). Degisiklik yoksa commit atilmaz.
+name: Daily (fiyat ve haber)
+
+on:
+  schedule:
+    - cron: '0 4 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nexizon-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Onbellek
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: nexizon-cache-${{ github.run_id }}
+          restore-keys: nexizon-cache-
+
+      - name: Gunluk guncelleme
+        env:
+          SEC_USER_AGENT:  ${{ secrets.SEC_USER_AGENT }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FRED_API_KEY:    ${{ secrets.FRED_API_KEY }}
+        run: python -m src.run_daily
+
+      - name: Commit (yalnizca degisiklik varsa)
+        run: |
+          git config user.name  "nexizon-bot"
+          git config user.email "actions@github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "Degisiklik yok — commit atilmadi."
+          else
+            git commit -m "veri: gunluk guncelleme $(date -u +%Y-%m-%d)"
+            git push
+          fi

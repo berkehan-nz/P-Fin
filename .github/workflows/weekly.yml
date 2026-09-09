@@ -1,0 +1,83 @@
+# HAFTALIK — pazar. SEC toplu verisini gunceller, huniyi BASTAN calistirir.
+name: Weekly (huni)
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Islenecek sirket sayisi ustu (bos = tam evren)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nexizon-data
+  cancel-in-progress: false
+
+jobs:
+  funnel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330      # tam evren taramasi uzun surer
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: SEC toplu veri onbellegi
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: nexizon-cache-${{ github.run_id }}
+          restore-keys: nexizon-cache-
+
+      - name: Huniyi calistir
+        env:
+          SEC_USER_AGENT:  ${{ secrets.SEC_USER_AGENT }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FRED_API_KEY:    ${{ secrets.FRED_API_KEY }}
+        run: |
+          if [ -n "${{ inputs.limit }}" ]; then
+            python -m src.run_funnel --limit "${{ inputs.limit }}"
+          else
+            python -m src.run_funnel
+          fi
+
+      - name: Huni ozeti
+        run: |
+          python - <<'PY' >> $GITHUB_STEP_SUMMARY
+          import json, pathlib
+          p = pathlib.Path('data/funnel_log.json')
+          if p.exists():
+              runs = json.loads(p.read_text())['runs']
+              if runs:
+                  r = runs[-1]
+                  print(f"### Huni — {r['date']}\n")
+                  print("| Asama | Girdi | Cikti | Elenen |")
+                  print("|---|---|---|---|")
+                  for s in r['stages']:
+                      print(f"| {s['stage']}. {s['name']} | {s['input']} | {s['output']} | {s['input']-s['output']} |")
+                  print("\n### En sik eleme sebepleri\n")
+                  for reason, n in list(r['kill_reasons'].items())[:10]:
+                      print(f"- **{n}** — {reason}")
+          PY
+
+      - name: Commit
+        run: |
+          git config user.name  "nexizon-bot"
+          git config user.email "actions@github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "Degisiklik yok."
+          else
+            git commit -m "veri: haftalik huni taramasi $(date -u +%Y-%m-%d)"
+            git push
+          fi

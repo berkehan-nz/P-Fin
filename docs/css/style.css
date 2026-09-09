@@ -1,0 +1,371 @@
+/* Nexizon Yatirim Dashboard — tek stil dosyasi, cerceve yok.
+   Tasarim ilkesi: bilgi yogun ama sakin. Renk yalnizca anlam tasir;
+   dekoratif renk yok. Mobil oncelikli. */
+
+/* ---------------------------------------------------------------- tokenlar */
+:root {
+  color-scheme: dark;
+
+  --bg:        #0e1116;
+  --bg-2:      #151a21;
+  --bg-3:      #1c232c;
+  --bg-hover:  #222b36;
+  --line:      #2a333f;
+  --line-soft: #202832;
+
+  --text:      #e6edf3;
+  --text-2:    #9aa7b4;
+  --text-3:    #6b7885;
+
+  --green:     #3fb950;
+  --green-bg:  #122919;
+  --yellow:    #d9a441;
+  --yellow-bg: #2b2313;
+  --red:       #f0655b;
+  --red-bg:    #2d1618;
+  --gray:      #4a5561;
+  --gray-bg:   #1a1f26;
+
+  --accent:    #4b9fd6;
+  --accent-bg: #10222e;
+
+  --radius: 8px;
+  --radius-sm: 5px;
+  --gap: 12px;
+
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg:        #f7f8fa;
+  --bg-2:      #ffffff;
+  --bg-3:      #eef1f5;
+  --bg-hover:  #e6eaf0;
+  --line:      #d5dbe3;
+  --line-soft: #e4e8ee;
+
+  --text:      #16202b;
+  --text-2:    #55636f;
+  --text-3:    #7d8894;
+
+  --green:     #1a7f37;
+  --green-bg:  #e6f4ea;
+  --yellow:    #9a6700;
+  --yellow-bg: #fdf3d7;
+  --red:       #c0362c;
+  --red-bg:    #fbe9e7;
+  --gray:      #8c959f;
+  --gray-bg:   #eef1f5;
+
+  --accent:    #1c6fa8;
+  --accent-bg: #e3f0f9;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+button {
+  font: inherit;
+  cursor: pointer;
+  color: var(--text);
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 6px 11px;
+  transition: background .12s, border-color .12s;
+}
+button:hover { background: var(--bg-hover); border-color: var(--text-3); }
+button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+button.primary { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+button.ghost { background: transparent; }
+button[aria-pressed="true"] { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+select, input, textarea {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  max-width: 100%;
+}
+textarea { font-family: var(--mono); font-size: 12px; resize: vertical; }
+
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ------------------------------------------------------------------ duzen */
+header.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar-inner {
+  max-width: 1440px; margin: 0 auto;
+  display: flex; align-items: center; gap: var(--gap);
+  padding: 10px 16px;
+  flex-wrap: wrap;
+}
+.brand { font-weight: 650; letter-spacing: -.01em; white-space: nowrap; }
+.brand small { color: var(--text-3); font-weight: 400; margin-left: 6px; }
+
+nav.tabs { display: flex; gap: 4px; flex: 1; overflow-x: auto; scrollbar-width: none; }
+nav.tabs::-webkit-scrollbar { display: none; }
+nav.tabs a {
+  padding: 6px 12px; border-radius: var(--radius-sm);
+  color: var(--text-2); white-space: nowrap; font-weight: 500;
+}
+nav.tabs a:hover { background: var(--bg-3); text-decoration: none; color: var(--text); }
+nav.tabs a.active { background: var(--bg-3); color: var(--text); }
+
+main { max-width: 1440px; margin: 0 auto; padding: 16px; }
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -.01em; }
+h2 { font-size: 15px; margin: 24px 0 10px; letter-spacing: -.005em; }
+h3 { font-size: 13px; margin: 16px 0 8px; color: var(--text-2);
+     text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+.muted { color: var(--text-2); }
+.dim { color: var(--text-3); }
+.small { font-size: 12px; }
+.tiny { font-size: 11px; }
+
+/* ------------------------------------------------------------------ kutu */
+.card {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.grid { display: grid; gap: var(--gap); }
+.g-summary { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.g-cards   { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+.row { display: flex; gap: var(--gap); flex-wrap: wrap; align-items: center; }
+.spread { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+
+/* ------------------------------------------------------------- ozet kutu */
+.stat .label { font-size: 11px; color: var(--text-2); text-transform: uppercase;
+               letter-spacing: .05em; font-weight: 600; }
+.stat .value { font-size: 24px; font-weight: 600; margin-top: 4px;
+               font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.stat .sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+/* -------------------------------------------------------------- renkler */
+/* Renk korlugu icin: renge EK OLARAK ok isareti ve ince cubuk gosterilir. */
+.c-green  { color: var(--green); }
+.c-yellow { color: var(--yellow); }
+.c-red    { color: var(--red); }
+.c-gray   { color: var(--text-3); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; line-height: 1.6;
+  border: 1px solid transparent; white-space: nowrap;
+}
+.chip.green  { background: var(--green-bg);  color: var(--green);  border-color: color-mix(in srgb, var(--green) 35%, transparent); }
+.chip.yellow { background: var(--yellow-bg); color: var(--yellow); border-color: color-mix(in srgb, var(--yellow) 35%, transparent); }
+.chip.red    { background: var(--red-bg);    color: var(--red);    border-color: color-mix(in srgb, var(--red) 35%, transparent); }
+.chip.gray   { background: var(--gray-bg);   color: var(--text-3); border-color: var(--line); }
+.chip.accent { background: var(--accent-bg); color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+
+.arrow { font-size: 9px; opacity: .85; }
+
+.bar { height: 3px; border-radius: 2px; background: var(--line-soft);
+       overflow: hidden; min-width: 34px; }
+.bar > i { display: block; height: 100%; border-radius: 2px; }
+.bar.green  > i { background: var(--green); }
+.bar.yellow > i { background: var(--yellow); }
+.bar.red    > i { background: var(--red); }
+.bar.gray   > i { background: var(--gray); }
+
+/* -------------------------------------------------------------- tablolar */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line);
+              border-radius: var(--radius); background: var(--bg-2); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 7px 10px; text-align: right; white-space: nowrap;
+         border-bottom: 1px solid var(--line-soft); }
+th:first-child, td:first-child { text-align: left; position: sticky; left: 0;
+                                 background: var(--bg-2); z-index: 1; }
+thead th { position: sticky; top: 0; background: var(--bg-3); z-index: 2;
+           font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+           color: var(--text-2); font-weight: 600; cursor: pointer;
+           border-bottom: 1px solid var(--line); }
+thead th:first-child { z-index: 3; background: var(--bg-3); }
+tbody tr:hover td { background: var(--bg-hover); }
+tbody tr:hover td:first-child { background: var(--bg-hover); }
+tbody tr:last-child td { border-bottom: none; }
+
+/* --------------------------------------------------------- aday kartlari */
+.co-card {
+  background: var(--bg-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 13px;
+  display: flex; flex-direction: column; gap: 10px;
+  cursor: pointer; transition: border-color .12s, transform .12s;
+}
+.co-card:hover { border-color: var(--text-3); transform: translateY(-1px); }
+.co-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.co-ticker { font-size: 16px; font-weight: 650; letter-spacing: -.01em; }
+.co-name { font-size: 12px; color: var(--text-2); line-height: 1.35;
+           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+           overflow: hidden; }
+
+.score-ring { position: relative; width: 52px; height: 52px; flex-shrink: 0; }
+.score-ring svg { transform: rotate(-90deg); display: block; }
+.score-ring .n { position: absolute; inset: 0; display: grid; place-items: center;
+                 font-family: var(--mono); font-size: 15px; font-weight: 650; }
+
+.subscores { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.subscore .k { font-size: 9px; color: var(--text-3); text-transform: uppercase;
+               letter-spacing: .03em; margin-bottom: 3px; }
+
+.headline-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.hm { background: var(--bg-3); border-radius: var(--radius-sm); padding: 6px 8px; }
+.hm .k { font-size: 9px; color: var(--text-3); text-transform: uppercase;
+         letter-spacing: .03em; }
+.hm .v { font-family: var(--mono); font-size: 13px; font-weight: 600; margin-top: 2px; }
+
+.verdict { font-size: 12px; color: var(--text-2); line-height: 1.45;
+           border-left: 2px solid var(--accent); padding-left: 8px; }
+.verdict.stale { opacity: .5; border-left-color: var(--gray); }
+
+/* ------------------------------------------------------------ sirket detay */
+.detail-layout { display: grid; grid-template-columns: 190px 1fr; gap: 24px;
+                 align-items: start; }
+.toc { position: sticky; top: 62px; }
+.toc a { display: block; padding: 5px 9px; border-radius: var(--radius-sm);
+         color: var(--text-2); font-size: 12.5px; }
+.toc a:hover { background: var(--bg-3); color: var(--text); text-decoration: none; }
+.toc a.active { background: var(--bg-3); color: var(--accent); font-weight: 600; }
+
+.detail-head { display: flex; gap: 20px; flex-wrap: wrap; align-items: baseline; }
+.detail-head .price { font-size: 28px; font-weight: 650; font-family: var(--mono); }
+
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; font-size: 12.5px; }
+.kv dt { color: var(--text-2); }
+.kv dd { margin: 0; font-family: var(--mono); }
+
+section[id] { scroll-margin-top: 70px; }
+
+.help-btn {
+  display: inline-grid; place-items: center;
+  width: 15px; height: 15px; border-radius: 50%;
+  border: 1px solid var(--line); background: transparent;
+  color: var(--text-3); font-size: 10px; padding: 0; margin-left: 5px;
+  vertical-align: middle;
+}
+.help-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+.help-row td { background: var(--bg-3) !important; text-align: left;
+               white-space: normal; font-size: 12px; color: var(--text-2);
+               padding: 10px 14px; line-height: 1.55; }
+.help-row .formula { font-family: var(--mono); color: var(--text);
+                     background: var(--bg); padding: 2px 6px; border-radius: 3px;
+                     display: inline-block; margin-top: 5px; font-size: 11.5px; }
+
+.pctbar { display: inline-flex; align-items: center; gap: 5px; }
+.pctbar .track { width: 46px; height: 4px; background: var(--line-soft);
+                 border-radius: 2px; position: relative; }
+.pctbar .track i { position: absolute; top: -2px; width: 2px; height: 8px;
+                   background: var(--text); border-radius: 1px; }
+
+.thesis { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+.thesis ul { margin: 0; padding-left: 18px; }
+.thesis li { margin-bottom: 5px; line-height: 1.5; }
+
+.empty-story { color: var(--text-3); font-style: italic; font-size: 12.5px;
+               border: 1px dashed var(--line); border-radius: var(--radius);
+               padding: 14px; text-align: center; }
+
+/* ------------------------------------------------------------------ huni */
+.funnel-stage { display: flex; align-items: center; gap: var(--gap); margin-bottom: 8px; }
+.funnel-bar { height: 30px; border-radius: var(--radius-sm);
+              background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 45%, transparent));
+              display: flex; align-items: center; padding: 0 10px;
+              font-family: var(--mono); font-size: 12px; font-weight: 600;
+              color: #fff; min-width: 46px; transition: width .3s; }
+[data-theme="light"] .funnel-bar { color: #fff; }
+.funnel-label { width: 130px; flex-shrink: 0; font-size: 12.5px; }
+
+/* --------------------------------------------------------------- uyarilar */
+.warn { display: flex; gap: 9px; padding: 9px 11px; border-radius: var(--radius-sm);
+        border-left: 3px solid; font-size: 12.5px; line-height: 1.45;
+        margin-bottom: 6px; align-items: flex-start; }
+.warn.high   { background: var(--red-bg);    border-color: var(--red); }
+.warn.medium { background: var(--yellow-bg); border-color: var(--yellow); }
+.warn.low    { background: var(--bg-3);      border-color: var(--gray); }
+
+/* ------------------------------------------------------------------ modal */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  display: grid; place-items: center; z-index: 100; padding: 16px;
+}
+.modal { background: var(--bg-2); border: 1px solid var(--line);
+         border-radius: var(--radius); padding: 18px; width: min(560px, 100%);
+         max-height: 88vh; overflow-y: auto; }
+.modal h2 { margin-top: 0; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-grid label { display: flex; flex-direction: column; gap: 4px;
+                   font-size: 12px; color: var(--text-2); }
+.form-grid label.full { grid-column: 1 / -1; }
+
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+         background: var(--bg-3); border: 1px solid var(--accent);
+         color: var(--text); padding: 9px 16px; border-radius: var(--radius);
+         z-index: 200; font-size: 13px; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+
+/* ------------------------------------------------------------ bos durumlar */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-2); }
+.empty-state h2 { color: var(--text); margin-bottom: 8px; }
+.empty-state code { background: var(--bg-3); padding: 2px 6px; border-radius: 3px;
+                    font-family: var(--mono); font-size: 12px; color: var(--text); }
+.empty-state ol { text-align: left; max-width: 520px; margin: 16px auto;
+                  line-height: 1.9; }
+
+.banner { background: var(--yellow-bg); border: 1px solid var(--yellow);
+          color: var(--text); border-radius: var(--radius); padding: 11px 14px;
+          margin-bottom: var(--gap); font-size: 13px; line-height: 1.5; }
+
+/* ------------------------------------------------------------- duyarlilik */
+@media (max-width: 900px) {
+  .detail-layout { grid-template-columns: 1fr; }
+  .toc { position: static; display: flex; gap: 4px; overflow-x: auto;
+         padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .toc a { white-space: nowrap; }
+  .thesis { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  main { padding: 12px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .detail-head .price { font-size: 23px; }
+  .g-cards { grid-template-columns: 1fr; }
+  h1 { font-size: 18px; }
+}
+
+@media print {
+  header.topbar, .toc, button { display: none; }
+  .screen { display: block !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexizon Yatirim Dashboard</title>
+<meta name="description" content="Yatirim tarama, analiz ve portfoy takip panosu">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Nexizon <small>yatirim panosu</small></div>
+    <nav class="tabs" id="tabs">
+      <a href="#/overview">Genel bakis</a>
+      <a href="#/candidates">Adaylar</a>
+      <a href="#/portfolio">Portfoy</a>
+      <a href="#/funnel">Huni</a>
+    </nav>
+    <div class="row" style="gap:6px">
+      <span class="tiny dim" id="asOf"></span>
+      <button id="themeToggle" class="ghost" title="Tema degistir" aria-label="Tema degistir">◐</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="loadError"></div>
+
+  <!-- 1. GENEL BAKIS -->
+  <section class="screen" id="screen-overview">
+    <h1>Genel bakis</h1>
+    <p class="muted small" id="overviewSubtitle"></p>
+    <div class="grid g-summary" id="summaryBoxes"></div>
+    <h2>Makro</h2>
+    <div class="grid g-summary" id="macroStrip"></div>
+    <h2>Bugun ne olmus</h2>
+    <div id="todayStrip"></div>
+  </section>
+
+  <!-- 2. ADAYLAR -->
+  <section class="screen" id="screen-candidates">
+    <div class="spread">
+      <div>
+        <h1>Adaylar</h1>
+        <p class="muted small" id="candidateCount"></p>
+      </div>
+      <div class="row" style="gap:6px">
+        <button id="viewGrid" aria-pressed="true">Izgara</button>
+        <button id="viewTable" aria-pressed="false">Yogun tablo</button>
+        <button id="addCompany" class="primary">+ Sirket ekle</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin:12px 0">
+      <div class="row">
+        <label class="tiny dim">Sektor
+          <select id="fSector"><option value="">Hepsi</option></select></label>
+        <label class="tiny dim">Kol
+          <select id="fTrack">
+            <option value="">Hepsi</option>
+            <option value="A">Kol A (karli)</option>
+            <option value="B">Kol B (buyume)</option>
+            <option value="both">Her ikisi</option>
+          </select></label>
+        <label class="tiny dim">Kaynak
+          <select id="fSource">
+            <option value="">Hepsi</option>
+            <option value="seed">Tohum listesi</option>
+            <option value="funnel">Huni</option>
+            <option value="manual">Elle eklenen</option>
+          </select></label>
+        <label class="tiny dim">Karar
+          <select id="fDecision">
+            <option value="">Hepsi</option>
+            <option value="AL">AL</option>
+            <option value="BEKLE">BEKLE</option>
+            <option value="ELE">ELE</option>
+            <option value="__none__">Karar verilmemis</option>
+          </select></label>
+        <label class="tiny dim">Min puan
+          <input type="number" id="fMinScore" min="0" max="100" step="5"
+                 style="width:70px" placeholder="0"></label>
+        <label class="tiny dim">Sirala
+          <select id="fSort">
+            <option value="total">Puan</option>
+            <option value="value">Ucuzluk</option>
+            <option value="growth">Buyume</option>
+            <option value="momentum">Momentum</option>
+            <option value="updated">Guncellenme</option>
+            <option value="ticker">Sembol</option>
+          </select></label>
+        <label class="tiny dim row" style="gap:5px">
+          <input type="checkbox" id="fWatchOnly"> Sadece izleme listesi</label>
+        <label class="tiny dim row" style="gap:5px">
+          <input type="checkbox" id="fPortfolioOnly"> Sadece portfoy</label>
+        <button id="fReset" class="ghost tiny">Sifirla</button>
+      </div>
+    </div>
+
+    <div id="candidateGrid" class="grid g-cards"></div>
+    <div id="candidateTable" class="table-wrap" hidden></div>
+  </section>
+
+  <!-- 3. SIRKET DETAYI -->
+  <section class="screen" id="screen-company">
+    <div id="companyBody"></div>
+  </section>
+
+  <!-- 4. PORTFOY -->
+  <section class="screen" id="screen-portfolio">
+    <div class="spread">
+      <div><h1>Portfoy</h1><p class="muted small" id="portfolioSubtitle"></p></div>
+      <button id="addTrade" class="primary">+ Islem ekle</button>
+    </div>
+    <div class="grid g-summary" id="portfolioSummary" style="margin:12px 0"></div>
+    <div id="portfolioWarnings"></div>
+    <h2>Pozisyonlar</h2>
+    <div id="positionsTable" class="table-wrap"></div>
+    <h2>Sektor dagilimi</h2>
+    <div id="sectorMix" class="card"></div>
+  </section>
+
+  <!-- 5. HUNI -->
+  <section class="screen" id="screen-funnel">
+    <h1>Huni</h1>
+    <p class="muted small" id="funnelSubtitle"></p>
+    <h2>Asama asama daralma</h2>
+    <div class="card" id="funnelStages"></div>
+    <h2>En sik eleme sebepleri</h2>
+    <div id="killReasons" class="table-wrap"></div>
+    <h2>Esik simulasyonu</h2>
+    <p class="muted small">Yalnizca gorsel — kaydiricilar veriyi degistirmez,
+      esikleri degistirmenin kac sirketi etkileyecegini tahmin eder.
+      Kalici degisiklik icin <code>src/config.py</code> duzenlenmeli.</p>
+    <div class="card" id="thresholdSim"></div>
+  </section>
+</main>
+
+<div id="modalRoot"></div>
+<div id="toastRoot"></div>
+
+<script src="js/data.js"></script>
+<script src="js/format.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/views/overview.js"></script>
+<script src="js/views/candidates.js"></script>
+<script src="js/views/company.js"></script>
+<script src="js/views/portfolio.js"></script>
+<script src="js/views/funnel.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
