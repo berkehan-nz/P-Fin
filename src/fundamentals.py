@@ -24,7 +24,13 @@ FLOW_FIELDS = (
     "net_income", "pretax_income", "tax_expense", "interest_expense",
     "sga", "rnd", "dep_amort", "cfo", "capex", "cfi", "cff", "sbc",
     "stock_issued", "dividends_paid",
+    "shares_diluted", "shares_basic",
 )
+
+# Bunlar da SURE bazli etiketlerdir (donem boyunca agirlikli ortalama) ama
+# TOPLANMAZ — 12 aylik hisse sayisi diye 4 ceyregin toplamini vermek sacmadir.
+# TTM'de son ceyregin degeri alinir.
+AVERAGE_FIELDS = ("shares_diluted", "shares_basic")
 
 # Stok kalemleri — donem sonu degeri alinir
 STOCK_FIELDS = (
@@ -33,7 +39,6 @@ STOCK_FIELDS = (
     "short_term_debt", "operating_lease_current", "operating_lease_noncurrent",
     "goodwill", "intangibles", "retained_earnings", "receivables",
     "inventory", "ppe_net", "deferred_revenue", "debt_due_2y",
-    "shares_diluted", "shares_basic",
 )
 
 
@@ -209,7 +214,12 @@ class Fundamentals:
         if len(qs) >= need:
             window = qs[len(qs) - need: len(qs) - offset]
             vals = [num(getattr(p, field_name)) for p in window]
+            # DORT CEYREGIN HEPSI dolu olmali. Eksigi atlayip toplamak
+            # 2 ceyreklik rakami "12 aylik" diye sunar; buyume ve marj
+            # hesaplarini sessizce cope cevirir.
             if all(v is not None for v in vals):
+                if field_name in AVERAGE_FIELDS:
+                    return vals[-1]
                 return sum(vals)  # type: ignore[arg-type]
 
         # yillik yedek
@@ -226,23 +236,33 @@ class Fundamentals:
         qs = self.sorted_quarters()
         need = 4 + offset
 
+        annual_fallback = self.latest_annual(offset // 4)
+
         if len(qs) >= need:
             window = qs[len(qs) - need: len(qs) - offset]
             end_period = window[-1]
             p = Period(period_end=end_period.period_end, period_type="TTM",
                        fiscal_year=end_period.fiscal_year,
                        fiscal_period=end_period.fiscal_period)
+
             for f in FLOW_FIELDS:
                 vals = [num(getattr(q, f)) for q in window]
-                setattr(p, f, sum(v for v in vals if v is not None)
-                        if any(v is not None for v in vals) else None)
+                if all(v is not None for v in vals):
+                    setattr(p, f, vals[-1] if f in AVERAGE_FIELDS else sum(vals))
+                else:
+                    # KISMI TOPLAM YAZILMAZ. Bir ceyrek bile eksikse o kalem
+                    # icin yillik tabloya duselim; o da yoksa None kalsin.
+                    # Eksik ceyrekleri atlayip toplamak, 2 ceyreklik rakami
+                    # 12 aylik diye sunar ve tum buyume/marj hesabini bozar.
+                    setattr(p, f, num(getattr(annual_fallback, f, None))
+                            if annual_fallback is not None else None)
+
             for f in STOCK_FIELDS:
                 setattr(p, f, getattr(end_period, f))
             return p
 
-        ann = self.latest_annual(offset // 4)
-        if ann is not None:
-            return ann
+        if annual_fallback is not None:
+            return annual_fallback
         return Period(period_end="", period_type="TTM")
 
     # ------------------------------------------------------------- seriler

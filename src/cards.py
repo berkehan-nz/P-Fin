@@ -11,7 +11,8 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from . import config, metrics as metrics_mod, percentiles as pct_mod, scores as scores_mod, scoring
+from . import (config, metrics as metrics_mod, percentiles as pct_mod,
+               scores as scores_mod, scoring, validate)
 from .config import CARDS_DIR, INBOX_DIR, color_for, sector_for_sic
 from .fundamentals import Fundamentals
 from .sources import prices
@@ -228,10 +229,15 @@ def build(f: Fundamentals, *,
             "price": f.sources.get("price"),
             "news": "finnhub" if news else None,
             "analyst": (analyst or {}).get("source"),
+            "shares": f.sources.get("shares"),
             "period_end": meta.get("period_end"),
         },
         "generated_at": utc_now_iso(),
     }
+
+    # Yayimlamadan once makulluk denetimi: imkansiz degerler silinir,
+    # supheli olanlar isaretlenir. Sessiz yanlis sayi, gorunur boslugtan kotudur.
+    validate.check(card)
     return card
 
 
@@ -404,6 +410,7 @@ def summary_row(card: dict) -> dict:
         "why_cheap": (card.get("story") or {}).get("why_cheap_diagnosis", ""),
         "claude_verdict": verdict[:140],
         "story_age_days": card.get("story_age_days"),
+        "data_quality": (card.get("data_quality") or {}).get("status", "iyi"),
         "decision": (card.get("decision") or {}).get("action", ""),
         "warnings": (card.get("flags") or {}).get("warnings", []),
         "warning_count": len((card.get("flags") or {}).get("warnings", [])),

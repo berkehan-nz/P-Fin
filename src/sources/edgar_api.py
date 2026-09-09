@@ -17,6 +17,10 @@ from ..util import read_json, sec_get
 
 MILLION = 1e6
 
+# Kapak sayfasi hisse sayisi, seyreltilmis ortalamanin bu oraninin altindaysa
+# muhtemelen yalnizca tek hisse sinifini tasiyor demektir.
+SHARE_COUNT_SANITY_RATIO = 0.70
+
 TICKER_CACHE = config.CACHE_DIR / "company_tickers.json"
 FACTS_CACHE_DIR = config.CACHE_DIR / "companyfacts"
 FACTS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -29,10 +33,14 @@ FLOW_TAGS = {
         "RevenueFromContractWithCustomerExcludingAssessedTax",
         "RevenueFromContractWithCustomerIncludingAssessedTax",
         "Revenues", "SalesRevenueNet", "SalesRevenueServicesNet",
+        "RevenueFromContractWithCustomerExcludingAssessedTaxMember",
+        "RevenuesNetOfInterestExpense",
+        "TotalRevenuesAndOtherIncome",
     ],
     "cost_of_revenue": [
         "CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfServices",
-        "CostOfGoodsSold",
+        "CostOfGoodsSold", "CostOfSales",
+        "CostOfGoodsAndServicesSoldExcludingDepreciationDepletionAndAmortization",
     ],
     "gross_profit": ["GrossProfit"],
     "operating_income": ["OperatingIncomeLoss"],
@@ -101,8 +109,20 @@ STOCK_TAGS = {
     "deferred_revenue": [
         "ContractWithCustomerLiabilityCurrent", "DeferredRevenueCurrent",
     ],
-    "shares_diluted": ["WeightedAverageNumberOfDilutedSharesOutstanding"],
-    "shares_basic": ["WeightedAverageNumberOfSharesOutstandingBasic"],
+}
+
+# Agirlikli ortalama hisse sayilari SURE bazlidir (start+end tasir), anlik
+# degil. Stok olarak aranirsa hicbir zaman bulunmaz — seyrelme filtresi de
+# sessizce hic calismaz.
+SHARE_FLOW_TAGS = {
+    "shares_diluted": [
+        "WeightedAverageNumberOfDilutedSharesOutstanding",
+        "WeightedAverageNumberOfDilutedSharesOutstandingBasicAndDiluted",
+    ],
+    "shares_basic": [
+        "WeightedAverageNumberOfSharesOutstandingBasic",
+        "WeightedAverageNumberOfSharesOutstanding",
+    ],
 }
 
 # 2 yilda vadesi gelen borc (vade duvari testi)
@@ -110,10 +130,6 @@ MATURITY_TAGS = [
     "LongTermDebtMaturitiesRepaymentsOfPrincipalInNextTwelveMonths",
     "LongTermDebtMaturitiesRepaymentsOfPrincipalInYearTwo",
 ]
-
-# Hisse sayilari MILYON adet, para MILYON USD; boler
-SHARE_FIELDS = {"shares_diluted", "shares_basic"}
-
 
 # --------------------------------------------------------------------------
 # Ticker -> CIK
@@ -270,13 +286,35 @@ def _collect_stock(facts: dict, tags: list[str]) -> dict[str, float]:
     return out
 
 
-def _shares_outstanding(facts: dict) -> float | None:
-    """dei:EntityCommonStockSharesOutstanding — cok sinifli hisselerde TOPLA.
+def _shares_outstanding(facts: dict) -> tuple[float | None, str]:
+    """Tedavuldeki hisse sayisi (milyon) ve hangi yontemle bulundugu.
 
-    Ayni kapak sayfasinda (ayni ``accn``) her sinif ayri satirdir; onlari
-    toplariz. Farkli basvurulari toplamak cift sayim olur, o yuzden en son
-    basvuruyu aliriz.
+    CIFT KONTROL GEREKIYOR: cok sinifli sirketlerde (Class A/B) kapak sayfasi
+    her sinifi AYRI satirda, ``ClassOfStockAxis`` boyutuyla raporlar.
+    companyfacts boyutsuz degerleri tasidigi icin bu sirketlerde etiket ya
+    hic yok, ya da yalnizca TEK SINIF gorunuyor. Tek sinifi toplam sanmak
+    piyasa degerini kati kati kucuk gosterir (orn. MNTN: 16M yerine 60M+).
+
+    Bu yuzden bulunan deger, seyreltilmis agirlikli ortalama hisse sayisiyla
+    karsilastirilir; belirgin dusukse o kullanilir.
     """
+    cover = _cover_page_shares(facts)
+    diluted = _latest_diluted_shares(facts)
+
+    if cover is None:
+        if diluted is None:
+            return None, "yok"
+        return diluted, "seyreltilmis_agirlikli_ortalama"
+
+    if diluted is not None and cover < diluted * SHARE_COUNT_SANITY_RATIO:
+        # Kapak sayfasi seyreltilmisin belirgin altinda -> muhtemelen tek sinif
+        return diluted, "seyreltilmis_agirlikli_ortalama (kapak tek sinif gorunuyor)"
+
+    return cover, "kapak_sayfasi"
+
+
+def _cover_page_shares(facts: dict) -> float | None:
+    """dei:EntityCommonStockSharesOutstanding — ayni basvurudaki siniflari topla."""
     entries = _facts_for_tag(facts, "EntityCommonStockSharesOutstanding")
     if not entries:
         entries = _facts_for_tag(facts, "CommonStockSharesOutstanding")
@@ -296,17 +334,32 @@ def _shares_outstanding(facts: dict) -> float | None:
         key=lambda a: max((e.get("end", "") or "", e.get("filed", "") or "")
                           for e in by_accn[a]),
     )
-    group = by_accn[latest_accn]
-    # ayni sinif iki kez gecerse tekrarlamayalim
+    # Ayni kapak sayfasindaki farkli siniflar toplanir; ayni sinifin tekrari atlanir
     seen: set[tuple] = set()
     total = 0.0
-    for e in group:
+    for e in by_accn[latest_accn]:
         key = (e.get("end"), e.get("val"))
         if key in seen:
             continue
         seen.add(key)
         total += float(e["val"])
     return total / MILLION if total > 0 else None
+
+
+def _latest_diluted_shares(facts: dict) -> float | None:
+    """En guncel donemin seyreltilmis agirlikli ortalama hisse sayisi.
+
+    Tum siniflari kapsar, bu yuzden cok sinifli sirketlerde kapak sayfasindan
+    daha guvenilirdir.
+    """
+    for tag in SHARE_FLOW_TAGS["shares_diluted"] + SHARE_FLOW_TAGS["shares_basic"]:
+        entries = [e for e in _facts_for_tag(facts, tag)
+                   if e.get("val") and (_is_quarter(e) or _is_annual(e))]
+        if not entries:
+            continue
+        best = max(entries, key=lambda e: (e.get("end", ""), e.get("filed", "")))
+        return float(best["val"]) / MILLION
+    return None
 
 
 def _derive_q4(annual: dict[str, float], quarterly: dict[str, float],
@@ -368,13 +421,16 @@ def fundamentals_from_facts(facts: dict, ticker: str, *,
 
     fy_map = _fiscal_quarter_ends(facts)
 
-    # --- akis kalemleri ---
+    # --- akis kalemleri (hisse sayilari dahil: onlar da sure bazlidir) ---
     q_flows: dict[str, dict[str, float]] = {}
     a_flows: dict[str, dict[str, float]] = {}
-    for field, tags in FLOW_TAGS.items():
+    for field, tags in {**FLOW_TAGS, **SHARE_FLOW_TAGS}.items():
         annual = _collect_flow(facts, tags, annual=True)
         quarterly = _collect_flow(facts, tags, annual=False)
-        _derive_q4(annual, quarterly, fy_map)
+        # Hisse sayilari agirlikli ORTALAMADIR; Q4 = yil - (Q1+Q2+Q3) formulu
+        # onlar icin anlamsiz sonuc uretir.
+        if field not in SHARE_FLOW_TAGS:
+            _derive_q4(annual, quarterly, fy_map)
         q_flows[field] = quarterly
         a_flows[field] = annual
 
@@ -403,10 +459,8 @@ def fundamentals_from_facts(facts: dict, ticker: str, *,
         # stok kalemleri: bu donem sonuna en yakin bilanco
         for field, series in stocks.items():
             val = series.get(end)
-            if val is None:
-                continue
-            setattr(p, field, val / MILLION if field not in SHARE_FIELDS
-                    else val / MILLION)
+            if val is not None:
+                setattr(p, field, val / MILLION)
         if end in maturity:
             p.debt_due_2y = maturity[end] / MILLION
         try:
@@ -425,8 +479,9 @@ def fundamentals_from_facts(facts: dict, ticker: str, *,
     _backfill_balance_sheet(f.quarters, stocks, maturity)
     _backfill_balance_sheet(f.annuals, stocks, maturity)
 
-    f.shares_outstanding = _shares_outstanding(facts)
+    f.shares_outstanding, share_source = _shares_outstanding(facts)
     f.sources["fundamentals"] = "sec_companyfacts"
+    f.sources["shares"] = share_source
     return f
 
 

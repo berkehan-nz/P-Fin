@@ -158,6 +158,10 @@ window.ViewCandidates = (function () {
       portSet.has(String(r.ticker).toUpperCase()) ? '<span class="chip green">portfoy</span>' : '',
       Fmt.decisionBadge(r.decision),
       r.warning_count ? `<span class="chip yellow" title="${Fmt.esc((r.warnings || []).join(' | '))}">⚠ ${r.warning_count}</span>` : '',
+      r.data_quality === 'kotu'
+        ? '<span class="chip red" title="Veri kalitesi dusuk — sayilara guvenme, detaya bak">veri şüpheli</span>'
+        : r.data_quality === 'sinirli'
+        ? '<span class="chip gray" title="Bazi alanlar eksik veya dogrulanmali">veri sınırlı</span>' : '',
     ].filter(Boolean).join(' ');
 
     return `<article class="co-card" data-ticker="${Fmt.esc(r.ticker)}" tabindex="0">

@@ -12,7 +12,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from . import cards, config, pipeline, portfolio, watchlist
+from . import cards, config, pipeline, portfolio, validate, watchlist
 from .config import CARDS_DIR
 from .sources import analyst as analyst_src, finnhub_api, prices
 from .util import read_json, try_fetch
@@ -71,6 +71,8 @@ def main(argv: list[str] | None = None) -> int:
         if analyst:
             card["analyst"] = analyst
 
+        # Fiyat degisince carpanlar yeniden hesaplandi; denetimi tekrarla
+        validate.check(card)
         card["as_of"] = pipeline.today_iso()
         # merge_story() HER KOSUDA cagrilir — Claude'un yazdigi kartlara isler
         if cards.save(card):

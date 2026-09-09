@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import shutil
 
-from . import config, funnel, pipeline, watchlist
+from . import config, funnel, pipeline, validate, watchlist
 from .config import DATA_DIR, SEED_TICKERS, sector_for_sic
 from .fundamentals import build_annual_fundamentals
 from .metrics import track_for
@@ -352,6 +352,12 @@ def finalize(state: dict, *, ctx: dict | None = None,
                                  ctx=ctx, bench=bench or [])
         print(f"[tarama] {len(card_rows)} kart yazildi "
               f"({len(selected_tickers)} aday, {len(manual)} elle eklenen)")
+
+        written = [c for c in (pipeline.read_json(pipeline.CARDS_DIR / f"{t}.json")
+                               for t in sorted(wanted)) if isinstance(c, dict)]
+        summary = validate.summarize(written)
+        print(f"[tarama] Veri kalitesi: {summary['counts']}")
+        state["data_quality"] = summary
 
     pipeline.write_thresholds()
     pipeline.write_universe(rows, log)

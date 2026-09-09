@@ -223,7 +223,15 @@ def compute(f: Fundamentals, benchmark: list[tuple[str, float]] | None = None) -
     m["rule_of_40_gap"] = sub(m["rule_of_40_ebitda"], m["rule_of_40"])
 
     # --- Saglamlik ---
-    net_debt = sub(latest.financial_debt, latest.cash_and_investments)
+    # EV hesabi eksik borcu 0 sayiyor (borc etiketi olmayan sirketin borcu
+    # yoktur). net_debt de AYNI kurali izlemeli; aksi halde EV hesaplanip
+    # net borc bos kalir ve iki alan birbiriyle celisir.
+    cash_known = num(latest.cash_and_investments)
+    debt_known = num(latest.financial_debt)
+    if cash_known is None and debt_known is None:
+        net_debt = None
+    else:
+        net_debt = (debt_known or 0.0) - (cash_known or 0.0)
     m["net_debt"] = net_debt
     m["net_debt_to_ebitda"] = div(net_debt, ebitda) if (ebitda or 0) > 0 else (
         0.0 if (net_debt is not None and net_debt <= 0) else None)

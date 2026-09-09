@@ -107,8 +107,12 @@ window.ViewCompany = (function () {
         <p class="tiny dim" style="margin-top:6px">Puanin %${Math.round(s.weight_coverage * 100)}'i
         hesaplanabildi; eksik bilesenler agirlik havuzundan cikarildi.</p>` : ''}
 
+      ${dataQualityBlock()}
+
       ${warnings.length ? `<h3>Uyarilar</h3>${warnings.map((w) =>
-        `<div class="warn medium"><span>⚠</span><span>${Fmt.esc(w)}</span></div>`).join('')}` : ''}
+        `<div class="warn ${w.startsWith('VERI KALITESI') ? 'high' : 'medium'}">
+          <span>${w.startsWith('VERI KALITESI') ? '⛔' : '⚠'}</span>
+          <span>${Fmt.esc(w)}</span></div>`).join('')}` : ''}
 
       ${funnelStatus()}
 
@@ -119,6 +123,26 @@ window.ViewCompany = (function () {
         <a href="#/candidates"><button class="ghost">← Adaylar</button></a>
       </div>
     </section>`;
+  }
+
+  /* Veri kalitesi — sessizce yanlis sayi gostermektense acikca soyle. */
+  function dataQualityBlock() {
+    const dq = card.data_quality;
+    if (!dq || dq.status === 'iyi') return '';
+    const label = dq.status === 'kotu'
+      ? ['red', 'Bu kartin sayilarina guvenme']
+      : ['yellow', 'Bazi alanlar eksik'];
+    return `<h3>Veri kalitesi</h3>
+      <div class="warn ${dq.status === 'kotu' ? 'high' : 'medium'}">
+        <span>${dq.status === 'kotu' ? '⛔' : '⚠'}</span>
+        <span><b>${Fmt.esc(label[1])}.</b> ${dq.issue_count} sorun bulundu:
+          <ul style="margin:6px 0 0;padding-left:18px">
+            ${(dq.issues || []).map((i) =>
+              `<li>${Fmt.esc(i.message)}</li>`).join('')}
+          </ul>
+          <span class="tiny dim">Bu denetim kart yayimlanmadan once calisir;
+            imkansiz degerler silinir, supheli olanlar burada listelenir.</span>
+        </span></div>`;
   }
 
   function funnelStatus() {

@@ -13,7 +13,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from . import config, funnel, percentiles, pipeline
+from . import config, funnel, percentiles, pipeline, validate
 from .config import SEED_SOURCE_TAG, SEED_TICKERS
 
 
@@ -74,6 +74,18 @@ def main(argv: list[str] | None = None) -> int:
     for stage in sorted(would_fail, key=lambda s: (s is None, s)):
         label = "gecerdi" if stage is None else f"Asama {stage}"
         print(f"          {label}: {would_fail[stage]}")
+
+    # VERI KALITESI — sessiz yanlis sayi, gorunur bosluktan tehlikelidir
+    summary = validate.summarize(built)
+    print(f"\n[tohum] Veri kalitesi: {summary['counts']}")
+    if summary["top_issues"]:
+        print("[tohum] En sik sorunlar:")
+        for code, n in summary["top_issues"].items():
+            print(f"          {n:3}  {code}")
+    bad = [c["ticker"] for c in built
+           if (c.get("data_quality") or {}).get("status") == "kotu"]
+    if bad:
+        print(f"[tohum] Guvenilmeyen kartlar ({len(bad)}): {', '.join(bad)}")
     return 0
 
 

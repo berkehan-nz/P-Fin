@@ -164,3 +164,32 @@ class TestRobustness:
         f.annuals[-1].goodwill = 400     # 285 -> 400, %40 artis
         r = metrics.compute(f)
         assert r["flags"]["rev_growth_organic_suspect"] is True
+
+
+class TestNetDebtConsistency:
+    """EV ve net borc ayni kurali izlemeli.
+
+    MNTN'de gorulen: borc etiketi yokken EV hesaplandi (borc 0 sayildi) ama
+    net_debt None dondu; kartta EV dolu, net borc bos gorunuyordu.
+    """
+
+    def test_missing_debt_with_known_cash_is_treated_as_zero(self):
+        f = fixtures.lscc()
+        p = f.annuals[-1]
+        p.long_term_debt = None
+        p.short_term_debt = None
+        r = metrics.compute(f)
+        # nakit 130, borc yok -> net borc -130
+        assert r["metrics"]["net_debt"] == pytest.approx(-130.0)
+
+    def test_net_debt_matches_ev_minus_market_cap(self):
+        f = fixtures.dbx()
+        r = metrics.compute(f)
+        ev = r["meta"]["enterprise_value_musd"]
+        mcap = r["meta"]["market_cap_musd"]
+        assert r["metrics"]["net_debt"] == pytest.approx(ev - mcap, abs=0.01)
+
+    def test_no_balance_sheet_data_gives_none(self):
+        from src.fundamentals import Fundamentals
+        r = metrics.compute(Fundamentals(ticker="ZZZZ"))
+        assert r["metrics"]["net_debt"] is None
