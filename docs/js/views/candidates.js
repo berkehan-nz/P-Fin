@@ -102,9 +102,11 @@ window.ViewCandidates = (function () {
 
     out.sort(sorter(f.sort));
 
-    $('candidateCount').textContent =
+    $('candidateCount').innerHTML =
       `${out.length} / ${rows.length} sirket gosteriliyor` +
-      (rows.length ? '' : ' — veri hatti henuz calismadi');
+      (rows.length ? ' · <span class="dim">Karta tikla, tum metrikleri ve '
+        + 'her birinin ne anlama geldigini gor.</span>'
+        : ' — veri hatti henuz calismadi');
 
     if (mode === 'grid') renderGrid(out); else renderTable(out);
   }
@@ -130,6 +132,21 @@ window.ViewCandidates = (function () {
       el.addEventListener('click', () => { location.hash = `#/company/${el.dataset.ticker}`; }));
   }
 
+  /* Kart uzerinde yer az; tam cumle sigmaz. Kisa ama ANLAMLI bir ozet. */
+  function shortMeaning(key, v) {
+    if (!Fmt.isNum(v)) return 'veri yok';
+    const map = {
+      ev_ebit: (x) => `${Fmt.num(x, 1)} yilda kendini oder`,
+      ev_sales: (x) => `1$ satis icin ${Fmt.num(x, 1)}$`,
+      ev_gross_profit: (x) => `brut karin ${Fmt.num(x, 1)} kati`,
+      fcf_yield_ev: (x) => `yilda %${Fmt.num(x, 1)} nakit getiri`,
+      roic: (x) => `sermaye getirisi %${Fmt.num(x, 0)}`,
+      rev_growth_ttm: (x) => `satislar %${Fmt.num(x, 1)} ${x < 0 ? 'dustu' : 'artti'}`,
+      rule_of_40: (x) => `buyume+nakit = ${Fmt.num(x, 0)}`,
+    };
+    return map[key] ? map[key](v) : '';
+  }
+
   function cardHtml(r) {
     const s = r.scores || {};
     const stale = Fmt.isNum(r.story_age_days) && r.story_age_days > 30;
@@ -138,17 +155,29 @@ window.ViewCandidates = (function () {
          ${stale ? `<span class="tiny dim"> · ${r.story_age_days} gun once</span>` : ''}</div>`
       : `<div class="verdict stale">Claude notu yok</div>`;
 
-    const headline = Object.entries(r.headline || {}).map(([k, cell]) => `
-      <div class="hm"><div class="k">${Fmt.esc(Fmt.label(k))}</div>
+    const headline = Object.entries(r.headline || {}).map(([k, cell]) => {
+      const v = cell && cell.value;
+      return `
+      <div class="hm" title="${Fmt.esc(Fmt.plain(k))}${
+        Fmt.isNum(v) ? ' — ' + Fmt.sentence(k, v) : ''}">
+        <div class="k">${Fmt.esc(Fmt.label(k))}</div>
         <div class="v ${cell ? 'c-' + (cell.color || 'gray') : 'c-gray'}">
           <span class="arrow">${Fmt.arrow(k, cell && cell.color)}</span>
-          ${Fmt.esc(Fmt.metricValue(k, cell && cell.value))}</div></div>`).join('');
+          ${Fmt.esc(Fmt.metricValue(k, v))}</div>
+        <div class="tiny dim" style="margin-top:2px;line-height:1.25;white-space:normal">
+          ${Fmt.esc(shortMeaning(k, v))}</div></div>`; }).join('');
 
+    const subLabels = { value: 'Ucuzluk', quality: 'Kalite', safety: 'Saglamlik',
+                        momentum: 'Momentum', earnings_quality: 'Kazanc kalitesi' };
     const subs = ['value', 'quality', 'safety', 'momentum', 'earnings_quality']
-      .map((k) => `<div class="subscore"><div class="k">${
-        { value: 'Ucuz', quality: 'Kalite', safety: 'Saglam',
-          momentum: 'Mom', earnings_quality: 'Kazanc' }[k]}</div>
-        ${Charts.miniBar(s[k])}</div>`).join('');
+      .map((k) => {
+        const info = (App.thresholds.score_plain || {})[k] || [subLabels[k], ''];
+        const val = Fmt.isNum(s[k]) ? Math.round(s[k]) : null;
+        return `<div class="subscore"
+          title="${Fmt.esc(info[0])}: ${Fmt.esc(info[1])}${
+            val !== null ? ' — su an ' + val + '/100' : ''}">
+          <div class="k">${Fmt.esc(subLabels[k])}</div>
+          ${Charts.miniBar(s[k])}</div>`; }).join('');
 
     const badges = [
       Fmt.trackBadge(r.track),
@@ -172,7 +201,10 @@ window.ViewCandidates = (function () {
           <div class="tiny dim" style="margin-top:3px">${Fmt.esc(r.sector)} ·
             ${Fmt.money(r.market_cap_musd, { musd: true })}</div>
         </div>
-        ${Charts.scoreRing(s.total)}
+        <div style="text-align:center">
+          ${Charts.scoreRing(s.total)}
+          <div class="tiny dim" style="margin-top:2px">genel puan</div>
+        </div>
       </div>
       <div class="subscores">${subs}</div>
       <div class="headline-metrics">${headline}</div>

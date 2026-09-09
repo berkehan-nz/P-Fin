@@ -81,27 +81,40 @@ window.ViewCompany = (function () {
       </div>
 
       <div class="grid g-summary" style="margin:14px 0">
-        ${stat('Piyasa degeri', Fmt.money(card.market_cap_musd, { musd: true }))}
-        ${stat('Isletme degeri (EV)', Fmt.money(card.enterprise_value_musd, { musd: true }),
-               'Kiralama yukumlulukleri haric')}
+        ${stat('Piyasa degeri', Fmt.money(card.market_cap_musd, { musd: true }),
+               'Tum hisselerin toplam degeri')}
+        ${stat('Isletme degeri', Fmt.money(card.enterprise_value_musd, { musd: true }),
+               'Hisseler + borc - nakit. Sirketi tamamen almanin maliyeti')}
         ${stat('Net borc', Fmt.money(card.net_debt_musd, { musd: true }),
-               Fmt.isNum(card.net_debt_musd) && card.net_debt_musd < 0 ? 'net nakit' : '')}
-        ${stat('Sonraki kazanc', Fmt.date((card.calendar || {}).next_earnings))}
+               Fmt.isNum(card.net_debt_musd) && card.net_debt_musd < 0
+                 ? 'Negatif: borctan cok nakdi var' : 'Borc eksi nakit')}
+        ${stat('Sonraki bilanco', Fmt.date((card.calendar || {}).next_earnings),
+               'Kazanc aciklamasi tarihi')}
       </div>
 
       <h3>Puan dagilimi</h3>
-      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr))">
-        ${[['value', 'Ucuzluk', 25], ['quality', 'Kalite', 20], ['safety', 'Saglamlik', 15],
-           ['momentum', 'Momentum', 15], ['earnings_quality', 'Kazanc kalitesi', 10],
-           ['catalyst', 'Katalizor', 15]].map(([k, label, w]) => `
-          <div class="card" style="padding:9px">
-            <div class="tiny dim">${label} <span class="dim">·${w}</span></div>
-            <div class="num" style="font-size:17px;font-weight:600;margin:3px 0">
-              ${Fmt.isNum(s[k]) ? Math.round(s[k]) : '—'}</div>
+      <p class="small muted" style="margin:-2px 0 8px">Her puan 0-100 arasidir ve
+        <b>ayni sektordeki diger sirketlere gore</b> hesaplanir — 70 puan
+        "sektorun en iyi %30'unda" demektir, mutlak bir not degildir.
+        Yanindaki sayi o basligin genel puandaki agirligi.</p>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr))">
+        ${[['value', 25], ['quality', 20], ['safety', 15],
+           ['momentum', 15], ['earnings_quality', 10],
+           ['catalyst', 15]].map(([k, w]) => {
+          const info = (App.thresholds.score_plain || {})[k] || [k, ''];
+          return `
+          <div class="card" style="padding:10px">
+            <div class="tiny dim">${Fmt.esc(info[0])}
+              <span class="dim">· agirlik ${w}</span></div>
+            <div class="num" style="font-size:19px;font-weight:600;margin:3px 0">
+              ${Fmt.isNum(s[k]) ? Math.round(s[k]) : '—'}
+              <span class="tiny dim" style="font-weight:400">/100</span></div>
             ${Charts.miniBar(s[k])}
+            <div class="tiny dim" style="margin-top:6px;line-height:1.4;white-space:normal">
+              ${Fmt.esc(info[1])}</div>
             ${k === 'catalyst' && !Fmt.isNum(s[k])
-              ? '<div class="tiny dim" style="margin-top:4px">elle girilir</div>' : ''}
-          </div>`).join('')}
+              ? '<div class="tiny c-yellow" style="margin-top:4px">Henuz girilmedi</div>' : ''}
+          </div>`; }).join('')}
       </div>
       ${Fmt.isNum(s.weight_coverage) && s.weight_coverage < 1 ? `
         <p class="tiny dim" style="margin-top:6px">Puanin %${Math.round(s.weight_coverage * 100)}'i
@@ -206,32 +219,85 @@ window.ViewCompany = (function () {
   }
 
   /* ------------------------------------------------------- metrik tablo */
+  /* Her satir SAYI DEGIL, CUMLE gosterir. "1,00x" kimseye bir sey anlatmaz;
+     "Her 1 dolar karin 1,00 dolari nakde donuyor" anlatir. Sayi yine
+     durur ama yaninda ne demek oldugu yazar. */
   function metricsSection() {
     const blocks = (App.thresholds.metric_blocks) || {};
     const order = ['Degerleme', 'Buyume', 'Kalite', 'Saglamlik ve Tuzak'];
+    const blockIntro = {
+      'Degerleme': 'Sirket kac paraya satiliyor ve bu fiyat ucuz mu?',
+      'Buyume': 'Is buyuyor mu, ne kadar karli buyuyor?',
+      'Kalite': 'Isin kendisi iyi mi? Kar gercek mi, sermaye verimli mi kullaniliyor?',
+      'Saglamlik ve Tuzak': 'Bilanco dayanikli mi? Muhasebede oynama isareti var mi?',
+    };
     return `<section id="metrikler"><h2>Metrikler</h2>
+      <div class="card" style="margin-bottom:14px;background:var(--bg-3)">
+        <b class="small">Nasil okunur</b>
+        <ul class="small" style="margin:6px 0 0;padding-left:18px;line-height:1.7">
+          <li><span class="chip green">yesil</span> iyi ·
+              <span class="chip yellow">sari</span> sinirda ·
+              <span class="chip red">kirmizi</span> kotu ·
+              <span class="chip gray">gri</span> veri yok</li>
+          <li><b>Sektorde nerede:</b> ayni sektordeki diger sirketlere gore siralamasi.</li>
+          <li><b>Kendi gecmisine gore:</b> bu sirketin son 5 yildaki kendi
+              degerlerine gore bugun nerede durdugu. Sektorde ucuz ama kendi
+              gecmisine gore pahaliysa, sektorun tamami ucuzlamis demektir.</li>
+          <li>Renk esikleri <code>src/config.py</code> dosyasindan gelir, panoya gomulu degildir.</li>
+        </ul>
+      </div>
       ${order.filter((b) => blocks[b]).map((block) => `
         <h3>${Fmt.esc(block)}</h3>
+        <p class="small muted" style="margin:-4px 0 8px">${Fmt.esc(blockIntro[block] || '')}</p>
         <div class="table-wrap"><table>
-          <thead><tr><th>Metrik</th><th>Deger</th><th>Sektor %</th>
-            <th>Kendi 5y %</th></tr></thead>
+          <thead><tr>
+            <th style="min-width:190px">Metrik</th>
+            <th style="min-width:110px">Deger</th>
+            <th style="min-width:300px;text-align:left">Ne anlama geliyor</th>
+            <th style="min-width:170px;text-align:left">Sektorde nerede</th>
+            <th style="min-width:170px;text-align:left">Kendi gecmisine gore
+              <div class="tiny dim" style="font-weight:400;text-transform:none">
+                yalnizca degerleme carpanlari</div></th>
+          </tr></thead>
           <tbody>${blocks[block].map((key) => metricRow(key)).join('')}</tbody>
         </table></div>`).join('')}
-      <p class="tiny dim">* isaretli yuzdelikler sektorde yeterli sirket olmadigi
-        icin tum evrene gore hesaplandi.</p>
     </section>`;
   }
 
   function metricRow(key) {
     const cell = (card.metrics || {})[key] || {};
     const spec = Fmt.spec(key) || {};
+    const v = cell.value;
+    const color = cell.color || 'gray';
+
+    const meaning = Fmt.isNum(v)
+      ? Fmt.sentence(key, v)
+      : '<span class="dim">Bu sirket icin hesaplanamadi — SEC dosyasinda ilgili kalem bulunamadi.</span>';
+
+    const sektorNerede = Fmt.percentileSentence(key, cell.sector_pct, cell.pct_basis);
+    const own = Fmt.ownHistorySentence(key, cell.own_5y_pct);
+
     return `<tr data-metric="${Fmt.esc(key)}">
-      <td>${Fmt.esc(spec.label || key)}
-        <button class="help-btn" data-help="${Fmt.esc(key)}"
-                aria-label="${Fmt.esc(spec.label || key)} aciklamasi">?</button></td>
-      <td>${Fmt.cell(key, cell)}</td>
-      <td>${Fmt.percentileBar(cell.sector_pct, cell.pct_basis)}</td>
-      <td>${Fmt.percentileBar(cell.own_5y_pct, 'own')}</td>
+      <td>
+        <div><b>${Fmt.esc(spec.label || key)}</b>
+          <button class="help-btn" data-help="${Fmt.esc(key)}"
+                  aria-label="${Fmt.esc(spec.label || key)} formulu">?</button></div>
+        <div class="tiny dim" style="white-space:normal;max-width:230px;line-height:1.4">
+          ${Fmt.esc(spec.plain || '')}</div>
+      </td>
+      <td>${Fmt.cell(key, cell)}
+        ${Fmt.isNum(v) ? `<div class="tiny dim">${Fmt.esc(Fmt.colorMeaning(color))}</div>` : ''}</td>
+      <td style="text-align:left;white-space:normal;line-height:1.45">${meaning}</td>
+      <td style="text-align:left;white-space:normal">
+        ${sektorNerede ? `<span class="small">${Fmt.esc(sektorNerede)}</span>
+          ${Fmt.percentileBar(cell.sector_pct, cell.pct_basis)}`
+        : '<span class="tiny dim">karsilastirma icin yeterli sirket yok</span>'}</td>
+      <td style="text-align:left;white-space:normal">
+        ${own ? `<span class="small">${Fmt.esc(own)}</span>
+          ${Fmt.percentileBar(cell.own_5y_pct, 'own')}`
+        : Fmt.hasOwnHistory(key)
+        ? '<span class="tiny dim">yeterli gecmis fiyat/bilanco verisi yok</span>'
+        : '<span class="tiny dim">bu metrik icin hesaplanmiyor</span>'}</td>
     </tr>`;
   }
 
@@ -241,16 +307,27 @@ window.ViewCompany = (function () {
     const labels = s.quarters || [];
     const basis = s.basis === 'annual' ? 'yillik' : 'ceyreklik';
     return `<section id="grafikler"><h2>Son 12 ${basis} donem</h2>
+      <p class="small muted">Isin yonu buradan okunur: satis buyuyor mu, marj
+        korunuyor mu, uretilen nakit artiyor mu, hisse sayisi seyreliyor mu.
+        Bosluklar SEC dosyasinda o kalemin bulunamadigi ceyreklerdir.</p>
       <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
         <div class="card">${Charts.bars(s.revenue, labels,
-          { title: 'Hasilat (M$)', fmt: (v) => Fmt.money(v, { musd: true }) })}</div>
+          { title: 'Satislar (milyon $)', fmt: (v) => Fmt.money(v, { musd: true }) })}
+          <div class="tiny dim" style="margin-top:6px">Her cubuk bir ceyregin satisi.
+            Cubuklar yukseliyorsa is buyuyor.</div></div>
         <div class="card">${Charts.line(s.gross_margin, labels,
-          { title: 'Brut marj', fmt: (v) => Fmt.pct(v), color: 'var(--green)' })}</div>
+          { title: 'Brut marj (%)', fmt: (v) => Fmt.pct(v), color: 'var(--green)' })}
+          <div class="tiny dim" style="margin-top:6px">100 dolarlik satistan urun
+            maliyeti sonrasi kalan. Duserse rekabet baskisi var demektir.</div></div>
         <div class="card">${Charts.bars(s.fcf, labels,
-          { title: 'Serbest nakit akisi (M$)', fmt: (v) => Fmt.money(v, { musd: true }) })}</div>
+          { title: 'Serbest nakit akisi (milyon $)', fmt: (v) => Fmt.money(v, { musd: true }) })}
+          <div class="tiny dim" style="margin-top:6px">Isten gercekten arta kalan
+            nakit. Muhasebe karindan daha zor manipule edilir.</div></div>
         <div class="card">${Charts.line(s.share_count, labels,
-          { title: 'Seyreltilmis hisse sayisi (M)', fmt: (v) => Fmt.num(v, 1),
-            color: 'var(--yellow)' })}</div>
+          { title: 'Hisse sayisi (milyon adet)', fmt: (v) => Fmt.num(v, 1),
+            color: 'var(--yellow)' })}
+          <div class="tiny dim" style="margin-top:6px">Artiyorsa senin ortaklik
+            payin eriyor; azaliyorsa sirket kendi hissesini geri aliyor.</div></div>
       </div></section>`;
   }
 
@@ -277,6 +354,10 @@ window.ViewCompany = (function () {
         : implied > actual
         ? ['yellow', 'Fiyat, gerceklesen buyumenin biraz uzerini varsayiyor.']
         : ['green', 'Fiyat, sirketin mevcut buyumesini bile tam fiyatlamamis.'];
+    } else if (Fmt.isNum(implied) && implied <= 0 && Fmt.isNum(actual) && actual > 0) {
+      verdict = ['green', 'Fiyat, nakit akisinin AZALACAGINI varsayiyor — ama sirket '
+        + 'buyuyor. Piyasa bu sirketten hicbir sey beklemiyor demektir; '
+        + 'tezin dogruysa yeniden fiyatlanma potansiyeli en yuksek durum budur.'];
     } else if (Fmt.isNum(implied) && Fmt.isNum(actual) && actual <= 0) {
       verdict = implied <= 0
         ? ['green', 'Sirket kuculuyor ve fiyat da dususu varsayiyor — oran degil, '

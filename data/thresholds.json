@@ -68,6 +68,36 @@
     "projection_years": 10,
     "terminal_growth": 0.03
   },
+  "score_plain": {
+    "catalyst": [
+      "Katalizor",
+      "Yeniden fiyatlanmayi tetikleyecek somut bir olay var mi. Bu puani otomatik hesaplamiyoruz; Claude analiz yazarken elle giriyor."
+    ],
+    "earnings_quality": [
+      "Kazanc kalitesi",
+      "Raporlanan kar gercek mi: nakde donuyor mu, muhasebe oynamasi isareti var mi."
+    ],
+    "momentum": [
+      "Momentum",
+      "Hisse son 6-12 ayda nasil gitti ve piyasaya gore nerede duruyor."
+    ],
+    "quality": [
+      "Kalite",
+      "Isin kendisi ne kadar iyi: marjlar, sermaye getirisi, buyume ve karlilik dengesi."
+    ],
+    "safety": [
+      "Saglamlik",
+      "Bilanco ne kadar dayanikli: borc, faiz odeme gucu, kisa vadeli likidite, iflas riski."
+    ],
+    "total": [
+      "Genel puan",
+      "Bes basligin agirlikli ortalamasi. 0-100 arasi; yuksek olan daha cazip. Ayni sektordeki digerleriyle karsilastirilarak hesaplanir."
+    ],
+    "value": [
+      "Ucuzluk",
+      "Sirket, urettigi kar ve nakde gore ne kadar ucuz. Sektordeki digerlerine gore siralanir."
+    ]
+  },
   "score_weights": {
     "catalyst": 15,
     "earnings_quality": 10,
@@ -186,7 +216,10 @@
       "green_min": 2.6,
       "help": "Iflas riski skoru (imalat disi versiyon). Ozkaynak negatifse anlamsizdir; z_unreliable bayragina bak.",
       "label": "Altman Z''",
+      "plain": "Iflas riski skoru — yuksek olan guvenli",
+      "sentence": "Iflas riski skoru {v} (2,6 ustu guvenli, 1,1 alti tehlikeli)",
       "unit": "",
+      "unit_name": "puan",
       "yellow_min": 1.1
     },
     "beneish_m": {
@@ -195,7 +228,10 @@
       "green_max": -2.22,
       "help": "Kazanc manipulasyonu olasiligi. -1.78 ustu 'muhtemel manipulator'. Hizli buyuyen saglikli sirketlerde de yanlis alarm verebilir.",
       "label": "Beneish M",
+      "plain": "Muhasebe oynamasi olasiligi — dusuk olan iyi",
+      "sentence": "Manipulasyon skoru {v} (-1,78 ustu supheli sayilir)",
       "unit": "",
+      "unit_name": "puan",
       "yellow_max": -1.78
     },
     "cash_conversion": {
@@ -204,7 +240,10 @@
       "green_min": 1.0,
       "help": "Isletme nakit akisi / net kar. 1'in altinda surekli kalmasi karin kagit uzerinde kaldigini gosterir.",
       "label": "Nakit donusumu",
+      "plain": "Kagit uzerindeki karin ne kadari gercekten nakde donuyor",
+      "sentence": "Her 1 dolar karin {v} dolari nakde donuyor",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_min": 0.7
     },
     "current_ratio": {
@@ -213,7 +252,10 @@
       "green_min": 2.0,
       "help": "Donen varlik / kisa vadeli yukumluluk. Yazilimda ertelenmis gelir bu orani yapay olarak dusurur.",
       "label": "Cari oran",
+      "plain": "Donen varliklar, kisa vadeli borclarin kac kati",
+      "sentence": "Kisa vadeli borclarin {v} kati kadar donen varlik var",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_min": 1.2
     },
     "earnings_yield": {
@@ -222,7 +264,10 @@
       "green_min": 8,
       "help": "EBIT/EV. Greenblatt'in 'sihirli formul' getirisi. EV/EBIT'in tersi.",
       "label": "Kazanc verimi",
+      "plain": "Faaliyet karinin, sirketin toplam degerine orani",
+      "sentence": "Tamamini alsan faaliyet kari yilda %{v} getiri demek",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 5
     },
     "ev_ebit": {
@@ -231,7 +276,10 @@
       "green_max": 12,
       "help": "Isletme degerinin faiz ve vergi oncesi kara orani. Sermaye yapisindan bagimsiz F/K. Tuzak: tek seferlik kalemler EBIT'i sisirir, dususte ucuz gorunur.",
       "label": "EV/FVOK",
+      "plain": "Sirketin tamaminin degeri, yillik faaliyet karinin kac katina esit",
+      "sentence": "Sirketi bugun tamamen satin alsan, faaliyet kariyla {v} yilda kendini oderdi",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 18
     },
     "ev_ebitda": {
@@ -240,7 +288,10 @@
       "green_max": 9,
       "help": "Amortisman oncesi. Sermaye yogun sirketlerde yanilticidir; yatirim harcamasini gormezden gelir.",
       "label": "EV/FAVOK",
+      "plain": "Tamaminin degeri, amortisman oncesi karin kac kati",
+      "sentence": "Amortisman oncesi karla {v} yilda kendini oderdi",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 14
     },
     "ev_gross_profit": {
@@ -249,7 +300,10 @@
       "green_max": 8,
       "help": "Kar etmeyen ama yuksek brut marjli yazilim sirketleri icin en saglam deger olcusu. Brut kar manipulasyona en dayanikli kalem.",
       "label": "EV/Brut kar",
+      "plain": "Tamaminin degeri, yillik brut karin kac kati",
+      "sentence": "Brut karla {v} yilda kendini oderdi",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 15
     },
     "ev_sales": {
@@ -258,7 +312,10 @@
       "green_max": 4,
       "help": "En kaba olcu. Marj farklarini gormezden gelir; sadece ayni sektor icinde karsilastirilabilir.",
       "label": "EV/Hasilat",
+      "plain": "Tamaminin degeri, yillik satislarin kac kati",
+      "sentence": "Her 1 dolarlik yillik satis icin {v} dolar odiyorsun",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 7
     },
     "fcf_margin": {
@@ -267,7 +324,10 @@
       "green_min": 20,
       "help": "Her 100 dolar hasilattan kalan serbest nakit. Muhasebe karindan daha zor manipule edilir.",
       "label": "FCF marji",
+      "plain": "100 dolarlik satistan gercekten cebe giren nakit",
+      "sentence": "Her 100 dolarlik satistan {v} dolar serbest nakit kaliyor",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 10
     },
     "fcf_yield_ev": {
@@ -276,7 +336,10 @@
       "green_min": 6,
       "help": "Serbest nakit akisinin isletme degerine orani. Tahvil faizi ile dogrudan karsilastirilabilir. Tuzak: tek seferlik tahsilatlar.",
       "label": "FCF verimi (EV)",
+      "plain": "Urettigi serbest nakit, sirketin toplam degerinin yuzde kaci",
+      "sentence": "Sirketi tamamen alsan, yatirdigin paranin yilda %{v} kadari nakit olarak geri donerdi",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 3
     },
     "fcf_yield_mcap": {
@@ -285,7 +348,10 @@
       "green_min": 6,
       "help": "Hissedara dusen nakit verimi. Borclu sirketlerde EV versiyonundan yuksek cikar; ikisini birlikte oku.",
       "label": "FCF verimi (Piyasa degeri)",
+      "plain": "Serbest nakit, hisselerin toplam degerinin yuzde kaci",
+      "sentence": "Hisseye odedigin paranin yilda %{v} kadari nakit olarak uretiliyor",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 3
     },
     "gross_margin": {
@@ -294,7 +360,10 @@
       "green_min": 60,
       "help": "Fiyatlama gucunun en dogrudan gostergesi. Dusen brut marj rekabet baskisinin ilk isaretidir.",
       "label": "Brut marj",
+      "plain": "100 dolarlik satistan, urunun maliyeti dustukten sonra kalan",
+      "sentence": "Her 100 dolarlik satistan {v} dolar brut kar kaliyor",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 30
     },
     "gross_profitability": {
@@ -303,7 +372,10 @@
       "green_min": 0.33,
       "help": "Novy-Marx olcusu: brut kar / toplam varlik. Uzun vadede F/K'dan daha guclu bir getiri ongoruculugu var.",
       "label": "Brut karlilik",
+      "plain": "Brut karin toplam varliklara orani",
+      "sentence": "Her 1 dolarlik varlik {v} dolar brut kar uretiyor",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_min": 0.2
     },
     "implied_growth": {
@@ -312,7 +384,10 @@
       "green_max": 8,
       "help": "Bugunku fiyatin 10 yil boyunca varsaydigi FCF buyumesi. Sirketin gercek buyumesiyle karsilastir.",
       "label": "Ima edilen buyume",
+      "plain": "Bugunku fiyat, sirketin yilda ne kadar buyuyecegini varsayiyor",
+      "sentence": "Bu fiyat, nakit akisinin yilda %{v} buyumesini varsayiyor",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_max": 15
     },
     "implied_vs_actual_growth": {
@@ -321,7 +396,10 @@
       "green_max": 1.0,
       "help": "1'in altinda: piyasa sirketin mevcut buyumesini bile fiyatlamamis. 1.5 ustu: fiyat hatasiz gidise bagli.",
       "label": "Ima edilen / Gercek buyume",
+      "plain": "Fiyatin varsaydigi buyume, gerceklesenin kac kati",
+      "sentence": "Fiyat, gerceklesen buyumenin {v} katini varsayiyor",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 1.5
     },
     "interest_coverage": {
@@ -330,7 +408,10 @@
       "green_min": 8,
       "help": "EBIT / faiz gideri. 3'un altinda operasyonel bir aksama dogrudan temerrut riskine donusur.",
       "label": "Faiz karsilama",
+      "plain": "Faaliyet kari, faiz giderinin kac kati",
+      "sentence": "Faaliyet kari faiz giderinin {v} kati",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_min": 3
     },
     "maturity_wall_2y": {
@@ -339,7 +420,10 @@
       "green_max": 0.5,
       "help": "2 yilda vadesi gelen borc / nakit. 1'in ustu ve FCF negatifse yeniden finansman riski var.",
       "label": "Vade duvari (2y)",
+      "plain": "2 yilda odenecek borc, eldeki nakdin kac kati",
+      "sentence": "2 yilda vadesi gelen borc, nakdin {v} kati",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 1.0
     },
     "net_debt_to_ebitda": {
@@ -348,7 +432,10 @@
       "green_max": 0,
       "help": "Negatif = net nakit (yesil). 3'un ustu, faiz artislarinda kirilgan bilanco demek.",
       "label": "Net borc / FAVOK",
+      "plain": "Net borc, yillik FAVOK'un kac kati",
+      "sentence": "Net borc yillik FAVOK'un {v} kati",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 3
     },
     "operating_margin": {
@@ -357,7 +444,10 @@
       "green_min": 20,
       "help": "EBIT / hasilat. Olcek ekonomisinin calisip calismadigini gosterir.",
       "label": "Faaliyet marji",
+      "plain": "100 dolarlik satistan, tum faaliyet giderleri sonrasi kalan",
+      "sentence": "Her 100 dolarlik satistan {v} dolar faaliyet kari kaliyor",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 8
     },
     "pct_off_52w_high": {
@@ -366,7 +456,10 @@
       "green_max": 15,
       "help": "Zirveden ne kadar uzakta. Derin dususler hem firsat hem kirilma sinyali olabilir; hikayeye bak.",
       "label": "52 hafta zirveden uzaklik",
+      "plain": "Son 1 yilin en yuksek fiyatindan ne kadar asagida",
+      "sentence": "1 yilin zirvesinden %{v} asagida",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_max": 35
     },
     "pe": {
@@ -375,7 +468,10 @@
       "green_max": 15,
       "help": "Fiyat / net kar. Tek seferlik kalemlere en acik oran. one_off_earnings bayragi varsa bu sayiyi yok say.",
       "label": "F/K",
+      "plain": "Fiyat, hisse basina net karin kac kati",
+      "sentence": "Bugunku karla {v} yilda kendini oderdi",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 25
     },
     "peg": {
@@ -384,7 +480,10 @@
       "green_max": 1.0,
       "help": "F/K bolu buyume. Buyume tahmini yanlissa oran anlamsizdir.",
       "label": "PEG",
+      "plain": "Fiyat/kazanc oraninin buyume hizina bolunmusu",
+      "sentence": "Buyumeye gore fiyat carpani {v} (1 alti ucuz, 2 ustu pahali sayilir)",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 2.0
     },
     "piotroski_f": {
@@ -393,7 +492,10 @@
       "green_min": 7,
       "help": "9 maddelik temel saglik kontrol listesi. 4 ve alti zayif bilanco/nakit akisi demek.",
       "label": "Piotroski F",
+      "plain": "9 maddelik temel saglik kontrolunden kac tanesini geciyor",
+      "sentence": "9 saglik testinin {v} tanesini geciyor",
       "unit": "/9",
+      "unit_name": "puan",
       "yellow_min": 5
     },
     "rel_strength_12m": {
@@ -402,7 +504,10 @@
       "green_min": 0,
       "help": "Nasdaq 100'e gore 12 aylik fark.",
       "label": "12 ay goreli getiri",
+      "plain": "12 ayda Nasdaq 100'e gore fark",
+      "sentence": "12 ayda Nasdaq 100'den %{v} farkli",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": -20
     },
     "rel_strength_6m": {
@@ -411,7 +516,10 @@
       "green_min": 0,
       "help": "Nasdaq 100'e gore fark. Sert negatif deger 'deger tuzagi' riskinin en erken sinyalidir.",
       "label": "6 ay goreli getiri",
+      "plain": "6 ayda Nasdaq 100'e gore ne kadar iyi/kotu gitti",
+      "sentence": "6 ayda Nasdaq 100'den %{v} farkli",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": -15
     },
     "return_12m": {
@@ -420,7 +528,10 @@
       "green_min": 15,
       "help": "Mutlak 12 aylik fiyat getirisi.",
       "label": "12 aylik getiri",
+      "plain": "Son 12 ayda hisse ne kadar getirdi",
+      "sentence": "12 ayda %{v} getirdi",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 0
     },
     "return_6m": {
@@ -429,7 +540,10 @@
       "green_min": 10,
       "help": "Mutlak fiyat getirisi. Tek basina karar araci degil.",
       "label": "6 aylik getiri",
+      "plain": "Son 6 ayda hisse ne kadar getirdi",
+      "sentence": "6 ayda %{v} getirdi",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 0
     },
     "rev_cagr_3y": {
@@ -438,7 +552,10 @@
       "green_min": 15,
       "help": "3 yillik bilesik yillik buyume orani. Tek yillik siciramalari yumusatir.",
       "label": "Hasilat BYBO (3y)",
+      "plain": "Son 3 yilin ortalama yillik satis buyumesi",
+      "sentence": "3 yildir yilda ortalama %{v} buyuyor",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 5
     },
     "rev_growth_ttm": {
@@ -447,7 +564,10 @@
       "green_min": 15,
       "help": "Son 12 ayin bir onceki 12 aya gore buyumesi. Satin alma kaynakli buyume organik degildir; rev_growth_organic_suspect'e bak.",
       "label": "Hasilat buyumesi (TTM)",
+      "plain": "Son 12 ayin satislari, onceki 12 aya gore ne kadar degisti",
+      "sentence": "Satislar bir yilda %{v} degisti",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 5
     },
     "roic": {
@@ -456,7 +576,10 @@
       "green_min": 15,
       "help": "Yatirilan sermayenin getirisi. Sermaye maliyetinin (~%10) uzerinde olmali. Ozkaynak negatifse (b) yontemi kullanilir.",
       "label": "ROIC",
+      "plain": "Isletmeye yatirilan her 100 dolarin yilda kac dolar getirdigi",
+      "sentence": "Yatirilan sermaye yilda %{v} getiri uretiyor",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_min": 8
     },
     "rule_of_40": {
@@ -465,7 +588,10 @@
       "green_min": 40,
       "help": "Hasilat buyumesi % + FCF marji %. Yazilimda buyume/karlilik dengesinin standart olcusu.",
       "label": "40 Kurali",
+      "plain": "Buyume yuzdesi + nakit marji. Yazilimda saglik olcusu",
+      "sentence": "Buyume ve nakit karliligi toplami {v} (40 ustu saglikli)",
       "unit": "",
+      "unit_name": "puan",
       "yellow_min": 30
     },
     "rule_of_40_ebitda": {
@@ -474,7 +600,10 @@
       "green_min": 40,
       "help": "FCF yerine EBITDA marji ile. FCF versiyonu ile arasindaki fark buyuk olcude hisse bazli odemedir (SBC).",
       "label": "40 Kurali (FAVOK)",
+      "plain": "40 Kuralinin FAVOK marjiyla hesaplanan versiyonu",
+      "sentence": "FAVOK ile hesaplandiginda {v}",
       "unit": "",
+      "unit_name": "puan",
       "yellow_min": 30
     },
     "sbc_to_fcf": {
@@ -483,7 +612,10 @@
       "green_max": 0.3,
       "help": "1'in ustunde ise sirket urettigi tum nakiti calisanlara hisse olarak dagitiyor demektir.",
       "label": "SBC / FCF",
+      "plain": "Calisanlara verilen hisse, uretilen nakdin kac kati",
+      "sentence": "Uretilen her 1 dolar nakdin {v} dolari calisana hisse olarak gidiyor",
       "unit": "x",
+      "unit_name": "kat",
       "yellow_max": 1.0
     },
     "sbc_to_revenue": {
@@ -492,7 +624,10 @@
       "green_max": 8,
       "help": "Hisse bazli odemenin hasilata orani. Gercek bir maliyettir; FCF'te gorunmez ama hisse sayisini artirir.",
       "label": "SBC / Hasilat",
+      "plain": "Calisanlara hisse olarak verilenin satislara orani",
+      "sentence": "Satislarin %{v} kadari calisana hisse olarak veriliyor",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_max": 15
     },
     "share_count_change_1y": {
@@ -501,7 +636,10 @@
       "green_max": 0,
       "help": "Negatif = geri alim (iyi). Pozitif = seyrelme. SBC agir sirketlerde geri alimlar sadece seyrelmeyi dengeler.",
       "label": "Hisse sayisi degisimi",
+      "plain": "Hisse sayisi bir yilda ne kadar degisti — negatif iyi",
+      "sentence": "Hisse sayisi bir yilda %{v} degisti (negatif = geri alim, ortaklik payin artiyor)",
       "unit": "%",
+      "unit_name": "yuzde",
       "yellow_max": 3
     },
     "sloan_accruals": {
@@ -510,7 +648,10 @@
       "green_max": 0.0,
       "help": "Karin ne kadari nakde donmemis. Yuksek tahakkuk gelecek yil dusuk getiri ile iliskili.",
       "label": "Sloan tahakkuk",
+      "plain": "Karin ne kadarinin nakde donmedigi — dusuk olan iyi",
+      "sentence": "Karin nakde donmeyen kismi {v} (negatif olmasi iyi)",
       "unit": "",
+      "unit_name": "oran",
       "yellow_max": 0.1
     }
   },

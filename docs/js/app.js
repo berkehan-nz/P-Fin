@@ -11,6 +11,7 @@ window.App = (function () {
     '/candidates': { screen: 'candidates', view: () => ViewCandidates.render() },
     '/portfolio':  { screen: 'portfolio',  view: () => ViewPortfolio.render() },
     '/funnel':     { screen: 'funnel',     view: () => ViewFunnel.render() },
+    '/rehber':     { screen: 'rehber',     view: () => ViewGuide.render() },
   };
 
   const api = { thresholds: {} };

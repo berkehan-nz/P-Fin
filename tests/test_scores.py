@@ -115,3 +115,49 @@ class TestScoresIntegration:
         r = metrics.compute(f)
         s = scores.compute(f, r)
         assert s["metrics"]["piotroski_f"] is None
+
+
+class TestImpliedGrowthRatio:
+    """Ima edilen/gerceklesen orani yalnizca ikisi de pozitifken anlamlidir.
+
+    DOCU'da gorulen: fiyat %-1,0 buyume varsayiyordu, sirket %8,6 buyuyordu.
+    Oran -0,12 cikiyor ve "gerceklesenin -0,12 katini varsayiyor" gibi
+    yorumlanamaz bir cumleye donusuyordu.
+    """
+
+    def _res(self, implied, actual):
+        f = fixtures.dbx()
+        r = metrics.compute(f)
+        r["metrics"]["rev_cagr_3y"] = actual
+        r["meta"]["fcf_ttm_musd"] = 100.0
+        r["meta"]["enterprise_value_musd"] = 1000.0
+        s = scores.compute(f, r)
+        s["metrics"]["implied_growth"] = implied
+        # orani yeniden hesaplat
+        return scores.compute(f, r)
+
+    def test_negative_implied_growth_gives_no_ratio(self):
+        f = fixtures.dbx()
+        r = metrics.compute(f)
+        r["metrics"]["rev_cagr_3y"] = 8.6
+        # cok ucuz -> ima edilen buyume negatif
+        r["meta"]["fcf_ttm_musd"] = 500.0
+        r["meta"]["enterprise_value_musd"] = 3000.0
+        s = scores.compute(f, r)
+        if s["metrics"]["implied_growth"] is not None and s["metrics"]["implied_growth"] <= 0:
+            assert s["metrics"]["implied_vs_actual_growth"] is None
+
+    def test_both_positive_gives_ratio(self):
+        f = fixtures.lscc()
+        r = metrics.compute(f)
+        s = scores.compute(f, r)
+        if (s["metrics"]["implied_growth"] or 0) > 0 and (r["metrics"]["rev_cagr_3y"] or 0) > 0:
+            assert s["metrics"]["implied_vs_actual_growth"] is not None
+            assert s["metrics"]["implied_vs_actual_growth"] > 0
+
+    def test_negative_actual_growth_gives_no_ratio(self):
+        f = fixtures.dbx()      # hasilati daraliyor
+        r = metrics.compute(f)
+        s = scores.compute(f, r)
+        assert r["metrics"]["rev_cagr_3y"] < 0
+        assert s["metrics"]["implied_vs_actual_growth"] is None

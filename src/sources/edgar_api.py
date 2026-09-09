@@ -57,6 +57,9 @@ FLOW_TAGS = {
     "tax_expense": ["IncomeTaxExpenseBenefit"],
     "interest_expense": [
         "InterestExpense", "InterestExpenseNonoperating", "InterestExpenseDebt",
+        "InterestExpenseBorrowings", "InterestAndDebtExpense",
+        "InterestIncomeExpenseNet", "InterestExpenseRelatedParty",
+        "InterestExpenseOperating", "InterestPaidNet",
     ],
     "sga": [
         "SellingGeneralAndAdministrativeExpense",
@@ -235,6 +238,76 @@ def _is_quarter(entry: dict) -> bool:
 def _is_annual(entry: dict) -> bool:
     d = _duration_days(entry)
     return d is not None and 340 <= d <= 380
+
+
+# 10-Q'larda NAKIT AKIS TABLOSU yil basindan itibaren KUMULATIFTIR:
+# Q2 dosyasi 6 aylik, Q3 dosyasi 9 aylik rakam verir. Ceyreklik degeri
+# elde etmek icin ardisik kumulatif degerlerin FARKI alinmali.
+# Gelir tablosu kalemleri 10-Q'da hem 3 aylik hem yil basindan raporlanir,
+# o yuzden onlarda bu gerekmez.
+CUMULATIVE_FIELDS = {"cfo", "capex", "cfi", "cff", "sbc",
+                     "dividends_paid", "stock_issued", "dep_amort"}
+
+
+def _period_bucket(entry: dict) -> int | None:
+    """Kac ceyreklik bir donem: 1=3 ay, 2=6 ay, 3=9 ay, 4=12 ay."""
+    d = _duration_days(entry)
+    if d is None:
+        return None
+    if 80 <= d <= 100:
+        return 1
+    if 170 <= d <= 195:
+        return 2
+    if 260 <= d <= 285:
+        return 3
+    if 340 <= d <= 380:
+        return 4
+    return None
+
+
+def _collect_cumulative_quarterly(facts: dict, tags: list[str]) -> dict[str, float]:
+    """Kumulatif (yil basindan) rakamlardan ceyreklik degerleri turetir.
+
+    Ayni ``start`` tarihini paylasan kayitlar bir mali yilin kumulatif
+    serisidir: 3 ay, 6 ay, 9 ay, 12 ay. Ceyreklik deger ardisik ikisinin
+    farkidir. Q1 zaten 3 ayliktir, oldugu gibi kullanilir.
+
+    Bu olmadan nakit akisi ceyreklerinin dortte ucu kaybolur; FCF grafigi
+    bos kalir ve TTM sessizce son mali yila duser.
+    """
+    out: dict[str, float] = {}
+    for tag in tags:
+        entries = _facts_for_tag(facts, tag)
+        if not entries:
+            continue
+
+        # {baslangic: {bucket: (donem_sonu, deger)}}
+        by_start: dict[str, dict[int, tuple[str, float]]] = {}
+        for e in entries:
+            bucket = _period_bucket(e)
+            start = e.get("start")
+            if bucket is None or not start or e.get("val") is None:
+                continue
+            slot = by_start.setdefault(start, {})
+            prev = slot.get(bucket)
+            # Ayni donem birden fazla dosyada varsa en son dosyalanani al
+            if prev is None or (e.get("filed", ""), e.get("accn", "")) > prev[2:]:
+                slot[bucket] = (e["end"], float(e["val"]),
+                                e.get("filed", ""), e.get("accn", ""))  # type: ignore[assignment]
+
+        for _, slot in by_start.items():
+            for bucket in sorted(slot):
+                end, value = slot[bucket][0], slot[bucket][1]
+                if bucket == 1:
+                    out.setdefault(end, value)
+                    continue
+                prior = slot.get(bucket - 1)
+                if prior is not None:
+                    out.setdefault(end, value - prior[1])
+
+        if out:
+            break
+    return out
 
 
 def _pick_best(entries: list[dict]) -> dict | None:
@@ -431,6 +504,14 @@ def fundamentals_from_facts(facts: dict, ticker: str, *,
     for field, tags in {**FLOW_TAGS, **SHARE_FLOW_TAGS}.items():
         annual = _collect_flow(facts, tags, annual=True)
         quarterly = _collect_flow(facts, tags, annual=False)
+
+        if field in CUMULATIVE_FIELDS:
+            # Acikca 3 aylik raporlanan degerler oncelikli; eksik ceyrekler
+            # kumulatif serinin farkindan tamamlanir.
+            derived = _collect_cumulative_quarterly(facts, tags)
+            for end, val in derived.items():
+                quarterly.setdefault(end, val)
+
         # Hisse sayilari agirlikli ORTALAMADIR; Q4 = yil - (Q1+Q2+Q3) formulu
         # onlar icin anlamsiz sonuc uretir.
         if field not in SHARE_FLOW_TAGS:

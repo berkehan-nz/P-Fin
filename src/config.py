@@ -652,6 +652,7 @@ def thresholds_payload() -> dict:
     """``data/thresholds.json`` icerigi. Dashboard renkleri buradan okur."""
     return {
         "thresholds": THRESHOLDS,
+        "score_plain": SCORE_PLAIN,
         "metric_blocks": METRIC_BLOCKS,
         "headline_metrics": HEADLINE_METRICS,
         "score_weights": SCORE_WEIGHTS,
@@ -743,4 +744,128 @@ METRIC_PARAMS = {
     "require_positive_denominator": [
         "ev_ebit", "ev_ebitda", "ev_gross_profit", "pe", "peg",
     ],
+}
+
+
+# --------------------------------------------------------------------------
+# SADE TURKCE ACIKLAMALAR
+# --------------------------------------------------------------------------
+# Her metrik icin: gunluk dille ne oldugu, biriminin adi, ve degeri yerine
+# koyunca anlamli bir CUMLE veren sablon. Dashboard sayiyi tek basina
+# gostermez; yanina bu cumleyi yazar.
+#
+# Kural: finans jargonu bilmeyen biri de okuyup anlayabilmeli. "1,00x" bir
+# sey ifade etmez; "Her 1 dolar karin 1,00 dolari nakde donuyor" eder.
+METRIC_PLAIN = {
+    "ev_ebit": ("Sirketin tamaminin degeri, yillik faaliyet karinin kac katina esit",
+                "kat", "Sirketi bugun tamamen satin alsan, faaliyet kariyla {v} yilda kendini oderdi"),
+    "ev_ebitda": ("Tamaminin degeri, amortisman oncesi karin kac kati", "kat",
+                  "Amortisman oncesi karla {v} yilda kendini oderdi"),
+    "ev_gross_profit": ("Tamaminin degeri, yillik brut karin kac kati", "kat",
+                        "Brut karla {v} yilda kendini oderdi"),
+    "ev_sales": ("Tamaminin degeri, yillik satislarin kac kati", "kat",
+                 "Her 1 dolarlik yillik satis icin {v} dolar odiyorsun"),
+    "fcf_yield_ev": ("Urettigi serbest nakit, sirketin toplam degerinin yuzde kaci",
+                     "yuzde", "Sirketi tamamen alsan, yatirdigin paranin yilda %{v} kadari nakit olarak geri donerdi"),
+    "fcf_yield_mcap": ("Serbest nakit, hisselerin toplam degerinin yuzde kaci", "yuzde",
+                       "Hisseye odedigin paranin yilda %{v} kadari nakit olarak uretiliyor"),
+    "pe": ("Fiyat, hisse basina net karin kac kati", "kat",
+           "Bugunku karla {v} yilda kendini oderdi"),
+    "earnings_yield": ("Faaliyet karinin, sirketin toplam degerine orani", "yuzde",
+                       "Tamamini alsan faaliyet kari yilda %{v} getiri demek"),
+    "peg": ("Fiyat/kazanc oraninin buyume hizina bolunmusu", "kat",
+            "Buyumeye gore fiyat carpani {v} (1 alti ucuz, 2 ustu pahali sayilir)"),
+    "rev_growth_ttm": ("Son 12 ayin satislari, onceki 12 aya gore ne kadar degisti",
+                       "yuzde", "Satislar bir yilda %{v} degisti"),
+    "rev_cagr_3y": ("Son 3 yilin ortalama yillik satis buyumesi", "yuzde",
+                    "3 yildir yilda ortalama %{v} buyuyor"),
+    "gross_margin": ("100 dolarlik satistan, urunun maliyeti dustukten sonra kalan",
+                     "yuzde", "Her 100 dolarlik satistan {v} dolar brut kar kaliyor"),
+    "operating_margin": ("100 dolarlik satistan, tum faaliyet giderleri sonrasi kalan",
+                         "yuzde", "Her 100 dolarlik satistan {v} dolar faaliyet kari kaliyor"),
+    "fcf_margin": ("100 dolarlik satistan gercekten cebe giren nakit", "yuzde",
+                   "Her 100 dolarlik satistan {v} dolar serbest nakit kaliyor"),
+    "ebitda_margin": ("Amortisman oncesi kar marji", "yuzde",
+                      "Her 100 dolarlik satistan {v} dolar FAVOK kaliyor"),
+    "roic": ("Isletmeye yatirilan her 100 dolarin yilda kac dolar getirdigi", "yuzde",
+             "Yatirilan sermaye yilda %{v} getiri uretiyor"),
+    "gross_profitability": ("Brut karin toplam varliklara orani", "kat",
+                            "Her 1 dolarlik varlik {v} dolar brut kar uretiyor"),
+    "rule_of_40": ("Buyume yuzdesi + nakit marji. Yazilimda saglik olcusu",
+                   "puan", "Buyume ve nakit karliligi toplami {v} (40 ustu saglikli)"),
+    "rule_of_40_ebitda": ("40 Kuralinin FAVOK marjiyla hesaplanan versiyonu", "puan",
+                          "FAVOK ile hesaplandiginda {v}"),
+    "rule_of_40_gap": ("Iki 40 Kurali arasindaki fark — buyuk olcude hisse bazli odeme",
+                       "puan", "Iki hesap arasindaki {v} puanlik fark buyuk olcude calisana verilen hisse"),
+    "piotroski_f": ("9 maddelik temel saglik kontrolunden kac tanesini geciyor",
+                    "puan", "9 saglik testinin {v} tanesini geciyor"),
+    "altman_z": ("Iflas riski skoru — yuksek olan guvenli", "puan",
+                 "Iflas riski skoru {v} (2,6 ustu guvenli, 1,1 alti tehlikeli)"),
+    "beneish_m": ("Muhasebe oynamasi olasiligi — dusuk olan iyi", "puan",
+                  "Manipulasyon skoru {v} (-1,78 ustu supheli sayilir)"),
+    "sloan_accruals": ("Karin ne kadarinin nakde donmedigi — dusuk olan iyi", "oran",
+                       "Karin nakde donmeyen kismi {v} (negatif olmasi iyi)"),
+    "cash_conversion": ("Kagit uzerindeki karin ne kadari gercekten nakde donuyor",
+                        "kat", "Her 1 dolar karin {v} dolari nakde donuyor"),
+    "sbc_to_revenue": ("Calisanlara hisse olarak verilenin satislara orani", "yuzde",
+                       "Satislarin %{v} kadari calisana hisse olarak veriliyor"),
+    "sbc_to_fcf": ("Calisanlara verilen hisse, uretilen nakdin kac kati", "kat",
+                   "Uretilen her 1 dolar nakdin {v} dolari calisana hisse olarak gidiyor"),
+    "share_count_change_1y": ("Hisse sayisi bir yilda ne kadar degisti — negatif iyi",
+                              "yuzde", "Hisse sayisi bir yilda %{v} degisti (negatif = geri alim, ortaklik payin artiyor)"),
+    "net_debt_to_ebitda": ("Net borc, yillik FAVOK'un kac kati", "kat",
+                           "Net borc yillik FAVOK'un {v} kati"),
+    "interest_coverage": ("Faaliyet kari, faiz giderinin kac kati", "kat",
+                          "Faaliyet kari faiz giderinin {v} kati"),
+    "current_ratio": ("Donen varliklar, kisa vadeli borclarin kac kati", "kat",
+                      "Kisa vadeli borclarin {v} kati kadar donen varlik var"),
+    "maturity_wall_2y": ("2 yilda odenecek borc, eldeki nakdin kac kati", "kat",
+                         "2 yilda vadesi gelen borc, nakdin {v} kati"),
+    "lease_liabilities": ("Kiralama yukumlulukleri (EV hesabina DAHIL DEGIL)",
+                          "milyon dolar", "{v} milyon dolarlik kiralama yukumlulugu var"),
+    "net_debt": ("Finansal borc eksi nakit — negatif ise net nakit", "milyon dolar",
+                 "Net borc {v} milyon dolar (negatif = borctan cok nakdi var)"),
+    "implied_growth": ("Bugunku fiyat, sirketin yilda ne kadar buyuyecegini varsayiyor",
+                       "yuzde", "Bu fiyat, nakit akisinin yilda %{v} buyumesini varsayiyor"),
+    "implied_vs_actual_growth": ("Fiyatin varsaydigi buyume, gerceklesenin kac kati",
+                                 "kat", "Fiyat, gerceklesen buyumenin {v} katini varsayiyor"),
+    "return_6m": ("Son 6 ayda hisse ne kadar getirdi", "yuzde", "6 ayda %{v} getirdi"),
+    "return_12m": ("Son 12 ayda hisse ne kadar getirdi", "yuzde", "12 ayda %{v} getirdi"),
+    "rel_strength_6m": ("6 ayda Nasdaq 100'e gore ne kadar iyi/kotu gitti", "yuzde",
+                        "6 ayda Nasdaq 100'den %{v} farkli"),
+    "rel_strength_12m": ("12 ayda Nasdaq 100'e gore fark", "yuzde",
+                         "12 ayda Nasdaq 100'den %{v} farkli"),
+    "pct_off_52w_high": ("Son 1 yilin en yuksek fiyatindan ne kadar asagida", "yuzde",
+                         "1 yilin zirvesinden %{v} asagida"),
+    "gross_margin_change_3y": ("Brut marj 3 yilda kac puan degisti", "puan",
+                               "Brut marj 3 yilda {v} puan degisti"),
+    "operating_margin_change_3y": ("Faaliyet marji 3 yilda kac puan degisti", "puan",
+                                   "Faaliyet marji 3 yilda {v} puan degisti"),
+    "fcf_margin_change_3y": ("Nakit marji 3 yilda kac puan degisti", "puan",
+                             "Nakit marji 3 yilda {v} puan degisti"),
+}
+
+# Aciklamalari esik tanimlarina yedir
+for _key, (_plain, _unit, _sentence) in METRIC_PLAIN.items():
+    if _key in THRESHOLDS:
+        THRESHOLDS[_key]["plain"] = _plain
+        THRESHOLDS[_key]["unit_name"] = _unit
+        THRESHOLDS[_key]["sentence"] = _sentence
+
+# Puan bloklarinin sade aciklamalari
+SCORE_PLAIN = {
+    "total": ("Genel puan", "Bes basligin agirlikli ortalamasi. 0-100 arasi; "
+              "yuksek olan daha cazip. Ayni sektordeki digerleriyle karsilastirilarak hesaplanir."),
+    "value": ("Ucuzluk", "Sirket, urettigi kar ve nakde gore ne kadar ucuz. "
+              "Sektordeki digerlerine gore siralanir."),
+    "quality": ("Kalite", "Isin kendisi ne kadar iyi: marjlar, sermaye getirisi, "
+                "buyume ve karlilik dengesi."),
+    "safety": ("Saglamlik", "Bilanco ne kadar dayanikli: borc, faiz odeme gucu, "
+               "kisa vadeli likidite, iflas riski."),
+    "momentum": ("Momentum", "Hisse son 6-12 ayda nasil gitti ve piyasaya gore "
+                 "nerede duruyor."),
+    "earnings_quality": ("Kazanc kalitesi", "Raporlanan kar gercek mi: nakde donuyor mu, "
+                         "muhasebe oynamasi isareti var mi."),
+    "catalyst": ("Katalizor", "Yeniden fiyatlanmayi tetikleyecek somut bir olay var mi. "
+                 "Bu puani otomatik hesaplamiyoruz; Claude analiz yazarken elle giriyor."),
 }

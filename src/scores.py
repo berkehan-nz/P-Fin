@@ -322,7 +322,11 @@ def compute(f: Fundamentals, metrics: dict) -> dict:
 
     actual_growth = metrics.get("metrics", {}).get("rev_cagr_3y")
     implied_vs_actual = None
-    if ig is not None and actual_growth is not None and actual_growth > 0:
+    # Oran YALNIZCA ikisi de pozitifken anlamlidir. Fiyat dusus varsayiyorsa
+    # (ig <= 0) "gerceklesenin -0,12 katini varsayiyor" gibi yorumlanamaz bir
+    # sayi cikar; boyle bir durumda ima edilen buyumeyi MUTLAK okumak gerekir.
+    if (ig is not None and ig > 0
+            and actual_growth is not None and actual_growth > 0):
         implied_vs_actual = ig / actual_growth
 
     return {
