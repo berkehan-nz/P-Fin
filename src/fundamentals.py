@@ -27,12 +27,27 @@ FLOW_FIELDS = (
     "shares_diluted", "shares_basic",
 )
 
-# Nakit akis tablosu kalemleri BIRLIKTE ele alinmali. Biri ceyreklerden
-# toplanip digeri yillik tabloya duserse FCF = CFO - Yatirim harcamasi
-# farkli tabanlarin cikarmasi olur ve sessizce yanlis cikar.
-# SONO'da gorulen: ceyrek toplami 130,4 iken TTM 147,1 yaziyordu.
-CASHFLOW_FIELDS = ("cfo", "capex", "cfi", "cff", "sbc",
-                   "dividends_paid", "stock_issued", "dep_amort")
+# BIRBIRINE BAGLI kalemler: bir metrikte ARITMETIK olarak birlestirildikleri
+# icin ayni tabandan gelmeleri sart. FCF = CFO - Yatirim harcamasi; biri
+# ceyreklerden toplanip digeri yillik tabloya duserse sonuc iki farkli
+# donemin farki olur ve sessizce yanlis cikar (SONO: ceyrek toplami 130,4
+# iken TTM 147,1 yaziyordu).
+#
+# DIKKAT: bu kume DAR tutulmali. Basta tum nakit akis tablosunu (temettu,
+# hisse ihraci, amortisman...) bagladim; cogu sirket bunlarin bir kismini
+# ceyreklik raporlamadigi icin 36 kartin HEPSI yillik tabloya dustu ve
+# "mixed" oldu. Baglanti yalnizca gercekten birlikte hesaplanan kalemler
+# icin kurulmali.
+COUPLED_FIELD_GROUPS = (
+    ("cfo", "capex"),      # FCF
+)
+
+# Kartin BASLIK sayilarini besleyen kalemler. data_basis etiketi yalnizca
+# bunlara bakar: temettu ya da hisse ihraci gibi ikincil bir kalem yillik
+# tablodan geldi diye "karma veri" demek etiketi anlamsizlastirir, cunku
+# neredeyse her sirkette oyle olur.
+CORE_FLOW_FIELDS = ("revenue", "cost_of_revenue", "gross_profit",
+                    "operating_income", "net_income", "cfo", "capex")
 
 # Bunlar da SURE bazli etiketlerdir (donem boyunca agirlikli ortalama) ama
 # TOPLANMAZ — 12 aylik hisse sayisi diye 4 ceyregin toplamini vermek sacmadir.
@@ -258,21 +273,24 @@ class Fundamentals:
                        fiscal_year=end_period.fiscal_year,
                        fiscal_period=end_period.fiscal_period)
 
-            # Nakit akis grubu TEK PARCA karar verir: iceride yillik verisi
-            # olup ceyrekleri eksik olan bir kalem varsa grubun TAMAMI yillik
-            # tabloya duser. Aksi halde CFO ceyreklerden, yatirim harcamasi
-            # yillikdan gelir ve FCF iki farkli tabanin farki olur.
-            cashflow_mixed = False
-            for f in CASHFLOW_FIELDS:
-                vals = [num(getattr(q, f)) for q in window]
-                if any(v is None for v in vals) and annual_fallback is not None \
-                        and num(getattr(annual_fallback, f, None)) is not None:
-                    cashflow_mixed = True
-                    break
+            # Birbirine bagli kalemler TEK PARCA karar verir: gruptaki bir
+            # kalem ceyreklerden toplanamiyorsa grubun tamami yillik tabloya
+            # duser, boylece FCF gibi turetilmis degerler ayni donemi anlatir.
+            forced_annual: set = set()
+            for group in COUPLED_FIELD_GROUPS:
+                incomplete = False
+                for f in group:
+                    vals = [num(getattr(q, f)) for q in window]
+                    if any(v is None for v in vals) and annual_fallback is not None \
+                            and num(getattr(annual_fallback, f, None)) is not None:
+                        incomplete = True
+                        break
+                if incomplete:
+                    forced_annual.update(group)
 
             fell_back = []
             for f in FLOW_FIELDS:
-                use_annual = cashflow_mixed and f in CASHFLOW_FIELDS
+                use_annual = f in forced_annual
                 vals = [num(getattr(q, f)) for q in window]
                 if not use_annual and all(v is not None for v in vals):
                     setattr(p, f, vals[-1] if f in AVERAGE_FIELDS else sum(vals))

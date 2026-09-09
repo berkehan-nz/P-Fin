@@ -262,9 +262,10 @@ def compute(f: Fundamentals, benchmark: list[tuple[str, float]] | None = None) -
         "effective_tax_rate": cur.effective_tax_rate,
         "period_end": cur.period_end,
         # DURUST OLSUN: "ceyreklik TTM" derken bazi kalemler yillik tablodan
-        # gelmis olabilir. Hangileri oldugunu da tasi.
+        # gelmis olabilir. Etiket yalnizca CEKIRDEK kalemlere bakar; ikincil
+        # bir kalemin dusmesi etiketi degistirmez ama listede gorunur.
         "data_basis": ("annual" if not f.has_quarterly(4)
-                       else "mixed" if getattr(cur, "annual_fallback_fields", ())
+                       else "mixed" if _core_fell_back(cur)
                        else "quarterly_ttm"),
         "annual_fallback_fields": list(getattr(cur, "annual_fallback_fields", ())),
     }
@@ -277,6 +278,13 @@ def compute(f: Fundamentals, benchmark: list[tuple[str, float]] | None = None) -
 # --------------------------------------------------------------------------
 # Anomali tespitleri
 # --------------------------------------------------------------------------
+def _core_fell_back(period: Period) -> bool:
+    """Kartin baslik sayilarini besleyen bir kalem yillik tabloya dustu mu?"""
+    from .fundamentals import CORE_FLOW_FIELDS
+    fell = set(getattr(period, "annual_fallback_fields", ()))
+    return bool(fell & set(CORE_FLOW_FIELDS))
+
+
 def _one_off_earnings(p: Period) -> bool:
     """Tek seferlik kalem suphesi (LYFT tipi: F/K 2 ama is degismedi).
 

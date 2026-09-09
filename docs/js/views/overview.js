@@ -34,11 +34,52 @@ window.ViewOverview = (function () {
           warnCount ? 'c-yellow' : 'c-green'),
     ].join('');
 
-    $('overviewSubtitle').textContent =
-      `Son guncelleme ${Fmt.date(cand.as_of || port.as_of)} · veri kaynagi: SEC EDGAR, Stooq, Finnhub, FRED`;
+    renderFreshness(cand, port);
 
     renderMacro(macro);
     renderToday(ov, port);
+  }
+
+  /* VERI TAZELIGI — otomasyon sessizce durursa kimse fark etmesin diye.
+     GitHub'in zamanlanmis is akislari en iyi cabayla calisir; yogunlukta
+     atlanabilir. Panonun bunu SOYLEMESI gerekir, cunku bayat veriyle
+     karar vermek yanlis veriyle karar vermek kadar kotudur. */
+  function renderFreshness(cand, port) {
+    const stamp = cand.as_of || port.as_of;
+    const days = daysSince(stamp);
+    const el = $('overviewSubtitle');
+
+    let state = 'taze';
+    if (days === null) state = 'bilinmiyor';
+    else if (days > 7) state = 'cok_bayat';
+    else if (days > 2) state = 'bayat';
+
+    const text = {
+      taze: `Veri guncel (${Fmt.date(stamp)})`,
+      bayat: `Veri ${days} gundur guncellenmedi (${Fmt.date(stamp)})`,
+      cok_bayat: `Veri ${days} GUNDUR guncellenmedi (${Fmt.date(stamp)})`,
+      bilinmiyor: 'Veri tarihi okunamadi',
+    }[state];
+
+    el.innerHTML = `${Fmt.esc(text)} · <span class="dim">kaynak: SEC EDGAR,
+      Stooq, Finnhub, FRED</span>`;
+
+    const banner = $('freshnessBanner');
+    if (state === 'taze') { banner.innerHTML = ''; return; }
+    banner.innerHTML = `<div class="banner">
+      <b>Veri bayat olabilir.</b> ${Fmt.esc(text)}.
+      Otomatik guncelleme calismiyorsa GitHub &rarr; Actions sekmesinden
+      <b>Scan</b> ve <b>Daily</b> is akislarinin son kosularina bak;
+      zamanlanmis kosular GitHub'da yogunlukta atlanabiliyor.
+      Elle calistirmak icin: Actions &rarr; ilgili is akisi &rarr; Run workflow.
+    </div>`;
+  }
+
+  function daysSince(iso) {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (isNaN(d)) return null;
+    return Math.floor((Date.now() - d.getTime()) / 86400000);
   }
 
   function box(label, value, sub, cls) {

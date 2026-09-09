@@ -156,7 +156,10 @@ def build(f: Fundamentals, *,
     if meta.get("data_basis") == "annual":
         warnings.append("Ceyreklik veri yetersiz; metrikler yillik tablodan hesaplandi.")
     elif meta.get("data_basis") == "mixed":
-        fields = ", ".join(meta.get("annual_fallback_fields", [])[:6])
+        from .fundamentals import CORE_FLOW_FIELDS
+        core = [f for f in meta.get("annual_fallback_fields", [])
+                if f in CORE_FLOW_FIELDS]
+        fields = ", ".join(core[:6])
         warnings.append(
             f"Bazi kalemler ceyreklerden degil YILLIK tablodan geldi ({fields}). "
             f"Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle "
@@ -263,15 +266,30 @@ def _build_series(f: Fundamentals, n: int = 12) -> dict:
             "share_count": [num(a.shares_diluted) for a in annuals],
             "basis": "annual",
         }
+    # Sirket yatirim harcamasini HIC raporlamiyorsa FCF = CFO dogrudur.
+    # Ama BAZI ceyreklerde raporlayip bazilarinda raporlamiyorsa, eksik
+    # ceyrekte cfo'yu FCF diye gostermek grafigi sisirir ve TTM'den koparir.
+    reports_capex = any(num(q.capex) is not None for q in quarters)
     return {
         "quarters": [f"{q.fiscal_year}-{q.period_end[5:7]}" for q in quarters],
         "period_ends": [q.period_end for q in quarters],
         "revenue": [num(q.revenue) for q in quarters],
         "gross_margin": [_gm(q) for q in quarters],
-        "fcf": [q.fcf for q in quarters],
+        "fcf": [_quarter_fcf(q, reports_capex) for q in quarters],
         "share_count": [num(q.shares_diluted) for q in quarters],
         "basis": "quarterly",
     }
+
+
+def _quarter_fcf(period, reports_capex: bool):
+    """Ceyreklik serbest nakit akisi; eksik yatirim harcamasini 0 sayma."""
+    cfo = num(period.cfo)
+    if cfo is None:
+        return None
+    capex = num(period.capex)
+    if capex is None:
+        return cfo if not reports_capex else None
+    return cfo - capex
 
 
 def _gm(p) -> float | None:

@@ -249,3 +249,74 @@ class TestCashFlowGroupCoherence:
                                 revenue=4000, cfo=999))
         p = f.ttm_period()
         assert p.cfo == 460          # yillik 999'a DUSMEMELI
+
+
+class TestCouplingIsNarrow:
+    """Baglanti kumesi DAR olmali.
+
+    Ilk denemede tum nakit akis tablosunu (temettu, hisse ihraci,
+    amortisman...) birbirine bagladim. Cogu sirket bunlarin bir kismini
+    ceyreklik raporlamadigi icin 36 kartin HEPSI yillik tabloya dustu ve
+    "mixed" oldu — ceyreklik veri varken bile kullanilmadi.
+    """
+
+    def _f(self, **quarter_overrides):
+        from src.fundamentals import Fundamentals, Period
+        f = Fundamentals(ticker="C")
+        for i in range(4):
+            p = Period(period_end=f"2025-{(i + 1) * 3:02d}-30", period_type="Q",
+                       revenue=1000, cfo=100, capex=10, net_income=50)
+            for k, vals in quarter_overrides.items():
+                setattr(p, k, vals[i])
+            f.quarters.append(p)
+        f.annuals.append(Period(period_end="2025-12-31", period_type="FY",
+                                revenue=4000, cfo=999, capex=99, net_income=200,
+                                dividends_paid=40, sbc=80, cfi=-50))
+        return f
+
+    def test_missing_dividends_does_not_drag_down_cfo(self):
+        """Temettu ceyreklik yoksa CFO yine ceyreklerden gelmeli."""
+        p = self._f().ttm_period()
+        assert p.cfo == 400          # yillik 999'a DUSMEMELI
+        assert p.capex == 40
+
+    def test_missing_capex_still_couples_cfo(self):
+        """Ama FCF ciftinde eksik varsa ikisi birlikte duser."""
+        p = self._f(capex=[10, 10, 10, None]).ttm_period()
+        assert p.cfo == 999
+        assert p.capex == 99
+
+    def test_data_basis_not_mixed_when_only_uncoupled_missing(self):
+        from src import metrics
+        f = self._f()
+        r = metrics.compute(f)
+        assert r["meta"]["data_basis"] == "quarterly_ttm"
+
+
+class TestQuarterlyFcfSeries:
+    """Ceyreklik FCF serisi TTM ile ayni sayiyi anlatmali."""
+
+    def _f(self, capex_vals):
+        from src.fundamentals import Fundamentals, Period
+        f = Fundamentals(ticker="S")
+        for i in range(4):
+            f.quarters.append(Period(
+                period_end=f"2025-{(i + 1) * 3:02d}-30", period_type="Q",
+                revenue=1000, cfo=100, capex=capex_vals[i]))
+        return f
+
+    def test_missing_capex_gives_none_not_inflated_fcf(self):
+        from src import cards
+        s = cards._build_series(self._f([10, 10, 10, None]))
+        assert s["fcf"] == [90, 90, 90, None]      # son ceyrek 100 OLMAMALI
+
+    def test_company_without_capex_uses_cfo(self):
+        from src import cards
+        s = cards._build_series(self._f([None, None, None, None]))
+        assert s["fcf"] == [100, 100, 100, 100]
+
+    def test_series_sum_matches_ttm_when_complete(self):
+        from src import cards
+        f = self._f([10, 12, 11, 13])
+        s = cards._build_series(f)
+        assert sum(s["fcf"]) == f.ttm_period().fcf
