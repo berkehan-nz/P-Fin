@@ -1,0 +1,536 @@
+{
+  "as_of": "2026-09-09",
+  "headline_metrics": {
+    "A": [
+      "ev_ebit",
+      "fcf_yield_ev",
+      "roic"
+    ],
+    "B": [
+      "ev_sales",
+      "rev_growth_ttm",
+      "rule_of_40"
+    ]
+  },
+  "metric_blocks": {
+    "Buyume": [
+      "rev_growth_ttm",
+      "rev_cagr_3y",
+      "gross_margin",
+      "operating_margin",
+      "fcf_margin",
+      "rule_of_40",
+      "rule_of_40_ebitda"
+    ],
+    "Degerleme": [
+      "ev_ebit",
+      "ev_ebitda",
+      "ev_gross_profit",
+      "ev_sales",
+      "fcf_yield_ev",
+      "fcf_yield_mcap",
+      "pe",
+      "earnings_yield",
+      "peg",
+      "implied_growth",
+      "implied_vs_actual_growth"
+    ],
+    "Kalite": [
+      "roic",
+      "gross_profitability",
+      "cash_conversion",
+      "sbc_to_revenue",
+      "sbc_to_fcf",
+      "share_count_change_1y",
+      "piotroski_f"
+    ],
+    "Saglamlik ve Tuzak": [
+      "net_debt_to_ebitda",
+      "interest_coverage",
+      "current_ratio",
+      "maturity_wall_2y",
+      "altman_z",
+      "beneish_m",
+      "sloan_accruals"
+    ]
+  },
+  "portfolio": {
+    "default_broker": "Midas",
+    "earnings_warning_days": 7,
+    "max_position_weight_pct": 15.0,
+    "review_overdue_grace_days": 0,
+    "tax_year_warning_days": 30
+  },
+  "reverse_dcf": {
+    "discount_rate": 0.1,
+    "growth_search_max": 1.5,
+    "growth_search_min": -0.5,
+    "projection_years": 10,
+    "terminal_growth": 0.03
+  },
+  "score_weights": {
+    "catalyst": 15,
+    "earnings_quality": 10,
+    "momentum": 15,
+    "quality": 20,
+    "safety": 15,
+    "value": 25
+  },
+  "seed": {
+    "both_tracks": [
+      "MNTN",
+      "RELY",
+      "YOU"
+    ],
+    "criteria": {
+      "common": {
+        "avg_volume_min_shares": 500000,
+        "country": "USA",
+        "market_cap_musd_max": 50000.0,
+        "market_cap_musd_min": 300.0,
+        "price_min_usd": 5.0
+      },
+      "track_a": {
+        "debt_to_equity_max": 1.0,
+        "gross_margin_min_pct": 30.0,
+        "p_fcf_max": 25.0,
+        "rev_growth_qoq_min_pct": 5.0,
+        "roi_min_pct": 10.0
+      },
+      "track_b": {
+        "gross_margin_min_pct": 50.0,
+        "p_sales_max": 6.0,
+        "rev_growth_qoq_min_pct": 20.0
+      }
+    },
+    "date": "2026-09-09",
+    "track_a": [
+      "ADEA",
+      "CRUS",
+      "DOCU",
+      "DUOL",
+      "EXLS",
+      "FFIV",
+      "FRSH",
+      "G",
+      "INOD",
+      "LYFT",
+      "MNTN",
+      "NXT",
+      "PATH",
+      "PAYS",
+      "PCTY",
+      "PEGA",
+      "QLYS",
+      "QTWO",
+      "RAMP",
+      "RELY",
+      "SONO",
+      "WDAY",
+      "YOU",
+      "ZBRA"
+    ],
+    "track_b": [
+      "AMPL",
+      "AVPT",
+      "BRZE",
+      "CALX",
+      "CPAY",
+      "FLYW",
+      "FSLY",
+      "GPN",
+      "GRND",
+      "KVYO",
+      "NTAP",
+      "ZETA"
+    ]
+  },
+  "source": "config.py",
+  "stage1": {
+    "gross_margin_min_pct": 30.0,
+    "high_growth_exemption_growth_pct": 25.0,
+    "high_growth_exemption_rule40_min": 40.0,
+    "net_debt_to_ebitda_max": 3.0,
+    "rev_growth_ttm_min_pct": 5.0,
+    "sbc_to_fcf_max": 1.0,
+    "share_count_growth_max_pct": 5.0
+  },
+  "stage2": {
+    "altman_z_min": 1.1,
+    "beneish_m_max": -1.78,
+    "cash_conversion_consecutive_years": 3,
+    "cash_conversion_min": 0.7,
+    "declining_years": 2,
+    "ipo_lockup_months": 12,
+    "maturity_wall_max": 1.0,
+    "piotroski_f_min_track_a": 4
+  },
+  "stage3": {
+    "implied_growth_vs_cagr_max_multiple": 1.5,
+    "track_a": {
+      "ev_ebit_own_5y_pct_max": 50.0,
+      "ev_ebit_sector_pct_max": 40.0,
+      "fcf_yield_min_pct": 4.0
+    },
+    "track_b": {
+      "ev_gross_profit_sector_pct_max": 40.0,
+      "ev_sales_own_5y_pct_max": 50.0
+    },
+    "track_b_operating_margin_pct": 5.0
+  },
+  "thresholds": {
+    "altman_z": {
+      "direction": "high_good",
+      "formula": "3.25 + 6.56A + 3.26B + 6.72C + 1.05D",
+      "green_min": 2.6,
+      "help": "Iflas riski skoru (imalat disi versiyon). Ozkaynak negatifse anlamsizdir; z_unreliable bayragina bak.",
+      "label": "Altman Z''",
+      "unit": "",
+      "yellow_min": 1.1
+    },
+    "beneish_m": {
+      "direction": "low_good",
+      "formula": "8 degiskenli Beneish modeli",
+      "green_max": -2.22,
+      "help": "Kazanc manipulasyonu olasiligi. -1.78 ustu 'muhtemel manipulator'. Hizli buyuyen saglikli sirketlerde de yanlis alarm verebilir.",
+      "label": "Beneish M",
+      "unit": "",
+      "yellow_max": -1.78
+    },
+    "cash_conversion": {
+      "direction": "high_good",
+      "formula": "CFO / Net kar",
+      "green_min": 1.0,
+      "help": "Isletme nakit akisi / net kar. 1'in altinda surekli kalmasi karin kagit uzerinde kaldigini gosterir.",
+      "label": "Nakit donusumu",
+      "unit": "x",
+      "yellow_min": 0.7
+    },
+    "current_ratio": {
+      "direction": "high_good",
+      "formula": "Donen varlik / Kisa vadeli yukumluluk",
+      "green_min": 2.0,
+      "help": "Donen varlik / kisa vadeli yukumluluk. Yazilimda ertelenmis gelir bu orani yapay olarak dusurur.",
+      "label": "Cari oran",
+      "unit": "x",
+      "yellow_min": 1.2
+    },
+    "earnings_yield": {
+      "direction": "high_good",
+      "formula": "EBIT / EV",
+      "green_min": 8,
+      "help": "EBIT/EV. Greenblatt'in 'sihirli formul' getirisi. EV/EBIT'in tersi.",
+      "label": "Kazanc verimi",
+      "unit": "%",
+      "yellow_min": 5
+    },
+    "ev_ebit": {
+      "direction": "low_good",
+      "formula": "EV / EBIT (TTM)",
+      "green_max": 12,
+      "help": "Isletme degerinin faiz ve vergi oncesi kara orani. Sermaye yapisindan bagimsiz F/K. Tuzak: tek seferlik kalemler EBIT'i sisirir, dususte ucuz gorunur.",
+      "label": "EV/FVOK",
+      "unit": "x",
+      "yellow_max": 18
+    },
+    "ev_ebitda": {
+      "direction": "low_good",
+      "formula": "EV / EBITDA (TTM)",
+      "green_max": 9,
+      "help": "Amortisman oncesi. Sermaye yogun sirketlerde yanilticidir; yatirim harcamasini gormezden gelir.",
+      "label": "EV/FAVOK",
+      "unit": "x",
+      "yellow_max": 14
+    },
+    "ev_gross_profit": {
+      "direction": "low_good",
+      "formula": "EV / Brut kar (TTM)",
+      "green_max": 8,
+      "help": "Kar etmeyen ama yuksek brut marjli yazilim sirketleri icin en saglam deger olcusu. Brut kar manipulasyona en dayanikli kalem.",
+      "label": "EV/Brut kar",
+      "unit": "x",
+      "yellow_max": 15
+    },
+    "ev_sales": {
+      "direction": "low_good",
+      "formula": "EV / Hasilat (TTM)",
+      "green_max": 4,
+      "help": "En kaba olcu. Marj farklarini gormezden gelir; sadece ayni sektor icinde karsilastirilabilir.",
+      "label": "EV/Hasilat",
+      "unit": "x",
+      "yellow_max": 7
+    },
+    "fcf_margin": {
+      "direction": "high_good",
+      "formula": "FCF / Hasilat",
+      "green_min": 20,
+      "help": "Her 100 dolar hasilattan kalan serbest nakit. Muhasebe karindan daha zor manipule edilir.",
+      "label": "FCF marji",
+      "unit": "%",
+      "yellow_min": 10
+    },
+    "fcf_yield_ev": {
+      "direction": "high_good",
+      "formula": "(Isletme nakit akisi - Yatirim harcamasi) / EV",
+      "green_min": 6,
+      "help": "Serbest nakit akisinin isletme degerine orani. Tahvil faizi ile dogrudan karsilastirilabilir. Tuzak: tek seferlik tahsilatlar.",
+      "label": "FCF verimi (EV)",
+      "unit": "%",
+      "yellow_min": 3
+    },
+    "fcf_yield_mcap": {
+      "direction": "high_good",
+      "formula": "FCF / Piyasa degeri",
+      "green_min": 6,
+      "help": "Hissedara dusen nakit verimi. Borclu sirketlerde EV versiyonundan yuksek cikar; ikisini birlikte oku.",
+      "label": "FCF verimi (Piyasa degeri)",
+      "unit": "%",
+      "yellow_min": 3
+    },
+    "gross_margin": {
+      "direction": "high_good",
+      "formula": "Brut kar / Hasilat",
+      "green_min": 60,
+      "help": "Fiyatlama gucunun en dogrudan gostergesi. Dusen brut marj rekabet baskisinin ilk isaretidir.",
+      "label": "Brut marj",
+      "unit": "%",
+      "yellow_min": 30
+    },
+    "gross_profitability": {
+      "direction": "high_good",
+      "formula": "Brut kar / Toplam varlik",
+      "green_min": 0.33,
+      "help": "Novy-Marx olcusu: brut kar / toplam varlik. Uzun vadede F/K'dan daha guclu bir getiri ongoruculugu var.",
+      "label": "Brut karlilik",
+      "unit": "x",
+      "yellow_min": 0.2
+    },
+    "implied_growth": {
+      "direction": "low_good",
+      "formula": "Ters DCF (r=%10, terminal g=%3)",
+      "green_max": 8,
+      "help": "Bugunku fiyatin 10 yil boyunca varsaydigi FCF buyumesi. Sirketin gercek buyumesiyle karsilastir.",
+      "label": "Ima edilen buyume",
+      "unit": "%",
+      "yellow_max": 15
+    },
+    "implied_vs_actual_growth": {
+      "direction": "low_good",
+      "formula": "implied_growth / rev_cagr_3y",
+      "green_max": 1.0,
+      "help": "1'in altinda: piyasa sirketin mevcut buyumesini bile fiyatlamamis. 1.5 ustu: fiyat hatasiz gidise bagli.",
+      "label": "Ima edilen / Gercek buyume",
+      "unit": "x",
+      "yellow_max": 1.5
+    },
+    "interest_coverage": {
+      "direction": "high_good",
+      "formula": "EBIT / Faiz gideri",
+      "green_min": 8,
+      "help": "EBIT / faiz gideri. 3'un altinda operasyonel bir aksama dogrudan temerrut riskine donusur.",
+      "label": "Faiz karsilama",
+      "unit": "x",
+      "yellow_min": 3
+    },
+    "maturity_wall_2y": {
+      "direction": "low_good",
+      "formula": "2 yilda vadesi gelen borc / Nakit",
+      "green_max": 0.5,
+      "help": "2 yilda vadesi gelen borc / nakit. 1'in ustu ve FCF negatifse yeniden finansman riski var.",
+      "label": "Vade duvari (2y)",
+      "unit": "x",
+      "yellow_max": 1.0
+    },
+    "net_debt_to_ebitda": {
+      "direction": "low_good",
+      "formula": "(Finansal borc - Nakit) / EBITDA",
+      "green_max": 0,
+      "help": "Negatif = net nakit (yesil). 3'un ustu, faiz artislarinda kirilgan bilanco demek.",
+      "label": "Net borc / FAVOK",
+      "unit": "x",
+      "yellow_max": 3
+    },
+    "operating_margin": {
+      "direction": "high_good",
+      "formula": "EBIT / Hasilat",
+      "green_min": 20,
+      "help": "EBIT / hasilat. Olcek ekonomisinin calisip calismadigini gosterir.",
+      "label": "Faaliyet marji",
+      "unit": "%",
+      "yellow_min": 8
+    },
+    "pct_off_52w_high": {
+      "direction": "low_good",
+      "formula": "1 - Fiyat / 52 hafta zirve",
+      "green_max": 15,
+      "help": "Zirveden ne kadar uzakta. Derin dususler hem firsat hem kirilma sinyali olabilir; hikayeye bak.",
+      "label": "52 hafta zirveden uzaklik",
+      "unit": "%",
+      "yellow_max": 35
+    },
+    "pe": {
+      "direction": "low_good",
+      "formula": "Fiyat / Hisse basina net kar (TTM)",
+      "green_max": 15,
+      "help": "Fiyat / net kar. Tek seferlik kalemlere en acik oran. one_off_earnings bayragi varsa bu sayiyi yok say.",
+      "label": "F/K",
+      "unit": "x",
+      "yellow_max": 25
+    },
+    "peg": {
+      "direction": "low_good",
+      "formula": "F/K / (hasilat buyumesi %)",
+      "green_max": 1.0,
+      "help": "F/K bolu buyume. Buyume tahmini yanlissa oran anlamsizdir.",
+      "label": "PEG",
+      "unit": "x",
+      "yellow_max": 2.0
+    },
+    "piotroski_f": {
+      "direction": "high_good",
+      "formula": "9 ikili testin toplami",
+      "green_min": 7,
+      "help": "9 maddelik temel saglik kontrol listesi. 4 ve alti zayif bilanco/nakit akisi demek.",
+      "label": "Piotroski F",
+      "unit": "/9",
+      "yellow_min": 5
+    },
+    "rel_strength_12m": {
+      "direction": "high_good",
+      "formula": "Hisse 12a getirisi - QQQ 12a getirisi",
+      "green_min": 0,
+      "help": "Nasdaq 100'e gore 12 aylik fark.",
+      "label": "12 ay goreli getiri",
+      "unit": "%",
+      "yellow_min": -20
+    },
+    "rel_strength_6m": {
+      "direction": "high_good",
+      "formula": "Hisse 6a getirisi - QQQ 6a getirisi",
+      "green_min": 0,
+      "help": "Nasdaq 100'e gore fark. Sert negatif deger 'deger tuzagi' riskinin en erken sinyalidir.",
+      "label": "6 ay goreli getiri",
+      "unit": "%",
+      "yellow_min": -15
+    },
+    "return_12m": {
+      "direction": "high_good",
+      "formula": "Fiyat / 12 ay onceki fiyat - 1",
+      "green_min": 15,
+      "help": "Mutlak 12 aylik fiyat getirisi.",
+      "label": "12 aylik getiri",
+      "unit": "%",
+      "yellow_min": 0
+    },
+    "return_6m": {
+      "direction": "high_good",
+      "formula": "Fiyat / 6 ay onceki fiyat - 1",
+      "green_min": 10,
+      "help": "Mutlak fiyat getirisi. Tek basina karar araci degil.",
+      "label": "6 aylik getiri",
+      "unit": "%",
+      "yellow_min": 0
+    },
+    "rev_cagr_3y": {
+      "direction": "high_good",
+      "formula": "(Hasilat_t / Hasilat_t-3)^(1/3) - 1",
+      "green_min": 15,
+      "help": "3 yillik bilesik yillik buyume orani. Tek yillik siciramalari yumusatir.",
+      "label": "Hasilat BYBO (3y)",
+      "unit": "%",
+      "yellow_min": 5
+    },
+    "rev_growth_ttm": {
+      "direction": "high_good",
+      "formula": "(TTM hasilat / onceki TTM hasilat) - 1",
+      "green_min": 15,
+      "help": "Son 12 ayin bir onceki 12 aya gore buyumesi. Satin alma kaynakli buyume organik degildir; rev_growth_organic_suspect'e bak.",
+      "label": "Hasilat buyumesi (TTM)",
+      "unit": "%",
+      "yellow_min": 5
+    },
+    "roic": {
+      "direction": "high_good",
+      "formula": "NOPAT / Yatirilan sermaye",
+      "green_min": 15,
+      "help": "Yatirilan sermayenin getirisi. Sermaye maliyetinin (~%10) uzerinde olmali. Ozkaynak negatifse (b) yontemi kullanilir.",
+      "label": "ROIC",
+      "unit": "%",
+      "yellow_min": 8
+    },
+    "rule_of_40": {
+      "direction": "high_good",
+      "formula": "Hasilat buyumesi % + FCF marji %",
+      "green_min": 40,
+      "help": "Hasilat buyumesi % + FCF marji %. Yazilimda buyume/karlilik dengesinin standart olcusu.",
+      "label": "40 Kurali",
+      "unit": "",
+      "yellow_min": 30
+    },
+    "rule_of_40_ebitda": {
+      "direction": "high_good",
+      "formula": "Hasilat buyumesi % + EBITDA marji %",
+      "green_min": 40,
+      "help": "FCF yerine EBITDA marji ile. FCF versiyonu ile arasindaki fark buyuk olcude hisse bazli odemedir (SBC).",
+      "label": "40 Kurali (FAVOK)",
+      "unit": "",
+      "yellow_min": 30
+    },
+    "sbc_to_fcf": {
+      "direction": "low_good",
+      "formula": "Hisse bazli odeme / FCF",
+      "green_max": 0.3,
+      "help": "1'in ustunde ise sirket urettigi tum nakiti calisanlara hisse olarak dagitiyor demektir.",
+      "label": "SBC / FCF",
+      "unit": "x",
+      "yellow_max": 1.0
+    },
+    "sbc_to_revenue": {
+      "direction": "low_good",
+      "formula": "Hisse bazli odeme / Hasilat",
+      "green_max": 8,
+      "help": "Hisse bazli odemenin hasilata orani. Gercek bir maliyettir; FCF'te gorunmez ama hisse sayisini artirir.",
+      "label": "SBC / Hasilat",
+      "unit": "%",
+      "yellow_max": 15
+    },
+    "share_count_change_1y": {
+      "direction": "low_good",
+      "formula": "Yillik seyreltilmis hisse sayisi degisimi",
+      "green_max": 0,
+      "help": "Negatif = geri alim (iyi). Pozitif = seyrelme. SBC agir sirketlerde geri alimlar sadece seyrelmeyi dengeler.",
+      "label": "Hisse sayisi degisimi",
+      "unit": "%",
+      "yellow_max": 3
+    },
+    "sloan_accruals": {
+      "direction": "low_good",
+      "formula": "(Net kar - CFO - CFI) / Toplam varlik",
+      "green_max": 0.0,
+      "help": "Karin ne kadari nakde donmemis. Yuksek tahakkuk gelecek yil dusuk getiri ile iliskili.",
+      "label": "Sloan tahakkuk",
+      "unit": "",
+      "yellow_max": 0.1
+    }
+  },
+  "universe": {
+    "allowed_exchanges": [
+      "NYSE",
+      "Nasdaq",
+      "NASDAQ",
+      "NYSE American",
+      "NYSEAMERICAN",
+      "AMEX"
+    ],
+    "avg_dollar_volume_30d_min_usd": 5000000.0,
+    "biotech_min_revenue_musd": 10.0,
+    "biotech_sic_codes": [
+      2836,
+      8731
+    ],
+    "exclude_adr": true,
+    "market_cap_musd_max": 50000.0,
+    "market_cap_musd_min": 300.0,
+    "price_min_usd": 5.0
+  }
+}
