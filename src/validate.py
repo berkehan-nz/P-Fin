@@ -131,6 +131,22 @@ def check(card: dict) -> dict:
                 f"Son 4 ceyregin {missing} tanesinde hasilat yok. TTM degerleri "
                 f"yillik tabloya dusmus olabilir."))
 
+    # --- ceyreklik seri ile TTM tutarli mi ---
+    fcf_series = [v for v in (series.get("fcf") or [])[-4:] if v is not None]
+    ttm_fcf = num(ttm.get("fcf_musd"))
+    if len(fcf_series) == 4 and ttm_fcf not in (None, 0):
+        sapma = abs(sum(fcf_series) - ttm_fcf) / max(abs(ttm_fcf), 1) * 100
+        if sapma > 5:
+            basis = (card.get("flags") or {}).get("data_basis")
+            issues.append(_issue(
+                "medium", "ttm_seri_uyusmazligi",
+                f"Son 4 ceyregin nakit akisi toplami ({sum(fcf_series):,.0f}M) ile "
+                f"TTM degeri ({ttm_fcf:,.0f}M) %{sapma:.0f} farkli"
+                + (" — bazi kalemler yillik tablodan geldigi icin bu beklenen bir "
+                   "durum, ama grafikle TTM ayni sayiyi gostermez."
+                   if basis == "mixed" else
+                   ". Ceyreklik grafikle TTM ayni donemi anlatmiyor olabilir.")))
+
     levels = [i["level"] for i in issues]
     status = ("kotu" if "high" in levels
               else "sinirli" if "medium" in levels

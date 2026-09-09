@@ -28,6 +28,31 @@ SHARE_COUNT_SANITY_RATIO = 0.70
 Q4_SANITY_MAX_MULTIPLE = 3.0
 Q4_SANITY_MIN_MULTIPLE = -1.5
 
+# Hasilat gibi kalemler negatif olamaz ve ceyrekten ceyrege bu kadar
+# ucuzlamaz. GPN'de Q4 hasilati 1.900 yerine 159 cikmisti: bu, medyan
+# ceyregin %8'i. Genel band (-1,5x .. 3x) boyle bir degeri gecirir, cunku
+# band asiri BUYUK degerleri yakalamak icin tasarlanmisti.
+STABLE_POSITIVE_FIELDS = {"revenue", "cost_of_revenue", "gross_profit"}
+STABLE_MIN_MULTIPLE = 0.35
+STABLE_MAX_MULTIPLE = 3.0
+
+
+def _q4_is_sane(field: str | None, derived: float, parts: list[float]) -> bool:
+    """Turetilmis bir ceyrek, komsularinin buyuklugune gore makul mu?
+
+    Hem ``_derive_q4`` (yillik - Q1-Q2-Q3) hem kumulatif fark yolu bunu
+    kullanir; aksi halde biri kontrolsuz kalir.
+    """
+    sizes = [abs(p) for p in parts if p]
+    if not sizes:
+        return True
+    typical = sorted(sizes)[len(sizes) // 2]
+    if typical <= 0:
+        return True
+    if field in STABLE_POSITIVE_FIELDS:
+        return STABLE_MIN_MULTIPLE * typical <= derived <= STABLE_MAX_MULTIPLE * typical
+    return Q4_SANITY_MIN_MULTIPLE * typical <= derived <= Q4_SANITY_MAX_MULTIPLE * typical
+
 TICKER_CACHE = config.CACHE_DIR / "company_tickers.json"
 FACTS_CACHE_DIR = config.CACHE_DIR / "companyfacts"
 FACTS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -272,7 +297,8 @@ def _period_bucket(entry: dict) -> int | None:
     return None
 
 
-def _collect_cumulative_quarterly(facts: dict, tags: list[str]) -> dict[str, float]:
+def _collect_cumulative_quarterly(facts: dict, tags: list[str],
+                                  field: str | None = None) -> dict[str, float]:
     """Kumulatif (yil basindan) rakamlardan ceyreklik degerleri turetir.
 
     Ayni ``start`` tarihini paylasan kayitlar bir mali yilin kumulatif
@@ -303,14 +329,24 @@ def _collect_cumulative_quarterly(facts: dict, tags: list[str]) -> dict[str, flo
                                 e.get("filed", ""), e.get("accn", ""))  # type: ignore[assignment]
 
         for _, slot in by_start.items():
-            for bucket in sorted(slot):
+            buckets = sorted(slot)
+            for bucket in buckets:
                 end, value = slot[bucket][0], slot[bucket][1]
                 if bucket == 1:
                     out.setdefault(end, value)
                     continue
                 prior = slot.get(bucket - 1)
-                if prior is not None:
-                    out.setdefault(end, value - prior[1])
+                if prior is None:
+                    continue
+                derived = value - prior[1]
+                # Ayni mali yilda daha once turetilmis ceyreklerle karsilastir
+                peers = [slot[b][1] - slot[b - 1][1]
+                         for b in buckets if b > 1 and (b - 1) in slot and b < bucket]
+                if bucket == 2 and 1 in slot:
+                    peers = [slot[1][1]]
+                if peers and not _q4_is_sane(field, derived, peers):
+                    continue
+                out.setdefault(end, derived)
 
         if out:
             break
@@ -487,7 +523,7 @@ def _latest_diluted_shares(facts: dict) -> float | None:
 
 
 def _derive_q4(annual: dict[str, float], quarterly: dict[str, float],
-               fy_ends: dict[str, list[str]]) -> None:
+               fy_ends: dict[str, list[str]], field: str | None = None) -> None:
     """Q4'u tureterek ``quarterly`` sozlugune ekler.
 
     Cogu sirket Q4'u ayri raporlamaz; 10-K yillik toplami verir. Q4 =
@@ -501,18 +537,10 @@ def _derive_q4(annual: dict[str, float], quarterly: dict[str, float],
         if len(parts) != 3 or any(p is None for p in parts):
             continue
         derived = annual[fy_end] - sum(parts)  # type: ignore[arg-type]
-
-        # MAKULLUK KONTROLU: turetilmis Q4, diger uc ceyregin buyuklugune
-        # yakin olmali. Cok uzaksa yillik ve ceyreklik rakamlar farkli
-        # olcekte demektir (farkli etiket, yeniden duzenleme, birim degisimi)
-        # ve cikarma islemi uydurma bir sayi uretmistir. Yazmaktansa bos birak.
-        sizes = [abs(p) for p in parts if p]                # type: ignore[arg-type]
-        if sizes:
-            typical = sorted(sizes)[len(sizes) // 2]
-            if typical > 0 and not (Q4_SANITY_MIN_MULTIPLE * typical
-                                    <= derived <= Q4_SANITY_MAX_MULTIPLE * typical):
-                continue
-        quarterly[fy_end] = derived
+        # Makul degilse YAZMA. Yillik ve ceyreklik rakamlar farkli olcekte
+        # oldugunda cikarma islemi uydurma bir sayi uretir.
+        if _q4_is_sane(field, derived, parts):   # type: ignore[arg-type]
+            quarterly[fy_end] = derived
 
 
 def _fiscal_quarter_ends(facts: dict) -> dict[str, list[str]]:
@@ -568,14 +596,14 @@ def fundamentals_from_facts(facts: dict, ticker: str, *,
         if field in CUMULATIVE_FIELDS:
             # Acikca 3 aylik raporlanan degerler oncelikli; eksik ceyrekler
             # kumulatif serinin farkindan tamamlanir.
-            derived = _collect_cumulative_quarterly(facts, tags)
+            derived = _collect_cumulative_quarterly(facts, tags, field)
             for end, val in derived.items():
                 quarterly.setdefault(end, val)
 
         # Hisse sayilari agirlikli ORTALAMADIR; Q4 = yil - (Q1+Q2+Q3) formulu
         # onlar icin anlamsiz sonuc uretir.
         if field not in SHARE_FLOW_TAGS:
-            _derive_q4(annual, quarterly, fy_map)
+            _derive_q4(annual, quarterly, fy_map, field)
         q_flows[field] = quarterly
         a_flows[field] = annual
 

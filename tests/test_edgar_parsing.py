@@ -207,3 +207,50 @@ class TestTagConsistency:
 
     def test_no_data_returns_empty(self):
         assert ea._collect_field({"facts": {}}, ["Revenues"]) == ({}, {}, None)
+
+
+class TestFieldAwareSanityBand:
+    """Makulluk bandi alan tipine gore degismeli.
+
+    GPN'de Q4 hasilati 1.900 yerine 159 cikmisti — medyan ceyregin %8'i.
+    Genel band (-1,5x..3x) bunu geciriyordu cunku asiri BUYUK degerleri
+    yakalamak icin tasarlanmisti. Hasilat negatif olamaz ve ceyrekten
+    ceyrege bu kadar ucuzlamaz.
+    """
+
+    def test_tiny_derived_revenue_rejected(self):
+        assert not ea._q4_is_sane("revenue", 159.0, [1834.0, 1971.0, 1997.0])
+
+    def test_normal_revenue_q4_accepted(self):
+        assert ea._q4_is_sane("revenue", 2100.0, [1834.0, 1971.0, 1997.0])
+
+    def test_seasonal_revenue_q4_accepted(self):
+        """Sonos'ta Aralik ceyregi digerlerinin 2,5 kati — bu gercek."""
+        assert ea._q4_is_sane("revenue", 750.0, [260.0, 290.0, 300.0])
+
+    def test_negative_revenue_rejected(self):
+        assert not ea._q4_is_sane("revenue", -50.0, [1834.0, 1971.0, 1997.0])
+
+    def test_cashflow_may_be_negative(self):
+        """Nakit akisinda negatif ceyrek normaldir; ayni band uygulanmaz."""
+        assert ea._q4_is_sane("cfo", -8.0, [20.0, 15.0, 18.0])
+
+    def test_cashflow_extreme_still_rejected(self):
+        assert not ea._q4_is_sane("cfo", 200.0, [20.0, 15.0, 18.0])
+
+    def test_no_peers_means_no_judgement(self):
+        assert ea._q4_is_sane("revenue", 1.0, [])
+
+    def test_cumulative_path_also_checked(self):
+        """Kumulatif fark yolu da bandi kullanmali — PAYS Q4'u oradan geliyordu."""
+        doc = facts_doc("NetCashProvidedByUsedInOperatingActivities", [
+            fact("2025-01-01", "2025-03-31", 10),
+            fact("2025-01-01", "2025-06-30", 22),
+            fact("2025-01-01", "2025-09-30", 33),
+            fact("2025-01-01", "2025-12-31", 9999),   # sacma sicrama
+        ])
+        out = ea._collect_cumulative_quarterly(
+            doc, ["NetCashProvidedByUsedInOperatingActivities"], "cfo")
+        assert out["2025-06-30"] == 12
+        assert out["2025-09-30"] == 11
+        assert "2025-12-31" not in out        # 9966 elenmeli

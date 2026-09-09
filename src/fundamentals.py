@@ -108,6 +108,12 @@ class Period:
     shares_diluted: float | None = None
     shares_basic: float | None = None
 
+    # Hangi akis kalemlerinin ceyreklerden degil YILLIK tablodan geldigi.
+    # ttm_period doldurur; kartta ve denetimde gorunur olmasi gerekir,
+    # aksi halde "ceyreklik TTM" diye sunulan bir sayi aslinda mali yil
+    # rakami olur ve kimse fark etmez.
+    annual_fallback_fields: tuple = ()
+
     # --- turetilmis ---
     @property
     def computed_gross_profit(self) -> float | None:
@@ -264,12 +270,16 @@ class Fundamentals:
                     cashflow_mixed = True
                     break
 
+            fell_back = []
             for f in FLOW_FIELDS:
                 use_annual = cashflow_mixed and f in CASHFLOW_FIELDS
                 vals = [num(getattr(q, f)) for q in window]
                 if not use_annual and all(v is not None for v in vals):
                     setattr(p, f, vals[-1] if f in AVERAGE_FIELDS else sum(vals))
                 else:
+                    if annual_fallback is not None and \
+                            num(getattr(annual_fallback, f, None)) is not None:
+                        fell_back.append(f)
                     # KISMI TOPLAM YAZILMAZ. Bir ceyrek bile eksikse o kalem
                     # icin yillik tabloya duselim; o da yoksa None kalsin.
                     # Eksik ceyrekleri atlayip toplamak, 2 ceyreklik rakami
@@ -279,6 +289,7 @@ class Fundamentals:
 
             for f in STOCK_FIELDS:
                 setattr(p, f, getattr(end_period, f))
+            p.annual_fallback_fields = tuple(fell_back)
             return p
 
         if annual_fallback is not None:

@@ -1,0 +1,50 @@
+# INBOX BIRLESTIRME — claude_inbox/ klasorune her yazildiginda calisir.
+#
+# Baska bir ajan (sohbetteki Claude, GitHub baglantisiyla) analiz yazdiginda
+# kartlar ~30 saniyede guncellenir; gunluk kosuyu beklemek gerekmez.
+# Ag erisimi GEREKTIRMEZ: yalnizca repodaki dosyalari okur ve yazar.
+name: Merge (analiz birlestirme)
+
+on:
+  push:
+    paths:
+      - 'claude_inbox/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finans-veri
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Inbox dosyalarini dogrula
+        run: python -m src.run_merge --check
+
+      - name: Kartlara isle
+        run: python -m src.run_merge
+
+      - name: Commit
+        run: |
+          git config user.name  "berkehan-bot"
+          git config user.email "actions@github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "Kartlarda degisiklik yok."
+          else
+            git commit -m "veri: analiz birlestirildi (claude_inbox)"
+            git pull --rebase --autostash origin ${{ github.ref_name }} || true
+            git push
+          fi

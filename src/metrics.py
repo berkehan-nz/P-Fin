@@ -261,7 +261,12 @@ def compute(f: Fundamentals, benchmark: list[tuple[str, float]] | None = None) -
         "gross_profit_ttm_musd": gross_profit,
         "effective_tax_rate": cur.effective_tax_rate,
         "period_end": cur.period_end,
-        "data_basis": "quarterly_ttm" if f.has_quarterly(4) else "annual",
+        # DURUST OLSUN: "ceyreklik TTM" derken bazi kalemler yillik tablodan
+        # gelmis olabilir. Hangileri oldugunu da tasi.
+        "data_basis": ("annual" if not f.has_quarterly(4)
+                       else "mixed" if getattr(cur, "annual_fallback_fields", ())
+                       else "quarterly_ttm"),
+        "annual_fallback_fields": list(getattr(cur, "annual_fallback_fields", ())),
     }
 
     m.update(momentum(f, benchmark))

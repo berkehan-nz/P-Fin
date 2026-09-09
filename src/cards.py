@@ -155,6 +155,13 @@ def build(f: Fundamentals, *,
         )
     if meta.get("data_basis") == "annual":
         warnings.append("Ceyreklik veri yetersiz; metrikler yillik tablodan hesaplandi.")
+    elif meta.get("data_basis") == "mixed":
+        fields = ", ".join(meta.get("annual_fallback_fields", [])[:6])
+        warnings.append(
+            f"Bazi kalemler ceyreklerden degil YILLIK tablodan geldi ({fields}). "
+            f"Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle "
+            f"toplami tutmayabilir."
+        )
 
     flags.update({
         "passed_stages": (funnel_result or {}).get("passed_stages", []),
@@ -165,6 +172,7 @@ def build(f: Fundamentals, *,
         "is_manual": is_manual,
         "roic_method": meta["roic_method"],
         "data_basis": meta["data_basis"],
+        "annual_fallback_fields": meta.get("annual_fallback_fields", []),
     })
 
     # --- seriler (12 ceyrek grafikleri) ---

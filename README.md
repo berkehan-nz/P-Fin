@@ -75,6 +75,8 @@ devam eder**. SEC anahtari (User-Agent) olmadan hicbir sey calismaz.
 | `python -m src.run_funnel` | tam evren taramasi TEK SEFERDE (elle) | **saatler** |
 | `python -m src.run_funnel --limit 500` | hizli deneme | ~20 dk |
 | `python -m src.run_daily` | fiyat, haber, portfoy + `merge_story()` | ~2-5 dk |
+| `python -m src.run_merge` | claude_inbox -> kartlar (ag gerekmez) | saniyeler |
+| `python -m src.run_merge --check` | inbox dosyalarini yalnizca dogrula | anlik |
 | `python scripts/init_data.py` | `data/` klasorunu bos semalarla kurar | anlik |
 | `python -m pytest tests/` | 147 test | < 1 sn |
 | `RUN_NETWORK_TESTS=1 python -m pytest tests/test_live_edgar.py` | canli EDGAR dogrulamasi | ~1 dk |
@@ -94,6 +96,8 @@ src/
   funnel.py           Asama 0-4 eleme mantigi + "nerede elenirdi" teshisi
   scan.py             KADEMELI tarama: kuyruk, parti, anlik goruntu, tur sonu
   cards.py            Kart JSON uretimi + merge_story() + yazili blok koruma
+  inbox.py            claude_inbox sozlesmesi ve dogrulamasi
+  validate.py         Yayim oncesi makulluk denetimi
   watchlist.py        Elle eklenen sirketler
   portfolio.py        Pozisyon takibi, K/Z, benchmark, uyarilar
   pipeline.py         Kosu adimlarinin ortak parcalari
@@ -115,7 +119,9 @@ data/                 CIKTI — repoya commit edilir, Claude buradan okur
   portfolio_state.json  scan_state.json
   cards/<TICKER>.json       tam kartlar (ilk 50 + tohum + elle eklenenler)
   survivors/<TICKER>.json   Asama 0-2'yi gecenlerin kompakt goruntusu
-claude_inbox/         Claude'un yazdigi hikaye/analiz dosyalari
+claude_inbox/         Analiz yazma alani — sozlesmesi README.md icinde
+  README.md           Yazan ajan icin kurallar
+  _TEMPLATE.json      Bos sema
 docs/                 GitHub Pages dashboard (vanilla JS, cerceve yok)
 tests/                pytest
 .github/workflows/    bootstrap · scan (saatlik) · daily · weekly · tests
@@ -246,6 +252,25 @@ Claude `claude_inbox/<TICKER>.json` dosyasina yazar:
 `story` ve `decision` bloklarina dokunabilir — sayisal alanlar veri hattinin
 sorumlulugundadir.
 
+### Baska bir ajanla calisma (Claude Code olmadan)
+
+Sohbetteki Claude'a GitHub baglantisi verirsen, Claude Code'u acmadan analiz
+yazdirabilirsin. Kurulum:
+
+1. claude.ai -> Ayarlar -> **Connectors** -> GitHub'i bagla
+2. Erisimi yalnizca `berkehan-nz/P-Fin` deposuna ver
+3. Ajana su talimati ver:
+   *"`claude_inbox/README.md` dosyasini oku, kurallarina uy."*
+
+Ajan `claude_inbox/<TICKER>.json` dosyasina yazar; **Merge** is akisi
+~30 saniyede kartlari gunceller. Gunluk kosuyu beklemek gerekmez.
+
+**Sinir kasitlidir:** inbox'a yazan taraf yalnizca `story`, `decision` ve
+`catalyst_score` alanlarina dokunabilir. Metrikler, fiyatlar ve puanlar veri
+hattinin sorumlulugundadir — elle yazilmis bir sayi hesaplanmis bir metrigin
+uzerine yazabilseydi kartta hangi sayinin nereden geldigi belirsizlesirdi.
+Kurallara uymayan dosya islenmez ve Actions'ta hata olarak gorunur.
+
 ### 4. Berke karar verir
 
 Sirket detayindaki **Karar kutusu** bir JSON parcasi uretir (AL/BEKLE/ELE +
@@ -270,6 +295,7 @@ Claude'un analizini ve Berke'nin kararini silerdi.
 | **Scan (saatlik evren taramasi)** | her saat :25 | kuyruktan 120 sirket isler; kuyruk bitince Asama 3-4 + kartlar |
 | **Daily (fiyat ve haber)** | hafta ici 07:00 TSI | fiyat, momentum, haber, kazanc takvimi, portfoy + `merge_story()` |
 | **Weekly (SEC toplu veri + yeni tur)** | pazar 05:00 TSI | yeni ceyrek verisini indirir, evren listesini tazeler, yeni tur baslatir |
+| **Merge (analiz birlestirme)** | `claude_inbox/` degisince | inbox dosyalarini dogrular ve kartlara isler (~30 sn, ag gerektirmez) |
 | **Tests** | her push | pytest + JSON gecerlilik |
 
 **Degisiklik yoksa commit atilmaz** — `write_json()` icerigi karsilastirir ve

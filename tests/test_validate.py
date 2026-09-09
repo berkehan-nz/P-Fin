@@ -222,3 +222,37 @@ class TestPartialTtmBugIsFixed:
                                      period_type="Q", revenue=10,
                                      shares_diluted=v))
         assert f.ttm_period().shares_diluted == 103      # 406 DEGIL
+
+
+class TestMixedBasisIsSurfaced:
+    """'Ceyreklik TTM' derken bazi kalemler yillik tablodan gelebiliyor.
+
+    GPN'de ceyreklik FCF toplami 1.658M iken TTM 2.657M yaziyordu ve kart
+    'quarterly_ttm' diyordu. Sayi yanlis degildi ama YANILTICIYDI.
+    """
+
+    def test_series_ttm_mismatch_is_flagged(self):
+        c = bare_card(
+            series={"fcf": [769.0, 515.0, -289.0, 663.0]},
+            ttm={"revenue_musd": 10207.0, "ebit_musd": 1200.0,
+                 "gross_profit_musd": 6500.0, "fcf_musd": 2657.0},
+            flags={"data_basis": "mixed"})
+        dq = validate.check(c)
+        issue = next(i for i in dq["issues"] if i["code"] == "ttm_seri_uyusmazligi")
+        assert "beklenen bir" in issue["message"]
+
+    def test_matching_series_not_flagged(self):
+        c = bare_card(
+            series={"fcf": [262.9, 350.2, 289.4, 295.8]},
+            ttm={"revenue_musd": 3361.0, "ebit_musd": 400.0,
+                 "gross_profit_musd": 2600.0, "fcf_musd": 1198.3},
+            flags={"data_basis": "quarterly_ttm"})
+        dq = validate.check(c)
+        assert not any(i["code"] == "ttm_seri_uyusmazligi" for i in dq["issues"])
+
+    def test_incomplete_series_not_judged(self):
+        c = bare_card(series={"fcf": [100.0, None, 120.0, 130.0]},
+                      ttm={"revenue_musd": 1000.0, "ebit_musd": 100.0,
+                           "gross_profit_musd": 600.0, "fcf_musd": 999.0})
+        dq = validate.check(c)
+        assert not any(i["code"] == "ttm_seri_uyusmazligi" for i in dq["issues"])
