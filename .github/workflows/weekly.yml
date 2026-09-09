@@ -1,27 +1,27 @@
-# HAFTALIK — pazar. SEC toplu verisini gunceller, huniyi BASTAN calistirir.
-name: Weekly (huni)
+# HAFTALIK — pazar. SEC toplu ceyreklik verisini gunceller ve YENI TARAMA TURU
+# baslatir.
+#
+# Tam evren taramasini artik bu is akisi DEGIL, saatlik `scan.yml` yapiyor.
+# Buranin isi: (1) yeni ceyrek verisi geldiyse indirmek, (2) evren listesini
+# tazeleyip kuyrugu bastan kurmak.
+name: Weekly (SEC toplu veri + yeni tur)
 
 on:
   schedule:
     - cron: '0 2 * * 0'
   workflow_dispatch:
-    inputs:
-      limit:
-        description: 'Islenecek sirket sayisi ustu (bos = tam evren)'
-        required: false
-        default: ''
 
 permissions:
   contents: write
 
 concurrency:
-  group: nexizon-data
+  group: finans-veri
   cancel-in-progress: false
 
 jobs:
-  funnel:
+  refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 330      # tam evren taramasi uzun surer
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -36,48 +36,45 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .cache
-          key: nexizon-cache-${{ github.run_id }}
-          restore-keys: nexizon-cache-
+          key: finans-cache-${{ github.run_id }}
+          restore-keys: finans-cache-
 
-      - name: Huniyi calistir
+      - name: Toplu veriyi senkronize et
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: |
+          if [ -z "$SEC_USER_AGENT" ]; then
+            echo "::error::SEC_USER_AGENT secret'i tanimli degil."
+            exit 1
+          fi
+          python - <<'PY'
+          from src.sources import edgar_bulk
+          yeni = edgar_bulk.sync()
+          print("Yeni ceyrek:", yeni or "yok")
+          edgar_bulk.prune()
+          print("Onbellek:", edgar_bulk.cache_stats())
+          PY
+
+      - name: Yeni tarama turu baslat
         env:
           SEC_USER_AGENT:  ${{ secrets.SEC_USER_AGENT }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           FRED_API_KEY:    ${{ secrets.FRED_API_KEY }}
-        run: |
-          if [ -n "${{ inputs.limit }}" ]; then
-            python -m src.run_funnel --limit "${{ inputs.limit }}"
-          else
-            python -m src.run_funnel
-          fi
+        run: python -m src.run_scan --new-cycle --batch 60
 
-      - name: Huni ozeti
-        run: |
-          python - <<'PY' >> $GITHUB_STEP_SUMMARY
-          import json, pathlib
-          p = pathlib.Path('data/funnel_log.json')
-          if p.exists():
-              runs = json.loads(p.read_text())['runs']
-              if runs:
-                  r = runs[-1]
-                  print(f"### Huni — {r['date']}\n")
-                  print("| Asama | Girdi | Cikti | Elenen |")
-                  print("|---|---|---|---|")
-                  for s in r['stages']:
-                      print(f"| {s['stage']}. {s['name']} | {s['input']} | {s['output']} | {s['input']-s['output']} |")
-                  print("\n### En sik eleme sebepleri\n")
-                  for reason, n in list(r['kill_reasons'].items())[:10]:
-                      print(f"- **{n}** — {reason}")
-          PY
+      - name: Ozet
+        if: always()
+        run: python -m src.run_scan --status >> $GITHUB_STEP_SUMMARY 2>&1 || true
 
       - name: Commit
         run: |
-          git config user.name  "nexizon-bot"
+          git config user.name  "berkehan-bot"
           git config user.email "actions@github.com"
           git add data/
           if git diff --staged --quiet; then
             echo "Degisiklik yok."
           else
-            git commit -m "veri: haftalik huni taramasi $(date -u +%Y-%m-%d)"
+            git commit -m "veri: haftalik SEC senkronu + yeni tarama turu $(date -u +%Y-%m-%d)"
+            git pull --rebase --autostash origin ${{ github.ref_name }} || true
             git push
           fi

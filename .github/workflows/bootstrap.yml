@@ -34,8 +34,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .cache
-          key: nexizon-cache-${{ github.run_id }}
-          restore-keys: nexizon-cache-
+          key: finans-cache-${{ github.run_id }}
+          restore-keys: finans-cache-
 
       - name: Tohum kartlarini uret
         env:
@@ -63,12 +63,13 @@ jobs:
 
       - name: Commit
         run: |
-          git config user.name  "nexizon-bot"
+          git config user.name  "berkehan-bot"
           git config user.email "actions@github.com"
           git add data/
           if git diff --staged --quiet; then
             echo "Degisiklik yok — commit atlanmadi."
           else
             git commit -m "veri: tohum listesi kartlari (bootstrap)"
+            git pull --rebase --autostash origin ${{ github.ref_name }} || true
             git push
           fi

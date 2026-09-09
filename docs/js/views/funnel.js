@@ -4,7 +4,10 @@ window.ViewFunnel = (function () {
   const $ = (id) => document.getElementById(id);
 
   async function render() {
-    const [uni, log] = await Promise.all([DataLayer.universe(), DataLayer.funnelLog()]);
+    const [uni, log, scan] = await Promise.all([
+      DataLayer.universe(), DataLayer.funnelLog(), DataLayer.scanState(),
+    ]);
+    renderScan(scan);
     const runs = log.runs || [];
     const latest = runs.length ? runs[runs.length - 1] : null;
     const stages = (latest && latest.stages) || (uni.log && uni.log.stages) || [];
@@ -16,6 +19,51 @@ window.ViewFunnel = (function () {
     renderStages(stages);
     renderKills((latest && latest.kill_reasons) || (uni.log && uni.log.kill_reasons) || {});
     renderSim(stages);
+  }
+
+  /* Kademeli tarama: evren bir kuyruktur, her saat bir parti islenir.
+     Buradaki cubuk kuyrugun ne kadarinin eridigini gosterir. */
+  function renderScan(scan) {
+    const el = $('scanProgress');
+    if (!scan || !scan.queue || !scan.queue.length) {
+      el.innerHTML = `<div class="card muted small">Tarama turu henuz baslamadi.
+        Saatlik <b>Scan</b> is akisi calistiginda ilerleme burada gorunur.</div>`;
+      return;
+    }
+    const total = scan.queue.length;
+    const done = Math.min(scan.cursor || 0, total);
+    const pct = total ? (done / total) * 100 : 0;
+    const survivors = scan.survivor_count || 0;
+    const perHour = scan.batch_size || 120;
+    const hoursLeft = perHour ? Math.ceil((total - done) / perHour) : null;
+
+    el.innerHTML = `<div class="card">
+      <div class="spread">
+        <span><b>Tur ${scan.cycle}</b>
+          <span class="tiny dim">${scan.cycle_started ? Fmt.date(scan.cycle_started) + ' tarihinde basladi' : ''}</span></span>
+        <span class="num">${done} / ${total} <span class="dim">(%${Fmt.num(pct, 1)})</span></span>
+      </div>
+      <span class="bar green" style="display:block;height:8px;margin:10px 0">
+        <i style="width:${pct}%"></i></span>
+      <div class="grid g-summary" style="margin-top:12px">
+        <div><div class="tiny dim">ASAMA 2'YI GECEN</div>
+          <div class="num" style="font-size:18px">${survivors}</div></div>
+        <div><div class="tiny dim">KALAN</div>
+          <div class="num" style="font-size:18px">${total - done}</div></div>
+        <div><div class="tiny dim">SAATLIK PARTI</div>
+          <div class="num" style="font-size:18px">${perHour}</div></div>
+        <div><div class="tiny dim">TAHMINI BITIS</div>
+          <div class="num" style="font-size:18px">${hoursLeft !== null ? '~' + hoursLeft + ' saat' : '—'}</div></div>
+      </div>
+      <div class="tiny dim" style="margin-top:10px">
+        Son parti: ${scan.last_batch_at ? Fmt.date(scan.last_batch_at) : '—'} ·
+        Son tur sonu: ${scan.last_finalized ? Fmt.date(scan.last_finalized) : 'henuz yok'}
+        ${(scan.failed || []).length ? ` · yuklenemeyen ${scan.failed.length}` : ''}
+      </div>
+      ${done < total ? `<p class="tiny dim" style="margin:8px 0 0">Asama 3-4 (goreli
+        ucuzluk ve puanlama) kuyruk bitince calisir — yuzdelikler havuzun
+        tamamini ister.</p>` : ''}
+    </div>`;
   }
 
   function renderStages(stages) {

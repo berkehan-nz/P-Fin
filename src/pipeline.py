@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from . import cards, config, funnel, portfolio, watchlist
-from .config import CARDS_DIR, DATA_DIR
+from .config import CARDS_DIR, DATA_DIR, SEED_TICKERS
 from .fundamentals import Fundamentals
-from .sources import analyst as analyst_src, edgar_api, finnhub_api, finra_short, fred_api, prices
+from .sources import (analyst as analyst_src, edgar_api, edgar_bulk,
+                      finnhub_api, finra_short, fred_api, prices)
 from .util import read_json, today_iso, try_fetch, write_json
 
 
@@ -213,3 +214,38 @@ def write_overview(ctx: dict, quotes: dict) -> bool:
         "watched_count": len(watched),
         "source": "prices+finnhub",
     })
+
+
+def universe_tickers(limit: int | None = None, *, auto_sync: bool = True) -> list[str]:
+    """Onbellekteki SEC sirketlerinden sembol listesi kurar.
+
+    Toplu veri CIK tasir, sembol tasimaz; ``company_tickers.json`` ile
+    eslestirilir. Eslesmeyenler (ADR, ozel sirket) elenir.
+
+    Onbellek bossa (ilk kosu, ya da Actions onbellegi dusmus) once toplu
+    veriyi indirir — aksi halde evren sessizce yalnizca tohum listesine
+    duser ve bunu kimse fark etmez.
+    """
+    companies = edgar_bulk.companies()
+    if not companies and auto_sync:
+        print("[evren] SEC toplu veri onbellegi bos — senkronize ediliyor...")
+        edgar_bulk.sync()
+        companies = edgar_bulk.companies()
+
+    tmap = edgar_api.ticker_map()
+    cik_to_ticker: dict[int, str] = {}
+    for ticker, info in tmap.items():
+        cik_to_ticker.setdefault(info["cik"], ticker)
+
+    out = []
+    for company in companies:
+        cik = company.get("cik")
+        sic = company.get("sic")
+        if cik is None or cik not in cik_to_ticker:
+            continue
+        if config.is_excluded_sic(sic):
+            continue
+        out.append(cik_to_ticker[cik])
+
+    out = sorted(set(out) | set(SEED_TICKERS) | set(watchlist.tickers()))
+    return out[:limit] if limit else out

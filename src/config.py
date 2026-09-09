@@ -27,7 +27,7 @@ for _d in (DATA_DIR, CARDS_DIR, INBOX_DIR, CACHE_DIR):
 # Kimlik / anahtarlar
 # --------------------------------------------------------------------------
 # SEC her istekte gercek bir iletisim adresi tasiyan User-Agent ister; yoksa 403.
-SEC_USER_AGENT = os.getenv("SEC_USER_AGENT", "Berkehan berkehan@nexizon.com")
+SEC_USER_AGENT = os.getenv("SEC_USER_AGENT", "Berkehan Turk berkehan@nexizon.com")
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY", "")
 FRED_API_KEY = os.getenv("FRED_API_KEY", "")
 

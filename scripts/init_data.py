@@ -67,6 +67,18 @@ def main() -> int:
     if portfolio.ensure_file():
         written.append("portfolio.json")
 
+    if write_json(D / "scan_state.json", {
+        **__import__("src.scan", fromlist=["scan"]).empty_state(),
+    }):
+        written.append("scan_state.json")
+
+    survivors = D / "survivors"
+    survivors.mkdir(parents=True, exist_ok=True)
+    keep = survivors / ".gitkeep"
+    if not keep.exists():
+        keep.write_text("", encoding="utf-8")
+        written.append("survivors/.gitkeep")
+
     gitkeep = config.CARDS_DIR / ".gitkeep"
     if not gitkeep.exists():
         gitkeep.write_text("", encoding="utf-8")

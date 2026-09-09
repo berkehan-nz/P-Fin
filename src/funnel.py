@@ -368,13 +368,54 @@ def run(rows: list[dict], *, top_n: int | None = None,
     log["stages"][-1]["output"] = len(passed)
     survivors = passed
 
-    # --- Sektor tablosu: yuzdelikler HAYATTA KALANLAR uzerinden ---
-    # Asama 0-2'de elenenler referans havuzunu bozar (iflas riskli sirketler
-    # carpanlari yapay olarak dusurur).
-    sector_table = pct_mod.build_sector_table(survivors)
+    # --- Asama 3 ve 4 ---
+    selected, sector_table = rank(survivors, log=log, top_n=top_n,
+                                  max_per_sector=max_per_sector,
+                                  compute_own_pct=True)
+
+    log["kill_reasons"] = dict(Counter(
+        r["kill_reason"] for r in rows if r.get("kill_reason")).most_common(30))
+
+    return {"candidates": selected, "all_rows": rows, "log": log,
+            "sector_table": sector_table}
+
+
+def rank(survivors: list[dict], *, log: dict | None = None,
+         top_n: int | None = None, max_per_sector: int | None = None,
+         sector_table: dict | None = None,
+         compute_own_pct: bool = True) -> tuple[list[dict], dict]:
+    """Asama 3 (goreli ucuzluk) + Asama 4 (puanlama, sektor kotasi, ilk N).
+
+    ``funnel.run`` ve kademeli tarayici (``scan.finalize``) ayni kodu
+    kullansin diye ayri fonksiyon. Kademeli taramada Asama 0-2 saatlik
+    partiler halinde onceden calistirilmis olur; buraya yalnizca hayatta
+    kalanlar gelir.
+
+    ``compute_own_pct=False`` ise satirlar ``own_pct`` degerini hazir
+    tasidigi varsayilir (anlik goruntuden geri yuklenmis satirlar).
+    """
+    top_n = top_n or config.FINAL_CANDIDATE_COUNT
+    max_per_sector = max_per_sector or config.MAX_PER_SECTOR
+    log = log if log is not None else {"stages": []}
+    log.setdefault("stages", [])
+
+    # Yuzdelikler HAYATTA KALANLAR uzerinden hesaplanir. Asama 0-2'de elenenler
+    # referans havuzunu bozar (iflas riskli sirketler carpanlari yapay olarak
+    # dusurur, saglikli sirketler pahali gorunur).
+    if sector_table is None:
+        sector_table = pct_mod.build_sector_table(survivors)
+
+    if compute_own_pct:
+        for row in survivors:
+            if row.get("fundamentals") is not None:
+                row["own_pct"] = pct_mod.own_history_percentiles(
+                    row["fundamentals"], row["metrics"])
+
     for row in survivors:
-        row["own_pct"] = pct_mod.own_history_percentiles(
-            row["fundamentals"], row["metrics"])
+        row.setdefault("track", metrics_mod.track_for(
+            row["metrics"], STAGE3["track_b_operating_margin_pct"]))
+        row.setdefault("passed_stages", [])
+        row.setdefault("own_pct", {})
 
     # --- Asama 3 ---
     log["stages"].append({"stage": 3, "name": STAGE_NAMES[3], "input": len(survivors)})
@@ -419,13 +460,10 @@ def run(rows: list[dict], *, top_n: int | None = None,
             break
 
     log["stages"][-1]["output"] = len(selected)
-    log["kill_reasons"] = dict(Counter(
-        r["kill_reason"] for r in rows if r.get("kill_reason")).most_common(30))
     log["sector_distribution"] = dict(per_sector)
     log["sector_quota_overflow"] = len(overflow)
 
-    return {"candidates": selected, "all_rows": rows, "log": log,
-            "sector_table": sector_table}
+    return selected, sector_table
 
 
 # --------------------------------------------------------------------------

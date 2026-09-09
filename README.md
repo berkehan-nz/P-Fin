@@ -1,4 +1,4 @@
-# Nexizon Yatirim Dashboard
+# Berkehan Finansal Takip Sistemi
 
 ABD hisselerinde 1-2 yillik vadede **yeniden fiyatlanma (re-rating)** firsatlari
 arayan kural tabanli bir tarama, analiz ve portfoy takip sistemi.
@@ -69,9 +69,11 @@ devam eder**. SEC anahtari (User-Agent) olmadan hicbir sey calismaz.
 |---|---|---|
 | `python -m src.run_seed` | 36 tohum sirket icin tam metrik seti + kart | ~5-10 dk |
 | `python -m src.run_seed --tickers DBX,LSCC` | alt kume | saniyeler |
-| `python -m src.run_funnel` | tam evren taramasi (Asama 0-4) | **saatler** |
+| `python -m src.run_scan` | **kademeli tarama** — kuyruktan bir parti (120 sirket) | ~15 dk |
+| `python -m src.run_scan --status` | tarama ilerlemesini goster | anlik |
+| `python -m src.run_scan --new-cycle` | kuyrugu bastan kur | ~15 dk |
+| `python -m src.run_funnel` | tam evren taramasi TEK SEFERDE (elle) | **saatler** |
 | `python -m src.run_funnel --limit 500` | hizli deneme | ~20 dk |
-| `python -m src.run_funnel --skip-sync` | SEC toplu verisini yeniden indirme | — |
 | `python -m src.run_daily` | fiyat, haber, portfoy + `merge_story()` | ~2-5 dk |
 | `python scripts/init_data.py` | `data/` klasorunu bos semalarla kurar | anlik |
 | `python -m pytest tests/` | 147 test | < 1 sn |
@@ -90,12 +92,14 @@ src/
   percentiles.py      Sektor ici + sirketin kendi 5 yillik yuzdelikleri
   scoring.py          Asama 4 puanlamasi (Ucuzluk/Kalite/Saglamlik/...)
   funnel.py           Asama 0-4 eleme mantigi + "nerede elenirdi" teshisi
+  scan.py             KADEMELI tarama: kuyruk, parti, anlik goruntu, tur sonu
   cards.py            Kart JSON uretimi + merge_story() + yazili blok koruma
   watchlist.py        Elle eklenen sirketler
   portfolio.py        Pozisyon takibi, K/Z, benchmark, uyarilar
   pipeline.py         Kosu adimlarinin ortak parcalari
   run_seed.py         TOHUM LISTESI kosusu
-  run_funnel.py       Tam evren taramasi
+  run_scan.py         Saatlik kademeli tarama partisi
+  run_funnel.py       Tam evren taramasi (elle, tek seferde)
   run_daily.py        Gunluk guncelleme
   sources/
     edgar_bulk.py     SEC toplu ZIP -> sqlite onbellek (API limiti yok)
@@ -108,11 +112,13 @@ src/
 data/                 CIKTI — repoya commit edilir, Claude buradan okur
   candidates.json  universe.json  funnel_log.json  macro.json
   overview.json  thresholds.json  watchlist.json  portfolio.json
-  portfolio_state.json  cards/<TICKER>.json
+  portfolio_state.json  scan_state.json
+  cards/<TICKER>.json       tam kartlar (ilk 50 + tohum + elle eklenenler)
+  survivors/<TICKER>.json   Asama 0-2'yi gecenlerin kompakt goruntusu
 claude_inbox/         Claude'un yazdigi hikaye/analiz dosyalari
 docs/                 GitHub Pages dashboard (vanilla JS, cerceve yok)
 tests/                pytest
-.github/workflows/    bootstrap · daily · weekly · tests
+.github/workflows/    bootstrap · scan (saatlik) · daily · weekly · tests
 ```
 
 ---
@@ -261,14 +267,44 @@ Claude'un analizini ve Berke'nin kararini silerdi.
 | Is akisi | Ne zaman | Ne yapar |
 |---|---|---|
 | **Bootstrap (tohum listesi)** | elle | 36 tohum sirket icin kart uretir — **ilk is bu** |
+| **Scan (saatlik evren taramasi)** | her saat :25 | kuyruktan 120 sirket isler; kuyruk bitince Asama 3-4 + kartlar |
 | **Daily (fiyat ve haber)** | hafta ici 07:00 TSI | fiyat, momentum, haber, kazanc takvimi, portfoy + `merge_story()` |
-| **Weekly (huni)** | pazar 05:00 TSI | SEC toplu veriyi gunceller, huniyi bastan calistirir |
+| **Weekly (SEC toplu veri + yeni tur)** | pazar 05:00 TSI | yeni ceyrek verisini indirir, evren listesini tazeler, yeni tur baslatir |
 | **Tests** | her push | pytest + JSON gecerlilik |
 
 **Degisiklik yoksa commit atilmaz** — `write_json()` icerigi karsilastirir ve
 zaman damgalarini karsilastirma disinda tutar.
 
----
+### Kademeli tarama nasil calisiyor
+
+Tam evren taramasi tek seferde saatler surer: ucretsiz kotalarda kirilgandir
+ve tek bir hata butun kosuyu cope atar. Bunun yerine **evren bir kuyruktur**:
+
+```
+Her saat  →  kuyruktan 120 sirket  →  Asama 0, 1, 2 (sirket bazli)
+                                       ↓
+                              hayatta kalanlar data/survivors/ altina
+                                       ↓
+              kuyruk bitince  →  Asama 3, 4 (havuzun tamamini ister)
+                                       ↓
+                        ilk 50 icin tam kart  →  yeni tur baslar
+```
+
+- **~4.900 sembol / 120 = ~41 saat**, yani tur basina yaklasik 1,7 gun.
+  Dashboard'un Huni ekraninda kuyrugun eridigini canli gorursun.
+- **Asama 0-2 partide calisir** cunku sirket bazlidir, komsuya ihtiyac duymaz.
+- **Asama 3-4 tur sonunda calisir** cunku goreli ucuzluk ve sektor yuzdelikleri
+  havuzun tamamini gerektirir.
+- **Ham companyfacts saklanmaz** (sirket basina 2-20 MB). `data/survivors/`
+  altina yalnizca Asama 3-4'un ve kart basliklarinin ihtiyaci olan kompakt
+  goruntu (~5-15 KB) yazilir. Tam kart yalnizca ilk 50 + tohum + elle
+  eklenenler icin, tur sonunda uretilir.
+- **Tur sonu isi hemen kaydedilir.** Yeni kuyrugu kurmak ag ister; o adim
+  cokerse saatlerce suren tarama sonucu kaybolmasin diye once biten tur
+  guvene alinir.
+- SEC'e giden trafik saniyede 8 istek sinirinin cok altinda kalir.
+
+Parti boyutunu degistirmek icin: Actions → **Scan** → Run workflow → `batch`.
 
 ## Test verisi hakkinda
 

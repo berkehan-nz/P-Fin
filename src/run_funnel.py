@@ -14,33 +14,9 @@ import argparse
 import sys
 
 from . import config, funnel, pipeline, watchlist
+from .pipeline import universe_tickers
 from .config import SEED_TICKERS
-from .sources import edgar_api, edgar_bulk
-
-
-def universe_tickers(limit: int | None = None) -> list[str]:
-    """Onbellekteki SEC sirketlerinden sembol listesi kurar.
-
-    Toplu veri CIK tasir, sembol tasimaz; ``company_tickers.json`` ile
-    eslestirilir. Eslesmeyenler (ADR, ozel sirket) elenir.
-    """
-    tmap = edgar_api.ticker_map()
-    cik_to_ticker: dict[int, str] = {}
-    for ticker, info in tmap.items():
-        cik_to_ticker.setdefault(info["cik"], ticker)
-
-    out = []
-    for company in edgar_bulk.companies():
-        cik = company.get("cik")
-        sic = company.get("sic")
-        if cik is None or cik not in cik_to_ticker:
-            continue
-        if config.is_excluded_sic(sic):
-            continue
-        out.append(cik_to_ticker[cik])
-
-    out = sorted(set(out) | set(SEED_TICKERS) | set(watchlist.tickers()))
-    return out[:limit] if limit else out
+from .sources import edgar_bulk
 
 
 def main(argv: list[str] | None = None) -> int:

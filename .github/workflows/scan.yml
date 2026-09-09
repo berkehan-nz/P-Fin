@@ -1,0 +1,83 @@
+# KADEMELI EVREN TARAMASI — her saat bir parti.
+#
+# Tam evreni tek seferde taramak yerine kuyruktan sabit sayida sirket isler.
+# Kuyruk bitince Asama 3-4 calisir, kartlar uretilir ve yeni tur baslar.
+# Boylece hem SEC'e nazik trafik olur, hem her saat gorunur ilerleme olur,
+# hem de hicbir kosu 20 dakikayi asmaz.
+name: Scan (saatlik evren taramasi)
+
+on:
+  schedule:
+    - cron: '25 * * * *'        # her saatin 25. dakikasi (gunluk kosuyla cakismasin)
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: 'Bu kosuda islenecek sirket sayisi (bos = 120)'
+        required: false
+        default: ''
+      new_cycle:
+        description: 'Kuyrugu bastan kur'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finans-veri            # daily/weekly ile ayni grup — es zamanli commit olmasin
+  cancel-in-progress: false
+
+jobs:
+  batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Onbellek (SEC toplu veri + fiyat)
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: finans-cache-${{ github.run_id }}
+          restore-keys: finans-cache-
+
+      - name: Parti
+        env:
+          SEC_USER_AGENT:  ${{ secrets.SEC_USER_AGENT }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+          FRED_API_KEY:    ${{ secrets.FRED_API_KEY }}
+        run: |
+          if [ -z "$SEC_USER_AGENT" ]; then
+            echo "::error::SEC_USER_AGENT secret'i tanimli degil — SEC 403 doner."
+            exit 1
+          fi
+          ARGS=""
+          [ -n "${{ inputs.batch }}" ] && ARGS="$ARGS --batch ${{ inputs.batch }}"
+          [ "${{ inputs.new_cycle }}" = "true" ] && ARGS="$ARGS --new-cycle"
+          python -m src.run_scan $ARGS
+
+      - name: Ilerleme ozeti
+        if: always()
+        run: |
+          python -m src.run_scan --status >> $GITHUB_STEP_SUMMARY 2>&1 || true
+
+      - name: Commit
+        run: |
+          git config user.name  "berkehan-bot"
+          git config user.email "actions@github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "Degisiklik yok."
+          else
+            git commit -m "veri: tarama partisi $(date -u +'%Y-%m-%d %H:%M')"
+            git pull --rebase --autostash origin ${{ github.ref_name }} || true
+            git push
+          fi
