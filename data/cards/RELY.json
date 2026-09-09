@@ -46,20 +46,23 @@
   "flags": {
     "data_basis": "quarterly_ttm",
     "is_manual": false,
-    "kill_reason": "Brut marj hesaplanamadi",
+    "kill_reason": "Hisse sayisi artisi %11.8 >= %5",
     "one_off_earnings": true,
     "passed_stages": [
       0
     ],
     "rev_growth_organic_suspect": false,
     "roic_method": "a",
+    "stage1_missing": [
+      "gross_margin"
+    ],
     "warnings": [
       "Net kar EBIT'e gore asiri yuksek veya vergi orani negatif — F/K tek seferlik kalemle sismis olabilir."
     ],
     "would_fail_at": 1,
     "z_unreliable": false
   },
-  "generated_at": "2026-09-09T13:05:05+00:00",
+  "generated_at": "2026-09-09T13:13:26+00:00",
   "insider": {
     "form4_count": 53,
     "last_form4": "2026-09-04",
@@ -267,7 +270,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 44.4,
+      "sector_pct": 42.6,
       "value": 5.0
     },
     "rel_strength_12m": {
@@ -444,8 +447,8 @@
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 44.4,
-          "scaled": 44.4,
+          "percentile": 42.6,
+          "scaled": 42.6,
           "weight": 0.25
         },
         "sloan_accruals": {
@@ -601,7 +604,7 @@
   },
   "scores": {
     "catalyst": null,
-    "earnings_quality": 29.1,
+    "earnings_quality": 28.5,
     "momentum": 77.8,
     "quality": 51.7,
     "safety": 81.2,

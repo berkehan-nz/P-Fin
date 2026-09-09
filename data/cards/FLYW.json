@@ -46,20 +46,23 @@
   "flags": {
     "data_basis": "quarterly_ttm",
     "is_manual": false,
-    "kill_reason": "Brut marj hesaplanamadi",
+    "kill_reason": "Kol A ucuzluk testi: EV/EBIT sektor yuzdeligi 93 > 40 ve FCF verimi 2 <= %4",
     "one_off_earnings": false,
     "passed_stages": [
-      0
+      0,
+      1,
+      2
     ],
     "rev_growth_organic_suspect": true,
     "roic_method": "a",
+    "stage1_missing": [],
     "warnings": [
       "Buyume satin alma kaynakli olabilir; serefiye artisi ve 8-K devralma duyurulari kontrol edilmeli."
     ],
-    "would_fail_at": 1,
+    "would_fail_at": 3,
     "z_unreliable": false
   },
-  "generated_at": "2026-09-09T13:04:44+00:00",
+  "generated_at": "2026-09-09T13:13:06+00:00",
   "insider": {
     "form4_count": 45,
     "last_form4": "2026-09-03",
@@ -267,7 +270,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 63.0,
+      "sector_pct": 61.1,
       "value": 6.0
     },
     "rel_strength_12m": {
@@ -444,8 +447,8 @@
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 63.0,
-          "scaled": 63.0,
+          "percentile": 61.1,
+          "scaled": 61.1,
           "weight": 0.25
         },
         "sloan_accruals": {
@@ -600,11 +603,11 @@
   },
   "scores": {
     "catalyst": null,
-    "earnings_quality": 52.7,
+    "earnings_quality": 52.2,
     "momentum": 74.1,
     "quality": 36.6,
     "safety": 68.0,
-    "total": 44.3,
+    "total": 44.2,
     "value": 14.9,
     "weight_coverage": 0.85
   },

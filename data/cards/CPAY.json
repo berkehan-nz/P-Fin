@@ -51,21 +51,27 @@
   "flags": {
     "data_basis": "quarterly_ttm",
     "is_manual": false,
-    "kill_reason": "Brut marj hesaplanamadi",
+    "kill_reason": null,
     "one_off_earnings": false,
     "passed_stages": [
-      0
+      0,
+      1,
+      2,
+      3
     ],
     "rev_growth_organic_suspect": true,
     "roic_method": "a",
+    "stage1_missing": [
+      "gross_margin"
+    ],
     "warnings": [
       "Bu olcekte %20+ ceyreklik buyume organik olamaz; buyume muhtemelen satin alma kaynakli. 10-K/8-K devralma kontrolu gerekli.",
       "Buyume satin alma kaynakli olabilir; serefiye artisi ve 8-K devralma duyurulari kontrol edilmeli."
     ],
-    "would_fail_at": 1,
+    "would_fail_at": null,
     "z_unreliable": false
   },
-  "generated_at": "2026-09-09T13:04:38+00:00",
+  "generated_at": "2026-09-09T13:12:59+00:00",
   "insider": {
     "form4_count": 18,
     "last_form4": "2026-08-25",

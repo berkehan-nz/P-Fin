@@ -46,18 +46,24 @@
   "flags": {
     "data_basis": "quarterly_ttm",
     "is_manual": false,
-    "kill_reason": "Brut marj hesaplanamadi",
+    "kill_reason": null,
     "one_off_earnings": false,
     "passed_stages": [
-      0
+      0,
+      1,
+      2,
+      3
     ],
     "rev_growth_organic_suspect": false,
     "roic_method": "b",
+    "stage1_missing": [
+      "gross_margin"
+    ],
     "warnings": [],
-    "would_fail_at": 1,
+    "would_fail_at": null,
     "z_unreliable": false
   },
-  "generated_at": "2026-09-09T13:05:08+00:00",
+  "generated_at": "2026-09-09T13:13:30+00:00",
   "insider": {
     "form4_count": 44,
     "last_form4": "2026-09-03",

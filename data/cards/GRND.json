@@ -17,15 +17,9 @@
     "next_earnings": null
   },
   "data_quality": {
-    "issue_count": 1,
-    "issues": [
-      {
-        "code": "brut_kar_yok",
-        "level": "medium",
-        "message": "Brut kar hesaplanamadi (satis maliyeti etiketi yok). Brut marj Asama 1'de sert filtredir — bu sirket haksiz yere elenebilir."
-      }
-    ],
-    "status": "sinirli"
+    "issue_count": 0,
+    "issues": [],
+    "status": "iyi"
   },
   "data_sources": {
     "analyst": "yfinance",
@@ -46,18 +40,19 @@
   "flags": {
     "data_basis": "quarterly_ttm",
     "is_manual": false,
-    "kill_reason": "Brut marj hesaplanamadi",
+    "kill_reason": "Hisse sayisi artisi %11.0 >= %5",
     "one_off_earnings": false,
     "passed_stages": [
       0
     ],
     "rev_growth_organic_suspect": false,
     "roic_method": "b",
+    "stage1_missing": [],
     "warnings": [],
     "would_fail_at": 1,
     "z_unreliable": false
   },
-  "generated_at": "2026-09-09T13:04:50+00:00",
+  "generated_at": "2026-09-09T13:13:11+00:00",
   "insider": {
     "form4_count": 30,
     "last_form4": "2026-09-02",
@@ -73,11 +68,11 @@
       "value": null
     },
     "beneish_m": {
-      "color": "gray",
+      "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "none",
-      "sector_pct": null,
-      "value": null
+      "pct_basis": "sector",
+      "sector_pct": 40.6,
+      "value": -2.8
     },
     "cash_conversion": {
       "color": "green",
@@ -122,11 +117,11 @@
       "value": 19.66
     },
     "ev_gross_profit": {
-      "color": "gray",
-      "own_5y_pct": null,
-      "pct_basis": "none",
-      "sector_pct": null,
-      "value": null
+      "color": "yellow",
+      "own_5y_pct": 25.0,
+      "pct_basis": "sector",
+      "sector_pct": 75.0,
+      "value": 8.03
     },
     "ev_sales": {
       "color": "yellow",
@@ -164,25 +159,25 @@
       "value": 5.24
     },
     "gross_margin": {
-      "color": "gray",
+      "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "none",
-      "sector_pct": null,
-      "value": null
+      "pct_basis": "sector",
+      "sector_pct": 70.5,
+      "value": 74.94
     },
     "gross_margin_change_3y": {
       "color": "gray",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": null
+      "value": 1.23
     },
     "gross_profitability": {
-      "color": "gray",
+      "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "none",
-      "sector_pct": null,
-      "value": null
+      "pct_basis": "sector",
+      "sector_pct": 93.2,
+      "value": 0.83
     },
     "implied_growth": {
       "color": "yellow",
@@ -265,8 +260,8 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 44.4,
-      "value": 5.0
+      "sector_pct": 61.1,
+      "value": 6.0
     },
     "rel_strength_12m": {
       "color": "red",
@@ -427,8 +422,9 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "contribution": null,
-          "percentile": null
+          "percentile": 40.6,
+          "scaled": 59.4,
+          "weight": 0.2
         },
         "cash_conversion": {
           "percentile": 50.0,
@@ -436,8 +432,8 @@
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 44.4,
-          "scaled": 44.4,
+          "percentile": 61.1,
+          "scaled": 61.1,
           "weight": 0.25
         },
         "sloan_accruals": {
@@ -446,7 +442,7 @@
           "weight": 0.25
         }
       },
-      "coverage": 0.8
+      "coverage": 1.0
     },
     "momentum": {
       "components": {
@@ -481,12 +477,14 @@
           "weight": 0.15
         },
         "gross_margin": {
-          "contribution": null,
-          "percentile": null
+          "percentile": 70.5,
+          "scaled": 70.5,
+          "weight": 0.2
         },
         "gross_profitability": {
-          "contribution": null,
-          "percentile": null
+          "percentile": 93.2,
+          "scaled": 93.2,
+          "weight": 0.2
         },
         "roic": {
           "percentile": 77.1,
@@ -499,7 +497,7 @@
           "weight": 0.15
         }
       },
-      "coverage": 0.6
+      "coverage": 1.0
     },
     "safety": {
       "components": {
@@ -537,8 +535,9 @@
           "weight": 0.3
         },
         "ev_gross_profit": {
-          "contribution": null,
-          "percentile": null
+          "percentile": 75.0,
+          "scaled": 25.0,
+          "weight": 0.2
         },
         "ev_sales": {
           "percentile": 87.0,
@@ -551,7 +550,7 @@
           "weight": 0.25
         }
       },
-      "coverage": 0.8
+      "coverage": 1.0
     }
   },
   "score_internals": {
@@ -567,20 +566,18 @@
       "z": null
     },
     "beneish": {
-      "m": null,
-      "missing": [
-        "GMI"
-      ]
+      "m": -2.803056889704047,
+      "missing": []
     },
     "piotroski": {
-      "max_possible": 8,
-      "score": 5,
+      "max_possible": 9,
+      "score": 6,
       "tests": {
         "accruals": true,
         "cfo_positive": true,
         "leverage_down": false,
         "liquidity_up": false,
-        "margin_up": null,
+        "margin_up": true,
         "no_dilution": false,
         "roa_improving": true,
         "roa_positive": true,
@@ -594,12 +591,12 @@
   },
   "scores": {
     "catalyst": null,
-    "earnings_quality": 52.5,
+    "earnings_quality": 58.0,
     "momentum": 58.3,
-    "quality": 78.0,
+    "quality": 79.5,
     "safety": 16.7,
-    "total": 51.0,
-    "value": 45.1,
+    "total": 50.8,
+    "value": 41.0,
     "weight_coverage": 0.85
   },
   "sector": "Is hizmetleri ve yazilim",
@@ -620,18 +617,18 @@
       null
     ],
     "gross_margin": [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
+      74.03,
+      74.63,
+      73.96,
+      74.5,
+      74.35,
+      75.37,
+      73.87,
+      73.7,
+      75.02,
+      74.84,
+      74.92,
+      74.98
     ],
     "period_ends": [
       "2023-09-30",
@@ -787,7 +784,7 @@
     "ebit_musd": 151.8,
     "ebitda_musd": 156.0,
     "fcf_musd": 140.8,
-    "gross_profit_musd": null,
+    "gross_profit_musd": 382.0,
     "net_income_musd": 95.6,
     "period_end": "2026-06-30",
     "revenue_musd": 509.8
