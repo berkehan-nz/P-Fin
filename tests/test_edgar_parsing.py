@@ -142,3 +142,68 @@ class TestQuarterDetection:
         entries = [fact("2025-01-01", "2025-03-31", 100, filed="2025-05-01"),
                    fact("2025-01-01", "2025-03-31", 105, filed="2025-11-01")]
         assert ea._pick_best(entries)["val"] == 105
+
+
+class TestQ4SanityCheck:
+    """Turetilmis Q4 (yillik - Q1 - Q2 - Q3) makul olmali.
+
+    GPN'de gorulen: bir ceyrek ~1.900 yerine 159 gorunuyordu, cunku yillik
+    rakam bir etiketten, ceyrekler baska bir etiketten geliyordu ve cikarma
+    iki farkli olcegi birbirinden cikardi.
+    """
+
+    def test_sane_q4_is_written(self):
+        annual = {"2025-12-31": 4000.0}
+        quarterly = {"2025-03-31": 950.0, "2025-06-30": 1000.0, "2025-09-30": 1050.0}
+        ea._derive_q4(annual, quarterly,
+                      {"2025-12-31": ["2025-03-31", "2025-06-30", "2025-09-30"]})
+        assert quarterly["2025-12-31"] == pytest.approx(1000.0)
+
+    def test_absurd_q4_is_discarded(self):
+        """Yillik rakam ceyreklerle ayni olcekte degilse Q4 yazilmaz."""
+        annual = {"2025-12-31": 4000.0}
+        quarterly = {"2025-03-31": 50.0, "2025-06-30": 55.0, "2025-09-30": 60.0}
+        ea._derive_q4(annual, quarterly,
+                      {"2025-12-31": ["2025-03-31", "2025-06-30", "2025-09-30"]})
+        assert "2025-12-31" not in quarterly
+
+    def test_negative_q4_beyond_tolerance_discarded(self):
+        annual = {"2025-12-31": 100.0}
+        quarterly = {"2025-03-31": 900.0, "2025-06-30": 950.0, "2025-09-30": 1000.0}
+        ea._derive_q4(annual, quarterly,
+                      {"2025-12-31": ["2025-03-31", "2025-06-30", "2025-09-30"]})
+        assert "2025-12-31" not in quarterly
+
+    def test_seasonal_q4_still_allowed(self):
+        """SONO gibi mevsimsel sirketlerde buyuk Q4 GERCEKTIR, elenmemeli."""
+        annual = {"2025-12-31": 1600.0}
+        quarterly = {"2025-03-31": 260.0, "2025-06-30": 290.0, "2025-09-30": 300.0}
+        ea._derive_q4(annual, quarterly,
+                      {"2025-12-31": ["2025-03-31", "2025-06-30", "2025-09-30"]})
+        assert quarterly["2025-12-31"] == pytest.approx(750.0)   # ~2.6x medyan, gecerli
+
+
+class TestTagConsistency:
+    def test_same_tag_used_for_annual_and_quarterly(self):
+        doc = {"facts": {"us-gaap": {
+            "Revenues": {"units": {"USD": [
+                fact("2025-01-01", "2025-12-31", 4000)]}},           # sadece yillik
+            "RevenueFromContractWithCustomerExcludingAssessedTax": {"units": {"USD": [
+                fact("2025-01-01", "2025-03-31", 950),
+                fact("2025-01-01", "2025-12-31", 4000)]}},           # ikisi de var
+        }}}
+        annual, quarterly, tag = ea._collect_field(
+            doc, ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues"])
+        assert tag == "RevenueFromContractWithCustomerExcludingAssessedTax"
+        assert annual and quarterly
+
+    def test_falls_back_when_no_tag_has_both(self):
+        doc = {"facts": {"us-gaap": {
+            "Revenues": {"units": {"USD": [fact("2025-01-01", "2025-12-31", 4000)]}},
+        }}}
+        annual, quarterly, tag = ea._collect_field(doc, ["Revenues"])
+        assert tag == "Revenues"
+        assert annual and not quarterly
+
+    def test_no_data_returns_empty(self):
+        assert ea._collect_field({"facts": {}}, ["Revenues"]) == ({}, {}, None)

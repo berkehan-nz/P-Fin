@@ -21,6 +21,13 @@ MILLION = 1e6
 # muhtemelen yalnizca tek hisse sinifini tasiyor demektir.
 SHARE_COUNT_SANITY_RATIO = 0.70
 
+# Turetilmis Q4 makulluk bandi, diger ceyreklerin medyaninin kati olarak.
+# Band ASIMETRIKTIR: mevsimsellik YUKARI yonde olur (Sonos'ta Aralik ceyregi
+# digerlerinin 2-3 kati satar), asagi yonde bu kadar sapma neredeyse her
+# zaman olcek uyusmazligi demektir.
+Q4_SANITY_MAX_MULTIPLE = 3.0
+Q4_SANITY_MIN_MULTIPLE = -1.5
+
 TICKER_CACHE = config.CACHE_DIR / "company_tickers.json"
 FACTS_CACHE_DIR = config.CACHE_DIR / "companyfacts"
 FACTS_CACHE_DIR.mkdir(parents=True, exist_ok=True)
@@ -320,6 +327,46 @@ def _pick_best(entries: list[dict]) -> dict | None:
     return max(entries, key=lambda e: (e.get("filed", ""), e.get("accn", "")))
 
 
+def _collect_field(facts: dict, tags: list[str]) -> tuple[dict, dict, str | None]:
+    """Bir kavramin yillik VE ceyreklik serisini AYNI ETIKETTEN toplar.
+
+    Kritik: ikisi ayri etiket secerse Q4 turetimi
+    (yillik - Q1 - Q2 - Q3) iki farkli olcegi birbirinden cikarir ve
+    tamamen uydurma bir sayi uretir. GPN'de bir ceyrek 1.900 yerine
+    159 gorunmesinin sebebi buydu.
+
+    Once hem yillik hem ceyreklik verisi olan ilk etiket denenir; boyle
+    bir etiket yoksa en cok veri tasiyan tercih edilir.
+    """
+    best: tuple[dict, dict, str] | None = None
+    for tag in tags:
+        annual = _collect_single_tag(facts, tag, annual=True)
+        quarterly = _collect_single_tag(facts, tag, annual=False)
+        if annual and quarterly:
+            return annual, quarterly, tag
+        if (annual or quarterly) and best is None:
+            best = (annual, quarterly, tag)
+    return best if best is not None else ({}, {}, None)
+
+
+def _collect_single_tag(facts: dict, tag: str, *, annual: bool) -> dict[str, float]:
+    """Tek bir etiketin donem sonu -> deger eslemesi."""
+    entries = _facts_for_tag(facts, tag)
+    if not entries:
+        return {}
+    bucket: dict[str, list[dict]] = {}
+    for e in entries:
+        ok = _is_annual(e) if annual else _is_quarter(e)
+        if ok and e.get("val") is not None:
+            bucket.setdefault(e["end"], []).append(e)
+    out: dict[str, float] = {}
+    for end, group in bucket.items():
+        best_entry = _pick_best(group)
+        if best_entry is not None:
+            out[end] = float(best_entry["val"])
+    return out
+
+
 def _collect_flow(facts: dict, tags: list[str], *, annual: bool) -> dict[str, float]:
     """{donem_sonu: deger} — ilk dolu etiket alternatifini kullanir."""
     out: dict[str, float] = {}
@@ -453,7 +500,19 @@ def _derive_q4(annual: dict[str, float], quarterly: dict[str, float],
         parts = [quarterly.get(q) for q in quarters]
         if len(parts) != 3 or any(p is None for p in parts):
             continue
-        quarterly[fy_end] = annual[fy_end] - sum(parts)  # type: ignore[arg-type]
+        derived = annual[fy_end] - sum(parts)  # type: ignore[arg-type]
+
+        # MAKULLUK KONTROLU: turetilmis Q4, diger uc ceyregin buyuklugune
+        # yakin olmali. Cok uzaksa yillik ve ceyreklik rakamlar farkli
+        # olcekte demektir (farkli etiket, yeniden duzenleme, birim degisimi)
+        # ve cikarma islemi uydurma bir sayi uretmistir. Yazmaktansa bos birak.
+        sizes = [abs(p) for p in parts if p]                # type: ignore[arg-type]
+        if sizes:
+            typical = sorted(sizes)[len(sizes) // 2]
+            if typical > 0 and not (Q4_SANITY_MIN_MULTIPLE * typical
+                                    <= derived <= Q4_SANITY_MAX_MULTIPLE * typical):
+                continue
+        quarterly[fy_end] = derived
 
 
 def _fiscal_quarter_ends(facts: dict) -> dict[str, list[str]]:
@@ -502,8 +561,9 @@ def fundamentals_from_facts(facts: dict, ticker: str, *,
     q_flows: dict[str, dict[str, float]] = {}
     a_flows: dict[str, dict[str, float]] = {}
     for field, tags in {**FLOW_TAGS, **SHARE_FLOW_TAGS}.items():
-        annual = _collect_flow(facts, tags, annual=True)
-        quarterly = _collect_flow(facts, tags, annual=False)
+        # Yillik ve ceyreklik AYNI etiketten gelmeli; aksi halde Q4 turetimi
+        # iki farkli olcegi birbirinden cikarir.
+        annual, quarterly, _tag = _collect_field(facts, tags)
 
         if field in CUMULATIVE_FIELDS:
             # Acikca 3 aylik raporlanan degerler oncelikli; eksik ceyrekler

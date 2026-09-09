@@ -193,3 +193,59 @@ class TestNetDebtConsistency:
         from src.fundamentals import Fundamentals
         r = metrics.compute(Fundamentals(ticker="ZZZZ"))
         assert r["metrics"]["net_debt"] is None
+
+
+class TestCashFlowGroupCoherence:
+    """Nakit akis kalemleri TEK PARCA karar vermeli.
+
+    SONO'da gorulen: CFO ceyreklerden toplaniyor, yatirim harcamasi yillik
+    tablodan geliyordu; FCF iki farkli tabanin farki oldugu icin ceyrek
+    toplami (130,4) ile TTM (147,1) uyusmuyordu.
+    """
+
+    def _quarters_with_gap(self):
+        from src.fundamentals import Fundamentals, Period
+        f = Fundamentals(ticker="MIX")
+        # 4 ceyrek: CFO hepsinde var, capex son ceyrekte YOK
+        for i, (cfo, capex) in enumerate([(100, 10), (110, 12), (120, 11), (130, None)]):
+            f.quarters.append(Period(period_end=f"2025-{(i + 1) * 3:02d}-30",
+                                     period_type="Q", revenue=1000,
+                                     cfo=cfo, capex=capex))
+        f.annuals.append(Period(period_end="2025-12-31", period_type="FY",
+                                revenue=4000, cfo=460, capex=45))
+        return f
+
+    def test_whole_group_falls_back_together(self):
+        p = self._quarters_with_gap().ttm_period()
+        # capex eksik -> CFO da yillik tabloya dusmeli
+        assert p.cfo == 460
+        assert p.capex == 45
+        assert p.fcf == 415
+
+    def test_fcf_is_never_mixed_basis(self):
+        p = self._quarters_with_gap().ttm_period()
+        # 460-45=415 tutarli; 460(ceyrek toplami) - 45(yillik) = 415 olsaydi
+        # rastlanti olurdu. Asil kontrol: cfo ve capex ayni kaynaktan.
+        assert p.cfo == 460 and p.capex == 45
+
+    def test_complete_quarters_still_summed(self):
+        from src.fundamentals import Fundamentals, Period
+        f = Fundamentals(ticker="OK")
+        for i, (cfo, capex) in enumerate([(100, 10), (110, 12), (120, 11), (130, 13)]):
+            f.quarters.append(Period(period_end=f"2025-{(i + 1) * 3:02d}-30",
+                                     period_type="Q", revenue=1000,
+                                     cfo=cfo, capex=capex))
+        p = f.ttm_period()
+        assert p.cfo == 460 and p.capex == 46 and p.fcf == 414
+
+    def test_field_missing_everywhere_does_not_force_fallback(self):
+        """Hic yatirim harcamasi raporlamayan sirkette CFO ceyreklerden gelmeli."""
+        from src.fundamentals import Fundamentals, Period
+        f = Fundamentals(ticker="NOCAPEX")
+        for i, cfo in enumerate([100, 110, 120, 130]):
+            f.quarters.append(Period(period_end=f"2025-{(i + 1) * 3:02d}-30",
+                                     period_type="Q", revenue=1000, cfo=cfo))
+        f.annuals.append(Period(period_end="2025-12-31", period_type="FY",
+                                revenue=4000, cfo=999))
+        p = f.ttm_period()
+        assert p.cfo == 460          # yillik 999'a DUSMEMELI

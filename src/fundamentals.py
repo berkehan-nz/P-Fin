@@ -27,6 +27,13 @@ FLOW_FIELDS = (
     "shares_diluted", "shares_basic",
 )
 
+# Nakit akis tablosu kalemleri BIRLIKTE ele alinmali. Biri ceyreklerden
+# toplanip digeri yillik tabloya duserse FCF = CFO - Yatirim harcamasi
+# farkli tabanlarin cikarmasi olur ve sessizce yanlis cikar.
+# SONO'da gorulen: ceyrek toplami 130,4 iken TTM 147,1 yaziyordu.
+CASHFLOW_FIELDS = ("cfo", "capex", "cfi", "cff", "sbc",
+                   "dividends_paid", "stock_issued", "dep_amort")
+
 # Bunlar da SURE bazli etiketlerdir (donem boyunca agirlikli ortalama) ama
 # TOPLANMAZ — 12 aylik hisse sayisi diye 4 ceyregin toplamini vermek sacmadir.
 # TTM'de son ceyregin degeri alinir.
@@ -245,9 +252,22 @@ class Fundamentals:
                        fiscal_year=end_period.fiscal_year,
                        fiscal_period=end_period.fiscal_period)
 
-            for f in FLOW_FIELDS:
+            # Nakit akis grubu TEK PARCA karar verir: iceride yillik verisi
+            # olup ceyrekleri eksik olan bir kalem varsa grubun TAMAMI yillik
+            # tabloya duser. Aksi halde CFO ceyreklerden, yatirim harcamasi
+            # yillikdan gelir ve FCF iki farkli tabanin farki olur.
+            cashflow_mixed = False
+            for f in CASHFLOW_FIELDS:
                 vals = [num(getattr(q, f)) for q in window]
-                if all(v is not None for v in vals):
+                if any(v is None for v in vals) and annual_fallback is not None \
+                        and num(getattr(annual_fallback, f, None)) is not None:
+                    cashflow_mixed = True
+                    break
+
+            for f in FLOW_FIELDS:
+                use_annual = cashflow_mixed and f in CASHFLOW_FIELDS
+                vals = [num(getattr(q, f)) for q in window]
+                if not use_annual and all(v is not None for v in vals):
                     setattr(p, f, vals[-1] if f in AVERAGE_FIELDS else sum(vals))
                 else:
                     # KISMI TOPLAM YAZILMAZ. Bir ceyrek bile eksikse o kalem
