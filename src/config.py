@@ -136,6 +136,13 @@ UNIVERSE = {
 # HUNI — Asama 1: Sert filtreler
 # --------------------------------------------------------------------------
 STAGE1 = {
+    # ILKE: sert filtre BILINEN KOTU degeri eler, VERI YOKLUGUNU elemez.
+    # Bir XBRL etiketi eslesmedigi icin sirketi atmak, etiketleme bicimine
+    # gore sistematik ve GORUNMEZ bir yanlilik yaratir — brut marji
+    # hesaplanamayan sirket, brut marji dusuk sirket demek degildir.
+    # Eksik girdiler isaretlenip tasinir; Asama 3 zaten sayiyi gercekten
+    # gerektirdiginde eleyecektir.
+    "kill_on_missing_data": False,
     "gross_margin_min_pct": 30.0,
     "rev_growth_ttm_min_pct": 5.0,
     # FCF > 0  VEYA  (buyume > X VE Rule of 40 >= Y)

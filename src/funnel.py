@@ -100,30 +100,44 @@ def stage0(row: dict) -> str | None:
 # Asama 1 — Sert filtreler
 # --------------------------------------------------------------------------
 def stage1(row: dict) -> str | None:
+    """Sert filtreler.
+
+    Eksik veri ELEME SEBEBI DEGILDIR (bkz. STAGE1["kill_on_missing_data"]).
+    Hesaplanamayan girdiler ``row["stage1_missing"]`` listesine yazilir ve
+    kartta gorunur; boylece "neden gecti" sorusu cevapsiz kalmaz.
+    """
     m = row["metrics"]
+    missing = row.setdefault("stage1_missing", [])
+    strict = STAGE1["kill_on_missing_data"]
 
     gm = num(m.get("gross_margin"))
     if gm is None:
-        return "Brut marj hesaplanamadi"
-    if gm <= STAGE1["gross_margin_min_pct"]:
+        if strict:
+            return "Brut marj hesaplanamadi"
+        missing.append("gross_margin")
+    elif gm <= STAGE1["gross_margin_min_pct"]:
         return f"Brut marj %{gm:.1f} <= %{STAGE1['gross_margin_min_pct']:.0f}"
 
     growth = num(m.get("rev_growth_ttm"))
     if growth is None:
-        return "Hasilat buyumesi hesaplanamadi"
-    if growth <= STAGE1["rev_growth_ttm_min_pct"]:
+        if strict:
+            return "Hasilat buyumesi hesaplanamadi"
+        missing.append("rev_growth_ttm")
+    elif growth <= STAGE1["rev_growth_ttm_min_pct"]:
         return f"Hasilat buyumesi %{growth:.1f} <= %{STAGE1['rev_growth_ttm_min_pct']:.0f}"
 
     # FCF > 0  VEYA  (yuksek buyume VE 40 Kurali)
     fcf = num(row["meta"].get("fcf_ttm_musd"))
     rule40 = num(m.get("rule_of_40"))
     fcf_ok = fcf is not None and fcf > 0
-    exemption = (growth > STAGE1["high_growth_exemption_growth_pct"]
+    exemption = (growth is not None
+                 and growth > STAGE1["high_growth_exemption_growth_pct"]
                  and rule40 is not None
                  and rule40 >= STAGE1["high_growth_exemption_rule40_min"])
     if not (fcf_ok or exemption):
         return ("FCF negatif ve yuksek buyume istisnasi saglanmadi "
-                f"(buyume %{growth:.1f}, 40 Kurali {rule40 if rule40 is None else round(rule40,1)})")
+                f"(buyume {'yok' if growth is None else f'%{growth:.1f}'}, "
+                f"40 Kurali {rule40 if rule40 is None else round(rule40, 1)})")
 
     nd_ebitda = num(m.get("net_debt_to_ebitda"))
     if nd_ebitda is not None and nd_ebitda >= STAGE1["net_debt_to_ebitda_max"]:
@@ -484,7 +498,8 @@ def diagnose(row: dict, sector_table: dict | None = None) -> dict:
 
     reason = stage1(row)
     if reason:
-        return {"passed_stages": passed, "would_fail_at": 1, "kill_reason": reason}
+        return {"passed_stages": passed, "would_fail_at": 1, "kill_reason": reason,
+                "stage1_missing": row.get("stage1_missing", [])}
     passed.append(1)
 
     track = metrics_mod.track_for(row["metrics"], STAGE3["track_b_operating_margin_pct"])
@@ -499,4 +514,5 @@ def diagnose(row: dict, sector_table: dict | None = None) -> dict:
             return {"passed_stages": passed, "would_fail_at": 3, "kill_reason": reason}
         passed.append(3)
 
-    return {"passed_stages": passed, "would_fail_at": None, "kill_reason": None}
+    return {"passed_stages": passed, "would_fail_at": None, "kill_reason": None,
+            "stage1_missing": row.get("stage1_missing", [])}

@@ -200,3 +200,58 @@ class TestFullRun:
         d = funnel.diagnose(clean_row())
         assert d["would_fail_at"] is None
         assert 2 in d["passed_stages"]
+
+
+class TestMissingDataIsNotAKill:
+    """Sert filtre BILINEN KOTU degeri eler, VERI YOKLUGUNU elemez.
+
+    Ilk canli kosuda 7 sirket (ADEA, CPAY, FLYW, GRND, RELY, WDAY, YOU)
+    "Brut marj hesaplanamadi" diye elendi. Bunlarin brut marji dusuk degildi
+    — satis maliyeti XBRL etiketi eslesmemisti. Etiketleme bicimine gore
+    eleme yapmak sistematik ve gorunmez bir yanlilik yaratir.
+    """
+
+    def test_missing_gross_margin_does_not_kill(self):
+        r = clean_row()
+        r["metrics"]["gross_margin"] = None
+        assert funnel.stage1(r) is None
+        assert "gross_margin" in r["stage1_missing"]
+
+    def test_missing_growth_does_not_kill(self):
+        r = clean_row()
+        r["metrics"]["rev_growth_ttm"] = None
+        assert funnel.stage1(r) is None
+        assert "rev_growth_ttm" in r["stage1_missing"]
+
+    def test_known_bad_gross_margin_still_kills(self):
+        """Veri VARSA ve kotuysa eleme devam eder."""
+        r = clean_row()
+        r["metrics"]["gross_margin"] = 22.0
+        assert "Brut marj" in funnel.stage1(r)
+
+    def test_known_bad_growth_still_kills(self):
+        r = clean_row()
+        r["metrics"]["rev_growth_ttm"] = 1.2
+        assert "Hasilat buyumesi" in funnel.stage1(r)
+
+    def test_missing_growth_with_negative_fcf_does_not_crash(self):
+        r = clean_row()
+        r["metrics"]["rev_growth_ttm"] = None
+        r["meta"]["fcf_ttm_musd"] = -50
+        r["metrics"]["rule_of_40"] = None
+        reason = funnel.stage1(r)
+        assert reason is not None and "FCF negatif" in reason
+
+    def test_diagnose_reports_missing_inputs(self):
+        r = clean_row()
+        r["metrics"]["gross_margin"] = None
+        d = funnel.diagnose(r)
+        assert "gross_margin" in d["stage1_missing"]
+
+    def test_strict_mode_can_be_reenabled(self, monkeypatch):
+        """Politika config'de; istenirse eski davranisa donulebilir."""
+        from src.config import STAGE1
+        monkeypatch.setitem(STAGE1, "kill_on_missing_data", True)
+        r = clean_row()
+        r["metrics"]["gross_margin"] = None
+        assert funnel.stage1(r) == "Brut marj hesaplanamadi"

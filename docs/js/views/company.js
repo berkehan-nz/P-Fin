@@ -160,7 +160,13 @@ window.ViewCompany = (function () {
       ${f.kill_reason ? `<p class="small muted" style="margin-top:6px">
         <b>Elenme sebebi:</b> ${Fmt.esc(f.kill_reason)}</p>` : ''}
       ${f.would_fail_at === null && passed.length >= 3
-        ? '<p class="small c-green" style="margin-top:6px">Huninin tum asamalarini geciyor.</p>' : ''}`;
+        ? '<p class="small c-green" style="margin-top:6px">Huninin tum asamalarini geciyor.</p>' : ''}
+      ${(f.stage1_missing || []).length ? `<p class="small c-yellow" style="margin-top:6px">
+        <b>Not:</b> Asama 1'de su girdiler hesaplanamadi:
+        ${Fmt.esc(f.stage1_missing.map((k) => Fmt.label(k)).join(', '))}.
+        Eksik veri eleme sebebi SAYILMAZ — etiketleme bicimine gore eleme
+        yapmak gorunmez bir yanlilik yaratirdi. Bu alanlari dogrulamadan
+        sirketi degerlendirme.</p>` : ''}`;
   }
 
   function stat(label, value, sub) {
