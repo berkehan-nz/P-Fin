@@ -595,14 +595,21 @@
     }
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 35.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 58.6,
     "momentum": 58.3,
     "quality": 81.2,
     "safety": 16.7,
-    "total": 51.6,
+    "total": 46.8,
     "value": 42.0,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -764,25 +771,38 @@
   "sic": 7370,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Ağırlıkla Al, hedef 18-20 $. Ayılar bilanço ve short.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Nakit 7 mn $, borç 386 mn $, özkaynak açığı; refinansman riski",
+      "SBC gelirin ~%15'i ve artıyor",
+      "EPS miss (0,10 vs 0,14 $); yüksek short"
+    ],
+    "bull_case": [
+      "Gelir +%33, FAVÖK marjı %41,7; FY26 kılavuzu 540 mn $ / 232 mn $ FAVÖK'e yükseltildi",
+      "37,6 mn hisse iptal — gerçek küçülme",
+      "AI ile ~60 mn $ maliyet tasarrufu"
+    ],
+    "business_model": "LGBTQ tanışma uygulaması; gelir %82 abonelik/tüketilebilir (XTRA, Unlimited) + %18 reklam. Ödeme yapan kullanıcı 1,4 mn (+%16), ARPPU 26,51 $ (+%12): hacim ve fiyat aynı anda artıyor.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2027Q1",
+      "type": "Bilanço normalleşmesi + fiyatlama gücünün devamı"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "İş harika, bilanço bizim Aşama 1 kurallarımızla uyumsuz (negatif özkaynak, borçla geri alım). 1-2 yıllık ufukta faiz/refinansman riski. BEKLE, bilanço düzelirse yeniden bak.",
+    "moat": "Niş ağ etkisi güçlü (kategori lideri), talep esnekliği düşük. Risk: Apple/Google mağaza politikaları, yüksek SBC.",
+    "news_summary": "6 Ağu 2026: Q2 gelir 138,1 mn $ (+%33) beat, EPS miss; kılavuz yükseltildi; 60 mn $ hızlandırılmış geri alım.",
+    "thesis_breakers": [
+      "Ödeme yapan kullanıcı büyümesi %10 altına düşerse",
+      "Net borç/FAVÖK 2x'i aşarsa",
+      "ARPPU büyümesi durursa",
+      "App store politika şoku"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "OPERASYONEL GÜÇ, AGRESİF BİLANÇO",
+    "why_cheap_rationale": "Kârlı ve %33 büyüyen bir şirket; ancak geri alımlar (kümülatif 598 mn $) FCF'yi aşıp borçla finanse edildi: nakit ~7 mn $, borç 386 mn $, özkaynak negatif. Short %17,7."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "GRND",
   "track": "A",
   "ttm": {

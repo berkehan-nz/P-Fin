@@ -604,14 +604,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 60.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 73.6,
     "momentum": 6.3,
     "quality": 46.0,
     "safety": 58.5,
-    "total": 45.4,
+    "total": 52.9,
     "value": 49.1,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -773,25 +780,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "20 Al / 2 Tut, hedef medyanı 26,5 $ (~%48 yukarı). Hedefler 51 $'dan aşağı revize edildi; fiyatı takip ediyorlar. Karşı tez: SMS marjı, Shopify bağımlılığı, KOBİ makro hassasiyeti.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Düzeltilmiş brüt marj yıllık 3 puan düşerek %73,4; yönetim Q4'te daha sert düşüş bekliyor",
+      "Q3 büyüme %21,5-22,5 ve faaliyet marjı %10,5-11: hem büyüme hem marj aynı anda geri çekiliyor",
+      "SMS fiyat yansıtması KOBİ müşteride iptal riski yaratabilir"
+    ],
+    "bull_case": [
+      "1,5 mlr $ ölçekte %23-26 büyüme; FCF marjı %17; 40 Kuralı ~48",
+      "Net nakit 944 mn $ (piyasa değerinin ~%19'u); son 12 ayda 347 mn $ geri alım, hisse 304→289 mn",
+      "Ters DCF piyasanın ~%9-10 büyüme fiyatladığını söylüyor; şirket %23+ büyüyor"
+    ],
+    "business_model": "E-ticaret markaları için B2C CRM/pazarlama otomasyonu (e-posta, SMS, push). 196K+ marka, Shopify ekosisteminden yukarı tırmanıyor. Gelir abonelik; SMS payı büyüyor ve operatör ücreti nedeniyle düşük marjlı.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2027Q2",
+      "type": "MARGIN_INFLECTION (SMS yansıtması tamamlanır, profil temizliği baz etkisi biter) + MGMT_CHANGE (yeni CFO)"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Grup içindeki en kaliteli düşmüş büyüme vakası; katalizör takvimi net (2027Q1-Q2). Tabanı görmeden almak düşen bıçak; yönetim Q4'te marjın daha düşeceğini söylüyor. Q4 sonuçlarına (Şubat 2027) kadar BEKLE, sonra liste üstü aday.",
+    "moat": "Shopify entegrasyonu ve platformda biriken müşteri verisi taşımayı pahalı kılar. Ama Shopify bağımlılığı iki taraflı bıçak; KOBİ tabanı dalgalı. NRR %109 (profil temizliği baz etkisiyle bastırılmış, 2027Q1'de biter).",
+    "news_summary": "Ağu 2026: Q2 gelir 370,6 mn $ (+%26) beat, yıllık gelir 1,514-1,522 mlr $'a yükseltildi; faaliyet kârı kılavuzu 10 mn $ düşürüldü (Agency devralması + yatırım). Eyl: geri alım sürüyor.",
+    "thesis_breakers": [
+      "Düzeltilmiş brüt marj %70 altına inerse",
+      "NRR %105 altına düşerse",
+      "Gelir büyümesi iki çeyrek üst üste %20 altına inerse",
+      "Hisse sayısı yeniden artmaya başlarsa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "GECICI_SOK + ILGISIZLIK",
+    "why_cheap_rationale": "İki düşüş: Mayıs 2026 CFO ayrılığı (-%21-30) ve Ağustos 2026 marj kılavuzu (-%11). İkisinde de gelir beklentiyi aştı. Zirveden %51 aşağı. Marj baskısının sebebi bilinen: SMS operatör ücretleri, müşteriye yansıtma başladı."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "KVYO",
   "track": "B",
   "ttm": {

@@ -607,14 +607,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 55.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 53.8,
     "momentum": 6.9,
     "quality": 75.4,
     "safety": 55.2,
-    "total": 55.6,
+    "total": 60.4,
     "value": 70.1,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -776,25 +783,38 @@
   "sic": 7374,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Gerçekten bölünmüş: DA Davidson 55 $, Rosenblatt 47-58 $ boğa; RBC 60→35 $, Loop 55→25 $ (Hold) ayı.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "ACV %7; uzayan satış döngüleri; yönetim FCF'nin yılın kalanında olumsuz etkileneceğini söyledi",
+      "GAAP net gelir -%56 iken non-GAAP +%19: makas büyük",
+      "No-consumption fiyatlama AI çağında marj riski de olabilir"
+    ],
+    "bull_case": [
+      "H1 FCF rekor 288 mn $; net nakit; H1'de 367 mn $ / ~9 mn hisse geri alım, 875 mn $ yetki kaldı",
+      "Pega Cloud +%22-28; backlog +%10 tampon; 2028 için 700 mn $+ FCF hedefi",
+      "FCF verimi ~%10, kendi tarihine göre ucuz çeyrek (bir yıl önce piyasa değeri 2x)"
+    ],
+    "business_model": "Kurumsal düşük kodlu iş akışı/karar otomasyonu; 2017'den beri abonelik geçişi. Subscription gelirin %88'i; Pega Cloud 213,9 mn $ (+%28), ACV'nin %57'si (hedef ~%75). Backlog 2,02 mlr $ (+%10).",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2027Q1",
+      "type": "ACV yeniden hızlanması (çift haneye dönüş) + Blueprint bookings kanıtı"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Klasik geçici şok profili: rekor FCF + net nakit + agresif geri alım + tek çeyrek bookings çöküşü. Şok taze; ACV Q3'te toparlanma sinyali verirse güçlü re-rating adayı. Sistem Aşama 1'de hasılat büyümesi %3,6 ile eliyor — kılavuz +%9, TTM'ye yansımadı. BEKLE, Q3 (Ekim) kritik.",
+    "moat": "Derin kurumsal gömülülük, 'no-consumption' (token bazlı olmayan) fiyatlama farklılaştırıcı. Blueprint/GenAI stratejisi. Risk: AI belirsizliği satış döngülerini uzattı.",
+    "news_summary": "22 Tem 2026: Q2 gelir 420,7 mn $ (+%9) miss, adj EPS 0,35 $ vs 0,43 $, ACV +%7; hisse -%19. Eyl: 7 mn $ özel temettü (dava uzlaşması).",
+    "thesis_breakers": [
+      "Toplam ACV büyümesi %5 altına düşerse",
+      "Pega Cloud ACV %15 altına inerse",
+      "Yıllık FCF 500 mn $ altına düşerse",
+      "Hisse sayısı düşüşü durursa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "GECICI_SOK (ACV yavaşlaması)",
+    "why_cheap_rationale": "Q2 2026'da toplam ACV büyümesi %17'den %7'ye çöktü (%15 kılavuz), EPS miss, hisse -%19; zirveden (68 $) ~%50 aşağı. Backlog +%10 ve rekor FCF gelirin bookings kadar düşmeyeceğini söylüyor."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "PEGA",
   "track": "A",
   "ttm": {

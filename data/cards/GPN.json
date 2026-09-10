@@ -608,14 +608,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 55.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 40.0,
     "momentum": 48.1,
     "quality": 29.8,
     "safety": 29.6,
-    "total": 52.4,
+    "total": 53.5,
     "value": 91.8,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -777,25 +784,38 @@
   "sic": 7389,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "32 analist: 11 Güçlü Al, 18 Tut, 2 Güçlü Sat; hedef aralığı 60-194 $ — gerçekten bölünmüş. Wells Fargo Kupferberg Al (~%33 yukarı).",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Organik büyüme ~%4; entegrasyon riski; travel portföyü baskısı",
+      "GAAP net gelir 13 mn $ (Q2), H1 GAAP zarar 1,79 mlr $; goodwill impairment riski",
+      "Stablecoin/ödeme rayı disrupsiyonuna yüksek maruziyet"
+    ],
+    "bull_case": [
+      "En ucuz S&P 500 hisselerinden; Elliott katalizör",
+      "Deleveraging 3,5x→3,0x (18-24 ay) + 2025-27'de 7,5 mlr $ sermaye iadesi",
+      "600 mn $ maliyet + 200 mn $ gelir sinerji hedefi; adj FCF 687 mn $/çeyrek"
+    ],
+    "business_model": "Merchant acquiring; Worldpay (24,25 mlr $ EV, 12 Oca 2026 kapanış) sonrası saf ödeme işleyici; Issuer Solutions FIS'e satıldı. Segmentler: SMB 1,51 mlr $ (+%4), Enterprise (+%7), Platforms (+%7). Normalize organik büyüme ~%4.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2027Q2",
+      "type": "Deleveraging + sinerji teslimatı + Elliott (aktivist) + geri alım"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Grup 4'te en yüksek re-rating opsiyonu ve en yüksek 'değer tuzağı' riski aynı isimde. Kaldıraç ve GAAP zarar Aşama 1-2 kurallarımızı zorluyor; sistem GAAP'ı esas aldığı için puan 52. Elliott + deleveraging tezi 12-24 ay için uygun ama pozisyon küçük olmalı. BEKLE, deleveraging teyidiyle AL.",
+    "moat": "Ölçek ve dağıtım; ama Stripe, Adyen, Toast, Square fiyat baskısı. Genius POS ivmeli. Elliott aktivist (Eyl 2025 uzlaşma, 2 bağımsız yönetici).",
+    "news_summary": "5 Ağu 2026: Q2 adj net revenue 3,16 mlr $, adj EPS 3,46 $ vs 3,44 $; gelir kılavuzu yumuşatıldı; hisse -%2,5. YTD 1,2 mlr $ sermaye iadesi.",
+    "thesis_breakers": [
+      "Normalize organik büyüme %3 altına düşerse",
+      "Net borç/FAVÖK 18-24 ayda 3,0x'e inmezse",
+      "Worldpay müşteri kaybı hızlanırsa",
+      "600 mn $ sinerji kaçırılırsa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "ENTEGRASYON İSKONTOSU — kendi tarihinin en ucuz çeyreği",
+    "why_cheap_rationale": "Forward F/K ~6x (tarihsel 10-15x), EV/FAVÖK ~11x, P/B <1x; ATH'den %57 aşağı. Piyasa Worldpay'e 'neredeyse evrensel muhalefet' gösterdi; GAAP zarar (amortisman), ~3,5x kaldıraç. Raporlanan +%34 büyüme tamamen konsolidasyon."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "GPN",
   "track": "A",
   "ttm": {

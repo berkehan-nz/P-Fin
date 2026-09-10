@@ -608,14 +608,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 40.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 47.6,
     "momentum": 90.7,
     "quality": 39.1,
     "safety": 49.9,
-    "total": 44.6,
+    "total": 38.9,
     "value": 17.1,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -777,25 +784,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Bölünmüş: William Blair Outperform, Canaccord 28 $ Al, Goldman Neutral 27 $; ortalama ~30-33 $ fiyata yakın. Short interest ~%10,4.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "GAAP EPS 0,03 $ vs 0,20 $ beklenti — GAAP/adjusted makası çok büyük",
+      "Büyümenin büyük kısmı M&A (Marigold, LiveIntent); brüt marj -300bp",
+      "Short raporu suçlamaları tam çürütülmedi; insider satışları"
+    ],
+    "bull_case": [
+      "Gelir +%44 (organik +%28), FAVÖK +%56, FCF +%73; 40 Kuralı ~66",
+      "NRR FY25 %128; AI süper kullanıcılar superscaled gelirin %75'i",
+      "OpenAI/Palantir/Snowflake ortaklık geliri kılavuza dahil değil (yukarı opsiyon)"
+    ],
+    "business_model": "AI destekli pazarlama bulutu: CDP + e-posta, CTV, social; Athena AI ajanı. Gelir platform abonelik + kullanım + ajans yönlendirmeli medya. 197 'superscaled' müşteri (+%17).",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2026Q4",
+      "type": "Ortaklık gelirinin kılavuza girmesi + GAAP kârlılığın güçlenmesi + short squeeze"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Operasyonel ivme güçlü ama kâr kalitesi ve M&A kaynaklı büyüme bizim kurallarımızla çelişiyor; ucuzluk tezi de 52h zirvesinde oynanmış. Küçük pozisyon dışında uymuyor. ELE eğilimli, izle.",
+    "moat": "Sahip olunan kimlik grafiği (LiveIntent) + veri varlıkları; NRR %128 (rekor) güçlü. Risk: veri toplama uygulamaları (Culper short raporu konusu) ve ajans social mix'i marjı eritiyor.",
+    "news_summary": "Ağu 2026: Q2 gelir 442,8 mn $ (+%44) beat, GAAP EPS büyük miss; FY26 gelir 1,81-1,82 mlr $ ve FCF 255 mn $'a yükseltildi. 3 Eyl: 52h zirvesi 32,8 $.",
+    "thesis_breakers": [
+      "NRR %115 altına düşerse",
+      "Organik büyüme %20 altına inerse",
+      "Restatement/SEC soruşturması/denetçi değişimi açıklanırsa (tez tamamen biter)",
+      "Düzeltilmiş FAVÖK marjı %20 altına gerilerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "YAPISAL ŞÜPHE İSKONTOSU (kapanmakta)",
+    "why_cheap_rationale": "13 Kas 2024 Culper Research 'consent farm' + gelir round-tripping suçlaması hisseyi bir günde %37 düşürdü. Restatement/SEC/denetçi değişimi olmadı; 20 ardışık beat-and-raise; hisse 52h zirvesine döndü ama short %10-15 hâlâ yüksek."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "ZETA",
   "track": "B",
   "ttm": {

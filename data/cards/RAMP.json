@@ -572,14 +572,21 @@
     }
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 10.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 20.4,
     "momentum": 72.0,
     "quality": 40.3,
     "safety": 70.8,
-    "total": 60.3,
+    "total": 46.5,
     "value": 78.8,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -741,25 +748,35 @@
   "sic": 7374,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Şirket kılavuz vermiyor. TIKR bağımsız değeri 53 $ diyor ama nakit anlaşma tavan koyuyor.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Anlaşma bozulursa hisse ~30 $'a döner",
+      "Yukarı potansiyel sınırlı (nakit anlaşma)",
+      "Bağımsız gelecek analiz edilemez"
+    ],
+    "bull_case": [
+      "Anlaşma nakit ve %30 primli; net nakit 310 mn $, borç yok",
+      "Q1 FY27 gelir +%10, non-GAAP faaliyet marjı %24"
+    ],
+    "business_model": "Veri işbirliği/kimlik çözümleme (clean room, ölçüm). FY26 gelir 812,9 mn $, ARR 545 mn $ (+%8), subscription NRR %107. Publicis 18 May 2026'da hisse başı 38,50 $ nakitle satın alıyor.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "yuksek",
+      "expected_date": "2026Q4",
+      "type": "Anlaşmanın kapanması"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "1-2 yıllık re-rating tezine uymuyor; yalnızca düşük getirili arbitraj. Listeden ÇIKAR (ELE).",
+    "moat": "Kimlik grafiği ve yayıncı/marka ağı. Ancak bağımsız tez artık geçersiz: şirket devralma sürecinde.",
+    "news_summary": "May 2026: Publicis 2,17 mlr $ EV ile satın alma; Ağu: hissedar toplantısı; kapanış yıl sonu.",
+    "thesis_breakers": [
+      "CFIUS/antitröst engeli",
+      "Publicis'in anlaşmadan çekilmesi"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "BİRLEŞME ARBİTRAJI",
+    "why_cheap_rationale": "Fiyat 38,50 $ tavana yapışık; kalan getiri = spread − anlaşma riski. Kapanış CY2026 sonu; onaylar hissedar/antitröst/CFIUS; fesih ücreti 32,35 mn $."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "RAMP",
   "track": "A",
   "ttm": {

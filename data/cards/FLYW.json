@@ -610,14 +610,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 30.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 56.4,
     "momentum": 74.1,
     "quality": 34.9,
     "safety": 64.8,
-    "total": 44.7,
+    "total": 38.1,
     "value": 18.1,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -779,25 +786,38 @@
   "sic": 7389,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Bölünmüş: Raymond James 22 $ Outperform; Truist 17 $ Hold (deselerasyon); Goldman 20 $ Neutral.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Vize riski doğrudan kılavuza gömülü; daha da kötüleşebilir",
+      "NDR %125→%110; adj brüt marj -450bp",
+      "Raporlanan büyüme organiği aşıyor (devralmalar); Ağu 2026 içeriden satışlar"
+    ],
+    "bull_case": [
+      "FY26 FX-nötr büyüme kılavuzu %21-27'ye yükseltildi (B2B/sağlık rampaları)",
+      "Q2 gelir +%28,5 beat, adj FAVÖK %14,7 marj beat; AI ile SFS verimliliği",
+      "Sertifi (seyahat) ve Invoiced (B2B) çeşitlendirme"
+    ],
+    "business_model": "Eğitim, sağlık, seyahat, B2B için çapraz sınır ödeme ağı + yazılım (SFS). FY25 gelir 623 mn $ (+%27): transaction 503 mn $ (FX spread + ücret), platform 120 mn $. NDR %110 (2023'te %125).",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2027Q1",
+      "type": "Vize varsayımlarının aşılmaması + travel/B2B monetizasyonu"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Politika riski tek kalemde ve kontrol dışı; GAAP kârlılık zayıf, NDR eriyor. Sistem Aşama 3 (EV/EBIT yüzdelik 84) ile eliyor, doğru. ELE eğilimli, izle.",
+    "moat": "Okul/hastane sistemlerine gömülü ödeme akışı; ama FX spread rekabeti (Wise, bankalar). Big 4 dışı eğitim +%30 çeşitlendirme.",
+    "news_summary": "11 Ağu 2026: Q2 gelir 163,8 mn $ (+%28,5) beat, adj EPS 0,11 $; FY26 kılavuzu yükseltildi; hisse yükseldi.",
+    "thesis_breakers": [
+      "Eğitim vize düşüşü %30 varsayımını aşarsa",
+      "Big 4 dışı + travel/B2B büyümesi %20 altına inerse",
+      "NDR %100 altına düşerse",
+      "FX-nötr toplam büyüme %20 altına inerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "TEK HATLI POLİTİKA RİSKİ (vize)",
+    "why_cheap_rationale": "Uluslararası öğrenci vizesi: FY26 kılavuzu ABD/UK vizelerinde %30, Kanada'da %10 düşüş varsayıyor. ATH'den (54 $) %67 aşağı ama 52h aralığının üst ucunda. GAAP F/K ~66-79x (düşük net gelir), EV/FAVÖK ~24x."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "FLYW",
   "track": "A",
   "ttm": {

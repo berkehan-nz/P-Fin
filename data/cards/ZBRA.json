@@ -604,14 +604,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 20.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 42.6,
     "momentum": 81.4,
     "quality": 26.6,
     "safety": 15.8,
-    "total": 42.2,
+    "total": 32.7,
     "value": 46.9,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Makine ve bilgisayar donanimi",
   "series": {
@@ -773,25 +780,38 @@
   "sic": 3560,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Analistler Q2 sonrası hedef yükseltti; az sayıda ayı zirve-kâr uyarısı yapıyor.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Q2 kârı tekrarlamayacak tarife kazanımıyla şişkin; Q3 marj kılavuzu ~%22 (Q2 %27,7)",
+      "Net borç ~2,4 mlr $; büyümenin ~8 puanı devralma/FX",
+      "Hafıza çipi maliyet enflasyonu; pull-forward talep riski; temettü yok"
+    ],
+    "bull_case": [
+      "FY26 satış büyümesi %14-16'ya, EPS 20,75-21,25 $'a yükseltildi; FCF kılavuzu >1 mlr $",
+      "Organik +%9,2; makine görüşü/RFID büyümesi; +1 mlr $ geri alım yetkisi",
+      "Elo ile +8 mlr $ adreslenebilir pazar"
+    ],
+    "business_model": "Ön saf iş gücü donanımı: barkod tarayıcı, mobil bilgisayar, RFID, makine görüşü + hizmet. Q2 2026 satış 1,557 mlr $ (+%20,4 rapor, +%9,2 organik). Elo Touch (1,3 mlr $) ve Photoneo devralmaları.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2027Q1",
+      "type": "Elo/Photoneo sinerjisi + borç azaltımı"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Sistemimizin 'zirve kârda ucuz' tuzağı için ders kitabı örneği: forward F/K 16x ucuz görünüyor ama 73 mn $'lık tek seferlik tarife kazanımı üzerine kurulu. one_off_earnings bayrağı tetiklenmeli. ELE.",
+    "moat": "Kurumsal kanal ve yerleşik taban; otomasyon TAM genişliyor. Ama proje/işlemsel donanım döngüsel; goodwill artıyor.",
+    "news_summary": "4 Ağu 2026: Q2 rekor sonuç, non-GAAP EPS 6,35 $ vs 4,38 $ (+%45), FY26 kılavuzu yükseltildi; hisse +%12-18.",
+    "thesis_breakers": [
+      "Organik büyüme negatife dönerse",
+      "Tarife hariç FAVÖK marjı %22 altına düşerse",
+      "Net borç/FAVÖK 3x üstüne çıkarsa",
+      "Kanal envanteri şişerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "TARİFE/DÖNGÜSEL DİP (tamamlandı) → ZİRVE KÂR RİSKİ",
+    "why_cheap_rationale": "2025 tarife/talep korkusu hisseyi 199 $'a indirdi; Q2 2026 büyük beat ile 363 $. Ama Q2 FAVÖK marjının +710bp'sinin çoğu 73 mn $ tek seferlik IEEPA tarife geri kazanımından; tarife hariç genişleme ~2 puan. Trailing F/K ~32x."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "ZBRA",
   "track": "A",
   "ttm": {

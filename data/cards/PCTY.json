@@ -605,14 +605,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 35.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 43.9,
     "momentum": 41.7,
     "quality": 55.5,
     "safety": 48.7,
-    "total": 52.0,
+    "total": 48.8,
     "value": 60.7,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -774,25 +781,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Moderate Buy, ortalama hedef ~175 $ (~%10 yukarı).",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "FY27 büyüme %7 — çarpanı sınırlıyor",
+      "Faiz oranı düşerse faiz geliri düşer; istihdam döngüsüne dolaylı bağımlı",
+      "HCM'de yoğun rekabet"
+    ],
+    "bull_case": [
+      "FCF marjı %24 (~428 mn $); FY26'da 398 mn $ geri alım, hisse gerçekten düşüyor; 1,3 mlr $ yetki",
+      "GAAP net gelir +%19, EPS +%22; SBC %8,3 ve uzun vadede %5 hedefi",
+      "Q4 gelir ve FAVÖK kılavuzu aştı"
+    ],
+    "business_model": "KOBİ/orta ölçek işverenlere bulut bordro + HCM yazılımı; finans/BT iş akışlarına genişliyor. Yinelenen gelir +%12; müşteri 44.400 (+%7), müşteri başı gelir +%5,4; tutma %92+. Müşteri fonlarından faiz geliri var. Mali yıl Haziran.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2027Q1",
+      "type": "Büyümenin %7'nin üzerine yeniden hızlanması + AI çapraz satış"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Kaliteli, kârlı, hisseyi küçülten; ama %7 büyümeyle re-rating katalizörü zayıf. 'Çekirdek kalite' dilimi için uygun, re-rating listesi için değil. BEKLE.",
+    "moat": "Bordro geçiş maliyeti yüksek; çapraz satış çalışıyor (Ignite AI). Risk: ADP/Paycom/Workday rekabeti, faiz gelirinin oran hassasiyeti.",
+    "news_summary": "Ağu 2026: Q4 FY26 gelir 444,7 mn $ (+%11) beat; FY27 kılavuzu 1,88-1,895 mlr $ (~%7). Son 1 ayda +%21 toparlanma.",
+    "thesis_breakers": [
+      "Yinelenen gelir büyümesi %8 altına inerse",
+      "Gelir tutma %90 altına düşerse",
+      "Müşteri büyümesi %5 altına inerse",
+      "Faiz geliri hariç FAVÖK marjı gerilerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "GARP — makul fiyatlı kalite (büyüme yavaşlıyor)",
+    "why_cheap_rationale": "F/K ~18x, P/FCF ~14x rakiplerinden (Paycom 22x, ADP 25x) ucuz; 52h zirvesinden ~%20-25 aşağı. Sebep: FY27 gelir kılavuzu ~%7 büyüme (FY26 %11'den yavaşlama)."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "PCTY",
   "track": "A",
   "ttm": {

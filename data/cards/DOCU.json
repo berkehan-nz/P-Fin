@@ -601,14 +601,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 65.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 88.0,
     "momentum": 54.1,
     "quality": 70.1,
     "safety": 23.7,
-    "total": 60.2,
+    "total": 62.0,
     "value": 66.6,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -770,25 +777,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "~20 analist, konsensüs Tut, ortalama hedef ~66 $ (fiyata yakın) — gerçekten bölünmüş. Citizens 124 $ en boğa; UBS 70 $, RBC 70 $ yükseltti. Morgan Stanley hedef yükseltti.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Çekirdek büyüme %9, DBNR %102",
+      "AI e-imzayı metalaştırabilir; IAM toplam büyümeyi henüz hızlandırmadı",
+      "SBC 622 mn $/yıl — FCF'nin yarısından fazlası"
+    ],
+    "bull_case": [
+      "TTM FCF 1,2 mlr $ (%30+ marj); FY26'da 869 mn $ geri alım (FCF'nin %82'si), hisse 205→~190 mn",
+      "IAM en hızlı büyüyen ürün, ARR payı çeyrekte 2,5 puan arttı; FY27 sonu hedefi %18-19",
+      "Net nakit 631 mn $; konvertibl tamamen ödendi; Q2 FY27 beat + kılavuz artışı, hisse +%8,7"
+    ],
+    "business_model": "E-imza lideri, IAM (Intelligent Agreement Management) platformuna dönüşüyor. Gelir ~%98 abonelik; ARR 3,42 mlr $ (+%9,3). IAM ARR payı Nis 2026 %12,6 → Tem 2026 %15,1. Mali yıl Ocak'ta biter.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2027Q1",
+      "type": "IAM'in toplam büyümeyi %10+'a hızlandırması + agresif geri alım + DBNR dönüşü"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Grup 1'in en net 'kalite + nakit + geri alım + ucuz' kurulumu: FCF verimi ~%10, hisse küçülüyor, IAM ivmeleniyor. Büyüme yeniden hızlanırsa çarpan 13x'ten 18x'e gider. Liste üstü, AL adayı; kısa liste 15'te kesin.",
+    "moat": "Güçlü marka + karşı taraf alışkanlığı (ağ etkisi) + yüksek geçiş maliyeti. Rakipler Adobe Sign, Dropbox Sign, Ironclad, PandaDoc. Risk: LLM'ler basit e-imzayı metalaştırabilir; DBNR %102 zayıf.",
+    "news_summary": "3 Eyl 2026: Q2 FY27 gelir 875,7 mn $ (+%9,4) beat, EPS 1,16 $ vs 1,08 $; billings +%10; FY27 gelir ~3,5 mlr $'a yükseltildi; 306 mn $ geri alım; hisse +%8,7.",
+    "thesis_breakers": [
+      "Toplam gelir büyümesi %6 altına inerse",
+      "DBNR %100 altına düşerse",
+      "IAM ARR payı artışı durursa",
+      "FCF marjı %25 altına gerilerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "OLGUNLAŞMA + geçiş hikâyesi",
+    "why_cheap_rationale": "E-imza pazarı olgunlaştı (%9 büyüme), COVID çarpanı normalleşti, AI korkusu; ATH'den %78, 52h zirvesinden %21-27 aşağı. Forward F/K ~13,5x, FCF verimi ~%9-10: kendi tarihinin dibinde."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "DOCU",
   "track": "A",
   "ttm": {

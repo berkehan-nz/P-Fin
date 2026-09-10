@@ -605,14 +605,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 40.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 23.0,
     "momentum": 21.2,
     "quality": 38.5,
     "safety": 70.2,
-    "total": 44.6,
+    "total": 45.8,
     "value": 56.7,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Elektronik ve elektrikli ekipman",
   "series": {
@@ -774,25 +781,38 @@
   "sic": 3674,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "21/27 Al; UBS 140 $. Ayılar politika ve 45X bağımlılığı.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Marj 45X kredisine bağımlı — kredi biterse çöker",
+      "4 Tem 2026 sonrası bookings görünürlüğü belirsiz",
+      "Beta 1,4-2,3; içeriden satışlar"
+    ],
+    "bull_case": [
+      "Rekor backlog >5,5 mlr $ (+300 mn $ depolama); borçsuz >1,2 mlr $ nakit",
+      "FY27 kılavuzu yükseltildi: gelir 4,1-4,4 mlr $, adj EPS 4,42-4,73 $",
+      "Adj brüt marj %32,6→%37; pazar payı kazanımı"
+    ],
+    "business_model": "Şebeke ölçekli güneş enerjisi takip sistemleri + eBOS, temeller, güç dönüşümü, depolama. FY26 gelir 3,56 mlr $ (+%20); Q1 FY27 935 mn $, adj brüt marj %37, backlog >5,5 mlr $. ABD %83.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2026Q4",
+      "type": "4 Temmuz 2026 sonrası bookings'in düşmediğinin teyidi + non-tracker gelir ölçeklenmesi"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Kaliteli backlog ve borçsuz bilanço ama tez tamamen ABD politikasına bağlı ve çarpan ucuz değil. Ekim'deki Q2 FY27 raporunda 4 Temmuz sonrası bookings görülmeden karar yok. BEKLE.",
+    "moat": "Pazar lideri, depozitolu/proje-spesifik yüksek kaliteli backlog; TrueCapture yazılımı. Ama marj 45X vergi kredisi rebate'lerine (~99 mn $/çeyrek) bağlı.",
+    "news_summary": "Ağu 2026: Q1 FY27 adj EPS 1,20 $ vs 1,04 $ beat, gelir hafif miss; FY27 kılavuzu yükseltildi; backlog rekor.",
+    "thesis_breakers": [
+      "Backlog ardışık çeyreklerde düşerse",
+      "45X rebate katkısı önemli ölçüde azalırsa",
+      "4 Tem sonrası yeni bookings çökerse",
+      "Adj brüt marj %33 altına dönerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "POLİTİKA-RİSKLİ DÖNGÜSEL",
+    "why_cheap_rationale": "OBBBA: ITC/PTC 2027 sonrası devreye giren projeler için biter; 4 Tem 2026'ya kadar inşaata başlayanlar safe harbor. Bu son tarih pull-forward yarattı; sonrası 'uçurum' riski. F/K ~23x, EV/FAVÖK ~17x — ucuz değil. Kılavuz 'politika değişmezse' varsayımlı."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "NXT",
   "track": "A",
   "ttm": {

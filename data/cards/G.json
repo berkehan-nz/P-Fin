@@ -608,14 +608,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 65.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 45.7,
     "momentum": 18.9,
     "quality": 26.6,
     "safety": 44.2,
-    "total": 49.5,
+    "total": 56.4,
     "value": 90.8,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Muhendislik ve arastirma",
   "series": {
@@ -777,25 +784,38 @@
   "sic": 8742,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Bölünmüş: Jefferies 45 $ Al, Needham 50 $ Al, BMO 44 $ Market Perform, Mizuho 39 $ Neutral, Citi 39 $. Hedefler fiyatın belirgin üstünde ama notlar temkinli.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Core segment %2 büyüyor; gelirin %73'ü geleneksel BPO'ya maruz (Mizuho)",
+      "Uzun vadede AI fiyat/hacim baskısı",
+      "İçeriden satışlar; konsensüs bölünmüş (çoğunluk Tut)"
+    ],
+    "bull_case": [
+      "Kümülatif hisselerin ~%35'i geri alındı; 2025'te 283 mn $; temettü 8 yıldır büyüyor (0,75 $/yıl); shareholder yield ~%4",
+      "ATS +%24, FY26 ATS kılavuzu 'en az %25'e, adj EPS büyümesi 'en az %12'ye yükseltildi",
+      "Rekor bookings, artan backlog; adj EPS gelirden hızlı büyüyor"
+    ],
+    "business_model": "Profesyonel hizmetler/BPO: Core Business Services 980 mn $ (+%1,9) ve Advanced Technology Solutions (ATS) 363 mn $ (+%24, gelirin %27'si). Non-FTE gelir ilk kez %50'yi aştı.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2026Q4",
+      "type": "ATS >%25 teyidi + marj genişleme serisi + olası aktivist ilgi (ucuz + yüksek shareholder yield)"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Grup 2'nin en net 'hem optik hem gerçek ucuz' vakası: F/K ~10x, gerçek hisse küçülmesi, ATS ivmesi, 13 çeyrek marj genişlemesi. Sistem puanı 50 (momentum 19 düşürüyor — tam olarak istediğimiz düşmüş profil). Liste üstü AL adayı.",
+    "moat": "Sektör süreç bilgisi, uzun müşteri ilişkileri, ürünleştirilmiş AI teklifleri (hacim taahhütlü, tekrarlayan). Brüt marj 13 çeyrek üst üste genişliyor (%36,5). Risk: Core segment durgun, AI FTE modelini baskılar.",
+    "news_summary": "6 Ağu 2026: Q2 gelir 1,343 mlr $ (+%7,1) beat, adj EPS 1,00 $ vs 0,96 $; beat'e rağmen hisse -%4. ATS ve EPS kılavuzu yükseltildi.",
+    "thesis_breakers": [
+      "ATS büyümesi %15 altına düşerse",
+      "Toplam organik gelir iki çeyrek daralırsa",
+      "Brüt marj genişleme serisi kırılırsa",
+      "Hisse sayısı düşüşü durursa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "YAPISAL DÜŞÜŞ KORKUSU + İHMAL (oynanmadı)",
+    "why_cheap_rationale": "'AI emek arbitrajını öldürür' anlatısı hisseyi 2026'da altı kez 52h dibine (27,35 $) itti; zirveden ~%40. Ama çalışan sayısı -%3 iken gelir +%7 (verimlilik marja dönüyor). F/K ~9-11x: kendi tarihinin en ucuz çeyreği."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "G",
   "track": "A",
   "ttm": {

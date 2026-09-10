@@ -628,14 +628,21 @@
     }
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 25.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 31.8,
     "momentum": 63.3,
     "quality": 63.2,
     "safety": 11.6,
-    "total": 48.1,
+    "total": 40.8,
     "value": 55.3,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -797,25 +804,38 @@
   "sic": 7389,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Morgan Stanley 415 $, Cantor 415 $ Overweight, Raymond James 442 $. Tek yönlü olumlu.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Take rate düşüyor (hacim telafi ediyor — sürdürülebilir mi?)",
+      "Cash EPS ↔ GAAP makası; 2,7x kaldıraç",
+      "AvidXchange minimum getiri garantisi (2029); zirve değerleme"
+    ],
+    "bull_case": [
+      "Cash EPS 7,00 $ rekor (+%36); FY26 gelir 5,31 mlr $, cash EPS 27,35 $ (+%28) kılavuzu yükseltildi",
+      "Q1'de 786 mn $ geri alım; gerçek hisse küçülmesi",
+      "Stablecoin settlement (BVNK/Circle) savunmacı konumlanma"
+    ],
+    "business_model": "Kurumsal ödemeler, filo kartı, konaklama, çapraz sınır. Q2 gelir 1,34 mlr $ (+%21, organik %10). Kurumsal Ödemeler harcama hacmi +%70 ama dolar başına gelir %0,70→%0,58. AvidXchange %34 azınlık payı (TPG ile).",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2027Q2",
+      "type": "Kurumsal Ödemeler mid-teens organik + AvidXchange tam satın alma opsiyonu"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Kaliteli ve büyüyor ama zirvede; re-rating alanı yok, getiri kâr büyümesinden gelir. Sistemin organik-şüphe bayrağı doğru: %21 rapor, %10 organik. Bizim tez için değil. BEKLE/ELE.",
+    "moat": "Filo kartında yüksek geçiş maliyeti ve ölçek; cross-border'da <%1 pay (fırsat). Tutma %93. Risk: take rate erozyonu, AvidXchange opsiyon/garanti yapısı.",
+    "news_summary": "Ağu 2026: Q2 gelir beat (45 mn $ üstü), cash EPS 7,00 $; kılavuz yükseltildi. 3 Eyl: ATH 426,77 $.",
+    "thesis_breakers": [
+      "Organik büyüme %8 altına düşerse",
+      "Take rate hacim telafisi olmadan %0,58 altına kırılırsa",
+      "Net borç/FAVÖK 3,5x'i aşarsa",
+      "Tutma %90 altına düşerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "PAHALI_DEGIL — primli compounder",
+    "why_cheap_rationale": "ATH'nin %5 altında (426,8 $); forward F/K ~15x, PEG ~0,94. Beş çeyrek çift haneli organik; 'cash EPS' satın alma amortismanını hariç tutuyor (goodwill+intangibles varlıkların ~%36)."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "CPAY",
   "track": "A",
   "ttm": {

@@ -608,14 +608,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 50.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 34.7,
     "momentum": 35.2,
     "quality": 72.6,
     "safety": 82.4,
-    "total": 65.7,
+    "total": 64.8,
     "value": 80.7,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -765,25 +772,38 @@
   "sic": 7310,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Hedef aralığı 13-27 $ çok geniş; konsensüs oluşmamış (ihmal + yeni IPO).",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Reklam resesyonunda ilk kesilen kalem",
+      "Geri alım henüz uygulanmadı; kilit açılma sonrası içeriden satış riski",
+      "Analist hedefleri 13-27 $ geniş dağılım: görüş bölünmüş"
+    ],
+    "bull_case": [
+      "Gelir +%21, FAVÖK +%48 (%26 marj), GAAP kârlı; nakit 237 mn $, borç yok",
+      "Genişleme oranı %115+, müşteri +%40",
+      "100 mn $ geri alım yetkisi (Ağu 2026)"
+    ],
+    "business_model": "Bağlı TV (CTV) performans reklamcılığı platformu ('Performance TV'); self-servis yazılımla KOBİ'lere ölçülebilir TV reklamı. Gelir reklam harcaması aracılığı. Aktif müşteri 4.225 (+%40), genişleme oranı %115+.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2027Q1",
+      "type": "Express/Premium yeni gelir akışlarıyla 2027 hızlanması + geri alım başlangıcı"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Küçük, kârlı, borçsuz, %80 brüt marjlı bir CTV oyuncusu; çarpan makul. Sistem puanı 66 (ikinci sıra) doğru yönde ama hisse artışı IPO artefaktı olarak Aşama 1'de kesiyor. Reklam döngüsü ana risk. Kısa liste adayı, BEKLE→küçük AL.",
+    "moat": "Ölçülebilir CTV nişinde erken lider; %80 brüt marj ve operasyon kaldıracı. Risk: reklam bütçesi döngüselliği, Trade Desk/Roku gibi büyük oyuncular.",
+    "news_summary": "4 Ağu 2026: Q2 gelir 82,5 mn $ (+%21) kılavuz üst ucu, GAAP EPS 0,09 $ vs 0,15 $ miss; FY26 görünüm teyit; Ağu: 100 mn $ geri alım yetkisi.",
+    "thesis_breakers": [
+      "Genişleme oranı %110 altına düşerse",
+      "Aktif müşteri büyümesi %25 altına inerse",
+      "Reklam durgunluğu büyümeyi tek haneye çekerse",
+      "Hisse artmaya devam edip geri alım uygulanmazsa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "IPO SONRASI SEYRELME + DÖNGÜSELLİK",
+    "why_cheap_rationale": "May 2025 IPO (16 $) sonrası ~%51 aşağı; Q2'de EPS miss ve büyüme %25→%21 yavaşlaması. Hisse sayısı IPO'da dönüştürülebilir enstrümanlarla 40→79 mn arttı; sistemin %268 artışı bu artefakt."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "MNTN",
   "track": "both",
   "ttm": {

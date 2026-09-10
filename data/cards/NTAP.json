@@ -610,14 +610,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 15.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 38.7,
     "momentum": 91.0,
     "quality": 62.0,
     "safety": 38.9,
-    "total": 55.5,
+    "total": 41.9,
     "value": 45.8,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Makine ve bilgisayar donanimi",
   "series": {
@@ -779,25 +786,38 @@
   "sic": 3572,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "15-20 analist: 9 Tut, 5 Al, 1 Sat; ortalama ~173 $ fiyatın altında.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Zirve marj + bellek maliyet enflasyonu; yönetim brüt marj düşüşü kılavuzladı",
+      "Envanter 198→375 mn $ (2x); Q1 OCF -%25, FCF -%35",
+      "Analist hedefi (~173 $) fiyatın altında; çoğunluk Tut"
+    ],
+    "bull_case": [
+      "All-flash rekor 1,3 mlr $ (+%47); ~350 AI/data lake anlaşması",
+      "FY27 gelir kılavuzu 8,1 mlr $'a yükseltildi; temettü 0,52 $; 1 mlr $ geri alım; hisse 217→200 mn",
+      "Rekor tam yıl FCF 1,87 mlr $"
+    ],
+    "business_model": "Veri depolama: all-flash diziler + bulut depolama. FY26 gelir 6,93 mlr $; Q1 FY27 2,03 mlr $ (+%30 rapor). Hybrid Cloud ve Public Cloud (206 mn $, +%28) segmentleri. Mali yıl Nisan.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2027Q1",
+      "type": "H2 FY27 büyüme teyidi + AI altyapı anlaşmaları"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Sistemin 'zirve kârda ucuz' tuzağına ders kitabı örneği: rev_growth_organic_suspect bayrağı doğru çalıştı. Marjlar rekor, çarpan genişlemiş, analist hedefleri fiyatın altında. ELE.",
+    "moat": "All-flash'ta #1 pay (IDC), NVIDIA/hyperscaler ortaklıkları, yerleşik kurumsal taban. Risk: Pure Storage, Dell, VAST Data rekabeti; bellek maliyet döngüsü.",
+    "news_summary": "2 Eyl 2026: Q1 FY27 adj EPS 2,58 $ vs 2,11 $ büyük beat, gelir beat; ama nakit akışı endişesiyle hisse -%9. 13 Ağu: ATH 209 $.",
+    "thesis_breakers": [
+      "Non-GAAP brüt marj %68 altına düşerse",
+      "İkinci yarı büyümesi (ekstra hafta hariç) düşük tek haneye/negatife dönerse",
+      "All-flash pazar payı kaybedilirse",
+      "Envanter erimez/FCF düşmeye devam ederse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "DÖNGÜSEL ZİRVE — ucuz gibi görünen",
+    "why_cheap_rationale": "Ekrandaki +%30 organik değil: çeyrekte EKSTRA HAFTA (~65 mn $) + pull-forward alımlar + fiyatlama; ekstra hafta hariç %26, FY27 kılavuzu ikinci yarıda ~%9-10'a yavaşlama ima ediyor. Non-GAAP brüt marj %71 ve faaliyet marjı %30 tarihsel REKOR; FY27 brüt marj kılavuzu %68-69'a DÜŞÜK (NAND/DRAM maliyeti). Trailing F/K ~26-30x, medyan 15-18x'in üstünde."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "NTAP",
   "track": "A",
   "ttm": {

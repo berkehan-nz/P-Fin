@@ -584,14 +584,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 40.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 54.1,
     "momentum": 59.3,
     "quality": 65.5,
     "safety": 44.4,
-    "total": 54.5,
+    "total": 50.4,
     "value": 49.1,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Iletisim",
   "series": {
@@ -753,25 +760,38 @@
   "sic": 4841,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "~10 analist (ihmal göstergesi), Moderate Buy, ortalama ~37,6 $. BWS 30→50 $, Rosenblatt 40 $, Roth 43 $.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Çeyrek geliri anlaşma zamanlamasına bağlı, oynak (Q2 gelir miss, hisse -%10,8)",
+      "Geri alım cılız (Q2 10 mn $), SBC'yi ancak karşılıyor",
+      "Short interest ~%12 yüksek; DRAM yenilemeleri 2028'e kaydı"
+    ],
+    "bull_case": [
+      "~%59 FAVÖK marjı nakit makinesi; yarı iletken geliri YTD 48 mn $ (2025 tamamı 26 mn $)",
+      "Uzun vadeli gelir hedefi 500→600 mn $ (AI/HBM hibrit bonding)",
+      "Borç 487→393 mn $ azaltıldı"
+    ],
+    "business_model": "Saf IP lisanslama: medya (~10.900 patent) ve yarı iletken (hibrit bonding, 3D NAND) portföyü. Çok yıllı lisans sözleşmeleri; Disney, Google, Amazon müşteri. Non-Pay-TV tekrarlayan gelir +%54.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2027Q2",
+      "type": "Büyük DRAM/yarı iletken lisans yenilemeleri + Fubo davası"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Bir yıl önce mükemmel vakaydı; re-rating büyük ölçüde oldu. Yarı iletken opsiyonu ilginç ama sistem Aşama 3'te 'ima edilen büyüme > CAGR×1,5' ile eliyor — CAGR ~%0 olduğu için çarpımsal test kırılıyor (düzeltme önerdim). Orta öncelik BEKLE.",
+    "moat": "Patent portföyü ve lisans yenileme döngüsü hendek; litigasyon gücü. Risk: patent süre bitişleri ve anlaşma zamanlamasının topaklı olması.",
+    "news_summary": "3 Ağu 2026: Q2 gelir 96,1 mn $ (hafif miss), EPS 0,34 $ beat; FY26 gelir 395-435 mn $ teyit; hisse -%10,8. 14 Ağu: BWS hedef 50 $.",
+    "thesis_breakers": [
+      "Google/Disney sınıfı bir lisans yenilenmezse",
+      "Yıllık gelir 395 mn $ altına düşerse",
+      "Yarı iletken geliri iki çeyrek ivme kaybederse",
+      "Net borç yeniden artarsa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "İHMAL + patent uçurumu korkusu (kısmen oynandı)",
+    "why_cheap_rationale": "'Pay-TV ölüyor' tezi 2025'te forward F/K'yı ~10x'e çekmişti; Disney/Google yenilemeleri ve yarı iletken çeşitlenmesi ile 1 yılda +%83, forward F/K ~18x. Kendi tarihine göre artık orta-üst bant."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "ADEA",
   "track": "A",
   "ttm": {

@@ -603,14 +603,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 55.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 69.6,
     "momentum": 32.5,
     "quality": 42.8,
     "safety": 56.3,
-    "total": 56.2,
+    "total": 58.3,
     "value": 75.7,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Elektronik ve elektrikli ekipman",
   "series": {
@@ -772,25 +779,38 @@
   "sic": 3651,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Sınırlı kapsama; görüşler toparlanmanın hızında ayrışıyor.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Gelir zirvenin %15 altında; kalıcı büyüme henüz kanıtlanmadı",
+      "Tarife (Vietnam %20, Malezya %19); Google IP davası",
+      "App krizinin kalıcı marka hasarı riski"
+    ],
+    "bull_case": [
+      "Q3 FY26 gelir +%9, GAAP net gelir 29,9 mn $ (bir yıl önce zarar), adj FAVÖK 44 mn $ (+%24)",
+      "Net nakit ~204 mn $; TTM FCF 125 mn $; geri alım sürüyor",
+      "Non-GAAP brüt marj %45,5 dirençli; maliyet disiplini"
+    ],
+    "business_model": "Premium ev sesi donanımı (hoparlör, soundbar, Ace kulaklık). FY25 gelir 1,44 mlr $; ABD %59, EMEA %31. Üretim Vietnam/Malezya. Q3 FY26 gelir 375 mn $ (+%9), GAAP kâra dönüş.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2026Q4",
+      "type": "Yeni ürün lansmanları + iki ardışık çeyrek gelir büyümesi + FY27 kılavuzu"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Gerçek bir dönüş hikâyesi: yeni CEO, marj toparlandı, net nakit, ucuz çarpan. Eksik olan gelir büyümesinin kalıcılığı. Kasım'daki Q4 FY26 + FY27 kılavuzu belirleyici. Orta-üst öncelik BEKLE; iki ardışık büyüme çeyreği görünce AL.",
+    "moat": "Marka ve çok odalı ekosistem geçiş maliyeti; ama Bose/Apple/Amazon/Google rekabeti yoğun. 2024 uygulama fiyaskosu marka hasarı verdi; NPS ve bayii ilişkileri iyileşti.",
+    "news_summary": "7 Ağu 2026: Q3 FY26 gelir 375,3 mn $ (+%9) kılavuz üst ucu, GAAP EPS 0,25 $; tarife iadesi brüt marjı destekledi.",
+    "thesis_breakers": [
+      "Gelir tekrar YoY düşerse",
+      "Non-GAAP brüt marj %43 altına dönerse",
+      "Adj FAVÖK marjı tek haneye/negatife düşerse",
+      "Yeni ürünler başarısız olur veya app sorunları tekrarlarsa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "GEÇİCİ ŞOK + TOPARLANMA (erken)",
+    "why_cheap_rationale": "May 2024 hatalı app → ~%8 gelir düşüşü, CEO Spence Oca 2025'te istifa, Tom Conrad Tem 2025'te kalıcı CEO. Marj/FAVÖK toparlandı ama gelir hâlâ FY22 zirvesinin (1,75 mlr $) altında. P/S ~1,2x, P/FCF ~14,5x."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "SONO",
   "track": "B",
   "ttm": {

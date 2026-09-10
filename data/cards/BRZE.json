@@ -605,14 +605,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 55.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 59.1,
     "momentum": 67.2,
     "quality": 21.9,
     "safety": 26.2,
-    "total": 37.2,
+    "total": 38.7,
     "value": 29.3,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -774,25 +781,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "18 analist, hepsi Al/Güçlü Al — tek yönlü konsensüs uyarı işareti; kötü sürprizde satacak çok kişi var. Karşı tez: büyüme fiyat artışıyla geliyor, brüt marj hafifliyor, rakipler daha büyük.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Brüt marj %69,3'ten %68,6'ya; hizmet geliri kalıcı olarak %9-10 pay alacak",
+      "cRPO büyümesi yavaşladı; yönetim mevsimsellik diyor, doğrulanmalı",
+      "Büyümenin %2'si OfferFit devralmasından; hendek dar, rekabet yoğun"
+    ],
+    "bull_case": [
+      "GAAP faaliyet marjı bir yılda -%21,5'ten -%8'e; kârlılığa geçiş görünür",
+      "RPO 1,1 mlr $ (+%27), 500K$+ müşteri 361 (+%28), NRR %108'den %110'a döndü",
+      "BrazeAI Decisioning Studio çeyrekte 6,6 mn $ gelir üretti; AI hikâye değil satır"
+    ],
+    "business_model": "Müşteri etkileşim platformu: markaların uygulama/web verisini alıp e-posta, push, SMS, WhatsApp üzerinden otomatik mesajlaşma yapar. Gelir ~%91 abonelik, ~%9 profesyonel hizmet (hizmet payı büyüyor ve düşük marjlı).",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2027Q1",
+      "type": "MARGIN_INFLECTION (GAAP kârlılığa geçiş) + AI monetizasyonu"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Sistemin aradığı türden vaka: iyi çeyrek, tek kılavuz kalemi yüzünden sert satış, bilanço sağlam. Ama hendek dar ve NRR erozyon geçmişi var. Q3 (Aralık) brüt marj %68+ tutarsa liste üstü. Önerim BEKLE.",
+    "moat": "Geçiş maliyeti gerçek (veri ve kampanya akışları platformda oturur) ama hendek dar: Salesforce, Adobe, Twilio, Klaviyo aynı işi yapıyor. Net gelir tutma 2021'de %126, bugün %110 — aşınmış ama son yıl dipten dönmüş.",
+    "news_summary": "8 Eyl 2026: Q2 FY27 gelir 227,2 mn $ (+%26), EPS 0,19 $ beat; yıllık gelir kılavuzu 911,5 mn $'a yükseltildi; Q3 EPS kılavuzu 0,13-0,14 $ konsensüs altı; hisse -%16.",
+    "thesis_breakers": [
+      "Düzeltilmiş brüt marj iki çeyrek üst üste %67 altına inerse",
+      "NRR %110 altına düşerse",
+      "cRPO büyümesi %15 altına inerse",
+      "SBC/FCF 1'in üstüne çıkarsa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "GECICI_SOK — marj kılavuzu",
+    "why_cheap_rationale": "Q2 FY27'de gelir, kâr ve yıllık öngörü beklentiyi aştı; hisse yalnızca Q3 EPS kılavuzunun konsensüsün %16 altında gelmesiyle bir günde %16 düştü. Bilanço bozulmadı, RPO %27 büyüyor."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "BRZE",
   "track": "B",
   "ttm": {

@@ -608,14 +608,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 45.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 58.1,
     "momentum": 26.1,
     "quality": 94.2,
     "safety": 47.7,
-    "total": 69.3,
+    "total": 67.5,
     "value": 92.6,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -777,25 +784,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Konsensüs Tut, hedef ~48-58 $. Boğalar FCF/CLEAR1, ayılar TSA ve yönetişim. Short %12 yüksek.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "TSA ücretsiz yüz tanıma core değer önerisini erozyona uğratabilir",
+      "Çift sınıf yapı: kurucular >%60-70 oy; aktivizm imkânsız; ilgili taraf işlemleri",
+      "Sistem 'kalite 94' puanı yalnızca 2 alt metriğe dayanıyor (ROIC/brüt marj eksik, kapsama 0,3)"
+    ],
+    "bull_case": [
+      "Adj FAVÖK marjı %36,4 (IPO hedefi aşıldı); rekor FCF 189 mn $; FY26 FCF ≥465 mn $",
+      "959 mn $ nakit, borç yok; temettü + geri alım; CrowdStrike ortaklığı (B2B)",
+      "Aktif CLEAR+ üye +%15 — yüz tanımaya rağmen büyüyor"
+    ],
+    "business_model": "Biyometrik kimlik doğrulama: CLEAR+ havalimanı aboneliği (~209-219 $/yıl, 8,3 mn aktif üye +%15), CLEAR1 (B2B), TSA PreCheck kaydı. Q2 gelir 277,8 mn $ (+%27), bookings +%33.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2027Q1",
+      "type": "CLEAR1 B2B ölçeklenmesi + üye büyümesinin yüz tanımaya rağmen sürmesi"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Nakit makinesi ve %36 düşmüş — ama düşüşün sebebi (TSA yüz tanıma) yapısal olabilir ve yönetişim zayıf. Sistemde 1. sırada olması veri eksikliği artefaktı (kalite kapsaması 0,3). Gerçek sıra orta. BEKLE; üye büyümesi %15'te kalırsa AL.",
+    "moat": "62 havalimanında altyapı ve TSA/DHS ilişkisi; eGates ile birim maliyet düşüyor. Risk: TSA'nın ücretsiz Touchless ID yüz tanımasının ~65 havalimanına genişlemesi doğrudan rekabet.",
+    "news_summary": "Ağu 2026: Q2 gelir +%27, net gelir +%91, FCF rekor; FY26 FCF kılavuzu yükseltildi. 31 Ağu: CrowdStrike ortaklığı. 5 Ağu ATH sonrası -%36.",
+    "thesis_breakers": [
+      "Aktif CLEAR+ üye büyümesi %10 altına düşerse",
+      "Yenileme oranı düşerse",
+      "TSA gelir paylaşımı/PreCheck ayrıcalığı olumsuz değişirse",
+      "Adj FAVÖK marjı %30 altına dönerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "TSA YÜZ TANIMA KORKUSU (Ağu 2026 zirvesinden -%36)",
+    "why_cheap_rationale": "ATH 69,07 $ (5 Ağu 2026) sonrası 44 $'a düşüş; short ~%12. Kendi tarihine göre orta-yüksek çarpan (EV/FAVÖK ~18-19x, P/FCF ~12x)."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "YOU",
   "track": "both",
   "ttm": {

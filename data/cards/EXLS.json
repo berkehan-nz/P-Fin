@@ -608,14 +608,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 50.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 48.1,
     "momentum": 24.3,
     "quality": 36.1,
     "safety": 58.5,
-    "total": 47.5,
+    "total": 50.4,
     "value": 63.6,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -777,25 +784,38 @@
   "sic": 7389,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Analist hedefleri yükseldi; konsensüs olumlu. Ayrışma bilanço esnekliğinde.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Net nakit sadece ~32 mn $ (299 mn $ revolver); geri alım OCF'nin çok üstünde",
+      "İkinci yarı marj baskısı (satış/AI yatırımı)",
+      "iMerit 170 mn $ + 140 mn $ earnout; büyümenin bir kısmı devralma"
+    ],
+    "bull_case": [
+      "Gelir +%15,6, adj EPS +%22; FY26 kılavuzu iki kez yükseltildi",
+      "Hisse 156,4→151,7 mn — SBC'yi aşan gerçek küçülme; 500 mn $ yeni yetki",
+      "Veri/AI geliri H1 704 mn $, %30 büyüme"
+    ],
+    "business_model": "Veri analitiği + BPO: veri/AI öncülüklü hizmetler gelirin %61'i ve +%30 büyüyor; geleneksel 'digital operations' -%1,5. Sağlık %22, bankacılık %11 büyüme. iMerit (AI veri) devralması Tem 2026.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2026Q4",
+      "type": "iMerit entegrasyonu + AI gelir açıklaması + kılavuz artışları"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Kaliteli, hisseyi küçülten, AI tezini sonuçla kanıtlamış — ama ucuzluk tezi büyük ölçüde oynandı ve bilanço ince. Kısa liste adayı ama giriş fiyatı önemli; geri çekilmede AL. Şimdilik BEKLE.",
+    "moat": "Sektör derinliği ve müşteri gömülülüğü; AI yaşam döngüsünün tamamına genişliyor. Risk: hizmet modeli, ücret enflasyonu, AI'nin FTE bazlı işi eritmesi.",
+    "news_summary": "Ağu 2026: Q2 gelir 594,8 mn $ (+%15,6) beat, adj EPS 0,59 $; FY26 gelir 2,39-2,415 mlr $'a yükseltildi; iMerit kapanışı 31 Tem.",
+    "thesis_breakers": [
+      "Organik büyüme %10 altına inerse",
+      "Net borç kalıcılaşıp geri alım durursa",
+      "Adj faaliyet marjı %20 altına düşerse",
+      "Veri/AI büyümesi tek haneye yavaşlarsa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "AI-BPO korkusu (çürütüldü, büyük ölçüde oynandı)",
+    "why_cheap_rationale": "Sektör geneli 'AI BPO'yu öldürür' anlatısı çarpanı sıkıştırdı; EXLS %15,6 büyüme ve iki kılavuz artışıyla çürüttü; son 1 ayda +%28. Forward F/K ~14x, kalite fiyatlanmış."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "EXLS",
   "track": "A",
   "ttm": {

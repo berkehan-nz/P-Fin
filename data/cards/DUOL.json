@@ -615,14 +615,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 30.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 9.3,
     "momentum": 42.6,
     "quality": 67.4,
     "safety": 86.5,
-    "total": 52.1,
+    "total": 47.5,
     "value": 42.0,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -784,25 +791,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Konsensüs Tut, hedef ~127-134 $ fiyatın altında — nadir bir uyarı. Charged Alpha adil değer ~140 $.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Bookings %8'e yavaşladı; gelir ertelenmiş bakiyeden ödeniyor",
+      "SBC gelirin %13-15'i; 400 mn $ geri alım sadece seyrelmeyi telafi ediyor",
+      "Analist konsensüsü Tut, ortalama hedef fiyatın ALTINDA; kurucu satışları"
+    ],
+    "bull_case": [
+      "DAU +%23 hızlanıyor; tutma zirvede; FCF >375 mn $ kılavuzu; borçsuz 1,3 mlr $ nakit",
+      "FAVÖK marjı kılavuzu %25→%26,5'e yükseltildi",
+      "Q2 gelir/EPS beat, tüm kılavuz satırları yükseltildi"
+    ],
+    "business_model": "Oyunlaştırılmış dil öğrenme uygulaması; freemium: Super/Max abonelik + reklam. DAU 58,7 mn (+%23). Kritik ayrım: bookings (peşin nakit) +%8 vs gelir (12 aya yayılan) +%18 — gelir ilk kez bookings'i geçti.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2026Q4",
+      "type": "Bookings'in ikinci yarıda çift haneye yeniden hızlanması"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Re-rating büyük ölçüde oldu ama ucuz değil; bookings yavaşlaması bizim tezimizin tersine sinyal. Kalite yüksek, fiyat uygun değil. BEKLE (bookings çift haneye dönerse yeniden bak).",
+    "moat": "Oyunlaştırma + streak alışkanlığı hendek; içerik değil. AI'yi kendi lehine kullanıyor (148+ yeni kurs). Risk: ücretsiz AI özel öğretmen metalaştırması; 2025 'AI-first' marka tepkisi.",
+    "news_summary": "6-7 Ağu 2026: Q2 gelir 298,5 mn $ (+%18) beat ama bookings +%8; hisse -%9,4 (gün içi -%17). Nis 2026 dibi 87,89 $.",
+    "thesis_breakers": [
+      "Bookings büyümesi %5 altına düşerse",
+      "DAU büyümesi %15 altına inerse",
+      "SBC/gelir %16'yı aşarsa",
+      "AI rakipleri ölçülebilir kullanıcı kaybına yol açarsa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "BÜYÜK RE-RATING (hâlâ pahalı)",
+    "why_cheap_rationale": "F/K 100x+'tan ~40x'e, EV/Sales ~6x'e daraldı; zirveden (353 $) %56 aşağı. Ama %8 bookings büyümesi için hâlâ pahalı; piyasa ~%16 gelir büyümesi fiyatlıyor."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "DUOL",
   "track": "A",
   "ttm": {

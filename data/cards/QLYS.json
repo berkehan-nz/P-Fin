@@ -601,14 +601,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 30.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 61.0,
     "momentum": 82.0,
     "quality": 84.1,
     "safety": 52.1,
-    "total": 61.2,
+    "total": 51.3,
     "value": 36.0,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -770,25 +777,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Konsensüs karışık; hisse Q2 sonrası yükseldi. Zacks sektör sıralaması alt çeyrek. Boğalar marj/kalite, ayılar çarpan.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Büyüme %10-11; EV/Sales 9x çarpan sıkışması riski",
+      "FCF marjı Q2'de %53→%31 (yatırım artışı)",
+      "Büyük platform rekabeti"
+    ],
+    "bull_case": [
+      "%46 FAVÖK marjı, borçsuz, 729 mn $ nakit; H1'de 131 mn $ geri alım",
+      "Tutarlı beat-and-raise: FY26 gelir kılavuzu 732-738 mn $ (iki kez yükseltildi), EPS 7,74-7,88 $",
+      "Kanal +%17, uluslararası +%15, TruRisk ile 3x harcama genişlemesi"
+    ],
+    "business_model": "Bulut tabanlı zafiyet yönetimi ve uyumluluk (VMDR, TruRisk/ETM). Abonelik, ~%83 brüt marj, %46 FAVÖK marjı. Kanal geliri %52 ve +%17 büyüyor.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2027Q1",
+      "type": "Büyümenin %12+'ya dönmesi + ETM platform genişlemesi"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Sistem puanı 61 ama bu 'kalite' bloğundan geliyor, ucuzluktan değil (value 36). Bizim 1-2 yıllık re-rating tezine uymuyor: ucuz değil, katalizör az. Portföy 'çekirdek kalite' dilimi için tutulabilir; re-rating listesinde değil. BEKLE/ELE.",
+    "moat": "Yerleşik tarama tabanı, yüksek geçiş maliyeti, kanal ağı. Forrester CNAPP lideri. Risk: CrowdStrike, Microsoft, Wiz gibi platformların sıkıştırması.",
+    "news_summary": "4 Ağu 2026: Q2 gelir 182,2 mn $ (+%11) beat, non-GAAP EPS 1,98 $ vs 1,78 $; FY26 kılavuzu yükseltildi; hisse yükseldi.",
+    "thesis_breakers": [
+      "Gelir büyümesi %7 altına inerse",
+      "Düzeltilmiş FAVÖK marjı %42 altına düşerse",
+      "Kanal büyümesi tersine dönerse",
+      "FCF marjı kalıcı %30 altına inerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "PAHALI_DEGIL — kaliteli ama yavaş",
+    "why_cheap_rationale": "EV/Sales ~9x ile mutlak ucuz değil; %10-11 büyüme yavaş görülüyor. 40 Kuralı ~57 ve %46 FAVÖK marjı kalite primini hak ediyor. Re-rating alanı sınırlı; getiri kâr+geri alımdan gelir."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "QLYS",
   "track": "A",
   "ttm": {

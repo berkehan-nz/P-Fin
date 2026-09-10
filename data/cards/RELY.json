@@ -611,14 +611,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 40.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 72.8,
     "momentum": 77.8,
     "quality": 46.9,
     "safety": 85.2,
-    "total": 63.3,
+    "total": 56.0,
     "value": 50.8,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -780,25 +787,38 @@
   "sic": 7389,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Moderate Buy, hedef 25-32 $ fiyata yakın; Cantor 30 $. Short ~%7.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Q2 GAAP net gelirin 140,6 mn $'ı tek seferlik vergi varlığı (tekrarlamaz)",
+      "Take rate düşüyor (yönetim RLTE vurgusu); stablecoin belirsizliği",
+      "Göç enforcement riski; hisse zirveye yakın"
+    ],
+    "bull_case": [
+      "FAVÖK +%79 (%23 marj), FCF 130 mn $+ (3x); geri alım başladı; net nakit",
+      "10 mn kullanıcı; havale vergisi dijitale kaymayı hızlandırdı",
+      "Stablecoin (Bridge/Circle) ile ürünleşme; FY26 gelir ~1,98 mlr $'a yükseltildi"
+    ],
+    "business_model": "Dijital havale; gelir işlem ücreti + FX spread. Q2 gelir 495 mn $ (+%20), send volume 23,5 mlr $ (+%27), aktif müşteri 10,2 mn (+%20), transaction margin %67. Corridor konsantrasyonu düşük.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2026Q4",
+      "type": "Operating leverage devamı + Remitly for Business + wallet"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "İş modeli güçlü ve politika riski lehine döndü; ama re-rating büyük ölçüde oldu ve Q2 kârı tek seferlikle şişkin (one_off bayrağı tetiklenmeli). Sistem puanı 63 kısmen momentum kaynaklı. BEKLE; geri çekilmede ilgi.",
+    "moat": "Son mil ağı (bankalar, cash pickup, yerel cüzdanlar) ve marka; ölçek kaynaklı verimlilik. Risk: Wise/bankalar/stablecoin take rate baskısı, göç politikası.",
+    "news_summary": "Ağu 2026: Q2 gelir 495,2 mn $ beat, GAAP EPS 0,93 $ (vergi kazancı dahil) büyük beat; kılavuz yükseltildi; hisse sert yükseldi.",
+    "thesis_breakers": [
+      "Aktif müşteri büyümesi %10 altına düşerse",
+      "Transaction margin %65 altına inerse",
+      "Send volume büyümesi %15 altına yavaşlarsa",
+      "Büyük bir corridor'da gözlemlenebilir stablecoin kaybı"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "RE-RATED (kâr dönüşü oynandı)",
+    "why_cheap_rationale": "Trailing F/K 150x+'tan ~18,5x'e (kâr inflection); 52h zirvesine yakın, ATH'den %46 aşağı. %1 havale vergisi (1 Oca 2026) yalnızca nakit fonlu transferlere — Remitly dijital modeli MUAF, net pozitif (rekor müşteri kazanımı)."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "RELY",
   "track": "both",
   "ttm": {

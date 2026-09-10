@@ -605,14 +605,21 @@
     }
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 40.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 64.0,
     "momentum": 75.9,
     "quality": 42.3,
     "safety": 25.0,
-    "total": 45.7,
+    "total": 41.3,
     "value": 35.4,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -774,25 +781,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "12 analist, ~%83 Al, ortalama hedef ~13,8 $ (fiyata yakın). Morgan Stanley 2026 başında Overweight'e yükseltti.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Çeyreklik NRR %103 — genişleme sınırlı",
+      "Brüt marj %71'e düştü (AI çıkarım maliyeti)",
+      "Büyümenin bir kısmı Statsig'den; GAAP faaliyet zararı -35 mn $"
+    ],
+    "bull_case": [
+      "Borçsuz, rekor FCF 23,7 mn $ (%24 marj), 40 Kuralı ~45",
+      "100K$+ müşteri 824 (+%30); RPO +%35; ilk 100 mn $ çeyrek",
+      "H1'de 89,5 mn $ geri alım; Statsig 17 mn $ ARR ekledi (bekleneni aştı)"
+    ],
+    "business_model": "Ürün/dijital analitik platformu, AI-native analitiğe dönüşüyor. ARR 410 mn $ (+%22), enterprise payı %68. Statsig varlık alımı (deney/feature-flag) ve Wave ürünü TAM'ı genişletiyor.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2027Q1",
+      "type": "Statsig/Wave AI monetizasyonu + NRR %108-110'a tırmanış"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Küçük, borçsuz, toparlanan bir platform; ancak sistem Aşama 1'de eliyor (hisse artışı %6,5 — yarısı Statsig). Geri alım artışı tersine çeviriyor. Düşük-orta öncelik BEKLE; NRR %108'i görmek isterim.",
+    "moat": "Veri gömülülüğü ve kurumsal entegrasyon orta düzey hendek; Mixpanel, Heap, Pendo, warehouse-native araçlar rakip. NRR %101'den %105-106'ya toparlandı ama çeyreklik %103'e geriledi.",
+    "news_summary": "Ağu 2026: Q2 gelir 100,9 mn $ (+%21) beat, ARR 410 mn $; FY26 gelir 407-411 mn $'a yükseltildi; uzun vadeli %20+ faaliyet marjı hedefi.",
+    "thesis_breakers": [
+      "TTM NRR %105 altına inerse",
+      "Organik ARR büyümesi %15 altına düşerse",
+      "Brüt marj %70 altına gerilerse",
+      "FCF marjı %15 altına inerse"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "DONGUSEL DİP + toparlanma başlangıcı",
+    "why_cheap_rationale": "2022-24 aşırı satın alma sonrası NRR %101'e çökünce çarpan tarihsel dibe indi (IPO'dan -%88). Şimdi NRR/ARR toparlanıyor ama GAAP zarar ve AI maliyetiyle brüt marj -4 puan."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "AMPL",
   "track": "B",
   "ttm": {

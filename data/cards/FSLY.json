@@ -599,14 +599,21 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 25.0,
+    "coverage_factors": {
+      "earnings_quality": 1.0,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
     "earnings_quality": 39.2,
     "momentum": 35.7,
     "quality": 16.3,
     "safety": 50.1,
-    "total": 27.1,
+    "total": 25.7,
     "value": 11.8,
-    "weight_coverage": 0.85
+    "weight_coverage": 1.0
   },
   "sector": "Is hizmetleri ve yazilim",
   "series": {
@@ -768,25 +775,38 @@
   "sic": 7372,
   "source": "seed_20260909",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "13 analist, Tut/Al bölünmüş, hedef 13-32 $, ortalama ~25-27 $. Boğalar marj+NRR, ayılar konsantrasyon ve Cloudflare.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "İlk 10 müşteri gelirin %26-34'ü; kullanım bazlı model oynak",
+      "Cloudflare karşısında yapısal pay kaybı riski",
+      "GAAP zararı, yüksek SBC; Q2'nin bir kısmı spor etkinliği trafiği (tekrarlamayabilir)"
+    ],
+    "bull_case": [
+      "LTM NRR beş çeyrek üst üste iyileşti: %100→%117",
+      "Güvenlik +%43 (gelirin %23'ü), Compute +%69; non-GAAP brüt marj rekor %65,8",
+      "Tam yıl kılavuzu iki kez yükseltildi; 40 Kuralı ~44 ilk kez sağlıklı"
+    ],
+    "business_model": "Uç bilişim (edge) platformu: CDN, güvenlik (Next-Gen WAF, DDoS) ve Compute. Gelir kullanım bazlı, bu yüzden abonelik SaaS'tan oynak. Gelirin %90+'ı büyük müşterilerden.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2027Q2",
+      "type": "GAAP kârlılığa geçiş + NRR %120"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Toparlanma gerçek ama hisse bunu büyük ölçüde fiyatladı; bizim tezimizde 'bir yıl önce olması gereken yer'. Sistem puanı 27 ile en düşük — momentum değil değerleme kaynaklı, doğru sinyal. ELE eğilimli, izleme listesinde tut.",
+    "moat": "CDN metalaşmış; Cloudflare çok daha büyük ve hızlı. Farklılaşma programlanabilir edge ve güvenlik. Hendek zayıf ama NRR %100'den %117'ye çıktı (3+ yılın en yükseği) — ürün tutuyor.",
+    "news_summary": "12 Ağu 2026: Q2 gelir 183,3 mn $ (+%23) büyük beat, EPS 0,15 $ vs 0,07 $; FY26 gelir 732-746 mn $'a yükseltildi. Hisse güçlü ralli, 52 haftada 7→21,5 $.",
+    "thesis_breakers": [
+      "LTM NRR %110 altına dönerse",
+      "Güvenlik büyümesi %25 altına inerse",
+      "Non-GAAP brüt marj %62 altına düşerse",
+      "İlk 10 müşteri payı %40 üstüne çıkarsa"
+    ],
+    "updated_at": "2026-09-10",
+    "why_cheap_diagnosis": "ŞOK SONRASI TOPARLANMA (büyük kısmı oynandı)",
+    "why_cheap_rationale": "2020 kesinti + 2024 büyüme çöküşü + tek müşteri (ByteDance) konsantrasyonu hisseyi 4,65 $'a düşürmüştü. 2025-26'da güvenlik/Compute ivmesiyle +%258; artık kendi tarihine göre ucuz değil."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "FSLY",
   "track": "B",
   "ttm": {
