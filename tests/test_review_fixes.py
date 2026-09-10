@@ -235,3 +235,106 @@ class TestAltmanSaaSException:
         r["flags"]["z_unreliable"] = True
         r["metrics"]["altman_z"] = -1.26
         assert funnel.stage2(r, "A") is None
+
+
+# ------------------------------------------------- bayrak/puan aktarimi
+class TestZUnreliableReachesFunnel:
+    """Istisna scores.altman_z icinde DOGRU hesaplaniyordu ama huniye hic
+    ulasmiyordu: funnel satirindaki ``flags`` yalnizca metrics.compute'tan
+    geliyor, o da sadece ozkaynak negatifligine bakiyor. FRSH boylece
+    "Altman Z'' -1.26" gerekcesiyle eleniyordu.
+
+    Mevcut testler bayragi ELLE set ettigi icin kopuklugu gormuyordu;
+    bu testler zinciri uctan uca kuruyor.
+    """
+
+    def test_scores_compute_exports_flag(self):
+        f = fixtures.frsh()
+        res = scores.compute(f, metrics.compute(f))
+        assert res["flags"]["z_unreliable"] is True
+        assert "Ertelenmis gelir" in res["flags"]["z_unreliable_reason"]
+
+    def test_funnel_row_carries_flag_without_manual_override(self):
+        r = funnel.evaluate(fixtures.frsh())
+        assert r["metrics"]["altman_z"] < 1.1        # esigin altinda
+        assert r["flags"]["z_unreliable"] is True    # ama guvenilmez
+        assert r["flags"].get("z_unreliable_reason")
+
+    def test_subscription_company_survives_stage2(self):
+        r = funnel.evaluate(fixtures.frsh())
+        reason = funnel.stage2(r, "A")
+        assert reason is None or "Altman" not in reason
+
+    def test_negative_equity_still_flagged(self):
+        """Eski (ozkaynak) yolu kirilmadi."""
+        r = funnel.evaluate(fixtures.dbx())
+        assert r["flags"]["z_unreliable"] is True
+
+    def test_healthy_company_not_flagged(self):
+        r = funnel.evaluate(fixtures.lscc())
+        assert r["flags"]["z_unreliable"] is False
+
+    def test_card_warning_uses_actual_reason(self):
+        from src import cards
+        c = cards.build(fixtures.frsh(), source="test")
+        assert c["flags"]["z_unreliable"] is True
+        assert any("Ertelenmis gelir" in w for w in c["flags"]["warnings"])
+
+
+# ----------------------------------------- kapsama carpani merge yolunda
+class TestCoverageSurvivesMerge:
+    """Kapsama carpani ``scoring.compute`` icinde dogru uygulaniyordu, ama
+    ``merge_story`` katalizor puani girildiginde toplami BASTAN hesapliyor
+    ve kapsamayi gecmiyordu — carpanlar sessizce 1,0'a donuyordu.
+
+    YOU'nun kartinda tam olarak bu oldu: kalite kapsamasi 0,30, "veri
+    yetersiz" rozeti gorunuyor, ama coverage_factors 1,0 ve puan
+    cezalandirilmamis.
+    """
+
+    def _card(self):
+        return {
+            "ticker": "YOU",
+            "scores": {"value": 96.2, "quality": 96.7, "safety": 53.0,
+                       "momentum": 6.0, "earnings_quality": 56.9},
+            "score_detail": {
+                "value": {"coverage": 0.80},
+                "quality": {"coverage": 0.30},     # 3 metrik bos
+                "safety": {"coverage": 1.0},
+                "momentum": {"coverage": 1.0},
+                "earnings_quality": {"coverage": 0.80},
+            },
+        }
+
+    def test_block_coverage_reads_detail(self):
+        from src import cards
+        cov = cards.block_coverage(self._card()["score_detail"])
+        assert cov["quality"] == 0.30
+        assert cov["safety"] == 1.0
+
+    def test_block_coverage_tolerates_missing_detail(self):
+        from src import cards
+        assert cards.block_coverage(None) == {}
+        assert cards.block_coverage({"quality": {}}) == {}
+
+    def test_merge_keeps_coverage_factors(self, tmp_path):
+        from src import cards
+        (tmp_path / "YOU.json").write_text(
+            '{"ticker": "YOU", "catalyst_score": 45}', encoding="utf-8")
+        card = cards.merge_story(self._card(), inbox_dir=tmp_path)
+        factors = card["scores"]["coverage_factors"]
+        assert factors["quality"] == COVERAGE["min_weight_factor"]   # 0,30 -> taban
+        assert factors["safety"] == 1.0
+
+    def test_merge_penalises_total(self, tmp_path):
+        """Dusuk kapsamali YUKSEK puan artik toplami tek basina tasiyamaz."""
+        from src import cards
+        (tmp_path / "YOU.json").write_text(
+            '{"ticker": "YOU", "catalyst_score": 45}', encoding="utf-8")
+        thin = cards.merge_story(self._card(), inbox_dir=tmp_path)
+
+        full_card = self._card()
+        full_card["score_detail"]["quality"]["coverage"] = 1.0
+        full = cards.merge_story(full_card, inbox_dir=tmp_path)
+
+        assert thin["scores"]["total"] < full["scores"]["total"]

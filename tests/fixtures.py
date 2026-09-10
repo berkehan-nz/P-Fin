@@ -162,3 +162,59 @@ def kvyo():
 
 
 ALL = {"DBX": dbx, "LSCC": lscc, "KVYO": kvyo}
+
+
+# --------------------------------------------------------------------------
+# FRSH — Freshworks. Abonelik modeli: pesin tahsil edilen yillik bedel
+# ERTELENMIS GELIR olarak kisa vadeli yukumluluge yaziliyor, ayrica IPO
+# oncesi birikmis zarar dagitilmamis kari cok negatif tutuyor. Z'' -1,26
+# cikiyor — oysa sirketin hic borcu yok ve ~1,1 mlr $ net nakdi var.
+# Beklenen: z_unreliable=True (ozkaynak POZITIF oldugu halde), Asama 2'de
+#           Altman esiginden ELENMEMELI.
+# --------------------------------------------------------------------------
+FRSH_FY2024 = {
+    "period_end": "2024-12-31", "fiscal_year": 2024, "fiscal_period": "FY",
+    "revenue": 720, "cost_of_revenue": 118, "gross_profit": 602,
+    "operating_income": -35, "net_income": -20,
+    "pretax_income": -28, "tax_expense": 8, "interest_expense": 0,
+    "sga": 430, "rnd": 155, "dep_amort": 22,
+    "cfo": 105, "capex": 8, "cfi": -60, "sbc": 175,
+    "assets": 1460, "current_assets": 880, "liabilities": 590,
+    "current_liabilities": 515, "equity": 870,
+    "cash": 660, "short_term_investments": 400,
+    "long_term_debt": 0, "short_term_debt": 0,
+    "operating_lease_current": 12, "operating_lease_noncurrent": 30,
+    "goodwill": 55, "retained_earnings": -3400,
+    "receivables": 150, "ppe_net": 30, "deferred_revenue": 292,
+    "debt_due_2y": 0,
+    "shares_diluted": 300, "shares_basic": 296,
+}
+
+FRSH_FY2025 = {
+    "period_end": "2025-12-31", "fiscal_year": 2025, "fiscal_period": "FY",
+    "revenue": 780, "cost_of_revenue": 125, "gross_profit": 655,
+    "operating_income": 13, "net_income": 25,
+    "pretax_income": 20, "tax_expense": 9, "interest_expense": 0,
+    "sga": 452, "rnd": 165, "dep_amort": 25,
+    "cfo": 140, "capex": 9, "cfi": -70, "sbc": 180,
+    "assets": 1500, "current_assets": 900, "liabilities": 600,
+    "current_liabilities": 528, "equity": 900,
+    "cash": 700, "short_term_investments": 380,
+    "long_term_debt": 0, "short_term_debt": 0,
+    "operating_lease_current": 12, "operating_lease_noncurrent": 28,
+    "goodwill": 55, "retained_earnings": -3576,
+    "receivables": 162, "ppe_net": 28, "deferred_revenue": 300,
+    "debt_due_2y": 0,
+    "shares_diluted": 305, "shares_basic": 300,
+}
+
+
+def frsh():
+    f = build_annual_fundamentals(
+        "FRSH", [FRSH_FY2024, FRSH_FY2025],
+        name="Freshworks Inc.", cik=1544522, sic=7372, exchange="Nasdaq",
+    )
+    f.price = 10.7
+    f.shares_outstanding = 305
+    f.avg_dollar_volume_30d = 30_000_000
+    return f

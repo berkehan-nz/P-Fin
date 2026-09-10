@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from . import cards
+from . import cards, pipeline
 from .config import CARDS_DIR, INBOX_DIR
 from .inbox import validate_file
 from .util import read_json
@@ -72,6 +72,14 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         print(f"[inbox] {len(merged)} dosya gecerli, {len(errors)} hatali")
         return 1 if errors else 0
+
+    # Pano izgarasi kartlari DEGIL data/candidates.json'i okur. Tazelenmezse
+    # birlestirme kartta gorunur ama panoda gorunmez — puan degistiginde
+    # (kapsama carpani, katalizor) iki dosya birbiriyle celisir.
+    # Kosulsuz: ``cards.save`` icerik degismediyse False doner, ama ozet dosyasi
+    # yine de kartlarla ayni fikirde olmayabilir (baska bir kosu karti
+    # guncelledi, birlestirme yeniden calisti). Yeniden kurmak ucuz.
+    pipeline.refresh_candidates_from_disk()
 
     print(f"[inbox] {len(merged)} kart guncellendi"
           + (f": {', '.join(merged)}" if merged else ""))

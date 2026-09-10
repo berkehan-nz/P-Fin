@@ -43,7 +43,7 @@ def evaluate(f: Fundamentals, benchmark: list | None = None) -> dict:
         "ipo_date": f.ipo_date,
         "metrics": m,
         "meta": mres["meta"],
-        "flags": mres["flags"],
+        "flags": {**mres["flags"], **sres["flags"]},
         "detail": sres["detail"],
         "fundamentals": f,
         "avg_dollar_volume_30d": f.avg_dollar_volume_30d,

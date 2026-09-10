@@ -85,7 +85,7 @@ def build(f: Fundamentals, *,
 
     m = {**mres["metrics"], **sres["metrics"]}
     meta = mres["meta"]
-    flags = dict(mres["flags"])
+    flags = {**mres["flags"], **sres["flags"]}
 
     sector = sector_for_sic(f.sic)
     track = metrics_mod.track_for(m, config.STAGE3["track_b_operating_margin_pct"])
@@ -149,9 +149,12 @@ def build(f: Fundamentals, *,
             "devralma duyurulari kontrol edilmeli."
         )
     if flags.get("z_unreliable"):
+        # Gerekce iki farkli sebepten gelebilir (negatif ozkaynak VEYA
+        # abonelik/ertelenmis gelir istisnasi); sabit metin yazmak yanlis
+        # teshis gosterirdi.
         warnings.append(
-            "Ozkaynak negatif — Altman Z'' anlamsiz. Faiz karsilama ve "
-            "FCF/toplam borc ile degerlendir."
+            flags.get("z_unreliable_reason")
+            or "Altman Z'' guvenilmez. Faiz karsilama ve FCF/toplam borc ile degerlendir."
         )
     if meta.get("data_basis") == "annual":
         warnings.append("Ceyreklik veri yetersiz; metrikler yillik tablodan hesaplandi.")
@@ -319,6 +322,22 @@ def _dedupe(items: list[str]) -> list[str]:
 # --------------------------------------------------------------------------
 # Hikaye birlestirme
 # --------------------------------------------------------------------------
+def block_coverage(score_detail: dict | None) -> dict[str, float]:
+    """Karttaki blok detaylarindan kapsama oranlarini geri okur.
+
+    ``scoring.compute`` kapsamayi hesaplar ama toplam puanla birlikte
+    saklamaz; yalnizca ``score_detail[blok]["coverage"]`` icinde durur.
+    Puani yeniden hesaplayan her yol bunu tekrar vermek zorunda.
+    """
+    out: dict[str, float] = {}
+    for block, detail in (score_detail or {}).items():
+        if isinstance(detail, dict):
+            cov = num(detail.get("coverage"))
+            if cov is not None:
+                out[block] = cov
+    return out
+
+
 def merge_story(card: dict, *, inbox_dir: Path | None = None) -> dict:
     """``claude_inbox/<TICKER>.json`` icerigini kartla birlestirir.
 
@@ -355,10 +374,15 @@ def merge_story(card: dict, *, inbox_dir: Path | None = None) -> dict:
     # Katalizor puani elle girilebilir (0-100)
     cat = num(payload.get("catalyst_score"))
     if cat is not None:
+        # KAPSAMA CARPANI KORUNMALI. Bu yol puani BASTAN hesapliyor; kapsama
+        # verilmezse total_score her blogun carpanini 1,0 kabul eder ve
+        # kartta 0,30 kapsamali bir kalite puani tam agirlikla geri doner.
+        # YOU tam olarak boyle 1. siraya cikmisti.
         card["scores"] = scoring.total_score(
             {k: card["scores"].get(k) for k in
              ("value", "quality", "safety", "momentum", "earnings_quality")},
             catalyst=cat,
+            coverage=block_coverage(card.get("score_detail")),
         )
     return card
 

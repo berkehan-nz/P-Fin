@@ -124,7 +124,9 @@ def altman_z(p: Period) -> dict:
     d = div(equity, liabilities)
 
     unreliable = equity is not None and equity <= 0
-    reason = "ozkaynak negatif — Z'' anlamsiz" if unreliable else None
+    # Bu metin karta UYARI olarak da basiliyor; kisaltma, teshisi kaybettirir.
+    reason = ("Ozkaynak negatif — Altman Z'' anlamsiz. Faiz karsilama ve "
+              "FCF/toplam borc ile degerlendir.") if unreliable else None
 
     # ABONELIK SIRKETI ISTISNASI: pesin tahsil edilen yillik bedel ERTELENMIS
     # GELIR olarak kisa vadeli yukumluluge yazilir. Isletme sermayesi negatife
@@ -362,5 +364,13 @@ def compute(f: Fundamentals, metrics: dict) -> dict:
             "altman": z,
             "beneish": beneish,
             "solvency_fallback": solvency_fallback(cur) if z["unreliable"] else None,
+        },
+        # Z'' guvenilmezligi BURADA belirlenir. metrics.compute yalnizca
+        # ozkaynak negatifligine bakar ve abonelik istisnasini goremez; huni
+        # o bayragi okudugu icin istisna sessizce kaybolurdu. Tek kaynak:
+        # altman_z()'nin kendi karari.
+        "flags": {
+            "z_unreliable": bool(z["unreliable"]),
+            "z_unreliable_reason": z.get("reason"),
         },
     }
