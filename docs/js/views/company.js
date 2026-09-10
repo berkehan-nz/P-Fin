@@ -97,21 +97,23 @@ window.ViewCompany = (function () {
         <b>ayni sektordeki diger sirketlere gore</b> hesaplanir — 70 puan
         "sektorun en iyi %30'unda" demektir, mutlak bir not degildir.
         Yanindaki sayi o basligin genel puandaki agirligi.</p>
-      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr))">
-        ${[['value', 25], ['quality', 20], ['safety', 15],
-           ['momentum', 15], ['earnings_quality', 10],
-           ['catalyst', 15]].map(([k, w]) => {
+      <div class="grid score-blocks" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr))">
+        ${['value', 'quality', 'safety', 'momentum', 'earnings_quality', 'catalyst']
+          .map((k) => {
           const info = (App.thresholds.score_plain || {})[k] || [k, ''];
+          // Agirliklar config.py'den gelir. Elle yazildiginda pano ile motor
+          // ayri fikirde oluyordu (momentum panoda 15, motorda 5).
+          const w = (App.thresholds.score_weights || {})[k];
           return `
           <div class="card" style="padding:10px">
             <div class="tiny dim">${Fmt.esc(info[0])}
-              <span class="dim">· agirlik ${w}</span></div>
+              <span class="dim">· ${weightLabel(k, w)}</span></div>
             <div class="num" style="font-size:19px;font-weight:600;margin:3px 0">
               ${Fmt.isNum(s[k]) ? Math.round(s[k]) : '—'}
               <span class="tiny dim" style="font-weight:400">/100</span></div>
             ${Charts.miniBar(s[k])}
             ${lowCoverage(k)}
-            <div class="tiny dim" style="margin-top:6px;line-height:1.4;white-space:normal">
+            <div class="tiny dim block-help" title="${Fmt.esc(info[1])}">
               ${Fmt.esc(info[1])}</div>
             ${k === 'catalyst' && !Fmt.isNum(s[k])
               ? '<div class="tiny c-yellow" style="margin-top:4px">Henuz girilmedi</div>' : ''}
@@ -186,6 +188,17 @@ window.ViewCompany = (function () {
   /* Bir blogun alt metriklerinin ancak bir kismi hesaplanabildiyse, o puan
      az sayida metrige dayaniyor demektir. Puani cezalandirmiyoruz ama
      toplamdaki agirligini azaltiyoruz — ve bunu SOYLUYORUZ. */
+  /* Kapsama carpani uygulandiginda blogun toplam puandaki GERCEK agirligi
+     nominal agirliktan dusuktur. Kartta yalnizca nominal agirlik yazarsa
+     "veri yetersiz" rozeti ile puanin cezalandirilmis olmasi arasindaki bag
+     gorunmez kaliyor. */
+  function weightLabel(block, w) {
+    if (!Fmt.isNum(w)) return '';
+    const f = ((card.scores || {}).coverage_factors || {})[block];
+    if (!Fmt.isNum(f) || f >= 0.999) return `agirlik ${w}`;
+    return `agirlik ${w} → ${Fmt.num(w * f, 1)} (kapsama ×${Fmt.num(f, 2)})`;
+  }
+
   function lowCoverage(block) {
     const d = (card.score_detail || {})[block];
     if (!d || d.coverage === undefined || d.coverage === null) return '';

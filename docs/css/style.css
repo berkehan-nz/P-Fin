@@ -1,21 +1,26 @@
 /* Berkehan Finansal Takip Sistemi — tek stil dosyasi, cerceve yok.
    Tasarim ilkesi: bilgi yogun ama sakin. Renk yalnizca anlam tasir;
-   dekoratif renk yok. Mobil oncelikli. */
+   dekoratif renk yok. Mobil oncelikli.
+
+   MOBIL DUZEN: 760px altinda ust sekmeler ALT CUBUGA tasinir. Bes sekmelik
+   yatay bir serit, kucuk ekranda ya tasar ya da kaydirma gerektirir; ikisi
+   de bas parmakla ulasilmasi zor bir yere denk gelir. Alt cubuk sabit ve
+   tek dokunusluk. Ust cubukta yalnizca kimlik ve tema anahtari kalir. */
 
 /* ---------------------------------------------------------------- tokenlar */
 :root {
   color-scheme: dark;
 
-  --bg:        #0e1116;
-  --bg-2:      #151a21;
-  --bg-3:      #1c232c;
-  --bg-hover:  #222b36;
-  --line:      #2a333f;
-  --line-soft: #202832;
+  --bg:        #0d1014;
+  --bg-2:      #14181f;
+  --bg-3:      #1b212a;
+  --bg-hover:  #222a35;
+  --line:      #29323d;
+  --line-soft: #1f2732;
 
-  --text:      #e6edf3;
+  --text:      #e7edf4;
   --text-2:    #9aa7b4;
-  --text-3:    #6b7885;
+  --text-3:    #6d7a87;
 
   --green:     #3fb950;
   --green-bg:  #122919;
@@ -26,12 +31,21 @@
   --gray:      #4a5561;
   --gray-bg:   #1a1f26;
 
-  --accent:    #4b9fd6;
-  --accent-bg: #10222e;
+  --accent:    #58a6e0;
+  --accent-bg: #0f2331;
 
-  --radius: 8px;
-  --radius-sm: 5px;
+  --radius:    10px;
+  --radius-sm: 6px;
   --gap: 12px;
+
+  /* Golge koyu temada neredeyse gorunmez olmali — derinlik cizgiyle,
+     parlaklikla degil kuruluyor. */
+  --shadow:    0 1px 2px rgba(0,0,0,.4);
+  --shadow-lg: 0 12px 34px rgba(0,0,0,.55);
+
+  /* Sabit ust/alt cubuk yukseklikleri — scroll-margin ve dolgu bunlara bagli */
+  --topbar-h: 53px;
+  --bottomnav-h: 0px;
 
   --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
@@ -39,33 +53,39 @@
 
 [data-theme="light"] {
   color-scheme: light;
-  --bg:        #f7f8fa;
+  --bg:        #f6f7f9;
   --bg-2:      #ffffff;
   --bg-3:      #eef1f5;
-  --bg-hover:  #e6eaf0;
-  --line:      #d5dbe3;
-  --line-soft: #e4e8ee;
+  --bg-hover:  #e5eaf1;
+  --line:      #d3dae2;
+  --line-soft: #e6eaef;
 
-  --text:      #16202b;
-  --text-2:    #55636f;
-  --text-3:    #7d8894;
+  --text:      #141d27;
+  --text-2:    #52606d;
+  --text-3:    #7a8592;
 
-  --green:     #1a7f37;
-  --green-bg:  #e6f4ea;
-  --yellow:    #9a6700;
-  --yellow-bg: #fdf3d7;
-  --red:       #c0362c;
-  --red-bg:    #fbe9e7;
+  --green:     #14762f;
+  --green-bg:  #e4f3e8;
+  --yellow:    #8a5c00;
+  --yellow-bg: #fcf1d4;
+  --red:       #b83026;
+  --red-bg:    #fbe8e6;
   --gray:      #8c959f;
   --gray-bg:   #eef1f5;
 
-  --accent:    #1c6fa8;
-  --accent-bg: #e3f0f9;
+  --accent:    #16679f;
+  --accent-bg: #e2eff9;
+
+  --shadow:    0 1px 2px rgba(16,26,38,.07);
+  --shadow-lg: 0 14px 38px rgba(16,26,38,.16);
 }
 
 * { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
 
 body {
   margin: 0;
@@ -73,6 +93,8 @@ body {
   color: var(--text);
   font: 14px/1.5 var(--sans);
   -webkit-font-smoothing: antialiased;
+  /* Tek bir tasan tablo bile tum sayfayi yatay kaydirilir hale getiriyordu. */
+  overflow-x: hidden;
 }
 
 a { color: var(--accent); text-decoration: none; }
@@ -85,15 +107,19 @@ button {
   background: var(--bg-3);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  padding: 6px 11px;
-  transition: background .12s, border-color .12s;
+  padding: 7px 12px;
+  transition: background .12s, border-color .12s, color .12s;
 }
 button:hover { background: var(--bg-hover); border-color: var(--text-3); }
-button:focus-visible, a:focus-visible, select:focus-visible, input:focus-visible {
+button:active { transform: translateY(.5px); }
+button:focus-visible, a:focus-visible, select:focus-visible,
+input:focus-visible, textarea:focus-visible, summary:focus-visible,
+[tabindex]:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 button.primary { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+button.primary:hover { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 button.ghost { background: transparent; }
 button[aria-pressed="true"] { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
 
@@ -103,9 +129,10 @@ select, input, textarea {
   background: var(--bg-2);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  padding: 6px 8px;
+  padding: 7px 9px;
   max-width: 100%;
 }
+select:hover, input:hover { border-color: var(--text-3); }
 textarea { font-family: var(--mono); font-size: 12px; resize: vertical; }
 
 .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
@@ -113,15 +140,16 @@ textarea { font-family: var(--mono); font-size: 12px; resize: vertical; }
 /* ------------------------------------------------------------------ duzen */
 header.topbar {
   position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: saturate(160%) blur(10px);
+  -webkit-backdrop-filter: saturate(160%) blur(10px);
   border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top);
 }
 .topbar-inner {
   max-width: 1440px; margin: 0 auto;
   display: flex; align-items: center; gap: var(--gap);
-  padding: 10px 16px;
-  flex-wrap: wrap;
+  padding: 10px max(16px, env(safe-area-inset-left)) 10px max(16px, env(safe-area-inset-right));
 }
 .brand { font-weight: 650; letter-spacing: -.01em; white-space: nowrap; }
 .brand small { color: var(--text-3); font-weight: 400; margin-left: 6px; }
@@ -129,21 +157,28 @@ header.topbar {
 nav.tabs { display: flex; gap: 4px; flex: 1; overflow-x: auto; scrollbar-width: none; }
 nav.tabs::-webkit-scrollbar { display: none; }
 nav.tabs a {
-  padding: 6px 12px; border-radius: var(--radius-sm);
+  padding: 7px 13px; border-radius: 999px;
   color: var(--text-2); white-space: nowrap; font-weight: 500;
+  transition: background .12s, color .12s;
 }
 nav.tabs a:hover { background: var(--bg-3); text-decoration: none; color: var(--text); }
-nav.tabs a.active { background: var(--bg-3); color: var(--text); }
+nav.tabs a.active { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
+/* Sekme etiketleri iki uzunlukta yazilir; genis ekranda uzun, dar ekranda kisa. */
+nav.tabs .lbl-short { display: none; }
 
-main { max-width: 1440px; margin: 0 auto; padding: 16px; }
+main {
+  max-width: 1440px; margin: 0 auto;
+  padding: 18px max(16px, env(safe-area-inset-left))
+           calc(24px + var(--bottomnav-h)) max(16px, env(safe-area-inset-right));
+}
 
 .screen { display: none; }
 .screen.active { display: block; }
 
-h1 { font-size: 20px; margin: 0 0 4px; letter-spacing: -.01em; }
-h2 { font-size: 15px; margin: 24px 0 10px; letter-spacing: -.005em; }
-h3 { font-size: 13px; margin: 16px 0 8px; color: var(--text-2);
-     text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+h1 { font-size: 21px; margin: 0 0 4px; letter-spacing: -.015em; font-weight: 650; }
+h2 { font-size: 15px; margin: 26px 0 10px; letter-spacing: -.005em; font-weight: 620; }
+h3 { font-size: 12px; margin: 18px 0 8px; color: var(--text-2);
+     text-transform: uppercase; letter-spacing: .05em; font-weight: 650; }
 .muted { color: var(--text-2); }
 .dim { color: var(--text-3); }
 .small { font-size: 12px; }
@@ -155,19 +190,29 @@ h3 { font-size: 13px; margin: 16px 0 8px; color: var(--text-2);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 14px;
+  box-shadow: var(--shadow);
 }
 .grid { display: grid; gap: var(--gap); }
-.g-summary { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
-.g-cards   { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+/* Izgara/esnek ogeler varsayilan olarak min-width:auto tasir: icindeki EN GENIS
+   bolunemez parca (min-genislikli bir tablo, sarilmayan uzun bir rozet) tum
+   sutunu kendi boyuna cekiyor ve sayfayi yatay kaydirilir hale getiriyordu.
+   Sutun kapsayiciya uysun, tasan parca kendi kutusunda kaysin. */
+.grid > *, .detail-layout > *, .row > * { min-width: 0; }
+/* minmax'in ilk degeri kapsayicidan genis olursa izgara tasar — min() sarti
+   dar telefonda tasmayi engeller. */
+.g-summary { grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); }
+.g-cards   { grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
 .row { display: flex; gap: var(--gap); flex-wrap: wrap; align-items: center; }
-.spread { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.spread { display: flex; justify-content: space-between; align-items: baseline;
+          gap: 8px; flex-wrap: wrap; }
 
 /* ------------------------------------------------------------- ozet kutu */
 .stat .label { font-size: 11px; color: var(--text-2); text-transform: uppercase;
-               letter-spacing: .05em; font-weight: 600; }
-.stat .value { font-size: 24px; font-weight: 600; margin-top: 4px;
-               font-family: var(--mono); font-variant-numeric: tabular-nums; }
-.stat .sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+               letter-spacing: .05em; font-weight: 650; }
+.stat .value { font-size: 24px; font-weight: 650; margin-top: 5px;
+               font-family: var(--mono); font-variant-numeric: tabular-nums;
+               letter-spacing: -.02em; }
+.stat .sub { font-size: 12px; color: var(--text-2); margin-top: 3px; }
 
 /* -------------------------------------------------------------- renkler */
 /* Renk korlugu icin: renge EK OLARAK ok isareti ve ince cubuk gosterilir. */
@@ -178,8 +223,8 @@ h3 { font-size: 13px; margin: 16px 0 8px; color: var(--text-2);
 
 .chip {
   display: inline-flex; align-items: center; gap: 4px;
-  padding: 2px 7px; border-radius: 20px;
-  font-size: 11px; font-weight: 600; line-height: 1.6;
+  padding: 2px 8px; border-radius: 999px;
+  font-size: 11px; font-weight: 650; line-height: 1.6;
   border: 1px solid transparent; white-space: nowrap;
 }
 .chip.green  { background: var(--green-bg);  color: var(--green);  border-color: color-mix(in srgb, var(--green) 35%, transparent); }
@@ -199,16 +244,24 @@ h3 { font-size: 13px; margin: 16px 0 8px; color: var(--text-2);
 .bar.gray   > i { background: var(--gray); }
 
 /* -------------------------------------------------------------- tablolar */
-.table-wrap { overflow-x: auto; border: 1px solid var(--line);
-              border-radius: var(--radius); background: var(--bg-2); }
+.table-wrap { max-width: 100%; overflow-x: auto; border: 1px solid var(--line);
+              border-radius: var(--radius); background: var(--bg-2);
+              box-shadow: var(--shadow);
+              -webkit-overflow-scrolling: touch;
+              overscroll-behavior-x: contain; }
 table { border-collapse: collapse; width: 100%; font-size: 13px; }
-th, td { padding: 7px 10px; text-align: right; white-space: nowrap;
+th, td { padding: 8px 11px; text-align: right; white-space: nowrap;
          border-bottom: 1px solid var(--line-soft); }
 th:first-child, td:first-child { text-align: left; position: sticky; left: 0;
                                  background: var(--bg-2); z-index: 1; }
+/* Sabit ilk sutunun kaydirilan sutunlardan ayrildigi belli olsun. */
+td:first-child::after, th:first-child::after {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 1px;
+  background: var(--line-soft);
+}
 thead th { position: sticky; top: 0; background: var(--bg-3); z-index: 2;
            font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
-           color: var(--text-2); font-weight: 600; cursor: pointer;
+           color: var(--text-2); font-weight: 650; cursor: pointer;
            border-bottom: 1px solid var(--line); }
 thead th:first-child { z-index: 3; background: var(--bg-3); }
 tbody tr:hover td { background: var(--bg-hover); }
@@ -218,57 +271,90 @@ tbody tr:last-child td { border-bottom: none; }
 /* --------------------------------------------------------- aday kartlari */
 .co-card {
   background: var(--bg-2); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 13px;
-  display: flex; flex-direction: column; gap: 10px;
-  cursor: pointer; transition: border-color .12s, transform .12s;
+  border-radius: var(--radius); padding: 14px;
+  display: flex; flex-direction: column; gap: 11px; min-width: 0;
+  cursor: pointer; box-shadow: var(--shadow);
+  transition: border-color .12s, box-shadow .12s, transform .12s;
 }
-.co-card:hover { border-color: var(--text-3); transform: translateY(-1px); }
-.co-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.co-ticker { font-size: 16px; font-weight: 650; letter-spacing: -.01em; }
+/* "Neden ucuz" teshisi tam cumle olabiliyor; rozetlerin nowrap kurali onu
+   kartin disina tasiriyordu. Karttaki serbest rozet sarilabilir. */
+.co-card > .chip { white-space: normal; max-width: 100%; text-align: left; }
+.co-card:hover, .co-card:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+.co-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.co-ticker { font-size: 17px; font-weight: 680; letter-spacing: -.02em; }
 .co-name { font-size: 12px; color: var(--text-2); line-height: 1.35;
-           display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-           overflow: hidden; }
+           display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+           -webkit-box-orient: vertical; overflow: hidden; }
 
 .score-ring { position: relative; width: 52px; height: 52px; flex-shrink: 0; }
 .score-ring svg { transform: rotate(-90deg); display: block; }
 .score-ring .n { position: absolute; inset: 0; display: grid; place-items: center;
-                 font-family: var(--mono); font-size: 15px; font-weight: 650; }
+                 font-family: var(--mono); font-size: 15px; font-weight: 680; }
 
-.subscores { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.subscores { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .subscore .k { font-size: 9px; color: var(--text-3); text-transform: uppercase;
-               letter-spacing: .03em; margin-bottom: 3px; }
+               letter-spacing: .03em; margin-bottom: 3px;
+               overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .headline-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.hm { background: var(--bg-3); border-radius: var(--radius-sm); padding: 6px 8px; }
+.hm { background: var(--bg-3); border-radius: var(--radius-sm); padding: 7px 9px;
+      min-width: 0; }
 .hm .k { font-size: 9px; color: var(--text-3); text-transform: uppercase;
          letter-spacing: .03em; }
-.hm .v { font-family: var(--mono); font-size: 13px; font-weight: 600; margin-top: 2px; }
+.hm .v { font-family: var(--mono); font-size: 13px; font-weight: 650; margin-top: 2px; }
 
 .verdict { font-size: 12px; color: var(--text-2); line-height: 1.45;
-           border-left: 2px solid var(--accent); padding-left: 8px; }
+           border-left: 2px solid var(--accent); padding-left: 9px; }
 .verdict.stale { opacity: .5; border-left-color: var(--gray); }
 
+/* ------------------------------------------------------- filtre paneli */
+/* Dar ekranda dokuz filtre kontrolu ekranin tamamini kapliyordu; katlanabilir
+   panelde varsayilan KAPALI acilir, genis ekranda ise hep acik durur. */
+.filters summary {
+  cursor: pointer; list-style: none; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+.filters summary::-webkit-details-marker { display: none; }
+.filters summary::after {
+  content: "▾"; margin-left: auto; color: var(--text-3);
+  transition: transform .15s;
+}
+.filters details[open] > summary::after { transform: rotate(180deg); }
+.filter-grid {
+  display: grid; gap: 10px; margin-top: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+  align-items: end;
+}
+.filter-grid label { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.filter-grid label.inline { flex-direction: row; align-items: center; gap: 6px; }
+.filter-grid select, .filter-grid input[type="number"] { width: 100%; }
+
 /* ------------------------------------------------------------ sirket detay */
-.detail-layout { display: grid; grid-template-columns: 190px 1fr; gap: 24px;
+.detail-layout { display: grid; grid-template-columns: 190px 1fr; gap: 26px;
                  align-items: start; }
-.toc { position: sticky; top: 62px; }
-.toc a { display: block; padding: 5px 9px; border-radius: var(--radius-sm);
+.toc { position: sticky; top: calc(var(--topbar-h) + 8px); }
+.toc a { display: block; padding: 6px 10px; border-radius: var(--radius-sm);
          color: var(--text-2); font-size: 12.5px; }
 .toc a:hover { background: var(--bg-3); color: var(--text); text-decoration: none; }
-.toc a.active { background: var(--bg-3); color: var(--accent); font-weight: 600; }
+.toc a.active { background: var(--accent-bg); color: var(--accent); font-weight: 600; }
 
 .detail-head { display: flex; gap: 20px; flex-wrap: wrap; align-items: baseline; }
-.detail-head .price { font-size: 28px; font-weight: 650; font-family: var(--mono); }
+.detail-head .price { font-size: 28px; font-weight: 680; font-family: var(--mono);
+                      letter-spacing: -.02em; }
 
-.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; font-size: 12.5px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 12.5px; }
 .kv dt { color: var(--text-2); }
-.kv dd { margin: 0; font-family: var(--mono); }
+.kv dd { margin: 0; font-family: var(--mono); overflow-wrap: anywhere; }
 
-section[id] { scroll-margin-top: 70px; }
+section[id] { scroll-margin-top: calc(var(--topbar-h) + 12px); }
 
 .help-btn {
   display: inline-grid; place-items: center;
-  width: 15px; height: 15px; border-radius: 50%;
+  width: 16px; height: 16px; border-radius: 50%;
   border: 1px solid var(--line); background: transparent;
   color: var(--text-3); font-size: 10px; padding: 0; margin-left: 5px;
   vertical-align: middle;
@@ -277,10 +363,19 @@ section[id] { scroll-margin-top: 70px; }
 
 .help-row td { background: var(--bg-3) !important; text-align: left;
                white-space: normal; font-size: 12px; color: var(--text-2);
-               padding: 10px 14px; line-height: 1.55; }
+               padding: 11px 14px; line-height: 1.55; }
 .help-row .formula { font-family: var(--mono); color: var(--text);
                      background: var(--bg); padding: 2px 6px; border-radius: 3px;
                      display: inline-block; margin-top: 5px; font-size: 11.5px; }
+
+/* Puan bloklari izgarasi en uzun aciklamaya gore esniyor, kisa kartlarin
+   altinda kocaman bosluk kaliyordu. Aciklama dort satirda kirpilir; tamami
+   title ile okunur. */
+.score-blocks .block-help {
+  margin-top: 6px; line-height: 1.4; white-space: normal;
+  display: -webkit-box; -webkit-line-clamp: 4; line-clamp: 4;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
 
 .pctbar { display: inline-flex; align-items: center; gap: 5px; }
 .pctbar .track { width: 46px; height: 4px; background: var(--line-soft);
@@ -290,7 +385,7 @@ section[id] { scroll-margin-top: 70px; }
 
 .thesis { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
 .thesis ul { margin: 0; padding-left: 18px; }
-.thesis li { margin-bottom: 5px; line-height: 1.5; }
+.thesis li { margin-bottom: 6px; line-height: 1.5; }
 
 .empty-story { color: var(--text-3); font-style: italic; font-size: 12.5px;
                border: 1px dashed var(--line); border-radius: var(--radius);
@@ -301,13 +396,13 @@ section[id] { scroll-margin-top: 70px; }
 .funnel-bar { height: 30px; border-radius: var(--radius-sm);
               background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 45%, transparent));
               display: flex; align-items: center; padding: 0 10px;
-              font-family: var(--mono); font-size: 12px; font-weight: 600;
+              font-family: var(--mono); font-size: 12px; font-weight: 650;
               color: #fff; min-width: 46px; transition: width .3s; }
 [data-theme="light"] .funnel-bar { color: #fff; }
 .funnel-label { width: 130px; flex-shrink: 0; font-size: 12.5px; }
 
 /* --------------------------------------------------------------- uyarilar */
-.warn { display: flex; gap: 9px; padding: 9px 11px; border-radius: var(--radius-sm);
+.warn { display: flex; gap: 9px; padding: 10px 12px; border-radius: var(--radius-sm);
         border-left: 3px solid; font-size: 12.5px; line-height: 1.45;
         margin-bottom: 6px; align-items: flex-start; }
 .warn.high   { background: var(--red-bg);    border-color: var(--red); }
@@ -316,22 +411,26 @@ section[id] { scroll-margin-top: 70px; }
 
 /* ------------------------------------------------------------------ modal */
 .modal-backdrop {
-  position: fixed; inset: 0; background: rgba(0,0,0,.6);
+  position: fixed; inset: 0; background: rgba(0,0,0,.62);
   display: grid; place-items: center; z-index: 100; padding: 16px;
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
 }
 .modal { background: var(--bg-2); border: 1px solid var(--line);
          border-radius: var(--radius); padding: 18px; width: min(560px, 100%);
-         max-height: 88vh; overflow-y: auto; }
+         max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow-lg);
+         -webkit-overflow-scrolling: touch; }
 .modal h2 { margin-top: 0; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .form-grid label { display: flex; flex-direction: column; gap: 4px;
                    font-size: 12px; color: var(--text-2); }
 .form-grid label.full { grid-column: 1 / -1; }
 
-.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+.toast { position: fixed; left: 50%; transform: translateX(-50%);
+         bottom: calc(20px + var(--bottomnav-h) + env(safe-area-inset-bottom));
          background: var(--bg-3); border: 1px solid var(--accent);
-         color: var(--text); padding: 9px 16px; border-radius: var(--radius);
-         z-index: 200; font-size: 13px; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+         color: var(--text); padding: 10px 16px; border-radius: var(--radius);
+         z-index: 200; font-size: 13px; box-shadow: var(--shadow-lg);
+         max-width: calc(100vw - 32px); text-align: center; }
 
 /* ------------------------------------------------------------ bos durumlar */
 .empty-state { text-align: center; padding: 48px 20px; color: var(--text-2); }
@@ -342,30 +441,126 @@ section[id] { scroll-margin-top: 70px; }
                   line-height: 1.9; }
 
 .banner { background: var(--yellow-bg); border: 1px solid var(--yellow);
-          color: var(--text); border-radius: var(--radius); padding: 11px 14px;
+          color: var(--text); border-radius: var(--radius); padding: 12px 14px;
           margin-bottom: var(--gap); font-size: 13px; line-height: 1.5; }
 
 /* ------------------------------------------------------------- duyarlilik */
-@media (max-width: 900px) {
-  .detail-layout { grid-template-columns: 1fr; }
-  .toc { position: static; display: flex; gap: 4px; overflow-x: auto;
-         padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+@media (max-width: 1000px) {
+  .detail-layout { grid-template-columns: 1fr; gap: 16px; }
+  .toc { position: sticky; top: var(--topbar-h); z-index: 20;
+         display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
+         padding: 8px 0; margin: 0 -4px; background: var(--bg);
+         border-bottom: 1px solid var(--line); }
+  .toc::-webkit-scrollbar { display: none; }
   .toc a { white-space: nowrap; }
   .thesis { grid-template-columns: 1fr; }
 }
-@media (max-width: 620px) {
-  main { padding: 12px; }
+
+/* --- MOBIL: sekmeler alt cubuga tasinir --------------------------------- */
+@media (max-width: 760px) {
+  :root { --topbar-h: 49px; --bottomnav-h: 56px; }
+
+  /* backdrop-filter, position:fixed alt ogeler icin KAPSAYICI BLOK yaratir.
+     Ust cubukta birakilsaydi alt sekme cubugu ekranin altina degil basligin
+     altina yapisirdi. Mobilde duz zemin kullaniyoruz. */
+  header.topbar { backdrop-filter: none; -webkit-backdrop-filter: none;
+                  background: var(--bg); }
+
+  nav.tabs {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    flex: none; gap: 0;
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    backdrop-filter: saturate(160%) blur(12px);
+    -webkit-backdrop-filter: saturate(160%) blur(12px);
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom);
+    overflow: visible;
+  }
+  nav.tabs a {
+    flex: 1 1 0; min-width: 0; border-radius: 0;
+    display: flex; align-items: center; justify-content: center;
+    /* Dokunma hedefi 48px — parmakla isabet ettirilebilir olmali. */
+    min-height: 48px; padding: 6px 2px;
+    font-size: 11px; font-weight: 600; text-align: center;
+    border-top: 2px solid transparent;
+  }
+  nav.tabs a.active {
+    background: transparent; color: var(--accent);
+    border-top-color: var(--accent);
+  }
+  nav.tabs a:hover { background: transparent; }
+  nav.tabs .lbl-long { display: none; }
+  nav.tabs .lbl-short { display: inline; }
+
+  .topbar-inner { padding: 8px 14px; gap: 8px; }
+  .brand { font-size: 14px; margin-right: auto; }
+  .brand small { display: none; }
+  /* Esik tarihi ust cubukta yer kapliyordu; ayni bilgi Genel bakis'ta zaten var. */
+  #asOf { display: none; }
+  /* Simge dugmesi kare kalsin — 16px yazi tipi onu genisletiyordu. */
+  #themeToggle { min-height: 36px; width: 36px; padding: 0; font-size: 15px; }
+
+  main { padding: 14px 14px calc(20px + var(--bottomnav-h)); }
+
+  /* iOS, 16px'ten kucuk yazi tipli bir alana odaklaninca sayfayi ZUMLAR ve
+     duzen bozulur. Mobilde form alanlari 16px. */
+  select, input, textarea, button { font-size: 16px; }
+  button { min-height: 40px; padding: 8px 13px; }
+  .filter-grid { grid-template-columns: 1fr 1fr; }
+  .filter-grid label.inline { grid-column: 1 / -1; }
+
+  h1 { font-size: 19px; }
+  h2 { font-size: 14px; margin: 20px 0 9px; }
+  .card { padding: 12px; }
+
+  th, td { padding: 8px 9px; }
+  /* Dar ekranda sabit ilk sutun tablonun yarisini yiyordu. */
+  th:first-child, td:first-child { max-width: 108px; overflow: hidden;
+                                   text-overflow: ellipsis; }
+
+  .funnel-label { width: 92px; font-size: 11.5px; }
+  .funnel-stage { gap: 8px; }
+
+  /* Ozet kutulari bir .card icindeyken 170px'lik taban telefonda tek sutuna
+     dusuyordu; ekranin yarisi bos kaliyor, kart gereksiz uzuyordu. */
+  .g-summary { grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)); }
+
+  /* Sembol/ad ustte tam genislik, fiyat ile puan halkasi altta yan yana. */
+  .detail-head { gap: 12px; align-items: center; justify-content: space-between; }
+  .detail-head > :first-child { flex: 1 0 100%; }
+  .detail-head .price { font-size: 24px; }
+
+  /* Modal alt sayfaya doner — bas parmak menzilinde ve tam genislikte. */
+  .modal-backdrop { place-items: end center; padding: 0; }
+  .modal {
+    width: 100%; max-height: 92vh;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border-bottom: none;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  }
   .form-grid { grid-template-columns: 1fr; }
-  .detail-head .price { font-size: 23px; }
+}
+
+@media (max-width: 460px) {
   .g-cards { grid-template-columns: 1fr; }
-  h1 { font-size: 18px; }
+  .subscores { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+  /* Dar sutunda "KAZANC KALITESI" tek satira sigmiyor; kirpmak yerine
+     iki satira sarsin — iki satirin yuksekligi sabitlenerek cubuklar hizali kalir. */
+  .subscore .k { font-size: 8px; letter-spacing: 0; white-space: normal;
+                 line-height: 1.15; height: 2.3em; overflow: hidden; }
+  .headline-metrics { grid-template-columns: repeat(2, 1fr); }
+  .hm { padding: 6px 8px; }
+  nav.tabs a { font-size: 10px; }
 }
 
 @media print {
-  header.topbar, .toc, button { display: none; }
+  header.topbar, nav.tabs, .toc, button { display: none !important; }
   .screen { display: block !important; }
+  .card, .co-card, .table-wrap { box-shadow: none; }
+  main { padding-bottom: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   * { transition: none !important; animation: none !important; }
 }

@@ -13,12 +13,12 @@
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">Berkehan <small>finansal takip sistemi</small></div>
-    <nav class="tabs" id="tabs">
-      <a href="#/overview">Genel bakis</a>
-      <a href="#/candidates">Adaylar</a>
-      <a href="#/portfolio">Portfoy</a>
-      <a href="#/funnel">Huni</a>
-      <a href="#/rehber">Nasil okunur</a>
+    <nav class="tabs" id="tabs" aria-label="Ana bolumler">
+      <a href="#/overview"><span class="lbl-long">Genel bakis</span><span class="lbl-short">Genel</span></a>
+      <a href="#/candidates"><span class="lbl-long">Adaylar</span><span class="lbl-short">Adaylar</span></a>
+      <a href="#/portfolio"><span class="lbl-long">Portfoy</span><span class="lbl-short">Portfoy</span></a>
+      <a href="#/funnel"><span class="lbl-long">Huni</span><span class="lbl-short">Huni</span></a>
+      <a href="#/rehber"><span class="lbl-long">Nasil okunur</span><span class="lbl-short">Rehber</span></a>
     </nav>
     <div class="row" style="gap:6px">
       <span class="tiny dim" id="asOf"></span>
@@ -56,50 +56,54 @@
       </div>
     </div>
 
-    <div class="card" style="margin:12px 0">
-      <div class="row">
-        <label class="tiny dim">Sektor
-          <select id="fSector"><option value="">Hepsi</option></select></label>
-        <label class="tiny dim">Kol
-          <select id="fTrack">
-            <option value="">Hepsi</option>
-            <option value="A">Kol A (karli)</option>
-            <option value="B">Kol B (buyume)</option>
-            <option value="both">Her ikisi</option>
-          </select></label>
-        <label class="tiny dim">Kaynak
-          <select id="fSource">
-            <option value="">Hepsi</option>
-            <option value="seed">Tohum listesi</option>
-            <option value="funnel">Huni</option>
-            <option value="manual">Elle eklenen</option>
-          </select></label>
-        <label class="tiny dim">Karar
-          <select id="fDecision">
-            <option value="">Hepsi</option>
-            <option value="AL">AL</option>
-            <option value="BEKLE">BEKLE</option>
-            <option value="ELE">ELE</option>
-            <option value="__none__">Karar verilmemis</option>
-          </select></label>
-        <label class="tiny dim">Min puan
-          <input type="number" id="fMinScore" min="0" max="100" step="5"
-                 style="width:70px" placeholder="0"></label>
-        <label class="tiny dim">Sirala
-          <select id="fSort">
-            <option value="total">Puan</option>
-            <option value="value">Ucuzluk</option>
-            <option value="growth">Buyume</option>
-            <option value="momentum">Momentum</option>
-            <option value="updated">Guncellenme</option>
-            <option value="ticker">Sembol</option>
-          </select></label>
-        <label class="tiny dim row" style="gap:5px">
-          <input type="checkbox" id="fWatchOnly"> Sadece izleme listesi</label>
-        <label class="tiny dim row" style="gap:5px">
-          <input type="checkbox" id="fPortfolioOnly"> Sadece portfoy</label>
-        <button id="fReset" class="ghost tiny">Sifirla</button>
-      </div>
+    <div class="card filters" style="margin:12px 0">
+      <details id="filterBox">
+        <summary>Filtreler &amp; siralama<span class="tiny dim" id="filterHint"></span></summary>
+        <div class="filter-grid">
+          <label class="tiny dim">Sektor
+            <select id="fSector"><option value="">Hepsi</option></select></label>
+          <label class="tiny dim">Kol
+            <select id="fTrack">
+              <option value="">Hepsi</option>
+              <option value="A">Kol A (karli)</option>
+              <option value="B">Kol B (buyume)</option>
+              <option value="both">Her ikisi</option>
+            </select></label>
+          <label class="tiny dim">Kaynak
+            <select id="fSource">
+              <option value="">Hepsi</option>
+              <option value="seed">Tohum listesi</option>
+              <option value="funnel">Huni</option>
+              <option value="manual">Elle eklenen</option>
+            </select></label>
+          <label class="tiny dim">Karar
+            <select id="fDecision">
+              <option value="">Hepsi</option>
+              <option value="AL">AL</option>
+              <option value="BEKLE">BEKLE</option>
+              <option value="ELE">ELE</option>
+              <option value="__none__">Karar verilmemis</option>
+            </select></label>
+          <label class="tiny dim">Min puan
+            <input type="number" id="fMinScore" min="0" max="100" step="5"
+                   inputmode="numeric" placeholder="0"></label>
+          <label class="tiny dim">Sirala
+            <select id="fSort">
+              <option value="total">Puan</option>
+              <option value="value">Ucuzluk</option>
+              <option value="growth">Buyume</option>
+              <option value="momentum">Momentum</option>
+              <option value="updated">Guncellenme</option>
+              <option value="ticker">Sembol</option>
+            </select></label>
+          <label class="tiny dim inline">
+            <input type="checkbox" id="fWatchOnly"> Sadece izleme listesi</label>
+          <label class="tiny dim inline">
+            <input type="checkbox" id="fPortfolioOnly"> Sadece portfoy</label>
+          <label class="tiny dim inline">
+            <button id="fReset" class="ghost">Sifirla</button></label>
+        </div>
+      </details>
     </div>
 
     <div id="candidateGrid" class="grid g-cards"></div>

@@ -60,7 +60,41 @@ window.ViewCandidates = (function () {
     $('viewGrid').addEventListener('click', () => setMode('grid'));
     $('viewTable').addEventListener('click', () => setMode('table'));
     $('addCompany').addEventListener('click', openAddCompany);
+    initFilterPanel();
     setMode(mode, true);
+  }
+
+  /* Filtre paneli genis ekranda hep acik, dar ekranda varsayilan KAPALI durur:
+     dokuz kontrol telefonda ilk ekranin tamamini yiyordu. Kullanici bir kez
+     acar/kapatirsa tercihi korunur; kendiliginden geri kapanmaz. */
+  const NARROW = '(max-width: 760px)';
+  let filterTouched = false;
+
+  function initFilterPanel() {
+    const box = $('filterBox');
+    const mq = window.matchMedia(NARROW);
+    const saved = DataLayer.prefs.get('filtersOpen', null);
+    const sync = () => { if (!filterTouched) box.open = !mq.matches; };
+
+    if (saved === null) sync(); else { box.open = saved === '1'; filterTouched = true; }
+    mq.addEventListener('change', sync);
+
+    box.addEventListener('toggle', () => {
+      filterTouched = true;
+      DataLayer.prefs.set('filtersOpen', box.open ? '1' : '0');
+    });
+  }
+
+  /* Panel kapaliyken kac filtre acik oldugu gorunmezdi — bos gelen bir listenin
+     sebebi anlasilmiyordu. */
+  function updateFilterHint(f) {
+    const active = [
+      f.sector && f.sector, f.track && 'kol', f.source && 'kaynak',
+      f.decision && 'karar', !isNaN(f.minScore) && 'min puan',
+      f.watchOnly && 'izleme', f.portfolioOnly && 'portfoy',
+    ].filter(Boolean).length;
+    const el = $('filterHint');
+    if (el) el.textContent = active ? ` · ${active} filtre acik` : '';
   }
 
   function setMode(m, silent) {
@@ -101,6 +135,7 @@ window.ViewCandidates = (function () {
     });
 
     out.sort(sorter(f.sort));
+    updateFilterHint(f);
 
     $('candidateCount').innerHTML =
       `${out.length} / ${rows.length} sirket gosteriliyor` +
