@@ -10,9 +10,9 @@
     "target_high": 200.0,
     "target_low": 130.0,
     "target_median": 165.0,
-    "upside_to_median": 48.97074468909495
+    "upside_to_median": 49.02456483097226
   },
-  "as_of": "2026-09-09",
+  "as_of": "2026-09-10",
   "calendar": {
     "next_earnings": null
   },
@@ -35,7 +35,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 4740.4,
+  "enterprise_value_musd": 4738.4,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -65,13 +65,13 @@
     "would_fail_at": null,
     "z_unreliable": false
   },
-  "generated_at": "2026-09-09T14:04:40+00:00",
+  "generated_at": "2026-09-10T07:49:38+00:00",
   "insider": {
     "form4_count": 25,
     "last_form4": "2026-08-24",
     "window_days": 180
   },
-  "market_cap_musd": 5551.0,
+  "market_cap_musd": 5549.0,
   "metrics": {
     "altman_z": {
       "color": "gray",
@@ -91,7 +91,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 48.3,
+      "sector_pct": 50.0,
       "value": 1.51
     },
     "current_ratio": {
@@ -138,7 +138,7 @@
     },
     "ev_sales": {
       "color": "green",
-      "own_5y_pct": 25.0,
+      "own_5y_pct": 16.7,
       "pct_basis": "universe",
       "sector_pct": 18.1,
       "value": 2.31
@@ -162,7 +162,7 @@
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 92.9,
-      "value": 13.43
+      "value": 13.44
     },
     "fcf_yield_mcap": {
       "color": "green",
@@ -197,7 +197,7 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -6.5
+      "value": -6.51
     },
     "implied_vs_actual_growth": {
       "color": "gray",
@@ -210,7 +210,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 95.0,
+      "sector_pct": 65.4,
       "value": 470.54
     },
     "maturity_wall_2y": {
@@ -252,8 +252,8 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 81.9,
-      "value": 38.61
+      "sector_pct": 76.4,
+      "value": 38.63
     },
     "pe": {
       "color": "green",
@@ -281,28 +281,28 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -28.99
+      "value": -30.42
     },
     "rel_strength_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 9.7,
-      "value": -35.52
+      "sector_pct": 12.5,
+      "value": -35.69
     },
     "return_12m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 37.5,
-      "value": -4.29
+      "sector_pct": 40.3,
+      "value": -5.71
     },
     "return_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 9.7,
-      "value": -17.32
+      "sector_pct": 12.5,
+      "value": -17.49
     },
     "rev_cagr_3y": {
       "color": "red",
@@ -427,13 +427,13 @@
       "url": "https://finnhub.io/api/news?id=82c116fb0f3356896354a76c02e9f91f55a39642fed5bc97f27dcae585110d45"
     }
   ],
-  "price": 110.76,
+  "price": 110.72,
   "reverse_dcf": {
     "actual_growth_pct": 1.72,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 4740.4,
+    "enterprise_value_musd": 4738.4,
     "fcf_ttm_musd": 636.6,
-    "implied_growth_pct": -6.5,
+    "implied_growth_pct": -6.51,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -446,8 +446,8 @@
           "weight": 0.2
         },
         "cash_conversion": {
-          "percentile": 48.3,
-          "scaled": 48.3,
+          "percentile": 50.0,
+          "scaled": 50.0,
           "weight": 0.3
         },
         "piotroski_f": {
@@ -461,32 +461,24 @@
           "weight": 0.25
         }
       },
-      "coverage": 1.0
+      "coverage": 1.0,
+      "low_coverage": false
     },
     "momentum": {
       "components": {
-        "pct_off_52w_high": {
-          "percentile": 81.9,
-          "scaled": 18.1,
-          "weight": 0.2
+        "rel_strength_3m": {
+          "percentile": 4.2,
+          "scaled": 4.2,
+          "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 9.7,
-          "scaled": 9.7,
-          "weight": 0.3
-        },
-        "return_12m": {
-          "percentile": 37.5,
-          "scaled": 37.5,
-          "weight": 0.25
-        },
-        "return_6m": {
-          "percentile": 9.7,
-          "scaled": 9.7,
-          "weight": 0.25
+          "percentile": 12.5,
+          "scaled": 12.5,
+          "weight": 0.4
         }
       },
-      "coverage": 1.0
+      "coverage": 1.0,
+      "low_coverage": false
     },
     "quality": {
       "components": {
@@ -516,7 +508,8 @@
           "weight": 0.15
         }
       },
-      "coverage": 1.0
+      "coverage": 1.0,
+      "low_coverage": false
     },
     "safety": {
       "components": {
@@ -530,8 +523,8 @@
           "weight": 0.2
         },
         "interest_coverage": {
-          "percentile": 95.0,
-          "scaled": 95.0,
+          "percentile": 65.4,
+          "scaled": 65.4,
           "weight": 0.2
         },
         "net_debt_to_ebitda": {
@@ -540,7 +533,8 @@
           "weight": 0.3
         }
       },
-      "coverage": 0.7
+      "coverage": 0.7,
+      "low_coverage": false
     },
     "value": {
       "components": {
@@ -570,7 +564,8 @@
           "weight": 0.25
         }
       },
-      "coverage": 1.0
+      "coverage": 1.0,
+      "low_coverage": false
     }
   },
   "score_internals": {
@@ -618,11 +613,11 @@
       "safety": 1.0,
       "value": 1.0
     },
-    "earnings_quality": 50.0,
-    "momentum": 18.3,
+    "earnings_quality": 50.5,
+    "momentum": 7.5,
     "quality": 52.0,
-    "safety": 79.2,
-    "total": 59.5,
+    "safety": 70.7,
+    "total": 57.8,
     "value": 85.3,
     "weight_coverage": 1.0
   },
@@ -672,66 +667,66 @@
       "2026-06-27"
     ],
     "price_sparkline": [
-      134.19,
-      132.59,
-      135.22,
-      134.01,
-      136.07,
-      142.91,
-      148.69,
-      138.33,
+      135.38,
+      133.71,
+      135.87,
+      136.74,
+      136.88,
+      143.31,
+      143.39,
+      144.62,
       147.13,
-      148.78,
+      147.35,
+      160.0,
+      160.75,
+      164.84,
+      168.38,
+      169.89,
+      174.17,
+      162.51,
+      163.08,
+      164.17,
+      167.69,
+      174.23,
+      166.45,
       159.71,
-      161.1,
-      157.71,
-      167.8,
-      169.77,
-      172.81,
-      170.79,
-      157.29,
-      164.24,
-      171.22,
-      171.67,
-      166.47,
-      162.84,
-      160.28,
-      166.01,
-      171.17,
-      173.59,
-      169.95,
-      170.62,
-      175.63,
-      164.07,
-      162.93,
-      165.94,
-      160.27,
-      165.41,
-      157.67,
-      146.5,
-      148.53,
-      146.24,
-      146.57,
-      150.36,
-      137.36,
-      136.97,
-      136.79,
-      139.49,
-      133.61,
-      136.16,
-      131.86,
-      127.33,
-      129.42,
-      121.84,
-      121.89,
-      121.09,
-      116.88,
-      116.9,
-      111.64,
-      110.34,
-      108.48,
-      109.07,
-      113.13
+      161.14,
+      166.62,
+      178.3,
+      174.33,
+      167.73,
+      178.9,
+      164.4,
+      157.87,
+      164.09,
+      160.76,
+      165.29,
+      157.78,
+      153.98,
+      146.35,
+      146.42,
+      148.83,
+      146.79,
+      146.51,
+      139.07,
+      137.98,
+      139.42,
+      133.53,
+      136.12,
+      134.07,
+      129.35,
+      133.59,
+      123.51,
+      121.99,
+      121.22,
+      119.87,
+      118.07,
+      115.33,
+      111.43,
+      110.88,
+      109.51,
+      113.06,
+      113.21
     ],
     "quarters": [
       "2023-09",
