@@ -145,7 +145,17 @@ def stage1(row: dict) -> str | None:
 
     share_change = num(m.get("share_count_change_1y"))
     if share_change is not None and share_change >= STAGE1["share_count_growth_max_pct"]:
-        return f"Hisse sayisi artisi %{share_change:.1f} >= %{STAGE1['share_count_growth_max_pct']:.0f}"
+        # Yillik artis TEK SEFERLIK bir olaydan gelebilir: IPO'da imtiyazli
+        # hisse donusumu (MNTN'de %268), konvertibl itfasi (QTWO), eski SPAC
+        # seyrelmesi (AVPT). Bunlar surekli seyrelme degildir. Son iki ceyrekte
+        # hisse sayisi ardisik dusuyorsa sirket artik seyrelmiyor demektir.
+        if not (STAGE1.get("share_count_recent_decline_exempts")
+                and _share_count_declining(row)):
+            return (f"Hisse sayisi artisi %{share_change:.1f} >= "
+                    f"%{STAGE1['share_count_growth_max_pct']:.0f}")
+        row.setdefault("stage1_exemptions", []).append(
+            f"Hisse artisi %{share_change:.1f} ama son iki ceyrekte hisse "
+            f"sayisi dusuyor — tek seferlik seyrelme sayildi")
 
     sbc_fcf = num(m.get("sbc_to_fcf"))
     if sbc_fcf is not None and sbc_fcf >= STAGE1["sbc_to_fcf_max"]:
@@ -192,6 +202,18 @@ def stage2(row: dict, track: str) -> str | None:
     if reason:
         return reason
     return None
+
+
+def _share_count_declining(row: dict) -> bool:
+    """Son iki ceyrekte seyreltilmis hisse sayisi ardisik dustu mu?"""
+    f: Fundamentals = row.get("fundamentals")
+    if f is None:
+        return False
+    counts = [num(q.shares_diluted) for q in f.sorted_quarters()[-3:]]
+    counts = [c for c in counts if c is not None]
+    if len(counts) < 3:
+        return False
+    return counts[-1] < counts[-2] < counts[-3]
 
 
 def _cash_conversion_streak(f: Fundamentals) -> str | None:
@@ -311,10 +333,15 @@ def stage3(row: dict, track: str, sector_table: dict) -> str | None:
     implied = num(m.get("implied_growth"))
     actual = num(m.get("rev_cagr_3y"))
     if implied is not None and actual is not None and actual > 0:
-        limit = actual * STAGE3["implied_growth_vs_cagr_max_multiple"]
+        # Carpim tek basina yetmez: CAGR %0,3 olan bir sirkette esik %0,45'e
+        # duser ve %7,7'lik makul bir ima edilen buyume "asiri" sayilir
+        # (ADEA'da boyle oluyordu). Mutlak bir pay da taniyoruz; esik ikisinin
+        # BUYUGU olur.
+        limit = max(actual * STAGE3["implied_growth_vs_cagr_max_multiple"],
+                    actual + STAGE3["implied_growth_absolute_headroom_pct"])
         if implied > limit:
-            return (f"Ima edilen buyume %{implied:.1f} > gerceklesen "
-                    f"%{actual:.1f} x {STAGE3['implied_growth_vs_cagr_max_multiple']}")
+            return (f"Ima edilen buyume %{implied:.1f} > izin verilen "
+                    f"%{limit:.1f} (gerceklesen %{actual:.1f})")
     return None
 
 

@@ -10,6 +10,7 @@ Parasal birim: milyon USD. Oranlar carpan, yuzdeler 0-100 olcegindedir.
 
 from __future__ import annotations
 
+from . import config
 from .config import ANOMALY, METRIC_PARAMS
 from .fundamentals import Fundamentals, Period
 from .util import add, cagr_pct, div, growth_pct, num, pct, sub
@@ -109,9 +110,11 @@ def return_over(history: list[tuple[str, float]], days: int) -> float | None:
 def momentum(f: Fundamentals, benchmark: list[tuple[str, float]] | None = None) -> dict:
     """6/12 aylik getiri, Nasdaq 100'e gore goreli guc, zirveden uzaklik."""
     hist = f.price_history
+    r3 = _return_over(hist, P["window_3m_days"])
     r6 = _return_over(hist, P["window_6m_days"])
     r12 = _return_over(hist, P["window_12m_days"])
 
+    b3 = _return_over(benchmark or [], P["window_3m_days"])
     b6 = _return_over(benchmark or [], P["window_6m_days"])
     b12 = _return_over(benchmark or [], P["window_12m_days"])
 
@@ -124,8 +127,10 @@ def momentum(f: Fundamentals, benchmark: list[tuple[str, float]] | None = None) 
         off_high = (1.0 - price / high) * 100.0
 
     return {
+        "return_3m": r3,
         "return_6m": r6,
         "return_12m": r12,
+        "rel_strength_3m": sub(r3, b3),
         "rel_strength_6m": sub(r6, b6),
         "rel_strength_12m": sub(r12, b12),
         "pct_off_52w_high": off_high,
@@ -208,7 +213,11 @@ def compute(f: Fundamentals, benchmark: list[tuple[str, float]] | None = None) -
     roic_value, roic_method = roic(cur)
     m["roic"] = roic_value
     m["gross_profitability"] = div(gross_profit, latest.assets)
-    m["cash_conversion"] = div(cfo, net_income) if (net_income or 0) > 0 else None
+    # Net kar sifira yakinken CFO/NK orani patlar (KVYO'da 40,6 cikiyordu).
+    # Oran "muhtesem nakit donusumu" degil, "payda sifira yakin" demektir.
+    _ni_floor = (revenue or 0) * ANOMALY["cash_conversion_min_net_income_share"]
+    m["cash_conversion"] = (div(cfo, net_income)
+                            if (net_income or 0) > max(0.0, _ni_floor) else None)
     m["sbc_to_revenue"] = pct(sbc, revenue)
     m["sbc_to_fcf"] = div(sbc, fcf) if (fcf or 0) > 0 else None
 
@@ -235,8 +244,16 @@ def compute(f: Fundamentals, benchmark: list[tuple[str, float]] | None = None) -
     m["net_debt"] = net_debt
     m["net_debt_to_ebitda"] = div(net_debt, ebitda) if (ebitda or 0) > 0 else (
         0.0 if (net_debt is not None and net_debt <= 0) else None)
+    # BORCSUZ SIRKETI CEZALANDIRMA: faiz gideri yoksa metrik "veri yok" degil,
+    # "sonsuz derecede rahat" demektir. Bos birakilirsa evrenin en guvenli
+    # sirketleri saglamlik puanindan pay alamiyor — bu tersine bir yanlilik.
     interest = num(cur.interest_expense)
-    m["interest_coverage"] = div(ebit, abs(interest)) if interest not in (None, 0) else None
+    if interest not in (None, 0):
+        m["interest_coverage"] = div(ebit, abs(interest))
+    elif (num(latest.financial_debt) or 0) == 0:
+        m["interest_coverage"] = config.SCORE_CAPS["interest_coverage"][1]
+    else:
+        m["interest_coverage"] = None
     m["current_ratio"] = div(latest.current_assets, latest.current_liabilities)
     m["maturity_wall_2y"] = div(latest.debt_due_2y, latest.cash_and_investments)
     m["lease_liabilities"] = num(latest.lease_liabilities)

@@ -150,6 +150,11 @@ STAGE1 = {
     "high_growth_exemption_rule40_min": 40.0,
     "net_debt_to_ebitda_max": 3.0,
     "share_count_growth_max_pct": 5.0,
+    # Yillik hisse artisi tek seferlik olaylarla sisebilir: IPO'da imtiyazli
+    # hisse donusumu (MNTN %268), konvertibl itfasi (QTWO), eski SPAC
+    # seyrelmesi (AVPT). Bunlar surekli seyrelme DEGILDIR. Son iki ceyrekte
+    # hisse sayisi ardisik dusuyorsa yillik artis affedilir.
+    "share_count_recent_decline_exempts": True,
     "sbc_to_fcf_max": 1.0,
 }
 
@@ -157,6 +162,11 @@ STAGE1 = {
 # HUNI — Asama 2: Tuzak eleme
 # --------------------------------------------------------------------------
 STAGE2 = {
+    # Altman Z'' abonelik sirketlerinde kirilir: pesin tahsil edilen yillik
+    # bedel ERTELENMIS GELIR olarak kisa vadeli yukumluluge yazilir, isletme
+    # sermayesi negatife doner ve model "iflas bolgesi" der. FRSH -1,26
+    # cikiyordu; oysa 665 mn $ net nakdi ve hic borcu yok.
+    "z_deferred_revenue_share_of_current_liabilities": 0.40,
     "beneish_m_max": -1.78,          # ustunde ise manipulasyon suphesi
     "altman_z_min": 1.1,             # altinda ise sikinti bolgesi
     "piotroski_f_min_track_a": 4,    # altinda ise ele (SADECE Kol A)
@@ -180,8 +190,12 @@ STAGE3 = {
         "ev_gross_profit_sector_pct_max": 40.0,
         "ev_sales_own_5y_pct_max": 50.0,
     },
-    # Her iki kolda: ima edilen buyume <= gerceklesen CAGR * carpan
+    # Her iki kolda: ima edilen buyume <= gerceklesen CAGR * carpan.
+    # CARPIM TEK BASINA YETMEZ: CAGR %0,3 olan bir sirkette esik %0,45'e
+    # duser ve %7,7'lik makul bir ima edilen buyume "asiri" sayilir.
+    # Bu yuzden mutlak bir pay da eklenir; esik ikisinin BUYUGU olur.
     "implied_growth_vs_cagr_max_multiple": 1.5,
+    "implied_growth_absolute_headroom_pct": 5.0,
     # Kol B tanimi: EBIT <= 0 VEYA faaliyet marji < X
     "track_b_operating_margin_pct": 5.0,
 }
@@ -189,13 +203,43 @@ STAGE3 = {
 # --------------------------------------------------------------------------
 # HUNI — Asama 4: Puanlama
 # --------------------------------------------------------------------------
+# AGIRLIK GEREKCELERI
+# Momentum 15 -> 5: bu sistem 1-2 yillik YENIDEN FIYATLANMA ariyor. Yuksek
+# 6/12 aylik getiriyi odullendirmek, yeniden fiyatlanmasi COKTAN OLMUS
+# isimleri one cikarir — tam olarak aramadigimiz sey. Momentum artik
+# "dusen bicak degil" olcusu; kucuk agirlikla kaliyor cunku serbest dususte
+# olan bir hisseye girmek de ayri bir risk.
+# Katalizor 15 -> 25: acilan 10 puan buraya. Yeniden fiyatlanmayi tetikleyecek
+# somut bir olayin varligi, gecmis fiyat hareketinden cok daha belirleyici.
 SCORE_WEIGHTS = {
     "value": 25,
     "quality": 20,
     "safety": 15,
-    "momentum": 15,
+    "momentum": 5,
     "earnings_quality": 10,
-    "catalyst": 15,  # elle girilir, otomatik hesaplanmaz
+    "catalyst": 25,  # elle girilir, otomatik hesaplanmaz
+}
+
+# Bir blokta alt metriklerin ne kadari hesaplanabildi? Dusuk kapsama, puanin
+# az sayida metrige dayandigi anlamina gelir. Puani CEZALANDIRMAK yanlis
+# olurdu (veri yoklugu kotu haber degildir), ama o blogun toplam puandaki
+# AGIRLIGI azaltilmali: az bilgi, az soz hakki.
+COVERAGE = {
+    "min_weight_factor": 0.35,   # kapsama 0 olsa bile blok tamamen susmasin
+    "low_coverage_flag": 0.60,   # bunun altinda kartta "veri yetersiz" rozeti
+}
+
+# Puanlamada uc degerlerin yuzdelik siralamasini bozmasini engelleyen tavanlar.
+# GORUNEN DEGER DEGISMEZ — yalnizca siralama icin kirpilir.
+# NTAP'in ROIC'i %352 cikiyor cunku agresif geri alim sonrasi yatirilan
+# sermaye sifira yaklasiyor; bu, sirketin digerlerinden 20 kat iyi oldugu
+# anlamina gelmez, paydanin kucuk oldugu anlamina gelir.
+SCORE_CAPS = {
+    "roic": (None, 60.0),
+    "cash_conversion": (None, 5.0),
+    "interest_coverage": (None, 100.0),
+    "gross_profitability": (None, 2.0),
+    "current_ratio": (None, 10.0),
 }
 
 # Her ana puanin hangi alt metriklerden olustugu ve alt agirliklari.
@@ -222,11 +266,13 @@ SCORE_COMPONENTS = {
         {"metric": "current_ratio", "weight": 0.20, "invert": False},
         {"metric": "altman_z", "weight": 0.30, "invert": False},
     ],
+    # Momentum artik "kim daha cok kazandirdi" degil, "dusus durdu mu"
+    # olcuyor. Mutlak getiri ve zirveye yakinlik KASITLI OLARAK cikarildi:
+    # zirveye yakin olmak, yeniden fiyatlanma firsatinin AZALDIGI anlamina
+    # gelir. Bu iki alan kartta bilgi olarak durmaya devam ediyor.
     "momentum": [
-        {"metric": "return_6m", "weight": 0.25, "invert": False},
-        {"metric": "return_12m", "weight": 0.25, "invert": False},
-        {"metric": "rel_strength_6m", "weight": 0.30, "invert": False},
-        {"metric": "pct_off_52w_high", "weight": 0.20, "invert": True},
+        {"metric": "rel_strength_3m", "weight": 0.60, "invert": False},
+        {"metric": "rel_strength_6m", "weight": 0.40, "invert": False},
     ],
     "earnings_quality": [
         {"metric": "cash_conversion", "weight": 0.30, "invert": False},
@@ -236,7 +282,7 @@ SCORE_COMPONENTS = {
     ],
 }
 
-MAX_PER_SECTOR = 10       # Asama 4 ciktisinda sektor basina en fazla
+MAX_PER_SECTOR = 12       # Asama 4 ciktisinda sektor basina en fazla
 FINAL_CANDIDATE_COUNT = 50
 
 # --------------------------------------------------------------------------
@@ -253,11 +299,19 @@ REVERSE_DCF = {
 # --------------------------------------------------------------------------
 # Tek seferlik kalem / organik buyume tespiti
 # --------------------------------------------------------------------------
+# Serbest dususte olan hisse: son 3 ayda endekse gore bu kadar geride ise
+# "dusen bicak" uyarisi. ELEME SEBEBI DEGIL — deger yatiriminda en iyi
+# girisler cogu zaman dususten sonra gelir — ama gormeden girilmemeli.
+FALLING_KNIFE_REL_STRENGTH_3M = -15.0
+
 ANOMALY = {
     # net kar / EBIT bu oranin ustundeyse tek seferlik kalem suphesi
     "net_income_to_ebit_ratio_max": 2.0,
     # efektif vergi orani negatifse tek seferlik kalem suphesi
     "negative_tax_rate_flag": True,
+    # Net kar hasilatin bu payindan kucukse nakit donusumu oranini hesaplama;
+    # payda sifira yakinken oran anlamsiz buyur.
+    "cash_conversion_min_net_income_share": 0.02,
     # organik buyume suphesi: buyume > X VE piyasa degeri > Y
     "organic_suspect_growth_pct": 20.0,
     "organic_suspect_market_cap_musd": 10_000.0,
@@ -505,6 +559,20 @@ THRESHOLDS = {
         "help": "Mutlak 12 aylik fiyat getirisi.",
         "formula": "Fiyat / 12 ay onceki fiyat - 1",
     },
+    "rel_strength_3m": {
+        "label": "3 ay goreli getiri", "unit": "%", "direction": "high_good",
+        "green_min": 0, "yellow_min": -15,
+        "help": "Nasdaq 100'e gore son 3 aylik fark. Bu sistemde momentum "
+                "'kim kazandirdi' degil 'dusus durdu mu' olcusudur; sert "
+                "negatif deger dusen bicak uyarisidir.",
+        "formula": "Hisse 3a getirisi - QQQ 3a getirisi",
+    },
+    "return_3m": {
+        "label": "3 aylik getiri", "unit": "%", "direction": "high_good",
+        "green_min": 5, "yellow_min": -10,
+        "help": "Son 3 ayin mutlak fiyat getirisi.",
+        "formula": "Fiyat / 3 ay onceki fiyat - 1",
+    },
     "rel_strength_6m": {
         "label": "6 ay goreli getiri", "unit": "%", "direction": "high_good",
         "green_min": 0, "yellow_min": -15,
@@ -581,7 +649,14 @@ SIC_MAJOR_GROUPS = {
     (5200, 5999): "Perakende",
     (6000, 6799): "Finans ve gayrimenkul",
     (7000, 7299): "Konaklama ve kisisel hizmet",
-    (7300, 7399): "Is hizmetleri ve yazilim",
+    # 7300'ler tek grup olunca evrenin buyuk kismi ayni kovaya dusuyor ve
+    # sektor kotasi (en fazla 10) listenin yarisini kesiyor. Yazilim/hizmet
+    # alt gruplari ayristirildi.
+    (7370, 7372): "Yazilim ve programlama",
+    (7373, 7374): "Veri isleme ve sistem entegrasyonu",
+    (7375, 7379): "Bilgi hizmetleri",
+    (7300, 7369): "Is hizmetleri",
+    (7380, 7399): "Diger is hizmetleri",
     (7400, 7999): "Cesitli hizmetler",
     (8000, 8099): "Saglik hizmetleri",
     (8200, 8299): "Egitim",
@@ -735,6 +810,7 @@ METRIC_PARAMS = {
     "margin_change_years": 3,
     "cagr_years": 3,
     # Momentum pencereleri (islem gunu)
+    "window_3m_days": 63,
     "window_6m_days": 126,
     "window_12m_days": 252,
     "window_52w_days": 252,
@@ -831,6 +907,9 @@ METRIC_PLAIN = {
                                  "kat", "Fiyat, gerceklesen buyumenin {v} katini varsayiyor"),
     "return_6m": ("Son 6 ayda hisse ne kadar getirdi", "yuzde", "6 ayda %{v} getirdi"),
     "return_12m": ("Son 12 ayda hisse ne kadar getirdi", "yuzde", "12 ayda %{v} getirdi"),
+    "rel_strength_3m": ("3 ayda Nasdaq 100'e gore ne kadar iyi/kotu gitti", "yuzde",
+                        "3 ayda Nasdaq 100'den %{v} farkli"),
+    "return_3m": ("Son 3 ayda hisse ne kadar getirdi", "yuzde", "3 ayda %{v} getirdi"),
     "rel_strength_6m": ("6 ayda Nasdaq 100'e gore ne kadar iyi/kotu gitti", "yuzde",
                         "6 ayda Nasdaq 100'den %{v} farkli"),
     "rel_strength_12m": ("12 ayda Nasdaq 100'e gore fark", "yuzde",
@@ -862,8 +941,11 @@ SCORE_PLAIN = {
                 "buyume ve karlilik dengesi."),
     "safety": ("Saglamlik", "Bilanco ne kadar dayanikli: borc, faiz odeme gucu, "
                "kisa vadeli likidite, iflas riski."),
-    "momentum": ("Momentum", "Hisse son 6-12 ayda nasil gitti ve piyasaya gore "
-                 "nerede duruyor."),
+    "momentum": ("Momentum", "Bu sistemde momentum 'kim daha cok kazandirdi' "
+                 "DEGIL, 'dusus durdu mu' olcusudur. 1-2 yillik yeniden "
+                 "fiyatlanma ariyoruz; yuksek 12 aylik getiriyi odullendirmek "
+                 "yeniden fiyatlanmasi COKTAN OLMUS isimleri one cikarirdi. "
+                 "Agirligi bu yuzden dusuk (5); acilan pay katalizore verildi."),
     "earnings_quality": ("Kazanc kalitesi", "Raporlanan kar gercek mi: nakde donuyor mu, "
                          "muhasebe oynamasi isareti var mi."),
     "catalyst": ("Katalizor", "Yeniden fiyatlanmayi tetikleyecek somut bir olay var mi. "

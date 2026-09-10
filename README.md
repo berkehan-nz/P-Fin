@@ -163,7 +163,16 @@ MNTN, RELY, YOU her iki taramadan da gecti → `track: "both"`.
 | **1 — Sert filtreler** | Brut marj > %30 **VE** hasilat buyumesi TTM > %5 **VE** (FCF > 0 **VEYA** (buyume > %25 **VE** 40 Kurali ≥ 40)) **VE** net borc/FAVOK < 3 **VE** hisse artisi < %5 **VE** SBC/FCF < 1 |
 | **2 — Tuzak eleme** | Beneish M > −1.78 · Altman Z'' < 1.1 (guvenilirse) · Piotroski F < 4 (**sadece Kol A**) · nakit donusumu < 0.7 uc yil ust uste · hasilat **VE** brut marj 2 yildir dusuyor · vade duvari > 1 **ve** FCF < 0 · IPO < 12 ay |
 | **3 — Goreli ucuzluk** | **Kol A:** ev_ebit sektor yuzdeligi ≤ 40 **VEYA** FCF verimi > %4; **VE** ev_ebit kendi 5 yil yuzdeligi ≤ 50. **Kol B:** ev_gross_profit sektor ≤ 40 **VE** ev_sales kendi 5 yil ≤ 50. **Ikisinde de:** ima edilen buyume ≤ gerceklesen CAGR × 1.5 |
-| **4 — Puanla** | Ucuzluk 25 / Kalite 20 / Saglamlik 15 / Momentum 15 / Kazanc kalitesi 10 / Katalizor 15 (elle). Sektor basina en fazla 10. Ilk 50 |
+| **4 — Puanla** | Ucuzluk 25 / Kalite 20 / Saglamlik 15 / **Momentum 5** / Kazanc kalitesi 10 / **Katalizor 25** (elle). Sektor basina en fazla 12. Ilk 50 |
+
+> **Momentum neden 5?** Bu sistem 1-2 yillik **yeniden fiyatlanma** ariyor.
+> Yuksek 12 aylik getiriyi odullendirmek, yeniden fiyatlanmasi COKTAN OLMUS
+> isimleri one cikarir — tam olarak aramadigimiz sey. Momentum artik
+> "kim kazandirdi" degil **"dusus durdu mu"** olcusu (3 ve 6 aylik goreli
+> guc); kucuk agirlikla duruyor cunku serbest dususteki bir hisseye girmek
+> ayri bir risk. Acilan 10 puan katalizore verildi: yeniden fiyatlanmayi
+> tetikleyecek somut bir olayin varligi, gecmis fiyat hareketinden cok daha
+> belirleyici.
 
 Her kosu `data/funnel_log.json`'a asama basina kalan sayiyi ve en sik eleme
 sebeplerini yazar — esikleri neyin elediğini gormeden iyilestirmek mumkun degil.
@@ -206,6 +215,17 @@ edilir. **Dashboard'a sabit gomulu hicbir sayi yoktur.**
 - **Eksik puan bileseni sifirlanmaz**, agirlik havuzundan cikarilir ve kalanlar
   yeniden normalize edilir; `weight_coverage` ne kadarinin hesaplanabildigini
   soyler.
+- **Kapsama agirligi:** bir blogun alt metriklerinin ancak %30'u
+  hesaplanabildiyse o puan iki metrige dayaniyordur. Puani CEZALANDIRMIYORUZ
+  (veri yoklugu kotu haber degildir) ama o blogun toplam puandaki **soz hakki**
+  kapsama ile carpilarak azaltiliyor. Kartta rozet olarak gorunur.
+- **Uc degerler siralamada kirpilir, gosterimde kirpilmaz.** NTAP'in ROIC'i
+  %352 cikiyor cunku agresif geri alim sonrasi yatirilan sermaye sifira
+  yaklasiyor — bu, sirketin 20 kat iyi oldugu degil paydanin kucuk oldugu
+  anlamina gelir. Kirpilmazsa tek sirket tum dagilimi kendine ceker.
+- **Borcsuz sirket cezalandirilmaz.** Faiz gideri yoksa faiz karsilama
+  "veri yok" degil "sonsuz rahat" demektir; bos birakmak evrenin en guvenli
+  sirketlerini saglamlik puanindan mahrum birakiyordu.
 - **Yuzdelikler hayatta kalanlar uzerinden hesaplanir.** Asama 0-2'de elenen
   sirketler referans havuzunu bozar (iflas riskli sirketler carpanlari yapay
   olarak dusurur).

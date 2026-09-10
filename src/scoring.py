@@ -8,8 +8,27 @@ normalken perakendede olaganustudur.
 
 from __future__ import annotations
 
-from .config import SCORE_COMPONENTS, SCORE_WEIGHTS
+from .config import COVERAGE, SCORE_CAPS, SCORE_COMPONENTS, SCORE_WEIGHTS
 from .util import num
+
+
+def cap_for_scoring(metric: str, value):
+    """Uc degerleri yalnizca SIRALAMA icin kirpar; gorunen deger degismez.
+
+    NTAP'in ROIC'i %352 cikiyor cunku agresif geri alim sonrasi yatirilan
+    sermaye sifira yaklasiyor. Bu, sirketin digerlerinden 20 kat iyi oldugu
+    anlamina gelmez — paydanin kucuk oldugu anlamina gelir. Kirpilmazsa tek
+    bir sirket tum yuzdelik dagilimini kendine dogru cekiyor.
+    """
+    v = num(value)
+    if v is None or metric not in SCORE_CAPS:
+        return v
+    lo, hi = SCORE_CAPS[metric]
+    if lo is not None:
+        v = max(v, lo)
+    if hi is not None:
+        v = min(v, hi)
+    return v
 
 
 def score_block(block: str, percentiles: dict[str, float | None]) -> tuple[float | None, dict]:
@@ -41,26 +60,39 @@ def score_block(block: str, percentiles: dict[str, float | None]) -> tuple[float
 
     score = weighted / total_weight
     coverage = total_weight / sum(c["weight"] for c in components)
-    return round(score, 1), {"components": detail, "coverage": round(coverage, 2)}
+    return round(score, 1), {"components": detail, "coverage": round(coverage, 2),
+                             "low_coverage": coverage < COVERAGE["low_coverage_flag"]}
 
 
-def total_score(blocks: dict[str, float | None], catalyst: float | None = None) -> dict:
+def total_score(blocks: dict[str, float | None], catalyst: float | None = None,
+                coverage: dict[str, float] | None = None) -> dict:
     """Agirlikli toplam puan (0-100 olceginde).
 
     Katalizor puani elle girilir; yoksa agirligi havuzdan cikarilir ve
     kalan bilesenler yeniden normalize edilir — otomatik puan katalizor
     girilmedi diye sistematik olarak dusuk gorunmesin.
+
+    KAPSAMA AGIRLIGI: bir blogun alt metriklerinin ancak %30'u hesaplanabildiyse
+    o puan iki metrige dayaniyor demektir. Puani cezalandirmak yanlis olurdu
+    (veri yoklugu kotu haber degildir) ama o blogun SOZ HAKKI azaltilmali.
+    Blok agirligi kapsama ile carpilir; boylece YOU'nun 0,30 kapsamali
+    94'luk kalite puani listeyi tek basina yukari cekemez.
     """
     used_weight = 0.0
     acc = 0.0
     parts: dict[str, float | None] = {}
+    coverage = coverage or {}
+    applied: dict[str, float] = {}
 
     for key in ("value", "quality", "safety", "momentum", "earnings_quality"):
         v = num(blocks.get(key))
         parts[key] = round(v, 1) if v is not None else None
         if v is None:
             continue
-        w = SCORE_WEIGHTS[key]
+        cov = num(coverage.get(key))
+        factor = 1.0 if cov is None else max(cov, COVERAGE["min_weight_factor"])
+        w = SCORE_WEIGHTS[key] * factor
+        applied[key] = round(factor, 2)
         acc += v * w
         used_weight += w
 
@@ -72,6 +104,7 @@ def total_score(blocks: dict[str, float | None], catalyst: float | None = None) 
 
     parts["total"] = round(acc / used_weight, 1) if used_weight > 0 else None
     parts["weight_coverage"] = round(used_weight / sum(SCORE_WEIGHTS.values()), 2)
+    parts["coverage_factors"] = applied
     return parts
 
 
@@ -84,8 +117,11 @@ def compute(percentiles: dict[str, float | None],
     """
     blocks: dict[str, float | None] = {}
     detail: dict[str, dict] = {}
+    coverage: dict[str, float] = {}
     for block in SCORE_COMPONENTS:
         score, d = score_block(block, percentiles)
         blocks[block] = score
         detail[block] = d
-    return total_score(blocks, catalyst), detail
+        if isinstance(d, dict) and d.get("coverage") is not None:
+            coverage[block] = d["coverage"]
+    return total_score(blocks, catalyst, coverage), detail

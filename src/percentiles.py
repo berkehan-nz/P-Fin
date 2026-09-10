@@ -15,6 +15,7 @@ from collections import defaultdict
 from .config import MIN_PEERS_FOR_SECTOR_PERCENTILE, METRIC_PARAMS
 from .fundamentals import Fundamentals
 from .metrics import enterprise_value
+from .scoring import cap_for_scoring
 from .util import num, percentile_rank
 
 # Sektor yuzdeligi hesaplanan metrikler
@@ -26,7 +27,8 @@ SECTOR_PERCENTILE_METRICS = [
     "net_debt_to_ebitda", "interest_coverage", "current_ratio",
     "cash_conversion", "sloan_accruals", "beneish_m", "piotroski_f",
     "altman_z", "sbc_to_revenue", "sbc_to_fcf", "share_count_change_1y",
-    "return_6m", "return_12m", "rel_strength_6m", "pct_off_52w_high",
+    "return_3m", "return_6m", "return_12m",
+    "rel_strength_3m", "rel_strength_6m", "pct_off_52w_high",
 ]
 
 # Sirketin kendi tarihine gore yuzdelik hesaplanan metrikler
@@ -40,7 +42,8 @@ def build_sector_table(rows: list[dict]) -> dict[str, dict[str, list[float]]]:
         sector = row.get("sector") or "Bilinmiyor"
         m = row.get("metrics", {})
         for key in SECTOR_PERCENTILE_METRICS:
-            v = num(m.get(key))
+            # Uc degerler dagilimi bozmasin diye kirpilmis haliyle havuza girer
+            v = cap_for_scoring(key, m.get(key))
             if v is not None:
                 table[sector][key].append(v)
                 table["__ALL__"][key].append(v)
@@ -54,7 +57,7 @@ def sector_percentile(table: dict, sector: str, metric: str,
     Sektorde yeterli sirket yoksa tum evrene duser; bu durumu ``basis``
     ile raporlar ki dashboard'da yanilticiliga yol acmasin.
     """
-    v = num(value)
+    v = cap_for_scoring(metric, value)
     if v is None:
         return None, "none"
     peers = (table.get(sector) or {}).get(metric) or []

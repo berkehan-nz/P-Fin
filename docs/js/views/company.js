@@ -110,6 +110,7 @@ window.ViewCompany = (function () {
               ${Fmt.isNum(s[k]) ? Math.round(s[k]) : '—'}
               <span class="tiny dim" style="font-weight:400">/100</span></div>
             ${Charts.miniBar(s[k])}
+            ${lowCoverage(k)}
             <div class="tiny dim" style="margin-top:6px;line-height:1.4;white-space:normal">
               ${Fmt.esc(info[1])}</div>
             ${k === 'catalyst' && !Fmt.isNum(s[k])
@@ -180,6 +181,21 @@ window.ViewCompany = (function () {
         Eksik veri eleme sebebi SAYILMAZ — etiketleme bicimine gore eleme
         yapmak gorunmez bir yanlilik yaratirdi. Bu alanlari dogrulamadan
         sirketi degerlendirme.</p>` : ''}`;
+  }
+
+  /* Bir blogun alt metriklerinin ancak bir kismi hesaplanabildiyse, o puan
+     az sayida metrige dayaniyor demektir. Puani cezalandirmiyoruz ama
+     toplamdaki agirligini azaltiyoruz — ve bunu SOYLUYORUZ. */
+  function lowCoverage(block) {
+    const d = (card.score_detail || {})[block];
+    if (!d || d.coverage === undefined || d.coverage === null) return '';
+    if (d.coverage >= 0.6) return '';
+    const known = Object.entries(d.components || {})
+      .filter(([, v]) => v && v.percentile !== null).map(([k]) => Fmt.label(k));
+    return `<div class="tiny c-yellow" style="margin-top:5px;line-height:1.35;white-space:normal"
+      title="${Fmt.esc(known.join(', '))}">
+      ⚠ Alt metriklerin yalnizca %${Math.round(d.coverage * 100)}'i hesaplanabildi —
+      bu puan az veriye dayaniyor, toplamdaki agirligi azaltildi.</div>`;
   }
 
   function stat(label, value, sub) {

@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-09",
+  "as_of": "2026-09-10",
   "headline_metrics": {
     "A": [
       "ev_ebit",
@@ -79,7 +79,7 @@
     ],
     "momentum": [
       "Momentum",
-      "Hisse son 6-12 ayda nasil gitti ve piyasaya gore nerede duruyor."
+      "Bu sistemde momentum 'kim daha cok kazandirdi' DEGIL, 'dusus durdu mu' olcusudur. 1-2 yillik yeniden fiyatlanma ariyoruz; yuksek 12 aylik getiriyi odullendirmek yeniden fiyatlanmasi COKTAN OLMUS isimleri one cikarirdi. Agirligi bu yuzden dusuk (5); acilan pay katalizore verildi."
     ],
     "quality": [
       "Kalite",
@@ -99,9 +99,9 @@
     ]
   },
   "score_weights": {
-    "catalyst": 15,
+    "catalyst": 25,
     "earnings_quality": 10,
-    "momentum": 15,
+    "momentum": 5,
     "quality": 20,
     "safety": 15,
     "value": 25
@@ -184,7 +184,8 @@
     "net_debt_to_ebitda_max": 3.0,
     "rev_growth_ttm_min_pct": 5.0,
     "sbc_to_fcf_max": 1.0,
-    "share_count_growth_max_pct": 5.0
+    "share_count_growth_max_pct": 5.0,
+    "share_count_recent_decline_exempts": true
   },
   "stage2": {
     "altman_z_min": 1.1,
@@ -194,9 +195,11 @@
     "declining_years": 2,
     "ipo_lockup_months": 12,
     "maturity_wall_max": 1.0,
-    "piotroski_f_min_track_a": 4
+    "piotroski_f_min_track_a": 4,
+    "z_deferred_revenue_share_of_current_liabilities": 0.4
   },
   "stage3": {
+    "implied_growth_absolute_headroom_pct": 5.0,
     "implied_growth_vs_cagr_max_multiple": 1.5,
     "track_a": {
       "ev_ebit_own_5y_pct_max": 50.0,
@@ -510,6 +513,18 @@
       "unit_name": "yuzde",
       "yellow_min": -20
     },
+    "rel_strength_3m": {
+      "direction": "high_good",
+      "formula": "Hisse 3a getirisi - QQQ 3a getirisi",
+      "green_min": 0,
+      "help": "Nasdaq 100'e gore son 3 aylik fark. Bu sistemde momentum 'kim kazandirdi' degil 'dusus durdu mu' olcusudur; sert negatif deger dusen bicak uyarisidir.",
+      "label": "3 ay goreli getiri",
+      "plain": "3 ayda Nasdaq 100'e gore ne kadar iyi/kotu gitti",
+      "sentence": "3 ayda Nasdaq 100'den %{v} farkli",
+      "unit": "%",
+      "unit_name": "yuzde",
+      "yellow_min": -15
+    },
     "rel_strength_6m": {
       "direction": "high_good",
       "formula": "Hisse 6a getirisi - QQQ 6a getirisi",
@@ -533,6 +548,18 @@
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 0
+    },
+    "return_3m": {
+      "direction": "high_good",
+      "formula": "Fiyat / 3 ay onceki fiyat - 1",
+      "green_min": 5,
+      "help": "Son 3 ayin mutlak fiyat getirisi.",
+      "label": "3 aylik getiri",
+      "plain": "Son 3 ayda hisse ne kadar getirdi",
+      "sentence": "3 ayda %{v} getirdi",
+      "unit": "%",
+      "unit_name": "yuzde",
+      "yellow_min": -10
     },
     "return_6m": {
       "direction": "high_good",

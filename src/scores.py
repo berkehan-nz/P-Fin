@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from scipy.optimize import brentq
 
-from .config import REVERSE_DCF
+from .config import REVERSE_DCF, STAGE2
 from .fundamentals import Fundamentals, Period
 from .util import div, num
 
@@ -124,6 +124,29 @@ def altman_z(p: Period) -> dict:
     d = div(equity, liabilities)
 
     unreliable = equity is not None and equity <= 0
+    reason = "ozkaynak negatif — Z'' anlamsiz" if unreliable else None
+
+    # ABONELIK SIRKETI ISTISNASI: pesin tahsil edilen yillik bedel ERTELENMIS
+    # GELIR olarak kisa vadeli yukumluluge yazilir. Isletme sermayesi negatife
+    # doner ve model "iflas bolgesi" der — oysa sirketin borcu yok, nakdi bol.
+    # FRSH -1,26 cikiyordu; 665 mn $ net nakdi ve hic borcu var.
+    if not unreliable:
+        deferred = num(p.deferred_revenue)
+        current_liabilities = num(p.current_liabilities)
+        net_cash = None
+        cash = num(p.cash_and_investments)
+        debt = num(p.financial_debt)
+        if cash is not None:
+            net_cash = cash - (debt or 0.0)
+        if (deferred and current_liabilities and net_cash is not None
+                and net_cash > 0
+                and deferred / current_liabilities
+                > STAGE2["z_deferred_revenue_share_of_current_liabilities"]):
+            unreliable = True
+            reason = ("Ertelenmis gelir kisa vadeli yukumlulugun buyuk kismi ve "
+                      "sirket net nakit pozisyonunda — Z'' abonelik modelinde "
+                      "yaniltici. Faiz karsilama ve FCF/borc ile degerlendir.")
+
     components = {"A": a, "B": b, "C": c, "D": d}
 
     if any(x is None for x in (a, b, c, d)):
@@ -131,12 +154,8 @@ def altman_z(p: Period) -> dict:
                 "reason": "bilesen eksik"}
 
     z = 3.25 + 6.56 * a + 3.26 * b + 6.72 * c + 1.05 * d
-    return {
-        "z": z,
-        "unreliable": unreliable,
-        "components": components,
-        "reason": "ozkaynak negatif — Z'' anlamsiz" if unreliable else None,
-    }
+    return {"z": z, "unreliable": unreliable, "components": components,
+            "reason": reason}
 
 
 def solvency_fallback(p: Period) -> dict:

@@ -137,8 +137,13 @@ class TestSeedList:
 
 
 class TestSectors:
-    def test_software_maps_to_business_services(self):
-        assert sector_for_sic(7372) == "Is hizmetleri ve yazilim"
+    def test_software_subgroups_are_separated(self):
+        """Tek buyuk '7300 is hizmetleri' kovasi sektor kotasini anlamsiz
+        kiliyordu; evrenin yarisi ayni gruba dusuyordu."""
+        assert sector_for_sic(7372) == "Yazilim ve programlama"
+        assert sector_for_sic(7374) == "Veri isleme ve sistem entegrasyonu"
+        assert sector_for_sic(7379) == "Bilgi hizmetleri"
+        assert sector_for_sic(7372) != sector_for_sic(7374)
 
     def test_semiconductors(self):
         assert sector_for_sic(3674) == "Elektronik ve elektrikli ekipman"
