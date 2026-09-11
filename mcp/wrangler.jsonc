@@ -1,0 +1,51 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pfin-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-10",
+  "compatibility_flags": ["nodejs_compat"],
+  /**
+	 * Note: Use secrets to store sensitive data.
+	 * https://developers.cloudflare.com/workers/configuration/secrets/
+	 * 
+	 * Commands to set secrets:
+	 * npx wrangler secret put GITHUB_CLIENT_ID
+	 * npx wrangler secret put GITHUB_CLIENT_SECRET
+	 * npx wrangler secret put COOKIE_ENCRYPTION_KEY
+	 */
+  "migrations": [
+    {
+      "new_sqlite_classes": ["PFinMCP"],
+      "tag": "v1"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "class_name": "PFinMCP",
+        "name": "MCP_OBJECT"
+      }
+    ]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "<Add-KV-ID>"
+    }
+  ],
+  "vars": {
+    // Depo ve yetkili kullanici. Gizli degiller — secret olmalari gerekmez.
+    "GITHUB_REPO": "berkehan-nz/P-Fin",
+    "ALLOWED_LOGIN": "berkehan-nz"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "dev": {
+    "port": 8788
+  }
+}
