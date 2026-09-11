@@ -202,6 +202,10 @@ class Fundamentals:
     # Kaynak izlenebilirligi
     sources: dict = field(default_factory=dict)
 
+    # Elle duzeltilen ham alanlar (bkz. overrides.py). Kartta gosterilir:
+    # okuyan kisi hangi sayinin EDGAR'dan, hangisinin elle geldigini gormeli.
+    overrides_applied: list = field(default_factory=list)
+
     # ---------------------------------------------------------------- erisim
     def sorted_quarters(self) -> list[Period]:
         return sorted(self.quarters, key=lambda p: p.period_end)

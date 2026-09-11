@@ -18,6 +18,9 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - name: Testler
         run: python -m pytest tests/ -v
+      - name: Inbox ve veri duzeltmesi sozlesmesi
+        run: python -m src.run_merge --check
+
       - name: JSON semalari gecerli mi
         run: |
           python - <<'PY'

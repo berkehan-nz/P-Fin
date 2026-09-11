@@ -156,6 +156,12 @@ def build(f: Fundamentals, *,
             flags.get("z_unreliable_reason")
             or "Altman Z'' guvenilmez. Faiz karsilama ve FCF/toplam borc ile degerlendir."
         )
+    for o in (getattr(f, "overrides_applied", None) or []):
+        warnings.append(
+            f"ELLE DUZELTME: {o['period_end']} donemi {o['field']} alani "
+            f"{o['before']} yerine {o['after']} olarak alindi. "
+            f"Gerekce: {o['reason']} Kaynak: {o['source_url']}")
+
     if meta.get("data_basis") == "annual":
         warnings.append("Ceyreklik veri yetersiz; metrikler yillik tablodan hesaplandi.")
     elif meta.get("data_basis") == "mixed":
@@ -237,6 +243,7 @@ def build(f: Fundamentals, *,
                         "missing": sres["detail"]["beneish"]["missing"]},
             "solvency_fallback": sres["detail"]["solvency_fallback"],
         },
+        "overrides": list(getattr(f, "overrides_applied", None) or []),
         "story": empty_story(),
         "decision": empty_decision(),
         "data_sources": {

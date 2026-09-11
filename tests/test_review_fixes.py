@@ -6,7 +6,7 @@ kullaniyor; boylece duzeltmenin gercekten o sorunu cozdugu gorulur.
 
 import pytest
 
-from src import funnel, metrics, scores, scoring
+from src import funnel, metrics, overrides, scores, scoring
 from src.config import COVERAGE, SCORE_CAPS, SCORE_WEIGHTS
 from src.fundamentals import Period
 from tests import fixtures
@@ -338,3 +338,73 @@ class TestCoverageSurvivesMerge:
         full = cards.merge_story(full_card, inbox_dir=tmp_path)
 
         assert thin["scores"]["total"] < full["scores"]["total"]
+
+
+# ------------------------------------------------- elle veri duzeltmeleri
+class TestOverrides:
+    """Chat'teki ajan veride hata buldugunda sayiyi DOGRUDAN yazamamali;
+    kaynagiyla birlikte ham donem verisini duzeltmeli ve her sey yeniden
+    hesaplanmali."""
+
+    def _entry(self, **kw):
+        base = {"ticker": "YOU", "period_end": "latest", "field": "gross_profit",
+                "value": 190.4, "reason": "10-Q s.4", "author": "claude",
+                "source_url": "https://www.sec.gov/Archives/x.htm"}
+        base.update(kw)
+        return base
+
+    def test_valid_entry_accepted(self):
+        assert overrides.validate_entry(self._entry()) == []
+
+    def test_source_is_mandatory(self):
+        problems = overrides.validate_entry(self._entry(source_url=""))
+        assert any("source_url" in p for p in problems)
+
+    def test_reason_is_mandatory(self):
+        problems = overrides.validate_entry(self._entry(reason=""))
+        assert any("reason" in p for p in problems)
+
+    def test_derived_field_rejected(self):
+        """fcf bir ozellik — ezilirse girdiyle cikti celisir."""
+        problems = overrides.validate_entry(self._entry(field="fcf"))
+        assert any("ham alan degil" in p for p in problems)
+
+    def test_score_field_rejected(self):
+        problems = overrides.validate_entry(self._entry(field="total"))
+        assert problems
+
+    def test_apply_changes_raw_period_and_reports_provenance(self):
+        f = fixtures.frsh()
+        before = f.latest_period().gross_profit
+        applied = overrides.apply(f, [self._entry(ticker="FRSH", value=700.0)])
+        assert len(applied) == 1
+        assert f.latest_period().gross_profit == 700.0
+        assert applied[0]["before"] == before
+        assert applied[0]["after"] == 700.0
+        assert applied[0]["source_url"].startswith("https://")
+
+    def test_apply_is_scoped_to_ticker(self):
+        f = fixtures.frsh()
+        before = f.latest_period().gross_profit
+        overrides.apply(f, [self._entry(ticker="YOU", value=700.0)])
+        assert f.latest_period().gross_profit == before
+
+    def test_metrics_recompute_from_corrected_input(self):
+        """Duzeltme brut MARJI da degistirmeli — metrigi ayrica yazmaya
+        gerek kalmamali."""
+        f = fixtures.frsh()
+        base = metrics.compute(f)["metrics"]["gross_margin"]
+        overrides.apply(f, [self._entry(ticker="FRSH", value=400.0)])
+        assert metrics.compute(f)["metrics"]["gross_margin"] != base
+
+    def test_card_warns_and_records(self):
+        from src import cards
+        f = fixtures.frsh()
+        f.overrides_applied = overrides.apply(f, [self._entry(ticker="FRSH", value=700.0)])
+        c = cards.build(f, source="test")
+        assert c["overrides"][0]["field"] == "gross_profit"
+        assert any("ELLE DUZELTME" in w for w in c["flags"]["warnings"])
+
+    def test_unknown_period_is_skipped_not_crashed(self):
+        f = fixtures.frsh()
+        assert overrides.apply(f, [self._entry(ticker="FRSH", period_end="1999-01-01")]) == []

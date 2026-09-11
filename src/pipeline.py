@@ -7,14 +7,29 @@ from .config import CARDS_DIR, DATA_DIR, SEED_TICKERS
 from .fundamentals import Fundamentals
 from .sources import (analyst as analyst_src, edgar_api, edgar_bulk,
                       finnhub_api, finra_short, fred_api, prices)
+from . import overrides
 from .util import read_json, today_iso, try_fetch, write_json
 
 
 def load_company(ticker: str, *, with_price: bool = True) -> Fundamentals | None:
-    """EDGAR temel verisi + fiyat serisi."""
+    """EDGAR temel verisi + fiyat serisi + elle veri duzeltmeleri.
+
+    Duzeltmeler BURADA uygulanir cunku her kosu yolu (tohum, tarama, gunluk)
+    Fundamentals'i bu fonksiyondan alir. Tek nokta olmasi sart: baska bir
+    yerde uygulansaydi bir kosuda duzeltilmis, digerinde duzeltilmemis veri
+    ile calisilirdi.
+    """
     f = try_fetch(edgar_api.load, ticker, label=f"edgar {ticker}")
     if f is None:
         return None
+
+    applied = overrides.apply(f)
+    if applied:
+        f.overrides_applied = applied
+        for o in applied:
+            print(f"  [duzeltme] {ticker} {o['period_end']} {o['field']}: "
+                  f"{o['before']} -> {o['after']}")
+
     if with_price:
         quote = try_fetch(prices.quote, ticker, label=f"fiyat {ticker}")
         if quote:

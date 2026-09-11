@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from . import cards, pipeline
+from . import cards, overrides, pipeline
 from .config import CARDS_DIR, INBOX_DIR
 from .inbox import validate_file
 from .util import read_json
@@ -69,9 +69,21 @@ def main(argv: list[str] | None = None) -> int:
     for s in skipped:
         print(f"  [atlandi] {s}")
 
+    # Veri duzeltmeleri de ayni on denetimden gecer. MCP sunucusu bunlari
+    # yaziyor; bozuk bir kaynak veya duzeltilemez bir alan PR'da yakalanmali,
+    # veri hattinin ortasinda degil.
+    override_problems = overrides.validate_all()
+    for problem in override_problems:
+        print(f"  [HATA] {problem}")
+
     if args.check:
         print(f"[inbox] {len(merged)} dosya gecerli, {len(errors)} hatali")
-        return 1 if errors else 0
+        print(f"[duzeltme] {len(override_problems)} hatali kayit")
+        return 1 if (errors or override_problems) else 0
+
+    if override_problems:
+        print("[duzeltme] overrides.json hatali — duzeltilmeden uygulanmayacak")
+        return 1
 
     # Pano izgarasi kartlari DEGIL data/candidates.json'i okur. Tazelenmezse
     # birlestirme kartta gorunur ama panoda gorunmez — puan degistiginde
