@@ -50,7 +50,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 	/** Inbox dosyasini calisma dalindan okur; yoksa main'den; yoksa bos. */
 	private async inboxFor(repo: Repo, ticker: string) {
 		const path = `claude_inbox/${ticker}.json`;
-		const branch = await repo.openReviewBranch();
+		const branch = await repo.existingBranch();
 		const staged = branch ? await repo.readJson<any>(path, branch) : null;
 		return { current: staged ?? (await repo.readJson<any>(path)) ?? { ticker }, path };
 	}
@@ -163,7 +163,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			{},
 			async () => {
 				const repo = this.repo();
-				const branch = await repo.openReviewBranch();
+				const branch = await repo.existingBranch();
 				if (!branch) return ok("Bekleyen degisiklik yok; calisma dali temiz.");
 				const files = await repo.pendingFiles();
 				return ok(
@@ -266,7 +266,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 			async ({ ticker, reason, tags }) => {
 				const repo = this.repo();
-				const branch = await repo.openReviewBranch();
+				const branch = await repo.existingBranch();
 				const wl =
 					(branch ? await repo.readJson<any>("data/watchlist.json", branch) : null) ??
 					(await repo.readJson<any>("data/watchlist.json")) ?? { entries: [] };
@@ -320,7 +320,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 			async ({ ticker, field, period_end, value, reason, source_url }) => {
 				const repo = this.repo();
-				const branch = await repo.openReviewBranch();
+				const branch = await repo.existingBranch();
 				const doc =
 					(branch ? await repo.readJson<any>("data/overrides.json", branch) : null) ??
 					(await repo.readJson<any>("data/overrides.json")) ?? { overrides: [] };

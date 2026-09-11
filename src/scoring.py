@@ -102,9 +102,26 @@ def total_score(blocks: dict[str, float | None], catalyst: float | None = None,
         acc += c * SCORE_WEIGHTS["catalyst"]
         used_weight += SCORE_WEIGHTS["catalyst"]
 
-    parts["total"] = round(acc / used_weight, 1) if used_weight > 0 else None
-    parts["weight_coverage"] = round(used_weight / sum(SCORE_WEIGHTS.values()), 2)
+    weight_coverage = used_weight / sum(SCORE_WEIGHTS.values())
+    parts["weight_coverage"] = round(weight_coverage, 2)
     parts["coverage_factors"] = applied
+
+    if used_weight <= 0:
+        parts["total"] = None
+        parts["not_scored"] = "Hicbir puan blogu hesaplanamadi"
+    elif weight_coverage < COVERAGE["min_total_weight"]:
+        # Puanin kendisi HESAPLANABILIR ama anlamli degil: agirligin cogu
+        # eksik, kalan da buyuk olcude elle girilmis katalizor. Yayimlamak
+        # yerine neden yayimlanmadigini soyle.
+        parts["total"] = None
+        parts["not_scored"] = (
+            f"Agirligin yalnizca %{round(weight_coverage * 100)}'i hesaplanabildi "
+            f"(taban %{round(COVERAGE['min_total_weight'] * 100)}). Kalan agirlik "
+            f"buyuk olcude elle girilen katalizor puani; toplam puan yaniltici "
+            f"olurdu. Sektor yuzdelikleri hesaplanamamis olabilir.")
+    else:
+        parts["total"] = round(acc / used_weight, 1)
+
     return parts
 
 

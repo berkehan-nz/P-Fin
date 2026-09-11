@@ -408,3 +408,62 @@ class TestOverrides:
     def test_unknown_period_is_skipped_not_crashed(self):
         f = fixtures.frsh()
         assert overrides.apply(f, [self._entry(ticker="FRSH", period_end="1999-01-01")]) == []
+
+
+# ----------------------------------------------- puan yayimlama tabani
+class TestScoreFloor:
+    """FRSH: tum otomatik bloklar bos, yalnizca elle girilen katalizor (60)
+    kaldi; toplam 60,0 cikti ve sirket siralamaya altinci olarak girdi."""
+
+    def test_catalyst_only_is_not_published(self):
+        s = scoring.total_score({k: None for k in
+                                 ("value", "quality", "safety", "momentum", "earnings_quality")},
+                                catalyst=60.0)
+        assert s["total"] is None
+        assert s["weight_coverage"] == 0.25
+        assert "katalizor" in s["not_scored"]
+
+    def test_normal_coverage_still_published(self):
+        s = scoring.total_score({"value": 60.0, "quality": 60.0, "safety": 60.0,
+                                 "momentum": 60.0, "earnings_quality": 60.0}, catalyst=60.0)
+        assert s["total"] == 60.0
+        assert "not_scored" not in s
+
+    def test_nothing_at_all(self):
+        s = scoring.total_score({k: None for k in
+                                 ("value", "quality", "safety", "momentum", "earnings_quality")})
+        assert s["total"] is None and s["not_scored"]
+
+
+# ------------------------------------------- alt kume kosusu yuzdelik havuzu
+class TestSubsetPercentilePool:
+    def test_single_row_pool_yields_no_percentiles(self):
+        """Hatanin kendisi: tek satirlik havuzda yuzdelik cikmaz."""
+        from src import percentiles
+        r = funnel.evaluate(fixtures.frsh())
+        table = percentiles.build_sector_table([r])
+        p, basis = percentiles.sector_percentile(table, r["sector"], "gross_margin",
+                                                 r["metrics"]["gross_margin"])
+        assert p is None and basis == "none"
+
+    def test_pool_from_cards_restores_percentiles(self, tmp_path, monkeypatch):
+        import json
+        from src import percentiles, pipeline
+        r = funnel.evaluate(fixtures.frsh())
+        for i in range(10):
+            (tmp_path / f"P{i}.json").write_text(json.dumps({
+                "ticker": f"P{i}", "sector": r["sector"],
+                "metrics": {"gross_margin": {"value": 50.0 + i * 4}}}))
+        monkeypatch.setattr(pipeline, "CARDS_DIR", tmp_path)
+        pool = [r] + pipeline.sector_rows_from_cards(exclude={"FRSH"})
+        table = percentiles.build_sector_table(pool)
+        p, basis = percentiles.sector_percentile(table, r["sector"], "gross_margin",
+                                                 r["metrics"]["gross_margin"])
+        assert p is not None and basis == "sector"
+
+    def test_run_tickers_excluded_from_card_pool(self, tmp_path, monkeypatch):
+        import json
+        from src import pipeline
+        (tmp_path / "FRSH.json").write_text(json.dumps({"ticker": "FRSH", "sector": "x", "metrics": {}}))
+        monkeypatch.setattr(pipeline, "CARDS_DIR", tmp_path)
+        assert pipeline.sector_rows_from_cards(exclude={"FRSH"}) == []

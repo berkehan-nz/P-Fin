@@ -144,6 +144,36 @@ def refresh_candidates_from_disk() -> bool:
     return write_candidates(seed, funnel_rows, manual)
 
 
+def sector_rows_from_cards(exclude: set[str] | None = None) -> list[dict]:
+    """Diskteki kartlardan yuzdelik havuzu icin satir uretir.
+
+    NEDEN: ``run_seed --tickers FRSH`` gibi ALT KUME kosularinda sektor
+    tablosu yalnizca o kosunun satirlarindan kuruluyordu. Tek sirketle
+    MIN_PEERS_FOR_SECTOR_PERCENTILE asilmiyor, TUM yuzdelikler None doner,
+    tum puan bloklari bosalir ve kart yalnizca elle girilen katalizor
+    puaniyla yayimlanir. FRSH tam olarak boyle 0,25 kapsamali 60,0 puanla
+    siralamaya girdi.
+
+    Havuz, kosuda OLMAYAN sirketlerin son bilinen metrikleriyle
+    tamamlanir; kosudakiler taze degerleriyle zaten ekleniyor.
+    """
+    exclude = {t.upper() for t in (exclude or set())}
+    rows: list[dict] = []
+    for path in sorted(CARDS_DIR.glob("*.json")):
+        card = read_json(path)
+        if not isinstance(card, dict):
+            continue
+        ticker = str(card.get("ticker", "")).upper()
+        if not ticker or ticker in exclude:
+            continue
+        cells = card.get("metrics") or {}
+        metrics = {k: (v or {}).get("value") for k, v in cells.items()
+                   if isinstance(v, dict)}
+        rows.append({"ticker": ticker, "sector": card.get("sector"),
+                     "metrics": metrics})
+    return rows
+
+
 def write_macro() -> bool:
     snapshot = try_fetch(fred_api.snapshot, label="FRED makro") or {}
     return write_json(DATA_DIR / "macro.json",

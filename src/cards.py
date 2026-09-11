@@ -156,6 +156,10 @@ def build(f: Fundamentals, *,
             flags.get("z_unreliable_reason")
             or "Altman Z'' guvenilmez. Faiz karsilama ve FCF/toplam borc ile degerlendir."
         )
+    not_scored = (score_block or {}).get("not_scored")
+    if not_scored:
+        warnings.append(f"PUANLANAMADI: {not_scored}")
+
     for o in (getattr(f, "overrides_applied", None) or []):
         warnings.append(
             f"ELLE DUZELTME: {o['period_end']} donemi {o['field']} alani "

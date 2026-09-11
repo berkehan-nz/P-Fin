@@ -227,6 +227,13 @@ SCORE_WEIGHTS = {
 COVERAGE = {
     "min_weight_factor": 0.35,   # kapsama 0 olsa bile blok tamamen susmasin
     "low_coverage_flag": 0.60,   # bunun altinda kartta "veri yetersiz" rozeti
+    # PUAN YAYIMLAMA TABANI. Otomatik bloklarin hicbiri hesaplanamadiginda
+    # geriye yalnizca ELLE girilen katalizor puani kalir; toplam o tek sayiya
+    # esit olur ve sirket siralamaya gercek bir olcum gibi girer. FRSH tam
+    # boyle 60,0 ile altinci siraya yerlesmisti (kapsama 0,25). Bu tabanin
+    # altinda toplam puan URETILMEZ: "veri yok" ile "puan dusuk" ayni sey
+    # degildir ve siralamada ayni yeri tutamaz.
+    "min_total_weight": 0.40,
 }
 
 # Puanlamada uc degerlerin yuzdelik siralamasini bozmasini engelleyen tavanlar.

@@ -14,7 +14,14 @@
  */
 import { Octokit } from "octokit";
 
-const BRANCH_PREFIX = "claude/";
+/**
+ * Dal oneki DAR olmali. Depoda baska projelere ait "claude/..." dallari da
+ * var (ornegin claude/new-private-project-*); genis bir onekle eslesirsek
+ * sunucu alakasiz bir dalin ustune yazar. Bu onek yalnizca bu sunucunun
+ * acdigi dallara uyar.
+ */
+const BRANCH_PREFIX = "claude/mcp-";
+const BRANCH_RE = /^claude\/mcp-\d{4}-\d{2}-\d{2}$/;
 
 export type RepoRef = { owner: string; repo: string; base: string };
 
@@ -60,40 +67,66 @@ export class Repo {
 		return text === null ? null : (JSON.parse(text) as T);
 	}
 
-	/** Acik bir inceleme PR'i varsa dali, yoksa null. */
-	async openReviewBranch(): Promise<string | null> {
-		const { data } = await this.octokit.rest.pulls.list({
-			base: this.ref.base,
+	/**
+	 * Biriken degisikliklerin durdugu dal — YOKSA null, olusturmaz.
+	 *
+	 * PR'a DEGIL DALIN KENDISINE bakar. Onceki surum acik PR ariyordu, ama
+	 * yazmalar submit_for_review'dan ONCE oluyor: PR henuz yokken her cagri
+	 * kendine yeni bir dal aciyor, hicbiri birikmiyordu.
+	 */
+	async existingBranch(): Promise<string | null> {
+		const { data } = await this.octokit.rest.git.listMatchingRefs({
 			owner: this.ref.owner,
+			ref: `heads/${BRANCH_PREFIX}`,
 			repo: this.ref.repo,
-			state: "open",
 		});
-		const pr = data.find((p) => p.head.ref.startsWith(BRANCH_PREFIX));
-		return pr ? pr.head.ref : null;
+
+		const names = data
+			.map((r) => r.ref.replace("refs/heads/", ""))
+			.filter((n) => BRANCH_RE.test(n))
+			.sort()
+			.reverse(); // tarih adin icinde; en yenisi basta
+
+		for (const name of names) {
+			// main'e gore ilerlemis mi? Birlestirilmis eski bir dal yeniden
+			// kullanilmamali, yoksa kapali bir PR'a yazmaya calisiriz.
+			const { data: cmp } = await this.octokit.rest.repos.compareCommitsWithBasehead({
+				basehead: `${this.ref.base}...${name}`,
+				owner: this.ref.owner,
+				repo: this.ref.repo,
+			});
+			if ((cmp.ahead_by ?? 0) > 0) return name;
+		}
+		return null;
 	}
 
 	/**
-	 * Calisma dali. Acik bir PR varsa ONUN dalina yazar — her arac cagrisi
-	 * ayri bir PR acsaydi Berke'nin "tek yerden onay" akisi bozulurdu.
+	 * Calisma dali: varsa mevcut olani, yoksa bugunun dalini acar. Boylece
+	 * oturum boyunca (ve ayni gun icinde) tum yazmalar TEK dalda birikir ve
+	 * tek PR olarak sunulur.
 	 */
 	async ensureBranch(): Promise<string> {
-		const existing = await this.openReviewBranch();
+		const existing = await this.existingBranch();
 		if (existing) return existing;
 
+		const name = `${BRANCH_PREFIX}${new Date().toISOString().slice(0, 10)}`;
 		const { data: baseRef } = await this.octokit.rest.git.getRef({
 			owner: this.ref.owner,
 			ref: `heads/${this.ref.base}`,
 			repo: this.ref.repo,
 		});
-		const name = `${BRANCH_PREFIX}${new Date().toISOString().slice(0, 10)}-${Math.random()
-			.toString(36)
-			.slice(2, 7)}`;
-		await this.octokit.rest.git.createRef({
-			owner: this.ref.owner,
-			ref: `refs/heads/${name}`,
-			repo: this.ref.repo,
-			sha: baseRef.object.sha,
-		});
+		try {
+			await this.octokit.rest.git.createRef({
+				owner: this.ref.owner,
+				ref: `refs/heads/${name}`,
+				repo: this.ref.repo,
+				sha: baseRef.object.sha,
+			});
+		} catch (err: any) {
+			// 422 = dal zaten var (bugun acilip birlestirilmis olabilir).
+			// Uzerine yazmak dogru: yeniden ilerlemis hale gelir.
+			if (err?.status !== 422) throw err;
+		}
 		return name;
 	}
 
@@ -137,7 +170,7 @@ export class Repo {
 
 	/** Calisma dalinin main'e gore degistirdigi dosyalar. */
 	async pendingFiles(): Promise<string[]> {
-		const branch = await this.openReviewBranch();
+		const branch = await this.existingBranch();
 		if (!branch) return [];
 		const { data } = await this.octokit.rest.repos.compareCommitsWithBasehead({
 			basehead: `${this.ref.base}...${branch}`,
@@ -149,7 +182,7 @@ export class Repo {
 
 	/** Tek PR'i acar veya basligini/govdesini gunceller. */
 	async submit(title: string, body: string) {
-		const branch = await this.openReviewBranch();
+		const branch = await this.existingBranch();
 		if (!branch) return null;
 
 		const { data: open } = await this.octokit.rest.pulls.list({
