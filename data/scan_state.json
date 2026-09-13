@@ -1,39 +1,58 @@
 {
   "as_of": "2026-09-13",
   "batch_size": 60,
-  "cursor": 60,
+  "cursor": 120,
   "cycle": 2,
   "cycle_started": "2026-09-13",
   "failed": [],
   "kill_counts": {
-    "30 gunluk ortalama dolar hacmi < 5M USD": 1,
+    "30 gunluk ortalama dolar hacmi < 5M USD": 4,
     "Beneish M -0.92 > -1.78 (manipulasyon suphesi)": 1,
-    "Borsa disi/uygunsuz kotasyon (OTC)": 7,
+    "Borsa disi/uygunsuz kotasyon (OTC)": 21,
+    "Brut marj %-3.1 <= %30": 1,
     "Brut marj %0.0 <= %30": 1,
     "Brut marj %12.0 <= %30": 1,
+    "Brut marj %16.9 <= %30": 1,
     "Brut marj %18.8 <= %30": 1,
+    "Brut marj %19.4 <= %30": 1,
+    "Brut marj %20.3 <= %30": 1,
+    "Brut marj %20.9 <= %30": 1,
+    "Brut marj %21.1 <= %30": 1,
+    "Brut marj %22.6 <= %30": 1,
     "Brut marj %22.8 <= %30": 1,
+    "Brut marj %25.3 <= %30": 1,
     "Brut marj %25.6 <= %30": 1,
     "Brut marj %27.2 <= %30": 1,
     "Brut marj %28.9 <= %30": 1,
+    "Brut marj %29.1 <= %30": 1,
     "Brut marj %5.7 <= %30": 1,
+    "Brut marj %6.3 <= %30": 1,
+    "Brut marj %7.1 <= %30": 1,
     "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume %128.5, 40 Kurali -103.2)": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume %140.6, 40 Kurali -230.8)": 1,
     "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume %27.3, 40 Kurali 15.9)": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume %30.5, 40 Kurali -43.8)": 1,
     "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume %6.8, 40 Kurali -6.2)": 1,
     "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume yok, 40 Kurali None)": 2,
     "Fiyat < 5 USD": 2,
+    "Hasilat buyumesi %-15.2 <= %5": 1,
     "Hasilat buyumesi %-16.2 <= %5": 1,
     "Hasilat buyumesi %-3.3 <= %5": 1,
     "Hasilat buyumesi %-5.4 <= %5": 1,
     "Hasilat buyumesi %-56.1 <= %5": 1,
-    "Hasilatsiz biyoteknoloji": 3,
-    "Piyasa degeri < 300M USD": 15,
-    "Piyasa degeri > 50000M USD": 6,
+    "Hasilat buyumesi %0.3 <= %5": 1,
+    "Hasilat buyumesi %2.1 <= %5": 1,
+    "Hasilat buyumesi %3.8 <= %5": 1,
+    "Hasilatsiz biyoteknoloji": 5,
+    "Hisse sayisi artisi %5.8 >= %5": 1,
+    "Piotroski F 2 < 4 (Kol A)": 1,
+    "Piyasa degeri < 300M USD": 28,
+    "Piyasa degeri > 50000M USD": 9,
     "SBC/FCF 1.82 >= 1.0": 1
   },
-  "last_batch_at": "2026-09-13T07:21:40+00:00",
+  "last_batch_at": "2026-09-13T10:25:06+00:00",
   "last_finalized": null,
-  "processed": 60,
+  "processed": 120,
   "queue": [
     "A",
     "AA",
@@ -3870,17 +3889,17 @@
   "source": "scan",
   "stage_counts": {
     "0": {
-      "in": 60,
-      "out": 26
+      "in": 120,
+      "out": 51
     },
     "1": {
-      "in": 26,
-      "out": 8
+      "in": 51,
+      "out": 15
     },
     "2": {
-      "in": 8,
-      "out": 7
+      "in": 15,
+      "out": 13
     }
   },
-  "survivor_count": 7
+  "survivor_count": 13
 }
