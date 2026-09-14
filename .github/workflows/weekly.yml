@@ -55,12 +55,17 @@ jobs:
           print("Onbellek:", edgar_bulk.cache_stats())
           PY
 
-      - name: Yeni tarama turu baslat
+      # DIKKAT: burada --new-cycle KULLANILMAZ.
+      # Bir tarama turu ~5-10 gun suruyor (GitHub zamanlanmis kosulari saatte
+      # bir degil, gunde 6-7 kez tetikliyor). Her pazar yeni tur baslatmak
+      # yarim kalan taramayi cope atiyor ve tur HIC BITMIYORDU.
+      # Yeni tur, mevcut tur bittiginde scan.run icinde kendiliginden baslar.
+      - name: Tarama partisi (mevcut turu surdurur)
         env:
           SEC_USER_AGENT:  ${{ secrets.SEC_USER_AGENT }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           FRED_API_KEY:    ${{ secrets.FRED_API_KEY }}
-        run: python -m src.run_scan --new-cycle --batch 60
+        run: python -m src.run_scan
 
       - name: Ozet
         if: always()

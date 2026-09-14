@@ -267,3 +267,115 @@ class TestDurability:
         assert out["queue"] == ["AAA", "BBB"]
         assert out["cycle"] == 2, "tur sayaci ilerlemeliydi"
         assert out["cursor"] == 1, "bir sirket islenmeliydi"
+
+
+class TestCycleProtection:
+    """Haftalik kosu her pazar --new-cycle cagiriyordu. Bir tur 5-10 gun
+    surdugu icin (GitHub zamanlanmis kosulari saatte bir degil, gunde 6-7
+    kez tetikliyor) tur her seferinde sifirlaniyor ve SONUC HIC URETILMIYORDU.
+    """
+
+    def test_cycle_in_progress_detection(self):
+        s = scan.empty_state()
+        assert scan.cycle_in_progress(s) is False          # kuyruk yok
+        s.update({"queue": ["A", "B", "C"], "cursor": 1})
+        assert scan.cycle_in_progress(s) is True
+        s["cursor"] = 3
+        assert scan.cycle_in_progress(s) is False          # bitmis
+
+    def test_new_cycle_refused_while_in_progress(self, isolated, monkeypatch):
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "load_company", lambda t, **kw: None)
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {"QQQ": []})
+
+        state = scan.empty_state()
+        state.update({"cycle": 1, "queue": ["A"] * 100, "cursor": 40,
+                      "batch_size": 10})
+        scan.save_state(state)
+
+        out = scan.run(new_cycle=True, build_cards=False)
+        assert out["cycle"] == 1, "yarim tur cope atilmamaliydi"
+        assert out["cursor"] >= 40, "imlec geri sarmamaliydi"
+
+    def test_force_allows_reset(self, isolated, monkeypatch):
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "load_company", lambda t, **kw: None)
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {"QQQ": []})
+
+        state = scan.empty_state()
+        state.update({"cycle": 1, "queue": ["A"] * 100, "cursor": 40})
+        scan.save_state(state)
+
+        out = scan.run(new_cycle=True, force=True, tickers=["X", "Y"],
+                       batch_size=1, build_cards=False)
+        assert out["cycle"] == 2
+
+    def test_one_off_batch_does_not_persist(self, isolated, monkeypatch):
+        """weekly --batch 60 kalici olarak parti boyutunu yariya
+        indiriyordu ve sonraki tum kosular yavasliyordu."""
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "load_company", lambda t, **kw: None)
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {"QQQ": []})
+
+        state = scan.empty_state()
+        state.update({"cycle": 1, "queue": ["A"] * 500, "cursor": 0,
+                      "batch_size": 120})
+        scan.save_state(state)
+
+        out = scan.run(batch_size=20, build_cards=False)
+        assert out["batch_size"] == 120, "kayitli parti boyutu degismemeliydi"
+        assert out["cursor"] == 20, "bu kosuda 20 islenmeliydi"
+
+
+class TestInterimResults:
+    """Tur 5-10 gun surerken kullanici hicbir yeni sirket gormemeliydi.
+    Biriken hayatta kalanlar uzerinden gecici siralama uretilir."""
+
+    def _seed_survivors(self, n):
+        import json
+        rows = []
+        for i in range(n):
+            r = row_for("KVYO")
+            r["ticker"] = f"T{i:03d}"
+            r["metrics"] = dict(r["metrics"])
+            r["metrics"]["ev_gross_profit"] = 3.0 + i * 0.1
+            r["own_pct"] = {}
+            snap = scan.to_snapshot(r)
+            snap["ticker"] = r["ticker"]
+            scan.survivor_path(r["ticker"]).write_text(
+                json.dumps(snap), encoding="utf-8")
+            rows.append(r)
+        return rows
+
+    def test_below_threshold_produces_nothing(self, isolated):
+        self._seed_survivors(5)
+        state = scan.empty_state()
+        state.update({"queue": ["A"] * 100, "cursor": 10})
+        assert scan.interim(state, build_cards=False) is None
+
+    def test_above_threshold_ranks_survivors(self, isolated, monkeypatch):
+        from src import pipeline
+        captured = {}
+        monkeypatch.setattr(pipeline, "refresh_candidates_from_disk",
+                            lambda partial=None: captured.update(partial or {}))
+        self._seed_survivors(20)
+        state = scan.empty_state()
+        state.update({"cycle": 1, "queue": ["A"] * 100, "cursor": 25})
+
+        out = scan.interim(state, build_cards=False)
+        assert out is not None
+        assert captured["is_partial"] is True
+        assert captured["scanned"] == 25
+        assert captured["survivors"] == 20
+
+    def test_partial_flag_reaches_candidates_file(self, tmp_path, monkeypatch):
+        """Pano 'bu liste gecici' diyebilmek icin bayragi gormeli."""
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "CARDS_DIR", tmp_path / "cards")
+        (tmp_path / "cards").mkdir()
+        monkeypatch.setattr(pipeline, "DATA_DIR", tmp_path)
+        written = {}
+        monkeypatch.setattr(pipeline, "write_json",
+                            lambda path, payload, **kw: written.update(payload) or True)
+        pipeline.write_candidates([], [], [], partial={"is_partial": True, "pct": 12.5})
+        assert written["partial"]["is_partial"] is True

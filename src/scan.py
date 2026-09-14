@@ -92,6 +92,12 @@ def progress(state: dict) -> dict:
 # --------------------------------------------------------------------------
 # Tur baslatma
 # --------------------------------------------------------------------------
+def cycle_in_progress(state: dict) -> bool:
+    """Tur devam ediyor mu? (kuyruk var ve bitmemis)"""
+    queue = state.get("queue") or []
+    return bool(queue) and state.get("cursor", 0) < len(queue)
+
+
 def start_cycle(state: dict, *, tickers: list[str] | None = None,
                 batch_size: int | None = None, keep_survivors: bool = False) -> dict:
     """Yeni bir tarama turu baslatir; kuyrugu bastan kurar.
@@ -99,6 +105,9 @@ def start_cycle(state: dict, *, tickers: list[str] | None = None,
     ``keep_survivors=False`` onceki turun hayatta kalanlarini siler — aksi
     halde artik evrende olmayan ya da artik filtreleri gecmeyen sirketler
     havuzda kalir ve yuzdelikleri bozar.
+
+    DIKKAT: bu islem YARIM KALAN BIR TURU COPE ATAR. Cagiran tarafin
+    ``cycle_in_progress`` ile kontrol etmesi gerekir; ``run()`` bunu yapar.
     """
     queue = tickers if tickers is not None else pipeline.universe_tickers()
 
@@ -288,6 +297,82 @@ def _run_early_stages(row: dict, counts: dict) -> tuple[int | None, str | None]:
 
 
 # --------------------------------------------------------------------------
+# Ara sonuc — tur bitmeden gosterilecek gecici siralama
+# --------------------------------------------------------------------------
+# Bir tur 5-10 gun suruyor. Asama 3-4'u yalnizca tur sonunda calistirmak,
+# kullanicinin bu sure boyunca HICBIR yeni sirket gormemesi demek. Oysa
+# biriken hayatta kalanlar uzerinden simdiden siralama yapilabilir; yalnizca
+# bunun GECICI oldugu ve havuz buyudukce degisecegi acikca soylenmeli.
+INTERIM_MIN_SURVIVORS = 15      # bu sayinin altinda siralama anlamsiz
+INTERIM_CARDS_PER_BATCH = 12    # her partide en fazla kac yeni tam kart
+
+
+def interim(state: dict, *, ctx: dict | None = None, bench: list | None = None,
+            build_cards: bool = True) -> dict | None:
+    """Biriken hayatta kalanlari siralar ve GECICI aday listesi yazar.
+
+    Tur sonundaki ``finalize`` ile ayni kodu (``funnel.rank``) kullanir;
+    fark, sonucun ``partial: true`` ile isaretlenmesi ve kart uretiminin
+    parti basina sinirlanmasi.
+    """
+    snapshots = load_survivors()
+    if len(snapshots) < INTERIM_MIN_SURVIVORS:
+        return None
+
+    rows = [from_snapshot(s) for s in snapshots]
+    log = {"stages": []}
+    selected, sector_table = funnel.rank(rows, log=log, compute_own_pct=False)
+
+    p = progress(state)
+    if build_cards:
+        _build_missing_cards(selected, sector_table, ctx=ctx, bench=bench,
+                             limit=INTERIM_CARDS_PER_BATCH)
+
+    pipeline.refresh_candidates_from_disk(partial={
+        "is_partial": True,
+        "scanned": p["done"],
+        "universe": p["total"],
+        "pct": p["pct"],
+        "survivors": len(snapshots),
+        "ranked": len(selected),
+        "cycle": p["cycle"],
+    })
+    print(f"[tarama] Ara sonuc: {len(snapshots)} hayatta kalan siralandi, "
+          f"{len(selected)} aday (tarama %{p['pct']})")
+    return {"selected": selected, "sector_table": sector_table}
+
+
+def _build_missing_cards(selected: list[dict], sector_table: dict, *,
+                         ctx: dict | None, bench: list | None,
+                         limit: int) -> int:
+    """Aday olup karti olmayan sirketler icin tam kart uretir (sinirli sayida).
+
+    Her kart bir companyfacts indirmesi demek; parti suresini sismemek icin
+    kosu basina ``limit`` taneyle sinirli. Kalanlar sonraki partilerde uretilir.
+    """
+    missing = [r for r in selected
+               if not (pipeline.CARDS_DIR / f"{r['ticker']}.json").exists()]
+    if not missing:
+        return 0
+
+    ctx = ctx if ctx is not None else pipeline.context([])
+    built = 0
+    for row in missing[:limit]:
+        f = pipeline.load_company(row["ticker"])
+        if f is None:
+            continue
+        full = funnel.evaluate(f, benchmark=bench or [])
+        full["passed_stages"] = row.get("passed_stages", [])
+        pipeline.build_cards([full], source="funnel", sector_table=sector_table,
+                             ctx=ctx, bench=bench or [])
+        built += 1
+    if built:
+        print(f"[tarama] {built} yeni kart uretildi "
+              f"({len(missing) - built} tanesi sonraki partilere kaldi)")
+    return built
+
+
+# --------------------------------------------------------------------------
 # Tur sonu
 # --------------------------------------------------------------------------
 def finalize(state: dict, *, ctx: dict | None = None,
@@ -373,20 +458,34 @@ def finalize(state: dict, *, ctx: dict | None = None,
 # Ust seviye kosu
 # --------------------------------------------------------------------------
 def run(*, batch_size: int | None = None, new_cycle: bool = False,
-        tickers: list[str] | None = None, build_cards: bool = True) -> dict:
+        tickers: list[str] | None = None, build_cards: bool = True,
+        force: bool = False) -> dict:
     """Bir saatlik parti calistirir; kuyruk bittiyse tur sonunu isler."""
     state = load_state()
 
-    if new_cycle or not state.get("queue"):
+    if new_cycle and cycle_in_progress(state) and not force:
+        # Yarim kalan tur cope gitmesin. Haftalik kosu her pazar --new-cycle
+        # cagiriyordu; tur 5-10 gun surdugu icin her seferinde sifirlaniyor
+        # ve SONUC HIC URETILMIYORDU. Yeni tur ancak mevcut tur bitince
+        # ya da acikca --force verilince baslar.
+        p = progress(state)
+        print(f"[tarama] Tur {p['cycle']} devam ediyor ({p['done']}/{p['total']}, "
+              f"%{p['pct']}) — yeni tur baslatilmadi. Zorlamak icin --force.")
+    elif new_cycle or not state.get("queue"):
         state = start_cycle(state, tickers=tickers, batch_size=batch_size)
 
-    if batch_size:
-        state["batch_size"] = batch_size
+    # Tek seferlik --batch, kayitli parti boyutunu KALICI degistirmesin;
+    # yalnizca bu kosuda gecerli olsun.
+    run_batch_size = batch_size or state.get("batch_size", DEFAULT_BATCH_SIZE)
 
     bench_map = pipeline.benchmarks()
     bench = bench_map.get("QQQ", [])
 
-    state = run_batch(state, bench=bench)
+    state = run_batch(state, size=run_batch_size, bench=bench)
+
+    # ARA SONUC: tur bitmesini beklemeden biriken hayatta kalanlari sirala.
+    # Tur 5 gun surerken kullanici hicbir yeni sirket gormemeli degil.
+    interim(state, ctx=None, bench=bench, build_cards=build_cards)
 
     p = progress(state)
     print(f"[tarama] Ilerleme: {p['done']}/{p['total']} (%{p['pct']}) · "

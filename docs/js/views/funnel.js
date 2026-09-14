@@ -34,8 +34,11 @@ window.ViewFunnel = (function () {
     const done = Math.min(scan.cursor || 0, total);
     const pct = total ? (done / total) * 100 : 0;
     const survivors = scan.survivor_count || 0;
-    const perHour = scan.batch_size || 120;
-    const hoursLeft = perHour ? Math.ceil((total - done) / perHour) : null;
+    const perRun = scan.batch_size || 120;
+    // GitHub zamanlanmis kosulari saatte bir DEGIL, gozlemlenen siklikla
+    // tetikliyor (gunde ~6-7). Saatlik varsayip "25 saat" demek yaniltici.
+    const runsPerDay = 6.5;
+    const daysLeft = perRun ? ((total - done) / (perRun * runsPerDay)) : null;
 
     el.innerHTML = `<div class="card">
       <div class="spread">
@@ -50,19 +53,23 @@ window.ViewFunnel = (function () {
           <div class="num" style="font-size:18px">${survivors}</div></div>
         <div><div class="tiny dim">KALAN</div>
           <div class="num" style="font-size:18px">${total - done}</div></div>
-        <div><div class="tiny dim">SAATLIK PARTI</div>
-          <div class="num" style="font-size:18px">${perHour}</div></div>
+        <div><div class="tiny dim">PARTI BASINA</div>
+          <div class="num" style="font-size:18px">${perRun}</div>
+          <div class="tiny dim">gunde ~${runsPerDay} kosu</div></div>
         <div><div class="tiny dim">TAHMINI BITIS</div>
-          <div class="num" style="font-size:18px">${hoursLeft !== null ? '~' + hoursLeft + ' saat' : '—'}</div></div>
+          <div class="num" style="font-size:18px">${daysLeft !== null ? '~' + daysLeft.toFixed(1) + ' gun' : '—'}</div>
+          <div class="tiny dim">gozlemlenen siklikla</div></div>
       </div>
       <div class="tiny dim" style="margin-top:10px">
         Son parti: ${scan.last_batch_at ? Fmt.date(scan.last_batch_at) : '—'} ·
         Son tur sonu: ${scan.last_finalized ? Fmt.date(scan.last_finalized) : 'henuz yok'}
         ${(scan.failed || []).length ? ` · yuklenemeyen ${scan.failed.length}` : ''}
       </div>
-      ${done < total ? `<p class="tiny dim" style="margin:8px 0 0">Asama 3-4 (goreli
-        ucuzluk ve puanlama) kuyruk bitince calisir — yuzdelikler havuzun
-        tamamini ister.</p>` : ''}
+      ${done < total ? `<p class="tiny dim" style="margin:8px 0 0">
+        Asama 3-4 (goreli ucuzluk ve puanlama) her partiden sonra biriken
+        hayatta kalanlar uzerinde calisir ve <b>gecici</b> bir aday listesi
+        uretir. Tur bitince liste havuzun tamamiyla yeniden kurulur;
+        yuzdelikler degistigi icin siralama da degisir.</p>` : ''}
     </div>`;
   }
 

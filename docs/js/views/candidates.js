@@ -30,9 +30,29 @@ window.ViewCandidates = (function () {
                                           .map((e) => String(e.ticker).toUpperCase()));
     portSet = new Set((port.positions || []).map((p) => String(p.ticker).toUpperCase()));
 
+    renderPartialBanner(cand.partial);
     fillSectorFilter();
     bindOnce();
     apply();
+  }
+
+  /* Tarama surerken yazilan liste GECICIDIR. Havuz buyudukce sektor
+     yuzdelikleri ve dolayisiyla siralama degisir. Bunu soylemezsek
+     kullanici yarim veriye gore karar verir. */
+  function renderPartialBanner(partial) {
+    const el = $('partialBanner');
+    if (!el) return;
+    if (!partial || !partial.is_partial) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="banner">
+      <b>Bu liste geçici.</b> Evren taramasi surüyor:
+      <b>${partial.scanned}/${partial.universe}</b> sirket islendi
+      (%${Fmt.num(partial.pct, 1)}), ${partial.survivors} tanesi sert
+      filtreleri gecti ve ${partial.ranked} tanesi aday olarak siralandi.
+      <br>
+      Puanlar <b>ayni sektordeki digerlerine gore</b> hesaplandigi icin havuz
+      buyudukce siralama DEGISECEK. Tarama bitince liste yeniden kurulur.
+      Tohum listesindeki 36 sirket bundan etkilenmez.
+    </div>`;
   }
 
   function fillSectorFilter() {

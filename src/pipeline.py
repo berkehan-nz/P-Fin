@@ -96,7 +96,7 @@ def build_cards(rows: list[dict], *, source: str, sector_table: dict,
 
 
 def write_candidates(seed_cards: list[dict], funnel_cards: list[dict],
-                     manual_cards: list[dict]) -> bool:
+                     manual_cards: list[dict], partial: dict | None = None) -> bool:
     """``data/candidates.json`` — dashboard izgarasinin okudugu dosya.
 
     Elle eklenenler AYRI bolumde; siralamaya karismaz.
@@ -119,12 +119,16 @@ def write_candidates(seed_cards: list[dict], funnel_cards: list[dict],
             "manual": len(manual_cards),
         },
         "seed_date": config.SEED_DATE,
+        # Tarama devam ederken yazilan liste GECICIDIR: havuz buyudukce
+        # sektor yuzdelikleri ve dolayisiyla siralama degisir. Pano bunu
+        # acikca soylemeli, yoksa kullanici yarim veriye gore karar verir.
+        "partial": partial,
         "source": "funnel+seed+manual",
     }
     return write_json(DATA_DIR / "candidates.json", payload)
 
 
-def refresh_candidates_from_disk() -> bool:
+def refresh_candidates_from_disk(partial: dict | None = None) -> bool:
     """Kartlari diskten okuyup candidates.json'i yeniden kurar.
 
     Gunluk kosuda tam huni calismaz; kartlarin fiyat/haber alanlari
@@ -141,7 +145,7 @@ def refresh_candidates_from_disk() -> bool:
             seed.append(card)
         else:
             funnel_rows.append(card)
-    return write_candidates(seed, funnel_rows, manual)
+    return write_candidates(seed, funnel_rows, manual, partial=partial)
 
 
 def sector_rows_from_cards(exclude: set[str] | None = None) -> list[dict]:
