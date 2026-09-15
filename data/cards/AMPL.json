@@ -3,19 +3,19 @@
     "analyst_count": 11,
     "buy": 9,
     "hold": 3,
-    "recommendation": "buy",
+    "recommendation": "none",
     "sell": 0,
     "source": "yfinance",
     "target_high": 18.0,
     "target_low": 11.0,
     "target_median": 13.0,
-    "upside_to_median": 3.2565528196981663
+    "upside_to_median": -4.761904761904767
   },
-  "as_of": "2026-09-14",
+  "as_of": "2026-09-15",
   "calendar": {
     "next_earnings": null
   },
-  "change_1d_pct": 1.04,
+  "change_1d_pct": 8.42,
   "data_quality": {
     "issue_count": 1,
     "issues": [
@@ -41,7 +41,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 1488.4,
+  "enterprise_value_musd": 1625.5,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -71,7 +71,7 @@
     "last_form4": "2026-08-18",
     "window_days": 180
   },
-  "market_cap_musd": 1628.9,
+  "market_cap_musd": 1766.0,
   "metrics": {
     "altman_z": {
       "color": "gray",
@@ -134,14 +134,14 @@
       "own_5y_pct": 75.0,
       "pct_basis": "sector",
       "sector_pct": 39.3,
-      "value": 5.49
+      "value": 6.0
     },
     "ev_sales": {
-      "color": "green",
+      "color": "yellow",
       "own_5y_pct": 75.0,
       "pct_basis": "sector",
       "sector_pct": 43.3,
-      "value": 3.975
+      "value": 4.34
     },
     "fcf_margin": {
       "color": "red",
@@ -162,14 +162,14 @@
       "own_5y_pct": 40.0,
       "pct_basis": "sector",
       "sector_pct": 10.0,
-      "value": 1.975
+      "value": 1.81
     },
     "fcf_yield_mcap": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 10.0,
-      "value": 1.805
+      "value": 1.66
     },
     "gross_margin": {
       "color": "green",
@@ -197,14 +197,14 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 19.69
+      "value": 20.9
     },
     "implied_vs_actual_growth": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 1.52
+      "value": 1.61
     },
     "interest_coverage": {
       "color": "green",
@@ -253,7 +253,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 23.3,
-      "value": 14.702
+      "value": 7.52
     },
     "pe": {
       "color": "gray",
@@ -281,28 +281,28 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -10.595
+      "value": -1.05
     },
     "rel_strength_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 83.3,
-      "value": 50.442
+      "value": 66.27
     },
     "return_12m": {
-      "color": "yellow",
+      "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 63.3,
-      "value": 12.511
+      "value": 20.37
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 83.3,
-      "value": 70.135
+      "value": 85.71
     },
     "rev_cagr_3y": {
       "color": "yellow",
@@ -379,6 +379,12 @@
   "net_debt_musd": -140.54,
   "news": [
     {
+      "date": "2026-09-14",
+      "headline": "3 Small-Cap Stocks Walking a Fine Line",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=085dbc06f2fe7fcc66fcce20315ddb0af6cd58aa0e3a442317a3379313ebf705"
+    },
+    {
       "date": "2026-09-12",
       "headline": "1 Cash-Heavy Stock on Our Watchlist and 2 We Ignore",
       "source": "Yahoo",
@@ -419,21 +425,15 @@
       "headline": "Datadog, Amplitude, Zscaler, DocuSign, and Salesforce Shares Skyrocket, What You Need To Know",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=7428c8a120fe47b640795f50a9b484fee33d0b3b97e5c85a191d33502649dd6b"
-    },
-    {
-      "date": "2026-08-31",
-      "headline": "INGM or AMPL: Which Is the Better Value Stock Right Now?",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=328fa81d342668e033a50cedc637d8cadffa23af36b0dddeb697683d5f378476"
     }
   ],
-  "price": 12.59,
+  "price": 13.65,
   "reverse_dcf": {
     "actual_growth_pct": 12.97,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 1488.4,
+    "enterprise_value_musd": 1625.5,
     "fcf_ttm_musd": 29.4,
-    "implied_growth_pct": 19.69,
+    "implied_growth_pct": 20.899426742824765,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -663,29 +663,28 @@
       "2026-06-30"
     ],
     "price_sparkline": [
-      7.35,
-      7.15,
-      7.21,
-      7.21,
-      6.59,
-      6.41,
+      7.28,
+      7.05,
+      7.01,
+      6.75,
+      6.7,
       6.82,
       6.84,
       6.7,
       6.01,
-      6.2,
-      6.79,
-      7.08,
-      7.28,
+      5.95,
+      6.69,
+      6.98,
+      7.0,
       7.06,
       7.06,
       7.11,
       8.04,
       7.52,
       6.39,
-      5.98,
-      6.06,
-      6.36,
+      6.18,
+      6.13,
+      6.35,
       6.52,
       6.84,
       6.88,
@@ -693,7 +692,7 @@
       8.11,
       7.66,
       6.96,
-      6.89,
+      6.88,
       6.65,
       6.53,
       6.66,
@@ -702,7 +701,7 @@
       8.55,
       8.91,
       8.81,
-      9.18,
+      9.36,
       9.64,
       9.6,
       9.59,
@@ -711,18 +710,19 @@
       8.89,
       8.88,
       9.88,
-      10.77,
-      12.19,
+      11.26,
+      12.69,
       13.3,
       12.61,
       12.83,
       13.29,
       13.11,
       14.28,
-      14.1,
-      13.29,
-      13.02,
-      12.39
+      13.83,
+      13.55,
+      12.52,
+      12.46,
+      13.65
     ],
     "quarters": [
       "2023-09",
@@ -808,7 +808,7 @@
     "why_cheap_diagnosis": "DONGUSEL DİP + toparlanma başlangıcı",
     "why_cheap_rationale": "2022-24 aşırı satın alma sonrası NRR %101'e çökünce çarpan tarihsel dibe indi (IPO'dan -%88). Şimdi NRR/ARR toparlanıyor ama GAAP zarar ve AI maliyetiyle brüt marj -4 puan."
   },
-  "story_age_days": 4,
+  "story_age_days": 5,
   "ticker": "AMPL",
   "track": "B",
   "ttm": {
