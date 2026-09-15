@@ -266,7 +266,9 @@ def build(f: Fundamentals, *,
         # hesaplar. Eski carpani oranla olceklemek her gun biraz daha sapan
         # bir sayi birakirdi; TTM buyuklukleri gun icinde degismez.
         "shares_outstanding_m": _round(f.shares_outstanding, None, 4),
-        "net_debt_musd": _round(m.get("net_debt"), None, 1),
+        # Metrik hucresiyle AYNI yuvarlama: ayni buyuklugun iki yerde
+        # farkli gorunmesi (5,25 ve 5,3) denetimde celiski sayilir.
+        "net_debt_musd": _round(m.get("net_debt"), "net_debt"),
         "ttm": {
             "revenue_musd": _round(meta.get("revenue_ttm_musd"), None, 1),
             "gross_profit_musd": _round(meta.get("gross_profit_ttm_musd"), None, 1),
