@@ -21,31 +21,42 @@ window.Fmt = (function () {
                                        maximumFractionDigits: digits });
   }
 
+  /* Turkcede yuzde isareti sayinin ONUNDE durur; eksi de yuzdenin onunde.
+     "%-8,2" degil "-%8,2". Isaret hicbir kosulda dusurulmez. */
+  function pctText(v, digits = 1) {
+    return `${v < 0 ? '-' : ''}%${num(Math.abs(v), digits)}`;
+  }
+
   function metricValue(metric, v) {
     if (!isNum(v)) return '—';
     const s = spec(metric);
     const unit = s ? s.unit : '';
-    if (unit === '%') return `%${num(v, 1)}`;
-    if (unit === 'x') return `${num(v, v >= 100 ? 0 : 2)}x`;
+    if (unit === '%') return pctText(v, 1);
+    if (unit === 'x') return `${num(v, Math.abs(v) >= 100 ? 0 : 2)}x`;
     if (unit === '/9') return `${Math.round(v)}/9`;
     return num(v, Math.abs(v) >= 100 ? 0 : 2);
   }
 
+  /* Eksi isareti para biriminin ONUNDE: "-$959M". "$-959M" para birimini
+     negatif gosteriyormus gibi okunuyor. */
   function money(v, { musd = false, digits = 0 } = {}) {
     if (!isNum(v)) return '—';
+    const sign = v < 0 ? '-' : '';
+    const a = Math.abs(v);
     if (musd) {
-      if (Math.abs(v) >= 1000) return `$${num(v / 1000, 2)}B`;
-      return `$${num(v, 0)}M`;
+      if (a >= 1000) return `${sign}$${num(a / 1000, 2)}B`;
+      return `${sign}$${num(a, 0)}M`;
     }
-    return `$${v.toLocaleString('tr-TR', { minimumFractionDigits: digits,
-                                           maximumFractionDigits: digits })}`;
+    return `${sign}$${a.toLocaleString('tr-TR', { minimumFractionDigits: digits,
+                                                  maximumFractionDigits: digits })}`;
   }
 
-  function pct(v, digits = 1) { return isNum(v) ? `%${num(v, digits)}` : '—'; }
+  function pct(v, digits = 1) { return isNum(v) ? pctText(v, digits) : '—'; }
 
+  /* Isaret HER ZAMAN yazilir (+ ve -), yuzde isareti onde. */
   function signedPct(v, digits = 1) {
     if (!isNum(v)) return '—';
-    return `${v > 0 ? '+' : ''}${num(v, digits)}%`;
+    return `${v >= 0 ? '+' : '-'}%${num(Math.abs(v), digits)}`;
   }
 
   function pnlClass(v) {
@@ -83,12 +94,14 @@ window.Fmt = (function () {
     if (!isNum(v)) return 0;
     const s = spec(metric);
     if (!s) return 0;
+    // Esikler negatif olabiliyor (orn. Beneish M yellow_max = -1,78).
+    // Mutlak deger alinmazsa span 1'e kirpiliyor ve cubuk hep dolu cikiyordu.
     if (s.direction === 'low_good') {
-      const span = Math.max(s.yellow_max * 2, 1);
-      return Math.max(0, Math.min(1, 1 - v / span));
+      const span = Math.max(Math.abs(s.yellow_max) * 2, 1);
+      return Math.max(0, Math.min(1, 1 - (v - Math.min(s.yellow_max, 0)) / span));
     }
-    const span = Math.max(s.green_min * 1.6, 1);
-    return Math.max(0, Math.min(1, v / span));
+    const span = Math.max(Math.abs(s.green_min) * 1.6, 1);
+    return Math.max(0, Math.min(1, (v - Math.min(s.green_min, 0)) / span));
   }
 
   function label(metric) {
@@ -129,17 +142,21 @@ window.Fmt = (function () {
     const s = spec(metric);
     if (!s || !s.sentence || !isNum(v)) return '';
     const unit = s.unit;
-    const shown = unit === '%' ? num(Math.abs(v), 1)
+    // Negatif sablonlar yonu KELIMEYLE tasidigi icin mutlak deger alir.
+    const shown = (unit === '%' || (v < 0 && s.sentence_neg))
+                ? num(Math.abs(v), unit === '%' ? 1 : 2)
                 : unit === '/9' ? String(Math.round(v))
                 : num(v, Math.abs(v) >= 100 ? 0 : 2);
-    let out = s.sentence.replace('{v}', shown);
-    // Negatif yuzdelerde "%-5 getirdi" yerine "%5 kaybettirdi" gibi
-    if (unit === '%' && v < 0) {
-      out = out.replace('%' + shown, '%' + shown)
-               .replace('degisti', 'azaldi')
-               .replace('getirdi', 'kaybettirdi');
+    // NEGATIF DEGER. Onceki surum mutlak degeri yazip yon bilgisini
+    // dusuruyordu: nakit YAKAN sirket "8,2 dolar serbest nakit kaliyor",
+    // kuculme varsayan fiyat "%2,9 buyume varsayiyor" diye okunuyordu.
+    // Once metrige ozel negatif sablon aranir; yoksa isaret sayida KALIR.
+    if (v < 0) {
+      if (s.sentence_neg) return s.sentence_neg.replace('{v}', shown);
+      const signed = unit === '%' ? num(v, 1) : shown;
+      return s.sentence.replace('{v}', signed);
     }
-    return out;
+    return s.sentence.replace('{v}', shown);
   }
 
   function plain(metric) {
@@ -254,7 +271,7 @@ window.Fmt = (function () {
     return `<span class="chip ${map[action] || 'gray'}">${esc(action)}</span>`;
   }
 
-  return { setThresholds, spec, isNum, num, metricValue, money, pct, signedPct,
+  return { setThresholds, spec, isNum, num, metricValue, money, pct, pctText, signedPct,
            pnlClass, colorFor, arrow, fillRatio, label, cell, chip,
            percentileBar, esc, date, daysLabel, trackBadge, decisionBadge,
            sentence, plain, unitName, percentileSentence, ownHistorySentence,

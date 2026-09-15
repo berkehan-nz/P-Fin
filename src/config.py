@@ -931,12 +931,59 @@ METRIC_PLAIN = {
                              "Nakit marji 3 yilda {v} puan degisti"),
 }
 
+# NEGATIF DEGERDE ANLAMI TERSINE DONEN CUMLELER.
+#
+# Pano "Ne anlama geliyor" sutununda sayiyi MUTLAK degerle yaziyordu; boylece
+# nakit YAKAN bir sirket "Her 100 dolarlik satistan 8,2 dolar serbest nakit
+# kaliyor" diye okunuyordu ve fiyatin KUCULME varsaydigi bir hisse "yilda %2,9
+# buyume varsayiyor" diye gorunuyordu. Tam tersi. Bu sutun finans bilmeyen
+# birinin okumasi icin var; yanlis yonde bir cumle, ham sayidan daha zararli.
+#
+# Buradaki sablonlar MUTLAK deger alir (isaret zaten cumlede tasiniyor).
+# Bir metrik burada yoksa isaret sayinin onunde korunur (orn. "-%8,2"),
+# hicbir kosulda sessizce dusurulmez.
+METRIC_SENTENCE_NEG = {
+    "fcf_yield_ev": "Sirket nakit uretmiyor; isletme degerinin yilda %{v} kadarini yakiyor",
+    "fcf_yield_mcap": "Sirket nakit uretmiyor; piyasa degerinin yilda %{v} kadarini yakiyor",
+    "earnings_yield": "Faaliyet kari NEGATIF; tamamini alsan yilda %{v} zarar demek",
+    "rev_growth_ttm": "Satislar bir yilda %{v} AZALDI",
+    "rev_cagr_3y": "3 yildir yilda ortalama %{v} KUCULUYOR",
+    "gross_margin": "Her 100 dolarlik satis {v} dolar ZARARLA yapiliyor "
+                    "(satis maliyeti hasilattan buyuk)",
+    "operating_margin": "Her 100 dolarlik satista {v} dolar faaliyet ZARARI var",
+    "fcf_margin": "Her 100 dolarlik satista {v} dolar nakit YAKILIYOR",
+    "ebitda_margin": "Her 100 dolarlik satista {v} dolar FAVOK ZARARI var",
+    "roic": "Yatirilan sermaye yilda %{v} ZARAR uretiyor",
+    "share_count_change_1y": "Hisse sayisi bir yilda %{v} AZALDI — geri alim var, "
+                             "ortaklik payin artiyor",
+    "implied_growth": "Bu fiyat, nakit akisinin yilda %{v} KUCULMESINI varsayiyor",
+    "return_3m": "3 ayda %{v} KAYBETTIRDI",
+    "return_6m": "6 ayda %{v} KAYBETTIRDI",
+    "return_12m": "12 ayda %{v} KAYBETTIRDI",
+    "rel_strength_3m": "3 ayda Nasdaq 100'un %{v} GERISINDE kaldi",
+    "rel_strength_6m": "6 ayda Nasdaq 100'un %{v} GERISINDE kaldi",
+    "rel_strength_12m": "12 ayda Nasdaq 100'un %{v} GERISINDE kaldi",
+    "pct_off_52w_high": "1 yilin zirvesinin %{v} USTUNDE",
+    "gross_margin_change_3y": "Brut marj 3 yilda {v} puan GERILEDI",
+    "operating_margin_change_3y": "Faaliyet marji 3 yilda {v} puan GERILEDI",
+    "fcf_margin_change_3y": "Nakit marji 3 yilda {v} puan GERILEDI",
+    "net_debt_to_ebitda": "Sirket NET NAKIT pozisyonunda; borcu nakdinden az",
+    "sbc_to_revenue": "Satislarin %{v} kadari calisana hisse olarak veriliyor",
+}
+
+# "farkli" yon bilgisi tasimiyordu; pozitif taraf da acik yazilmali.
+for _k, _n in (("rel_strength_3m", 3), ("rel_strength_6m", 6), ("rel_strength_12m", 12)):
+    METRIC_PLAIN[_k] = (METRIC_PLAIN[_k][0], METRIC_PLAIN[_k][1],
+                        f"{_n} ayda Nasdaq 100'un %{{v}} ONUNDE")
+
 # Aciklamalari esik tanimlarina yedir
 for _key, (_plain, _unit, _sentence) in METRIC_PLAIN.items():
     if _key in THRESHOLDS:
         THRESHOLDS[_key]["plain"] = _plain
         THRESHOLDS[_key]["unit_name"] = _unit
         THRESHOLDS[_key]["sentence"] = _sentence
+        if _key in METRIC_SENTENCE_NEG:
+            THRESHOLDS[_key]["sentence_neg"] = METRIC_SENTENCE_NEG[_key]
 
 # Puan bloklarinin sade aciklamalari
 SCORE_PLAIN = {

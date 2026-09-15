@@ -133,8 +133,28 @@ def _refresh_price_derived(card: dict, quote: dict, benchmark: list) -> None:
         _set(cells, "fcf_yield_mcap",
              (fcf / mcap * 100) if (fcf is not None and mcap > 0) else None)
 
+        # PEG, pe'den turer; pe her gun yenilenirken peg birakiliyordu ve
+        # ikisi gunler icinde birbirinden kopuyordu (%13'e varan sapma).
+        growth = num((cells.get("rev_growth_ttm") or {}).get("value"))
+        _set(cells, "peg",
+             div(num((cells.get("pe") or {}).get("value")), growth)
+             if (growth or 0) > 0 else None)
+
+        # IMA EDILEN BUYUME EV'YE BAGLI. Asagida EV guncelleniyordu ama ima
+        # edilen buyume eski EV'den kalma olarak duruyordu: ters DCF bolumu
+        # bugunun isletme degerini dunun varsayimiyla birlikte gosteriyordu.
+        from .scores import implied_growth as _implied_growth
+        ig = _implied_growth(fcf, ev)
+        _set(cells, "implied_growth", ig)
+        actual = num((cells.get("rev_cagr_3y") or {}).get("value"))
+        _set(cells, "implied_vs_actual_growth",
+             (ig / actual) if (ig is not None and ig > 0
+                               and actual is not None and actual > 0) else None)
+
         card["reverse_dcf"] = {**(card.get("reverse_dcf") or {}),
-                               "enterprise_value_musd": round(ev, 1)}
+                               "enterprise_value_musd": round(ev, 1),
+                               "implied_growth_pct": ig,
+                               "actual_growth_pct": actual}
 
     # --- momentum ---
     history = quote.get("history") or []
@@ -157,13 +177,19 @@ def _refresh_price_derived(card: dict, quote: dict, benchmark: list) -> None:
 
 
 def _set(cells: dict, key: str, value) -> None:
-    """Bir metrik hucresini gunceller; yuzdelikler haftalik kosuda yenilenir."""
+    """Bir metrik hucresini gunceller; yuzdelikler haftalik kosuda yenilenir.
+
+    Yuvarlama ve renk TAM YENIDEN URETIMLE AYNI kurali kullanmali: burada
+    sabit 3 haneye yuvarlanirsa ayni metrik, kartin en son hangi kosu
+    tarafindan yazildigina gore farkli hassasiyette gorunur.
+    """
+    from .cards import _round
     from .config import color_for
     from .util import num
-    v = num(value)
+    v = _round(num(value), key)
     cell = cells.setdefault(key, {"sector_pct": None, "own_5y_pct": None,
                                   "pct_basis": "none"})
-    cell["value"] = round(v, 3) if v is not None else None
+    cell["value"] = v
     cell["color"] = color_for(key, v)
 
 

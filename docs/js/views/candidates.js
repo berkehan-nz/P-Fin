@@ -194,9 +194,15 @@ window.ViewCandidates = (function () {
       ev_ebit: (x) => `${Fmt.num(x, 1)} yilda kendini oder`,
       ev_sales: (x) => `1$ satis icin ${Fmt.num(x, 1)}$`,
       ev_gross_profit: (x) => `brut karin ${Fmt.num(x, 1)} kati`,
-      fcf_yield_ev: (x) => `yilda %${Fmt.num(x, 1)} nakit getiri`,
-      roic: (x) => `sermaye getirisi %${Fmt.num(x, 0)}`,
-      rev_growth_ttm: (x) => `satislar %${Fmt.num(x, 1)} ${x < 0 ? 'dustu' : 'artti'}`,
+      // Negatifte hem isaret yeri hem de fiil degisir: nakit "getiri" degil
+      // "yakim"dir, sermaye "getiri" degil "zarar" uretir.
+      fcf_yield_ev: (x) => x < 0
+        ? `yilda ${Fmt.pctText(Math.abs(x), 1)} nakit yakiyor`
+        : `yilda ${Fmt.pctText(x, 1)} nakit getiri`,
+      roic: (x) => x < 0
+        ? `sermaye ${Fmt.pctText(Math.abs(x), 0)} zarar uretiyor`
+        : `sermaye getirisi ${Fmt.pctText(x, 0)}`,
+      rev_growth_ttm: (x) => `satislar ${Fmt.pctText(Math.abs(x), 1)} ${x < 0 ? 'dustu' : 'artti'}`,
       rule_of_40: (x) => `buyume+nakit = ${Fmt.num(x, 0)}`,
     };
     return map[key] ? map[key](v) : '';

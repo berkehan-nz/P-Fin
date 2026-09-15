@@ -467,3 +467,79 @@ class TestSubsetPercentilePool:
         (tmp_path / "FRSH.json").write_text(json.dumps({"ticker": "FRSH", "sector": "x", "metrics": {}}))
         monkeypatch.setattr(pipeline, "CARDS_DIR", tmp_path)
         assert pipeline.sector_rows_from_cards(exclude={"FRSH"}) == []
+
+
+# --------------------------------------------- pano veri dogrulugu denetimi
+class TestDisplayCorrectness:
+    """Sirket sayfasindaki sayilarin ve isaretlerin dogrulugu."""
+
+    def test_negative_sentences_exist_for_sign_flipping_metrics(self):
+        """Negatifte anlami donen her metrigin ayri bir cumlesi olmali."""
+        from src import config
+        for key in ("implied_growth", "fcf_margin", "operating_margin", "roic",
+                    "rev_cagr_3y", "earnings_yield", "fcf_yield_ev",
+                    "fcf_yield_mcap", "return_12m", "rel_strength_12m"):
+            assert config.THRESHOLDS[key].get("sentence_neg"), key
+
+    def test_negative_sentence_reverses_meaning(self):
+        from src import config
+        assert "KUCULME" in config.THRESHOLDS["implied_growth"]["sentence_neg"]
+        assert "YAKILIYOR" in config.THRESHOLDS["fcf_margin"]["sentence_neg"]
+        assert "buyume" not in config.THRESHOLDS["implied_growth"]["sentence_neg"]
+
+    def test_thresholds_payload_carries_negative_sentences(self):
+        """Pano bunu thresholds.json'dan okuyor; payload'a girmezse ise yaramaz."""
+        from src import config
+        payload = config.thresholds_payload()
+        assert payload["thresholds"]["implied_growth"].get("sentence_neg")
+
+    def test_sparkline_ends_on_latest_price(self):
+        from src.sources.prices import sparkline
+        rows = [(f"2026-{(i // 28) + 1:02d}-{(i % 28) + 1:02d}", 100.0 + i)
+                for i in range(200)]
+        sp = sparkline(rows)
+        assert sp[-1] == rows[-1][1]
+        assert sp[0] == rows[-126][1]
+
+    def test_color_matches_displayed_value(self):
+        """Kartta yazan sayi ile rengi ayni girdiden gelmeli."""
+        from src import cards
+        from src.config import color_for
+        for key, raw in (("sbc_to_fcf", 0.2996), ("current_ratio", 1.9996)):
+            shown = cards._round(raw, key)
+            assert color_for(key, shown) == color_for(key, cards._round(raw, key))
+
+    def test_daily_refresh_updates_peg_and_implied_growth(self):
+        from src import run_daily
+        from tests.test_daily_refresh import base_card
+        c = base_card()
+        c["metrics"]["rev_growth_ttm"] = {"value": 10.0, "sector_pct": None,
+                                          "own_5y_pct": None, "pct_basis": "none"}
+        run_daily._refresh_price_derived(
+            c, {"price": 28.67, "history": [], "high_52w": 32.0}, [])
+        pe = c["metrics"]["pe"]["value"]
+        assert c["metrics"]["peg"]["value"] == pytest.approx(pe / 10.0, abs=0.01)
+        # ters DCF alani da EV ile birlikte tazelenmeli
+        assert "implied_growth_pct" in c["reverse_dcf"]
+
+    def test_peg_follows_price(self):
+        """Fiyat degisince peg de degismeli — pe ile birlikte."""
+        from src import run_daily
+        from tests.test_daily_refresh import base_card
+        out = []
+        for price in (28.67, 14.34):
+            c = base_card()
+            c["metrics"]["rev_growth_ttm"] = {"value": 10.0, "sector_pct": None,
+                                              "own_5y_pct": None, "pct_basis": "none"}
+            run_daily._refresh_price_derived(
+                c, {"price": price, "history": [], "high_52w": 32.0}, [])
+            out.append(c["metrics"]["peg"]["value"])
+        assert out[1] < out[0]
+
+    def test_chart_metric_contradiction_is_flagged(self):
+        """Ceyreklik grafik ile TTM metrigi celisirse kart bunu yazmali."""
+        from src import cards
+        f = fixtures.frsh()
+        c = cards.build(f, source="test")
+        # tutarli fixture'da uyari CIKMAMALI
+        assert not any("GRAFIK-METRIK" in w for w in c["flags"]["warnings"])

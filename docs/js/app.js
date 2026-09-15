@@ -42,6 +42,12 @@ window.App = (function () {
   async function route() {
     const hash = location.hash.replace(/^#/, '') || '/overview';
 
+    // SAYFA ICI CAPA. Rotalar '/' ile baslar; '#metrikler' gibi bir capa
+    // rota DEGILDIR. Eskiden buraya dusuyor, bilinmeyen rota sayilip
+    // genel bakisa yonlendiriyordu — sirket sayfasindaki icindekiler
+    // menusu bu yuzden kullaniciyi disari atiyordu.
+    if (hash && hash[0] !== '/') return;
+
     const company = hash.match(/^\/company\/([A-Za-z0-9.\-]+)$/);
     if (company) {
       show('company');

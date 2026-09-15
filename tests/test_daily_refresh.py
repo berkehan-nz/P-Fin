@@ -34,12 +34,21 @@ class TestPriceRefresh:
         assert c["metrics"]["fcf_yield_ev"]["value"] == pytest.approx(9.098, abs=0.01)
 
     def test_repeated_refresh_does_not_drift(self):
-        """Ayni fiyatla 10 kez tazelemek carpani kaydirmamali."""
+        """Ayni fiyatla 10 kez tazelemek carpani kaydirmamali.
+
+        Sabit bir sayiya degil, KARARLILIGA bakilir: degerler artik gosterilen
+        hassasiyete yuvarlandigi icin sabit beklenti gereksiz yere kirilgandi.
+        """
         c = base_card()
         quote = {"price": 28.67, "history": [], "high_52w": 32.0}
-        for _ in range(10):
+        run_daily._refresh_price_derived(c, quote, [])
+        first = {k: c["metrics"][k]["value"] for k in
+                 ("ev_ebit", "fcf_yield_ev", "pe", "peg", "ev_sales")}
+        for _ in range(9):
             run_daily._refresh_price_derived(c, quote, [])
-        assert c["metrics"]["ev_ebit"]["value"] == pytest.approx(14.702, abs=0.001)
+        after = {k: c["metrics"][k]["value"] for k in first}
+        assert after == first
+        assert c["metrics"]["ev_ebit"]["value"] == pytest.approx(14.70, abs=0.01)
 
     def test_cheaper_price_lifts_fcf_yield(self):
         c = base_card()

@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-14",
+  "as_of": "2026-09-15",
   "headline_metrics": {
     "A": [
       "ev_ebit",
@@ -269,6 +269,7 @@
       "label": "Kazanc verimi",
       "plain": "Faaliyet karinin, sirketin toplam degerine orani",
       "sentence": "Tamamini alsan faaliyet kari yilda %{v} getiri demek",
+      "sentence_neg": "Faaliyet kari NEGATIF; tamamini alsan yilda %{v} zarar demek",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 5
@@ -329,6 +330,7 @@
       "label": "FCF marji",
       "plain": "100 dolarlik satistan gercekten cebe giren nakit",
       "sentence": "Her 100 dolarlik satistan {v} dolar serbest nakit kaliyor",
+      "sentence_neg": "Her 100 dolarlik satista {v} dolar nakit YAKILIYOR",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 10
@@ -341,6 +343,7 @@
       "label": "FCF verimi (EV)",
       "plain": "Urettigi serbest nakit, sirketin toplam degerinin yuzde kaci",
       "sentence": "Sirketi tamamen alsan, yatirdigin paranin yilda %{v} kadari nakit olarak geri donerdi",
+      "sentence_neg": "Sirket nakit uretmiyor; isletme degerinin yilda %{v} kadarini yakiyor",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 3
@@ -353,6 +356,7 @@
       "label": "FCF verimi (Piyasa degeri)",
       "plain": "Serbest nakit, hisselerin toplam degerinin yuzde kaci",
       "sentence": "Hisseye odedigin paranin yilda %{v} kadari nakit olarak uretiliyor",
+      "sentence_neg": "Sirket nakit uretmiyor; piyasa degerinin yilda %{v} kadarini yakiyor",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 3
@@ -365,6 +369,7 @@
       "label": "Brut marj",
       "plain": "100 dolarlik satistan, urunun maliyeti dustukten sonra kalan",
       "sentence": "Her 100 dolarlik satistan {v} dolar brut kar kaliyor",
+      "sentence_neg": "Her 100 dolarlik satis {v} dolar ZARARLA yapiliyor (satis maliyeti hasilattan buyuk)",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 30
@@ -389,6 +394,7 @@
       "label": "Ima edilen buyume",
       "plain": "Bugunku fiyat, sirketin yilda ne kadar buyuyecegini varsayiyor",
       "sentence": "Bu fiyat, nakit akisinin yilda %{v} buyumesini varsayiyor",
+      "sentence_neg": "Bu fiyat, nakit akisinin yilda %{v} KUCULMESINI varsayiyor",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_max": 15
@@ -437,6 +443,7 @@
       "label": "Net borc / FAVOK",
       "plain": "Net borc, yillik FAVOK'un kac kati",
       "sentence": "Net borc yillik FAVOK'un {v} kati",
+      "sentence_neg": "Sirket NET NAKIT pozisyonunda; borcu nakdinden az",
       "unit": "x",
       "unit_name": "kat",
       "yellow_max": 3
@@ -449,6 +456,7 @@
       "label": "Faaliyet marji",
       "plain": "100 dolarlik satistan, tum faaliyet giderleri sonrasi kalan",
       "sentence": "Her 100 dolarlik satistan {v} dolar faaliyet kari kaliyor",
+      "sentence_neg": "Her 100 dolarlik satista {v} dolar faaliyet ZARARI var",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 8
@@ -461,6 +469,7 @@
       "label": "52 hafta zirveden uzaklik",
       "plain": "Son 1 yilin en yuksek fiyatindan ne kadar asagida",
       "sentence": "1 yilin zirvesinden %{v} asagida",
+      "sentence_neg": "1 yilin zirvesinin %{v} USTUNDE",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_max": 35
@@ -508,7 +517,8 @@
       "help": "Nasdaq 100'e gore 12 aylik fark.",
       "label": "12 ay goreli getiri",
       "plain": "12 ayda Nasdaq 100'e gore fark",
-      "sentence": "12 ayda Nasdaq 100'den %{v} farkli",
+      "sentence": "12 ayda Nasdaq 100'un %{v} ONUNDE",
+      "sentence_neg": "12 ayda Nasdaq 100'un %{v} GERISINDE kaldi",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": -20
@@ -520,7 +530,8 @@
       "help": "Nasdaq 100'e gore son 3 aylik fark. Bu sistemde momentum 'kim kazandirdi' degil 'dusus durdu mu' olcusudur; sert negatif deger dusen bicak uyarisidir.",
       "label": "3 ay goreli getiri",
       "plain": "3 ayda Nasdaq 100'e gore ne kadar iyi/kotu gitti",
-      "sentence": "3 ayda Nasdaq 100'den %{v} farkli",
+      "sentence": "3 ayda Nasdaq 100'un %{v} ONUNDE",
+      "sentence_neg": "3 ayda Nasdaq 100'un %{v} GERISINDE kaldi",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": -15
@@ -532,7 +543,8 @@
       "help": "Nasdaq 100'e gore fark. Sert negatif deger 'deger tuzagi' riskinin en erken sinyalidir.",
       "label": "6 ay goreli getiri",
       "plain": "6 ayda Nasdaq 100'e gore ne kadar iyi/kotu gitti",
-      "sentence": "6 ayda Nasdaq 100'den %{v} farkli",
+      "sentence": "6 ayda Nasdaq 100'un %{v} ONUNDE",
+      "sentence_neg": "6 ayda Nasdaq 100'un %{v} GERISINDE kaldi",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": -15
@@ -545,6 +557,7 @@
       "label": "12 aylik getiri",
       "plain": "Son 12 ayda hisse ne kadar getirdi",
       "sentence": "12 ayda %{v} getirdi",
+      "sentence_neg": "12 ayda %{v} KAYBETTIRDI",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 0
@@ -557,6 +570,7 @@
       "label": "3 aylik getiri",
       "plain": "Son 3 ayda hisse ne kadar getirdi",
       "sentence": "3 ayda %{v} getirdi",
+      "sentence_neg": "3 ayda %{v} KAYBETTIRDI",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": -10
@@ -569,6 +583,7 @@
       "label": "6 aylik getiri",
       "plain": "Son 6 ayda hisse ne kadar getirdi",
       "sentence": "6 ayda %{v} getirdi",
+      "sentence_neg": "6 ayda %{v} KAYBETTIRDI",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 0
@@ -581,6 +596,7 @@
       "label": "Hasilat BYBO (3y)",
       "plain": "Son 3 yilin ortalama yillik satis buyumesi",
       "sentence": "3 yildir yilda ortalama %{v} buyuyor",
+      "sentence_neg": "3 yildir yilda ortalama %{v} KUCULUYOR",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 5
@@ -593,6 +609,7 @@
       "label": "Hasilat buyumesi (TTM)",
       "plain": "Son 12 ayin satislari, onceki 12 aya gore ne kadar degisti",
       "sentence": "Satislar bir yilda %{v} degisti",
+      "sentence_neg": "Satislar bir yilda %{v} AZALDI",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 5
@@ -605,6 +622,7 @@
       "label": "ROIC",
       "plain": "Isletmeye yatirilan her 100 dolarin yilda kac dolar getirdigi",
       "sentence": "Yatirilan sermaye yilda %{v} getiri uretiyor",
+      "sentence_neg": "Yatirilan sermaye yilda %{v} ZARAR uretiyor",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_min": 8
@@ -653,6 +671,7 @@
       "label": "SBC / Hasilat",
       "plain": "Calisanlara hisse olarak verilenin satislara orani",
       "sentence": "Satislarin %{v} kadari calisana hisse olarak veriliyor",
+      "sentence_neg": "Satislarin %{v} kadari calisana hisse olarak veriliyor",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_max": 15
@@ -665,6 +684,7 @@
       "label": "Hisse sayisi degisimi",
       "plain": "Hisse sayisi bir yilda ne kadar degisti — negatif iyi",
       "sentence": "Hisse sayisi bir yilda %{v} degisti (negatif = geri alim, ortaklik payin artiyor)",
+      "sentence_neg": "Hisse sayisi bir yilda %{v} AZALDI — geri alim var, ortaklik payin artiyor",
       "unit": "%",
       "unit_name": "yuzde",
       "yellow_max": 3

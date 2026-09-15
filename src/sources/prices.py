@@ -182,5 +182,8 @@ def sparkline(history_rows: list[tuple[str, float]], points: int = 60,
         return []
     if len(window) <= points:
         return [round(v, 4) for _, v in window]
-    step = len(window) / points
-    return [round(window[int(i * step)][1], 4) for i in range(points)]
+    # SON NOKTA MUTLAKA ALINMALI. Onceki surum int(i * len/points) kullaniyordu;
+    # en buyuk indeks len-1'e hic ulasmiyor, grafik birkac gun geride bitiyordu.
+    # Kartta guncel fiyat yaninda duran grafik ondan %5-8 sapabiliyordu.
+    step = (len(window) - 1) / (points - 1)
+    return [round(window[round(i * step)][1], 4) for i in range(points)]

@@ -115,7 +115,11 @@ def build(f: Fundamentals, *,
                 "value": _round(value, key),
                 "sector_pct": _round(sector_pcts.get(key), None, 1),
                 "own_5y_pct": _round(own_pcts.get(key), None, 1),
-                "color": color_for(key, value),
+                # Renk GOSTERILEN degerden hesaplanir. Yuvarlanmamis degerden
+                # hesaplanirsa kartta "0,30x" yazip sari boyanabiliyor; oysa
+                # ekrandaki kurala gore 0,30 yesil. Sayi ile rengi ayni girdiye
+                # bagla ki ikisi birbirini yalanlamasin.
+                "color": color_for(key, _round(value, key)),
                 "pct_basis": pct_basis.get(key, "none"),
             }
     # bloklarda gecmeyen ama gerekli olanlar
@@ -129,7 +133,11 @@ def build(f: Fundamentals, *,
                 "value": _round(value, key),
                 "sector_pct": _round(sector_pcts.get(key), None, 1),
                 "own_5y_pct": None,
-                "color": color_for(key, value),
+                # Renk GOSTERILEN degerden hesaplanir. Yuvarlanmamis degerden
+                # hesaplanirsa kartta "0,30x" yazip sari boyanabiliyor; oysa
+                # ekrandaki kurala gore 0,30 yesil. Sayi ile rengi ayni girdiye
+                # bagla ki ikisi birbirini yalanlamasin.
+                "color": color_for(key, _round(value, key)),
                 "pct_basis": pct_basis.get(key, "none"),
             }
 
@@ -193,6 +201,53 @@ def build(f: Fundamentals, *,
 
     # --- seriler (12 ceyrek grafikleri) ---
     series = _build_series(f)
+
+    # CEYREKLIK GRAFIK ILE TTM METRIGI CELISIYOR MU?
+    # Bir kalem yillik tablodan geldiginde grafik ceyrekleri, metrik ise mali
+    # yili gosterir. INOD'da grafik %44 brut marj cizerken metrik %31 diyordu;
+    # ayni sayfada iki farkli gercek. Genel "tutmayabilir" uyarisi hangi
+    # grafigin tutmadigini soylemiyor — farki OLC ve yaz.
+    if series.get("basis") != "annual":
+        for field, label, ttm_value in (
+            ("revenue", "Satislar", num(meta.get("revenue_ttm_musd"))),
+            ("fcf", "Serbest nakit akisi", num(meta.get("fcf_ttm_musd"))),
+        ):
+            q = [num(x) for x in (series.get(field) or [])[-4:]]
+            if len(q) == 4 and all(x is not None for x in q) and ttm_value:
+                diff = abs(sum(q) - ttm_value) / abs(ttm_value)
+                if diff > 0.05:
+                    warnings.append(
+                        f"GRAFIK-METRIK CELISKISI: {label} grafiginin son 4 ceyregi "
+                        f"{sum(q):,.0f} mn $ ediyor ama TTM {ttm_value:,.0f} mn $ "
+                        f"(%{diff * 100:.0f} fark). Bu kalem yillik tablodan gelmis "
+                        f"olabilir; grafik ile metrik ayni donemi anlatmiyor.")
+
+        # TEK CEYREK AYKIRI DEGERI. CRI'de brut marj %43'ten %67'ye sicriyor;
+        # perakendede bir ceyrekte 24 puan marj artisi gercek degil, etiket
+        # kapsami sorunudur (ceyreklik hasilata kumulatif brut kar gibi).
+        # Sayiyi sessizce duzeltmek yanlis olur — isaretle, insan baksin.
+        gm_all = [num(x) for x in (series.get("gross_margin") or []) if num(x) is not None]
+        if len(gm_all) >= 5:
+            ordered = sorted(gm_all[:-1])
+            median = ordered[len(ordered) // 2]
+            last = gm_all[-1]
+            if abs(last - median) > 15:
+                warnings.append(
+                    f"AYKIRI CEYREK: son ceyregin brut marji %{last:.1f}, onceki "
+                    f"ceyreklerin ortancasi %{median:.1f}. {abs(last - median):.0f} "
+                    f"puanlik sicrama muhtemelen XBRL etiket kapsami sorunudur; "
+                    f"bu ceyrek TTM'e de giriyor, dogrulanmadan guvenme.")
+
+        gm_series = [num(x) for x in (series.get("gross_margin") or []) if num(x) is not None]
+        gm_ttm = m.get("gross_margin")
+        if len(gm_series) >= 4 and gm_ttm is not None:
+            recent = sum(gm_series[-4:]) / 4
+            if abs(recent - gm_ttm) > 8:
+                warnings.append(
+                    f"GRAFIK-METRIK CELISKISI: Brut marj grafiginin son 4 ceyrek "
+                    f"ortalamasi %{recent:.1f} ama TTM brut marj %{gm_ttm:.1f}. "
+                    f"Aradaki {abs(recent - gm_ttm):.1f} puanlik fark, kalemlerin "
+                    f"farkli donemlerden geldigini gosterir.")
     series["price_sparkline"] = prices.sparkline(f.price_history)
 
     card = {
