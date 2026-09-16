@@ -401,6 +401,62 @@ section[id] { scroll-margin-top: calc(var(--topbar-h) + 12px); }
 [data-theme="light"] .funnel-bar { color: #fff; }
 .funnel-label { width: 130px; flex-shrink: 0; font-size: 12.5px; }
 
+/* ------------------------------------------------------ kuresel piyasa */
+.mkt-tag {
+  font-size: 9px; color: var(--text-3); text-transform: uppercase;
+  letter-spacing: .06em; font-weight: 650; margin-bottom: 2px;
+}
+.mkt-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mkt-row {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(min(168px, 100%), 1fr));
+}
+.mkt-tile {
+  background: var(--bg-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 9px 11px; min-width: 0;
+  box-shadow: var(--shadow);
+}
+.mkt-value {
+  font-size: 17px; font-weight: 650; letter-spacing: -.02em;
+  margin: 1px 0 2px;
+}
+
+/* ------------------------------------------------------ kritik tarihler */
+.cal-head {
+  font-size: 11px; color: var(--text-3); text-transform: uppercase;
+  letter-spacing: .05em; font-weight: 650;
+  padding: 9px 13px; background: var(--bg-3);
+  border-bottom: 1px solid var(--line);
+}
+.cal-head:not(:first-child) { border-top: 1px solid var(--line); }
+.cal-row {
+  display: grid; align-items: center; gap: 9px;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  padding: 8px 13px; border-bottom: 1px solid var(--line-soft);
+}
+.cal-row:last-child { border-bottom: none; }
+.cal-row:hover { background: var(--bg-hover); }
+.cal-title { font-size: 12.5px; min-width: 0; overflow-wrap: anywhere; }
+.cal-detail { white-space: nowrap; }
+.cal-when { white-space: nowrap; text-align: right; }
+
+/* ------------------------------------------------------------ haberler */
+.news-row {
+  display: flex; gap: 9px; align-items: flex-start;
+  padding: 9px 13px; border-bottom: 1px solid var(--line-soft);
+}
+.news-row:last-child { border-bottom: none; }
+.news-row:hover { background: var(--bg-hover); }
+.news-tag { flex-shrink: 0; }
+
+@media (max-width: 760px) {
+  .mkt-row { grid-template-columns: repeat(auto-fill, minmax(min(142px, 100%), 1fr)); }
+  .mkt-value { font-size: 15px; }
+  /* Takvimde aciklama alt satira gecer; dort sutun 390px'e sigmaz. */
+  .cal-row { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .cal-detail { grid-column: 2 / -1; margin-top: -4px; }
+}
+
 /* ---------------------------------------------------------- huni akisi */
 /* Her asama bir kart; cubugun genisligi O ASAMADAN GECEN sirket sayisiyla
    orantili. Daralma boylece okunmadan once GORULUR. */

@@ -80,6 +80,8 @@ window.DataLayer = (function () {
     funnelLog:     () => get('funnel_log.json', { runs: [] }),
     scanState:     () => get('scan_state.json', null),
     survivors:     () => get('survivors.json', { count: 0, survivors: [] }),
+    pulse:         () => get('pulse.json', { market: [], news: [],
+                                             calendar: { upcoming: [], recent: [] } }),
     macro:         () => get('macro.json', { series: {} }),
     overview:      () => get('overview.json', { movers: [], news: [] }),
     portfolio:     () => get('portfolio_state.json', { positions: [], summary: {}, warnings: [] }),

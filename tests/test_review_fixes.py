@@ -604,3 +604,94 @@ class TestAuditTolerance:
         # Buyuk paydada yuvarlama onemsiz; ayni goreli sapma HATA olmali
         a.check({"ticker": "X"}, "oran", 10.0, 10.5, den=5000.0)
         assert a.errors
+
+
+# ------------------------------------------------------ canli genel bakis
+class TestMarketSnapshot:
+    def test_risk_note_reads_vix(self):
+        from src.sources import market
+        assert "gergin" in market.risk_note([{"symbol": "^VIX", "value": 31.0}])
+        assert "rehavet" in market.risk_note([{"symbol": "^VIX", "value": 11.0}])
+        assert "normal" in market.risk_note([{"symbol": "^VIX", "value": 18.0}])
+        assert market.risk_note([]) is None
+
+    def test_one_broken_symbol_does_not_kill_the_strip(self, monkeypatch):
+        """Tek endeks cekilemezse butun serit bos kalmamali."""
+        import pandas as pd
+        from src.sources import market
+
+        def fake(symbol, days=40):
+            if symbol == "BAD":
+                raise RuntimeError("yok")
+            return pd.DataFrame({"Close": [100.0, 102.0, 101.0, 105.0, 110.0, 108.0]},
+                                index=pd.to_datetime(
+                                    ["2026-09-08", "2026-09-09", "2026-09-10",
+                                     "2026-09-11", "2026-09-12", "2026-09-15"]))
+        monkeypatch.setattr(market, "_history", fake)
+        rows = market.snapshot([("BAD", "Bozuk", "Hisse", "puan"),
+                                ("OK", "Calisan", "Hisse", "puan")])
+        assert [r["symbol"] for r in rows] == ["OK"]
+        assert rows[0]["change_1d_pct"] == pytest.approx(-1.82, abs=0.01)
+        assert rows[0]["change_5d_pct"] == pytest.approx(8.0, abs=0.01)
+
+
+class TestCriticalDates:
+    def _subs(self, forms, dates):
+        return {"filings": {"recent": {
+            "form": forms, "filingDate": dates,
+            "accessionNumber": ["0001-24-000001"] * len(forms),
+            "primaryDocument": ["a.htm"] * len(forms)}}}
+
+    def test_form4_noise_is_excluded(self, monkeypatch):
+        """Form 4 gunde onlarca geliyor ve yon tasimiyor; takvimi bogar."""
+        from src.sources import calendar_src, edgar_api
+        from src.util import today_iso
+        today = today_iso()
+        monkeypatch.setattr(edgar_api, "submissions",
+                            lambda cik: self._subs(["4", "8-K", "4"], [today] * 3))
+        out = calendar_src.sec_events({"AAA": 123})
+        assert len(out) == 1
+        assert out[0]["title"] == "AAA · 8-K"
+        assert out[0]["detail"] == "Onemli olay bildirimi"
+
+    def test_old_filings_are_not_listed(self, monkeypatch):
+        from src.sources import calendar_src, edgar_api
+        monkeypatch.setattr(edgar_api, "submissions",
+                            lambda cik: self._subs(["8-K"], ["2020-01-01"]))
+        assert calendar_src.sec_events({"AAA": 123}) == []
+
+    def test_earnings_only_for_tracked_tickers(self):
+        from datetime import date, timedelta
+        from src.sources import calendar_src
+        soon = (date.today() + timedelta(days=5)).isoformat()
+        far = (date.today() + timedelta(days=400)).isoformat()
+        out = calendar_src.earnings_events(
+            {"AAA": soon, "BBB": soon, "CCC": far}, {"AAA", "CCC"})
+        assert [e["ticker"] for e in out] == ["AAA"]   # BBB takipsiz, CCC cok uzak
+
+    def test_build_splits_past_and_future(self, monkeypatch):
+        from datetime import date, timedelta
+        from src.sources import calendar_src
+        monkeypatch.setattr(calendar_src, "macro_releases", lambda **kw: [
+            {"date": (date.today() + timedelta(days=3)).isoformat(), "kind": "makro",
+             "title": "TUFE", "detail": "enflasyon", "ticker": None},
+            {"date": (date.today() - timedelta(days=3)).isoformat(), "kind": "makro",
+             "title": "Eski", "detail": "x", "ticker": None}])
+        monkeypatch.setattr(calendar_src, "sec_events", lambda *a, **k: [])
+        out = calendar_src.build(earnings={}, tickers=set(), cik_by_ticker={})
+        assert [e["title"] for e in out["upcoming"]] == ["TUFE"]
+        assert [e["title"] for e in out["recent"]] == ["Eski"]
+
+
+class TestMacroNotClobbered:
+    def test_empty_fetch_keeps_existing_file(self, tmp_path, monkeypatch):
+        """FRED cevap vermeyince calisan pano 'veri yok'a dusmemeli."""
+        import json
+        from src import pipeline
+        from src.sources import fred_api
+        path = tmp_path / "macro.json"
+        path.write_text(json.dumps({"series": {"cpi_yoy": {"value": 3.3}}}))
+        monkeypatch.setattr(pipeline, "DATA_DIR", tmp_path)
+        monkeypatch.setattr(fred_api, "snapshot", lambda: {})
+        pipeline.write_macro()
+        assert json.loads(path.read_text())["series"]["cpi_yoy"]["value"] == 3.3

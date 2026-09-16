@@ -179,7 +179,19 @@ def sector_rows_from_cards(exclude: set[str] | None = None) -> list[dict]:
 
 
 def write_macro() -> bool:
+    """FRED makro anlik goruntusu.
+
+    BOS SONUC IYI VERIYI EZMEZ. Anahtar tanimsizsa veya FRED o an
+    cevap vermiyorsa snapshot bos doner; onu yazmak calisan panoyu
+    "veri yok" haline getirir. Bayat makro, eksik makrodan iyidir —
+    tarih damgasi zaten kartta gorunuyor.
+    """
     snapshot = try_fetch(fred_api.snapshot, label="FRED makro") or {}
+    if not snapshot:
+        existing = read_json(DATA_DIR / "macro.json", {}) or {}
+        if existing.get("series"):
+            print("  [makro] yeni veri alinamadi; mevcut dosya korundu")
+            return False
     return write_json(DATA_DIR / "macro.json",
                       {"series": snapshot, "source": "fred"})
 
@@ -239,8 +251,21 @@ def write_portfolio_state(quotes: dict, bench: dict, ctx: dict) -> bool:
 
 
 def write_overview(ctx: dict, quotes: dict) -> bool:
-    """Genel bakis ekraninin "bugun ne olmus" seridi."""
+    """Genel bakis ekraninin "bugun ne olmus" seridi.
+
+    KAPSAM: yalnizca izleme listesi + portfoy bakiliyordu. Ikisi de bosken
+    genel bakis TAMAMEN bos kaliyordu — 91 kartta haber varken sayfa
+    hicbirini gostermiyordu. Adaylar da dahil: sistemin ilgilendigi kume
+    zaten onlar.
+    """
     watched = set(watchlist.tickers()) | set(portfolio.tickers())
+    cand = read_json(DATA_DIR / "candidates.json", {}) or {}
+    rows = [*(cand.get("seed") or []), *(cand.get("candidates") or []),
+            *(cand.get("manual") or [])]
+    rows.sort(key=lambda r: (r.get("scores") or {}).get("total") or -1, reverse=True)
+    for row in rows[:config.PULSE["top_candidates"]]:
+        if row.get("ticker"):
+            watched.add(str(row["ticker"]).upper())
     movers = []
     for ticker in sorted(watched):
         q = quotes.get(ticker) or {}

@@ -4,9 +4,9 @@ window.ViewOverview = (function () {
   const $ = (id) => document.getElementById(id);
 
   async function render() {
-    const [cand, port, macro, ov] = await Promise.all([
+    const [cand, port, macro, ov, pulse] = await Promise.all([
       DataLayer.candidates(), DataLayer.portfolio(),
-      DataLayer.macro(), DataLayer.overview(),
+      DataLayer.macro(), DataLayer.overview(), DataLayer.pulse(),
     ]);
 
     const s = port.summary || {};
@@ -34,45 +34,184 @@ window.ViewOverview = (function () {
           warnCount ? 'c-yellow' : 'c-green'),
     ].join('');
 
-    renderFreshness(cand, port);
-
+    renderFreshness(cand, port, pulse);
+    renderMarket(pulse);
+    renderCalendar(pulse);
+    renderNews(pulse, ov);
     renderMacro(macro);
     renderToday(ov, port);
+  }
+
+  /* ------------------------------------------------------- kuresel piyasa */
+  /* Sayilar tek basina yetmez: VIX 28'in ne demek oldugunu bilmeyen icin 28
+     sadece bir sayidir. Serit, altinda tek cumlelik risk okumasi tasir. */
+  function renderMarket(pulse) {
+    const rows = pulse.market || [];
+    if (!rows.length) {
+      $('marketStrip').innerHTML = `<div class="card muted small">Piyasa verisi yok —
+        <b>Pulse</b> is akisi henuz calismadi. GitHub &rarr; Actions &rarr;
+        Pulse (piyasa nabzi) &rarr; Run workflow.</div>`;
+      return;
+    }
+
+    // TEK IZGARA. Gruplari ayri satirlara bolmek, tek enstrumanli gruplarda
+    // (Risk, Faiz, Kripto) satirin tamamini bos birakiyordu. Grup adi kutunun
+    // uzerinde kucuk bir etiket olarak duruyor; sira gruba gore.
+    const order = ['Hisse', 'Risk', 'Faiz', 'Kur', 'Emtia', 'Kripto'];
+    const sorted = [...rows].sort((a, b) =>
+      order.indexOf(a.group) - order.indexOf(b.group));
+
+    $('marketStrip').innerHTML = `
+      ${pulse.risk_note ? `<p class="small muted" style="margin:-4px 0 10px">
+        ${Fmt.esc(pulse.risk_note)}</p>` : ''}
+      <div class="mkt-row">${sorted.map(tile).join('')}</div>`;
+  }
+
+  function tile(r) {
+    const d = r.change_1d_pct;
+    const digits = Math.abs(r.value) >= 1000 ? 0 : 2;
+    // Kivilcim grafigi NOTR renkte. 'auto' yukseleni yesil yapiyor; VIX ve
+    // USD/TRY yukselince bu YANLIS isaret oluyordu — hemen yanindaki kirmizi
+    // gunluk degisimle celisiyordu. Yon bilgisini sayi tasir, grafik sekli.
+    const spark = Charts.sparkline(r.series || [], { w: 76, h: 22 });
+    return `<div class="mkt-tile" title="${Fmt.esc(r.symbol)} · ${Fmt.esc(r.as_of || '')}">
+      <div class="mkt-tag">${Fmt.esc(r.group)}</div>
+      <div class="tiny dim mkt-label">${Fmt.esc(r.label)}</div>
+      <div class="num mkt-value">${Fmt.num(r.value, digits)}${r.unit === '%' ? '%' : ''}</div>
+      <div class="spread" style="align-items:center">
+        <span class="num tiny ${Fmt.pnlClass(d)}">${Fmt.isNum(d) ? Fmt.signedPct(d) : '—'}</span>
+        ${spark}
+      </div>
+      <div class="tiny dim">5g ${Fmt.isNum(r.change_5d_pct) ? Fmt.signedPct(r.change_5d_pct) : '—'}</div>
+    </div>`;
+  }
+
+  /* ------------------------------------------------------ kritik tarihler */
+  function renderCalendar(pulse) {
+    const cal = pulse.calendar || {};
+    const up = cal.upcoming || [];
+    const recent = cal.recent || [];
+    if (!up.length && !recent.length) {
+      $('calendarBox').innerHTML = `<div class="card muted small">Takvim bos —
+        <b>Pulse</b> is akisi henuz calismadi veya FRED anahtari tanimli degil.</div>`;
+      return;
+    }
+
+    $('calendarBox').innerHTML = `<div class="card" style="padding:0">
+      ${up.length ? `<div class="cal-head">Yaklasan</div>
+        ${up.slice(0, 12).map((e) => calRow(e, true)).join('')}` : ''}
+      ${recent.length ? `<div class="cal-head">Olan biten</div>
+        ${recent.slice(0, 8).map((e) => calRow(e, false)).join('')}` : ''}
+    </div>`;
+
+    $('calendarBox').querySelectorAll('[data-go]').forEach((el) =>
+      el.addEventListener('click', () => { location.hash = `#/company/${el.dataset.go}`; }));
+  }
+
+  const KIND = {
+    makro:   ['accent', 'makro'],
+    bilanco: ['yellow', 'bilanco'],
+    sec:     ['gray',   'SEC'],
+  };
+
+  function calRow(e, upcoming) {
+    const [cls, label] = KIND[e.kind] || ['gray', e.kind];
+    const when = upcoming ? relativeDay(e.date) : Fmt.date(e.date);
+    const clickable = e.ticker ? ` data-go="${Fmt.esc(e.ticker)}" style="cursor:pointer"` : '';
+    const title = e.url
+      ? `<a href="${Fmt.esc(e.url)}" target="_blank" rel="noopener">${Fmt.esc(e.title)}</a>`
+      : Fmt.esc(e.title);
+    return `<div class="cal-row"${clickable}>
+      <span class="chip ${cls}">${Fmt.esc(label)}</span>
+      <span class="cal-title">${title}</span>
+      ${e.detail ? `<span class="tiny dim cal-detail">${Fmt.esc(e.detail)}</span>` : '<span></span>'}
+      <span class="tiny ${upcoming ? 'muted' : 'dim'} cal-when">${Fmt.esc(when)}</span>
+    </div>`;
+  }
+
+  /* "2026-09-18" degil "2 gun sonra" — takvimde onemli olan UZAKLIK. */
+  function relativeDay(iso) {
+    const d = new Date(iso + 'T00:00:00');
+    if (isNaN(d)) return iso;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const n = Math.round((d - today) / 86400000);
+    if (n === 0) return 'BUGUN';
+    if (n === 1) return 'yarin';
+    if (n < 0) return `${Math.abs(n)} gun once`;
+    if (n <= 14) return `${n} gun sonra`;
+    return Fmt.date(iso);
+  }
+
+  /* ------------------------------------------------------------ haberler */
+  function renderNews(pulse, ov) {
+    // Nabiz kosusu taze; yoksa gunluk kosunun yazdigina dus.
+    const news = (pulse.news && pulse.news.length) ? pulse.news : (ov.news || []);
+    if (!news.length) {
+      $('newsBox').innerHTML = `<div class="card muted small">Haber yok —
+        FINNHUB_API_KEY tanimli degilse haber cekilmez.</div>`;
+      return;
+    }
+    $('newsBox').innerHTML = `<div class="card" style="padding:0">
+      ${news.slice(0, 14).map((n) => `<div class="news-row">
+        <span class="chip accent news-tag" data-go="${Fmt.esc(n.ticker)}"
+              style="cursor:pointer">${Fmt.esc(n.ticker)}</span>
+        <div style="min-width:0">
+          <a href="${Fmt.esc(n.url)}" target="_blank" rel="noopener">${Fmt.esc(n.headline)}</a>
+          <div class="tiny dim">${Fmt.esc(n.source)} · ${Fmt.date(n.date)}</div>
+        </div>
+      </div>`).join('')}</div>`;
+
+    $('newsBox').querySelectorAll('[data-go]').forEach((el) =>
+      el.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        location.hash = `#/company/${el.dataset.go}`;
+      }));
   }
 
   /* VERI TAZELIGI — otomasyon sessizce durursa kimse fark etmesin diye.
      GitHub'in zamanlanmis is akislari en iyi cabayla calisir; yogunlukta
      atlanabilir. Panonun bunu SOYLEMESI gerekir, cunku bayat veriyle
      karar vermek yanlis veriyle karar vermek kadar kotudur. */
-  function renderFreshness(cand, port) {
-    const stamp = cand.as_of || port.as_of;
-    const days = daysSince(stamp);
-    const el = $('overviewSubtitle');
+  /* IKI AYRI TAZELIK. Nabiz (piyasa, haber, takvim) saatlik kosuyor;
+     kartlar ve puanlar gunluk. Tek bir "guncel" damgasi ikisini de temsil
+     edemez — hangisinin ne kadar eski oldugu ayri ayri yazilmali. */
+  function renderFreshness(cand, port, pulse) {
+    const cardStamp = cand.as_of || port.as_of;
+    const cardDays = daysSince(cardStamp);
+    const pulseHours = hoursSince(pulse.generated_at);
 
-    let state = 'taze';
-    if (days === null) state = 'bilinmiyor';
-    else if (days > 7) state = 'cok_bayat';
-    else if (days > 2) state = 'bayat';
+    const cardText = cardDays === null ? 'kart tarihi okunamadi'
+      : cardDays === 0 ? 'kartlar bugun guncellendi'
+      : `kartlar ${cardDays} gun once guncellendi`;
+    const pulseText = pulseHours === null ? 'nabiz hic calismadi'
+      : pulseHours < 1 ? 'piyasa az once guncellendi'
+      : `piyasa ${pulseHours} saat once guncellendi`;
 
-    const text = {
-      taze: `Veri guncel (${Fmt.date(stamp)})`,
-      bayat: `Veri ${days} gundur guncellenmedi (${Fmt.date(stamp)})`,
-      cok_bayat: `Veri ${days} GUNDUR guncellenmedi (${Fmt.date(stamp)})`,
-      bilinmiyor: 'Veri tarihi okunamadi',
-    }[state];
-
-    el.innerHTML = `${Fmt.esc(text)} · <span class="dim">kaynak: SEC EDGAR,
-      Stooq, Finnhub, FRED</span>`;
+    $('overviewSubtitle').innerHTML =
+      `${Fmt.esc(pulseText)} · ${Fmt.esc(cardText)} · `
+      + `<span class="dim">kaynak: SEC EDGAR, yfinance, Finnhub, FRED</span>`;
 
     const banner = $('freshnessBanner');
-    if (state === 'taze') { banner.innerHTML = ''; return; }
+    const stale = [];
+    if (pulseHours === null || pulseHours > 8) stale.push(`piyasa verisi (${pulseText})`);
+    if (cardDays === null || cardDays > 2) stale.push(`kartlar (${cardText})`);
+
+    if (!stale.length) { banner.innerHTML = ''; return; }
     banner.innerHTML = `<div class="banner">
-      <b>Veri bayat olabilir.</b> ${Fmt.esc(text)}.
-      Otomatik guncelleme calismiyorsa GitHub &rarr; Actions sekmesinden
-      <b>Scan</b> ve <b>Daily</b> is akislarinin son kosularina bak;
-      zamanlanmis kosular GitHub'da yogunlukta atlanabiliyor.
-      Elle calistirmak icin: Actions &rarr; ilgili is akisi &rarr; Run workflow.
+      <b>Veri bayat olabilir:</b> ${Fmt.esc(stale.join(', '))}.
+      GitHub zamanlanmis is akislarini EN IYI CABAYLA calistirir ve yogunlukta
+      atlar; saatlik kurulu bir kosu pratikte birkac saatte bir doner.
+      Elle tetiklemek icin: Actions &rarr; <b>Pulse</b> (piyasa) veya
+      <b>Daily</b> (kartlar) &rarr; Run workflow.
     </div>`;
+  }
+
+  function hoursSince(iso) {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (isNaN(d)) return null;
+    return Math.floor((Date.now() - d.getTime()) / 3600000);
   }
 
   function daysSince(iso) {
@@ -116,31 +255,21 @@ window.ViewOverview = (function () {
 
   function renderToday(ov, port) {
     const movers = ov.movers || [];
-    const news = ov.news || [];
-    if (!movers.length && !news.length) {
+    if (!movers.length) {
       $('todayStrip').innerHTML =
-        `<div class="card muted small">Portfoy ve izleme listesi bos, ya da veri hatti
-         henuz calismadi. Sirket ekledikten sonra son 24 saatin fiyat hareketleri
-         ve haberleri burada gorunur.</div>`;
+        `<div class="card muted small">Fiyat hareketi yok — gunluk kosu henuz
+         calismadi. Takip edilen sirketlerin son 24 saatlik hareketi burada gorunur.</div>`;
       return;
     }
 
     const moverHtml = movers.length ? `<div class="card">
-      <h3 style="margin-top:0">Fiyat hareketleri</h3>
       <div class="row">${movers.map((m) => `
         <span class="chip ${m.change_1d_pct > 0 ? 'green' : m.change_1d_pct < 0 ? 'red' : 'gray'}">
           <b>${Fmt.esc(m.ticker)}</b> ${Fmt.signedPct(m.change_1d_pct)}</span>`).join('')}
       </div></div>` : '';
 
-    const newsHtml = news.length ? `<div class="card" style="margin-top:12px">
-      <h3 style="margin-top:0">Haberler</h3>
-      ${news.map((n) => `<div style="padding:6px 0;border-bottom:1px solid var(--line-soft)">
-        <span class="chip accent">${Fmt.esc(n.ticker)}</span>
-        <a href="${Fmt.esc(n.url)}" target="_blank" rel="noopener">${Fmt.esc(n.headline)}</a>
-        <span class="tiny dim"> · ${Fmt.esc(n.source)} · ${Fmt.date(n.date)}</span>
-      </div>`).join('')}</div>` : '';
-
-    $('todayStrip').innerHTML = moverHtml + newsHtml;
+    // Haberler artik kendi bolumunde (nabiz kosusundan, daha taze).
+    $('todayStrip').innerHTML = moverHtml;
   }
 
   return { render };

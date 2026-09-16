@@ -730,6 +730,23 @@ FRED_URL = "https://api.stlouisfed.org/fred/series/observations"
 # --------------------------------------------------------------------------
 # Dashboard'a servis edilecek esik dosyasi
 # --------------------------------------------------------------------------
+# Piyasa risk okumasi. VIX bir SAYI olarak kimseye bir sey anlatmaz;
+# esikler burada durur ki pano sayinin yanina ne demek oldugunu yazabilsin.
+MARKET_RISK = {
+    "vix_high": 25.0,   # ustunde piyasa gergin
+    "vix_low": 14.0,    # altinda rehavet
+}
+
+# Genel bakis "nabiz" kosusunun kapsami. Tum adaylarin haberini her saat
+# cekmek Finnhub kotasini bosuna yakar; en yuksek puanlilar + portfoy +
+# izleme listesi zaten ilgilendigimiz kume.
+PULSE = {
+    "top_candidates": 25,      # puan sirasindan kac aday
+    "news_days": 3,            # kac gun geriye haber
+    "news_per_ticker": 3,
+    "max_news": 40,
+}
+
 # Huni asamalarinin adi ve ne yaptigi. funnel.py bunu okur; pano da ayni
 # metni thresholds.json uzerinden alir ki iki yerde farkli isim olmasin.
 STAGE_INFO = {

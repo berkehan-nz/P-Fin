@@ -75,6 +75,7 @@ devam eder**. SEC anahtari (User-Agent) olmadan hicbir sey calismaz.
 | `python -m src.run_funnel` | tam evren taramasi TEK SEFERDE (elle) | **saatler** |
 | `python -m src.run_funnel --limit 500` | hizli deneme | ~20 dk |
 | `python -m src.run_daily` | fiyat, haber, portfoy + `merge_story()` | ~2-5 dk |
+| `python -m src.run_pulse` | **saatlik nabiz** — kuresel piyasa, haber, kritik tarihler | ~1-2 dk |
 | `python -m src.run_merge` | claude_inbox -> kartlar (ag gerekmez) | saniyeler |
 | `python -m src.run_merge --check` | inbox dosyalarini yalnizca dogrula | anlik |
 | `python scripts/init_data.py` | `data/` klasorunu bos semalarla kurar | anlik |
@@ -105,10 +106,13 @@ src/
   run_scan.py         Saatlik kademeli tarama partisi
   run_funnel.py       Tam evren taramasi (elle, tek seferde)
   run_daily.py        Gunluk guncelleme
+  run_pulse.py        Saatlik nabiz — yalnizca data/pulse.json yazar
   sources/
     edgar_bulk.py     SEC toplu ZIP -> sqlite onbellek (API limiti yok)
     edgar_api.py      companyfacts, submissions, Form 4, XBRL -> Fundamentals
     prices.py         Stooq CSV (birincil) + yfinance (yedek)
+    market.py         Kuresel endeks/faiz/emtia/kur (yfinance, anahtarsiz)
+    calendar_src.py   Kritik tarihler: FRED yayin takvimi + bilanco + SEC 8-K
     finnhub_api.py    Haber, kazanc takvimi
     fred_api.py       Makro
     analyst.py        Analist konsensusu (BILGI alani, karar alani degil)
