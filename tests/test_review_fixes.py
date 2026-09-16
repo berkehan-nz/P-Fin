@@ -692,6 +692,8 @@ class TestMacroNotClobbered:
         path = tmp_path / "macro.json"
         path.write_text(json.dumps({"series": {"cpi_yoy": {"value": 3.3}}}))
         monkeypatch.setattr(pipeline, "DATA_DIR", tmp_path)
-        monkeypatch.setattr(fred_api, "snapshot", lambda: {})
+        # Anahtar yokken FRED bos sozluk degil, DEGERLERI None olan iskelet doner.
+        monkeypatch.setattr(fred_api, "snapshot", lambda: {
+            "cpi_yoy": {"label": "TUFE (yillik)", "value": None, "series": []}})
         pipeline.write_macro()
         assert json.loads(path.read_text())["series"]["cpi_yoy"]["value"] == 3.3

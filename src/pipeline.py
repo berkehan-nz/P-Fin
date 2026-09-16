@@ -187,9 +187,18 @@ def write_macro() -> bool:
     tarih damgasi zaten kartta gorunuyor.
     """
     snapshot = try_fetch(fred_api.snapshot, label="FRED makro") or {}
-    if not snapshot:
+
+    # DOLU MU, GERCEKTEN? Anahtar yokken snapshot bos sozluk DONMEZ: etiketleri
+    # olan ama degerleri None olan bir iskelet doner. "if not snapshot" bunu
+    # kacirip calisan panoyu "veri yok"a cevirdi.
+    has_values = any(
+        isinstance(v, dict) and v.get("value") is not None
+        for v in snapshot.values())
+
+    if not has_values:
         existing = read_json(DATA_DIR / "macro.json", {}) or {}
-        if existing.get("series"):
+        if any(isinstance(v, dict) and v.get("value") is not None
+               for v in (existing.get("series") or {}).values()):
             print("  [makro] yeni veri alinamadi; mevcut dosya korundu")
             return False
     return write_json(DATA_DIR / "macro.json",
