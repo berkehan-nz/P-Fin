@@ -197,6 +197,39 @@ def from_snapshot(snap: dict) -> dict:
     }
 
 
+def write_survivors_index() -> bool:
+    """``data/survivors.json`` — Asama 2'yi gecenlerin KOMPAKT listesi.
+
+    Pano bir klasoru listeleyemez; 157 ayri dosyayi tek tek cekmek de sacma.
+    Huni sayfasi bu tek dosyayi okur. Tur bitmeden puan olmadigi icin burada
+    puan YOKTUR — yalnizca kimlik ve ham metrikler vardir; sayfada da boyle
+    sunulur ki "puansiz" ile "puani dusuk" karistirilmasin.
+    """
+    rows = []
+    for snap in load_survivors():
+        m = snap.get("metrics") or {}
+        rows.append({
+            "ticker": snap.get("ticker"),
+            "name": snap.get("name"),
+            "sector": snap.get("sector"),
+            "track": snap.get("track"),
+            "exchange": snap.get("exchange"),
+            "market_cap_musd": (snap.get("meta") or {}).get("market_cap_musd"),
+            "scanned_at": snap.get("scanned_at"),
+            "cycle": snap.get("cycle"),
+            "metrics": {k: m.get(k) for k in (
+                "ev_ebit", "ev_sales", "ev_gross_profit", "fcf_yield_ev",
+                "rev_growth_ttm", "gross_margin", "roic", "rule_of_40",
+                "net_debt_to_ebitda", "piotroski_f")},
+        })
+    rows.sort(key=lambda r: (r.get("sector") or "", r.get("ticker") or ""))
+    # Yol SURVIVOR_DIR'den turetilir, DATA_DIR'den DEGIL: testler SURVIVOR_DIR'i
+    # gecici klasore yonlendiriyor ama DATA_DIR'i yonlendirmiyor. Sabit
+    # DATA_DIR kullanilirsa test kosusu GERCEK data/survivors.json'i sifirlar.
+    return write_json(SURVIVOR_DIR.parent / "survivors.json",
+                      {"count": len(rows), "survivors": rows, "source": "scan"})
+
+
 def survivor_path(ticker: str):
     return SURVIVOR_DIR / f"{ticker.upper()}.json"
 
@@ -486,6 +519,10 @@ def run(*, batch_size: int | None = None, new_cycle: bool = False,
     # ARA SONUC: tur bitmesini beklemeden biriken hayatta kalanlari sirala.
     # Tur 5 gun surerken kullanici hicbir yeni sirket gormemeli degil.
     interim(state, ctx=None, bench=bench, build_cards=build_cards)
+
+    # Huni sayfasinin okudugu kompakt liste. Her partide tazelenir ki
+    # tur ortasinda da kimlerin gectigi gorunsun.
+    write_survivors_index()
 
     p = progress(state)
     print(f"[tarama] Ilerleme: {p['done']}/{p['total']} (%{p['pct']}) · "

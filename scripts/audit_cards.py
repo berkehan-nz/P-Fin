@@ -33,17 +33,25 @@ class Audit:
         self.errors: dict[str, list[str]] = defaultdict(list)
         self.notes: dict[str, list[str]] = defaultdict(list)
 
-    def check(self, card, name, stored, expected):
+    def check(self, card, name, stored, expected, den=None):
         """Saklanan deger tanimdan hesaplanani tutuyor mu?
 
-        Kart degerleri GOSTERILDIGI hassasiyette saklanir; sapma yalnizca
-        yuvarlamayla aciklanabiliyorsa hata degildir.
+        IKI YONLU YUVARLAMA. Hem sonuc hem de GIRDILER gosterildikleri
+        hassasiyette saklaniyor. Payda kucukse girdinin yuvarlanmasi sonucta
+        buyuk GORELI fark yaratir: ConEd'in net kari 2,0 olarak saklaniyor,
+        gercegi 2,02; F/K farki %1,1 cikiyor ama ortada hata yok. ``den``
+        verilirse paydanin hassasiyetinden gelen belirsizlik tolere edilir.
         """
         if stored is None or expected is None:
             return
         if round(expected, _decimals(stored)) == stored:
             return
-        if abs(expected) > 1e-9 and abs(stored - expected) / abs(expected) <= 0.005:
+
+        tol = 0.005
+        if den:
+            # Paydanin son basamagi +-yarim birim oynayabilir.
+            tol = max(tol, (0.5 * 10 ** -_decimals(den)) / abs(den))
+        if abs(expected) > 1e-9 and abs(stored - expected) / abs(expected) <= tol:
             return
         self.errors[name].append(
             f"{card['ticker']}: kartta {stored:.6g}, tanimdan {expected:.6g}")
@@ -74,12 +82,12 @@ def audit_card(a: Audit, c: dict) -> None:
         for key, top in (("gross_margin", gp), ("operating_margin", ebit),
                          ("ebitda_margin", ebitda), ("fcf_margin", fcf)):
             a.check(c, f"{key} = kalem / hasilat", val(c, key),
-                    (top / rev * 100) if top is not None else None)
+                    (top / rev * 100) if top is not None else None, den=top)
     if ev:
         for key, den in (("ev_ebit", ebit), ("ev_ebitda", ebitda),
                          ("ev_sales", rev), ("ev_gross_profit", gp)):
             a.check(c, f"{key} = EV / kalem", val(c, key),
-                    (ev / den) if den else None)
+                    (ev / den) if den else None, den=den)
         a.check(c, "fcf_yield_ev = FCF / EV", val(c, "fcf_yield_ev"),
                 (fcf / ev * 100) if fcf is not None else None)
         a.check(c, "earnings_yield = EBIT / EV", val(c, "earnings_yield"),
@@ -88,7 +96,7 @@ def audit_card(a: Audit, c: dict) -> None:
         a.check(c, "fcf_yield_mcap = FCF / piyasa degeri", val(c, "fcf_yield_mcap"),
                 (fcf / mcap * 100) if fcf is not None else None)
         if ni and ni > 0:
-            a.check(c, "pe = piyasa degeri / net kar", val(c, "pe"), mcap / ni)
+            a.check(c, "pe = piyasa degeri / net kar", val(c, "pe"), mcap / ni, den=ni)
 
     g, fm, em = val(c, "rev_growth_ttm"), val(c, "fcf_margin"), val(c, "ebitda_margin")
     if g is not None and fm is not None:
@@ -98,13 +106,13 @@ def audit_card(a: Audit, c: dict) -> None:
                 val(c, "rule_of_40_ebitda"), g + em)
     if nd is not None and ebitda and ebitda > 0:
         a.check(c, "net_debt_to_ebitda = net borc / FAVOK",
-                val(c, "net_debt_to_ebitda"), nd / ebitda)
+                val(c, "net_debt_to_ebitda"), nd / ebitda, den=ebitda)
 
     # TUREV ALANLAR BAYAT MI? Gunluk kosu pe'yi tazeleyip peg'i unutursa
     # ikisi gunler icinde birbirinden kopar.
     pe = val(c, "pe")
     if pe is not None and g is not None and g > 0:
-        a.check(c, "peg = F/K / buyume (bayat turev)", val(c, "peg"), pe / g)
+        a.check(c, "peg = F/K / buyume (bayat turev)", val(c, "peg"), pe / g, den=g)
 
     d = c.get("reverse_dcf") or {}
     if d.get("enterprise_value_musd") is not None and ev is not None:
@@ -114,6 +122,12 @@ def audit_card(a: Audit, c: dict) -> None:
     if d.get("implied_growth_pct") is not None:
         a.check(c, "implied_growth metrigi = ters DCF alani",
                 val(c, "implied_growth"), d["implied_growth_pct"])
+
+    # Net kar EBIT'e gore imkansiz kucukse kalem yanlis alinmistir.
+    if ni is not None and ebit is not None and ebit > 50 and 0 < ni < ebit * 0.02:
+        a.note("net kar EBIT'e gore imkansiz kucuk",
+               f"{c['ticker']}: net kar {ni:,.1f}, EBIT {ebit:,.0f} "
+               f"-> F/K {(mcap / ni):,.0f}" if mcap else f"{c['ticker']}")
 
     # --- puan yeniden hesabi ---
     th = json.load(open("data/thresholds.json", encoding="utf-8"))

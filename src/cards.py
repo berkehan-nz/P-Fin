@@ -164,6 +164,19 @@ def build(f: Fundamentals, *,
             flags.get("z_unreliable_reason")
             or "Altman Z'' guvenilmez. Faiz karsilama ve FCF/toplam borc ile degerlendir."
         )
+    # NET KAR EBIT'E GORE IMKANSIZ KUCUK.
+    # ConEd'de TTM net kar 2,0 mn $ gorunuyordu; hasilat 17,4 mlr, EBIT 3,0 mlr.
+    # Gercek net kar ~2 mlr — yani bin kat yanlis. Sonuc panoda 19.158x F/K.
+    # Vergi ve faiz karin %98'ini yiyemez; boyle bir oran veri hatasidir.
+    _ni = num(meta.get("net_income_ttm_musd"))
+    _ebit = num(meta.get("ebit_ttm_musd"))
+    if _ni is not None and _ebit is not None and _ebit > 50 and 0 < _ni < _ebit * 0.02:
+        warnings.append(
+            f"NET KAR SUPHELI: TTM net kar {_ni:,.1f} mn $ ama EBIT {_ebit:,.0f} mn $. "
+            f"Vergi ve faiz karin %98'ini yiyemez; kalem buyuk olasilikla eksik veya "
+            f"yanlis olcekte alinmis. F/K, PEG ve kazanc kalitesi puani bu sayidan "
+            f"turedigi icin guvenilmez.")
+
     not_scored = (score_block or {}).get("not_scored")
     if not_scored:
         warnings.append(f"PUANLANAMADI: {not_scored}")

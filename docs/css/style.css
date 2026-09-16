@@ -401,6 +401,80 @@ section[id] { scroll-margin-top: calc(var(--topbar-h) + 12px); }
 [data-theme="light"] .funnel-bar { color: #fff; }
 .funnel-label { width: 130px; flex-shrink: 0; font-size: 12.5px; }
 
+/* ---------------------------------------------------------- huni akisi */
+/* Her asama bir kart; cubugun genisligi O ASAMADAN GECEN sirket sayisiyla
+   orantili. Daralma boylece okunmadan once GORULUR. */
+.pipeline { display: flex; flex-direction: column; gap: 10px; }
+
+.stage {
+  background: var(--bg-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 13px 15px; box-shadow: var(--shadow);
+  position: relative;
+}
+/* Asamalari birbirine baglayan dikey cizgi — akis hissi. */
+.stage:not(:last-child)::after {
+  content: ""; position: absolute; left: 30px; bottom: -10px;
+  width: 2px; height: 10px; background: var(--line);
+}
+.stage-pending { opacity: .6; border-style: dashed; }
+
+.stage-head { display: flex; align-items: flex-start; gap: 12px; }
+.stage-no {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--accent-bg); color: var(--accent);
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.stage-name { font-weight: 650; letter-spacing: -.01em; }
+.stage-count { margin-left: auto; text-align: right; flex-shrink: 0; }
+.stage-count .num { font-size: 22px; font-weight: 650; display: block; line-height: 1.1; }
+
+.stage-bar {
+  height: 10px; border-radius: 5px; background: var(--line-soft);
+  margin: 11px 0 7px; overflow: hidden;
+}
+.stage-bar > i {
+  display: block; height: 100%; border-radius: 5px;
+  background: linear-gradient(90deg, var(--accent),
+              color-mix(in srgb, var(--accent) 55%, transparent));
+  transition: width .4s;
+}
+.stage-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.stage-foot button { padding: 3px 9px; }
+
+.stage-why {
+  margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--line-soft);
+  display: flex; flex-direction: column; gap: 7px;
+}
+.why-row {
+  display: grid; grid-template-columns: 70px minmax(120px, auto) 44px 1fr;
+  align-items: center; gap: 10px;
+}
+.why-bar { height: 5px; border-radius: 3px; background: var(--line-soft); overflow: hidden; }
+.why-bar > i { display: block; height: 100%; border-radius: 3px; background: var(--red); }
+.why-label { font-size: 12.5px; font-weight: 600; }
+.why-row .num { text-align: right; color: var(--text-2); }
+.why-plain { white-space: normal; line-height: 1.35; }
+
+@media (max-width: 760px) {
+  /* Bekleyen asamalarda saga yaslanan aciklama basligi siksitiriyordu;
+     dar ekranda alt satira gecsin. */
+  .stage-head { flex-wrap: wrap; }
+  .stage-pending .stage-count {
+    /* flex-basis 100% + margin tasma yapardi; hizalama dolguyla. */
+    flex: 1 0 100%; margin-left: 0; padding-left: 38px;
+    text-align: left; margin-top: 4px;
+  }
+  .stage-pending .stage-count .tiny { text-align: left !important; }
+
+  .stage-why .why-row { grid-template-columns: 54px 1fr 40px; }
+  /* Dar ekranda aciklama alt satira gecer, yoksa tek kelimelik sutun olur. */
+  .why-plain { grid-column: 1 / -1; margin-top: -3px; }
+  .stage-count .num { font-size: 19px; }
+  .stage:not(:last-child)::after { left: 26px; }
+}
+
 /* --------------------------------------------------------------- uyarilar */
 .warn { display: flex; gap: 9px; padding: 10px 12px; border-radius: var(--radius-sm);
         border-left: 3px solid; font-size: 12.5px; line-height: 1.45;

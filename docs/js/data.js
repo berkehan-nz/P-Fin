@@ -79,6 +79,7 @@ window.DataLayer = (function () {
     universe:      () => get('universe.json', { log: { stages: [] }, sectors: {} }),
     funnelLog:     () => get('funnel_log.json', { runs: [] }),
     scanState:     () => get('scan_state.json', null),
+    survivors:     () => get('survivors.json', { count: 0, survivors: [] }),
     macro:         () => get('macro.json', { series: {} }),
     overview:      () => get('overview.json', { movers: [], news: [] }),
     portfolio:     () => get('portfolio_state.json', { positions: [], summary: {}, warnings: [] }),

@@ -543,3 +543,64 @@ class TestDisplayCorrectness:
         c = cards.build(f, source="test")
         # tutarli fixture'da uyari CIKMAMALI
         assert not any("GRAFIK-METRIK" in w for w in c["flags"]["warnings"])
+
+
+class TestSurvivorsIndex:
+    """Huni sayfasi 157 ayri dosyayi cekemez; kompakt indeks okur."""
+
+    def test_index_follows_isolated_dir(self, tmp_path, monkeypatch):
+        """Indeks SURVIVOR_DIR'in yanina yazilmali.
+
+        DATA_DIR'e sabitlenseydi test kosusu gercek data/survivors.json'i
+        sifirlardi — bir kez oldu.
+        """
+        import json
+        from src import scan
+        surv = tmp_path / "survivors"
+        surv.mkdir()
+        (surv / "AAA.json").write_text(json.dumps({
+            "ticker": "AAA", "name": "A Inc", "sector": "Yazilim", "track": "A",
+            "metrics": {"rev_growth_ttm": 12.0}, "meta": {"market_cap_musd": 900.0}}))
+        monkeypatch.setattr(scan, "SURVIVOR_DIR", surv)
+        scan.write_survivors_index()
+
+        out = json.loads((tmp_path / "survivors.json").read_text())
+        assert out["count"] == 1
+        assert out["survivors"][0]["ticker"] == "AAA"
+        assert out["survivors"][0]["market_cap_musd"] == 900.0
+        # gercek veri klasorune dokunulmadi
+        assert not (tmp_path / "data").exists()
+
+
+class TestAuditTolerance:
+    """Denetim, yuvarlamayi hatadan ayirmali — ama gercek sapmayi kacirmamali."""
+
+    def _audit(self):
+        import importlib.util
+        import pathlib
+        spec = importlib.util.spec_from_file_location(
+            "audit_cards", pathlib.Path("scripts/audit_cards.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    def test_rounding_is_not_an_error(self):
+        """ConEd: net kar 2,0 saklanmis, gercegi 2,02 — F/K farki hata degil."""
+        m = self._audit()
+        a = m.Audit()
+        a.check({"ticker": "ED"}, "pe", 19158.8, 38758.3 / 2.0, den=2.0)
+        assert not a.errors
+
+    def test_real_drift_is_still_caught(self):
+        """QLYS'de peg %13 kaymisti; tolerans bunu yutmamali."""
+        m = self._audit()
+        a = m.Audit()
+        a.check({"ticker": "QLYS"}, "peg", 2.75, 25.176 / 10.35, den=10.35)
+        assert a.errors
+
+    def test_tolerance_scales_with_denominator_precision(self):
+        m = self._audit()
+        a = m.Audit()
+        # Buyuk paydada yuvarlama onemsiz; ayni goreli sapma HATA olmali
+        a.check({"ticker": "X"}, "oran", 10.0, 10.5, den=5000.0)
+        assert a.errors

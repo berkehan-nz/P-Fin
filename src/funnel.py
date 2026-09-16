@@ -19,10 +19,8 @@ from .config import STAGE1, STAGE2, STAGE3, UNIVERSE, sector_for_sic
 from .fundamentals import Fundamentals
 from .util import num
 
-STAGE_NAMES = {
-    0: "Evren", 1: "Sert filtreler", 2: "Tuzak eleme",
-    3: "Goreli ucuzluk", 4: "Puanlama",
-}
+# Tek kaynak config.STAGE_INFO; pano da ayni metni oradan aliyor.
+STAGE_NAMES = {k: v[0] for k, v in config.STAGE_INFO.items()}
 
 
 # --------------------------------------------------------------------------

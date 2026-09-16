@@ -730,9 +730,94 @@ FRED_URL = "https://api.stlouisfed.org/fred/series/observations"
 # --------------------------------------------------------------------------
 # Dashboard'a servis edilecek esik dosyasi
 # --------------------------------------------------------------------------
+# Huni asamalarinin adi ve ne yaptigi. funnel.py bunu okur; pano da ayni
+# metni thresholds.json uzerinden alir ki iki yerde farkli isim olmasin.
+STAGE_INFO = {
+    0: ("Evren", "ABD borsalarinda islem goren, yeterince buyuk ve likit "
+                 "adi hisseler. Finans, gayrimenkul ve hasilatsiz biyoteknoloji harictir."),
+    1: ("Sert filtreler", "Is modeli calisiyor mu? Brut marj, buyume, nakit "
+                          "uretimi, borc ve seyrelme esikleri."),
+    2: ("Tuzak eleme", "Ucuz gorunup aslinda bozuk olanlari ayikla: muhasebe "
+                       "oynamasi, iflas riski, karin nakde donmemesi."),
+    3: ("Goreli ucuzluk", "Sektor emsallerine ve kendi gecmisine gore gercekten "
+                          "ucuz mu? Havuzun tamami bitmeden hesaplanamaz."),
+    4: ("Puanlama", "Kalanlari puanla, sektor basina kota uygula, ilk 50'yi sec."),
+}
+
+# ELEME SEBEPLERININ SINIFLANDIRMASI.
+#
+# Huni her elemeyi serbest metin olarak yaziyor ve esik degerleri metne
+# gomuluyor ("Brut marj %20.3 <= %30"). Bu yuzden 1500 sirketlik bir turda
+# 345 FARKLI sebep metni olusuyor; oylece listelenince hicbir sey anlatmiyor.
+# Kalipla gruplanir; gruplama kuralini ON YUZE KOPYALAMAK yerine burada
+# tutup thresholds.json ile gonderiyoruz — kural bilgisi tek yerde kalsin.
+#
+# (desen, asama, kisa grup adi, sade aciklama)
+KILL_REASON_GROUPS = [
+    (r"^SIC .*haric", 0, "Finans / gayrimenkul",
+     "Banka, sigorta ve gayrimenkul sirketleri farkli okunur; evren disi."),
+    (r"^Hasilatsiz biyoteknoloji", 0, "Hasilatsiz biyoteknoloji",
+     "Satisi olmayan ilac sirketi degerleme carpanlariyla olculemez."),
+    (r"^Borsa disi", 0, "Borsa disi kotasyon",
+     "OTC ve benzeri kotasyonlar; likidite ve raporlama standardi dusuk."),
+    (r"^Piyasa degeri hesaplanamadi", 0, "Piyasa degeri yok",
+     "Fiyat veya hisse sayisi alinamadi."),
+    (r"^Piyasa degeri <", 0, "Cok kucuk",
+     "Alt sinirin altinda; likidite ve veri kalitesi sorunlu olur."),
+    (r"^Piyasa degeri >", 0, "Cok buyuk",
+     "Ust sinirin ustunde; bu boyutta yeniden fiyatlanma nadir."),
+    (r"^Fiyat alinamadi", 0, "Fiyat yok", "Fiyat kaynagi bu sembolu tasimiyor."),
+    (r"^Fiyat <", 0, "Fiyat esigi", "Cok dusuk fiyatli hisseler haric."),
+    (r"ortalama dolar hacmi <", 0, "Islem hacmi dusuk",
+     "Girip cikmasi zor; fiyat tek islemle oynar."),
+
+    (r"^Brut marj hesaplanamadi", 1, "Brut marj yok",
+     "SEC dosyasinda satis maliyeti veya brut kar bulunamadi."),
+    (r"^Brut marj %", 1, "Brut marj dusuk",
+     "Fiyatlama gucu zayif; marj esigin altinda."),
+    (r"^Hasilat buyumesi hesaplanamadi", 1, "Buyume verisi yok",
+     "Onceki donem hasilati yok, buyume olculemedi."),
+    (r"^Hasilat buyumesi %", 1, "Buyume yetersiz",
+     "Satislar esigin altinda buyuyor veya kuculuyor."),
+    (r"^FCF negatif", 1, "Nakit uretmiyor",
+     "Serbest nakit akisi negatif ve yuksek buyume istisnasini da saglamiyor."),
+    (r"^Net borc/FAVOK", 1, "Borc yuksek",
+     "Net borc, yillik FAVOK'un esik kati uzerinde."),
+    (r"^Hisse sayisi artisi", 1, "Seyrelme",
+     "Hisse sayisi hizli artiyor; ortaklik payin eriyor."),
+    (r"^SBC/FCF", 1, "Hisse bazli odeme agir",
+     "Calisana verilen hisse, uretilen nakdin buyuk kismini yiyor."),
+
+    (r"^Beneish M", 2, "Manipulasyon suphesi",
+     "Muhasebe oynamasi olasiligi esigin ustunde."),
+    (r"^Altman Z", 2, "Iflas riski",
+     "Z'' skoru sikinti bolgesinde (abonelik istisnasi uygulanmadiysa)."),
+    (r"^Piotroski F", 2, "Temel saglik zayif",
+     "9 maddelik saglik testinin yeterlisini gecemiyor (yalnizca Kol A)."),
+    (r"^Nakit donusumu", 2, "Kar nakde donmuyor",
+     "Kagit uzerindeki kar ust uste birkac yil nakde donmemis."),
+    (r"^Hasilat VE brut marj", 2, "Is kotulesiyor",
+     "Hem satislar hem marj birlikte geriliyor."),
+    (r"^Vade duvari", 2, "Vade duvari",
+     "Yakin vadeli borc nakde gore buyuk ve FCF negatif."),
+    (r"^Halka arz", 2, "Yeni halka arz",
+     "Kilit suresi bitmemis olabilir; arz baskisi riski."),
+
+    (r"sektor yuzdeligi hesaplanamadi", 3, "Karsilastirma yok",
+     "Sektorde yeterli emsal olmadigi icin goreli ucuzluk olculemedi."),
+    (r"^Sektor kotasi", 4, "Sektor kotasi doldu",
+     "Ayni sektorden en fazla belirli sayida sirket listeye girebilir."),
+]
+
+
 def thresholds_payload() -> dict:
     """``data/thresholds.json`` icerigi. Dashboard renkleri buradan okur."""
     return {
+        "kill_reason_groups": [
+            {"pattern": pat, "stage": stage, "label": label, "plain": plain}
+            for pat, stage, label, plain in KILL_REASON_GROUPS
+        ],
+        "stage_info": {str(k): {"name": n, "plain": d} for k, (n, d) in STAGE_INFO.items()},
         "thresholds": THRESHOLDS,
         "score_plain": SCORE_PLAIN,
         "metric_blocks": METRIC_BLOCKS,

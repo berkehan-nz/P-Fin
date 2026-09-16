@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-15",
+  "as_of": "2026-09-16",
   "headline_metrics": {
     "A": [
       "ev_ebit",
@@ -12,6 +12,164 @@
       "rule_of_40"
     ]
   },
+  "kill_reason_groups": [
+    {
+      "label": "Finans / gayrimenkul",
+      "pattern": "^SIC .*haric",
+      "plain": "Banka, sigorta ve gayrimenkul sirketleri farkli okunur; evren disi.",
+      "stage": 0
+    },
+    {
+      "label": "Hasilatsiz biyoteknoloji",
+      "pattern": "^Hasilatsiz biyoteknoloji",
+      "plain": "Satisi olmayan ilac sirketi degerleme carpanlariyla olculemez.",
+      "stage": 0
+    },
+    {
+      "label": "Borsa disi kotasyon",
+      "pattern": "^Borsa disi",
+      "plain": "OTC ve benzeri kotasyonlar; likidite ve raporlama standardi dusuk.",
+      "stage": 0
+    },
+    {
+      "label": "Piyasa degeri yok",
+      "pattern": "^Piyasa degeri hesaplanamadi",
+      "plain": "Fiyat veya hisse sayisi alinamadi.",
+      "stage": 0
+    },
+    {
+      "label": "Cok kucuk",
+      "pattern": "^Piyasa degeri <",
+      "plain": "Alt sinirin altinda; likidite ve veri kalitesi sorunlu olur.",
+      "stage": 0
+    },
+    {
+      "label": "Cok buyuk",
+      "pattern": "^Piyasa degeri >",
+      "plain": "Ust sinirin ustunde; bu boyutta yeniden fiyatlanma nadir.",
+      "stage": 0
+    },
+    {
+      "label": "Fiyat yok",
+      "pattern": "^Fiyat alinamadi",
+      "plain": "Fiyat kaynagi bu sembolu tasimiyor.",
+      "stage": 0
+    },
+    {
+      "label": "Fiyat esigi",
+      "pattern": "^Fiyat <",
+      "plain": "Cok dusuk fiyatli hisseler haric.",
+      "stage": 0
+    },
+    {
+      "label": "Islem hacmi dusuk",
+      "pattern": "ortalama dolar hacmi <",
+      "plain": "Girip cikmasi zor; fiyat tek islemle oynar.",
+      "stage": 0
+    },
+    {
+      "label": "Brut marj yok",
+      "pattern": "^Brut marj hesaplanamadi",
+      "plain": "SEC dosyasinda satis maliyeti veya brut kar bulunamadi.",
+      "stage": 1
+    },
+    {
+      "label": "Brut marj dusuk",
+      "pattern": "^Brut marj %",
+      "plain": "Fiyatlama gucu zayif; marj esigin altinda.",
+      "stage": 1
+    },
+    {
+      "label": "Buyume verisi yok",
+      "pattern": "^Hasilat buyumesi hesaplanamadi",
+      "plain": "Onceki donem hasilati yok, buyume olculemedi.",
+      "stage": 1
+    },
+    {
+      "label": "Buyume yetersiz",
+      "pattern": "^Hasilat buyumesi %",
+      "plain": "Satislar esigin altinda buyuyor veya kuculuyor.",
+      "stage": 1
+    },
+    {
+      "label": "Nakit uretmiyor",
+      "pattern": "^FCF negatif",
+      "plain": "Serbest nakit akisi negatif ve yuksek buyume istisnasini da saglamiyor.",
+      "stage": 1
+    },
+    {
+      "label": "Borc yuksek",
+      "pattern": "^Net borc/FAVOK",
+      "plain": "Net borc, yillik FAVOK'un esik kati uzerinde.",
+      "stage": 1
+    },
+    {
+      "label": "Seyrelme",
+      "pattern": "^Hisse sayisi artisi",
+      "plain": "Hisse sayisi hizli artiyor; ortaklik payin eriyor.",
+      "stage": 1
+    },
+    {
+      "label": "Hisse bazli odeme agir",
+      "pattern": "^SBC/FCF",
+      "plain": "Calisana verilen hisse, uretilen nakdin buyuk kismini yiyor.",
+      "stage": 1
+    },
+    {
+      "label": "Manipulasyon suphesi",
+      "pattern": "^Beneish M",
+      "plain": "Muhasebe oynamasi olasiligi esigin ustunde.",
+      "stage": 2
+    },
+    {
+      "label": "Iflas riski",
+      "pattern": "^Altman Z",
+      "plain": "Z'' skoru sikinti bolgesinde (abonelik istisnasi uygulanmadiysa).",
+      "stage": 2
+    },
+    {
+      "label": "Temel saglik zayif",
+      "pattern": "^Piotroski F",
+      "plain": "9 maddelik saglik testinin yeterlisini gecemiyor (yalnizca Kol A).",
+      "stage": 2
+    },
+    {
+      "label": "Kar nakde donmuyor",
+      "pattern": "^Nakit donusumu",
+      "plain": "Kagit uzerindeki kar ust uste birkac yil nakde donmemis.",
+      "stage": 2
+    },
+    {
+      "label": "Is kotulesiyor",
+      "pattern": "^Hasilat VE brut marj",
+      "plain": "Hem satislar hem marj birlikte geriliyor.",
+      "stage": 2
+    },
+    {
+      "label": "Vade duvari",
+      "pattern": "^Vade duvari",
+      "plain": "Yakin vadeli borc nakde gore buyuk ve FCF negatif.",
+      "stage": 2
+    },
+    {
+      "label": "Yeni halka arz",
+      "pattern": "^Halka arz",
+      "plain": "Kilit suresi bitmemis olabilir; arz baskisi riski.",
+      "stage": 2
+    },
+    {
+      "label": "Karsilastirma yok",
+      "pattern": "sektor yuzdeligi hesaplanamadi",
+      "plain": "Sektorde yeterli emsal olmadigi icin goreli ucuzluk olculemedi.",
+      "stage": 3
+    },
+    {
+      "label": "Sektor kotasi doldu",
+      "pattern": "^Sektor kotasi",
+      "plain": "Ayni sektorden en fazla belirli sayida sirket listeye girebilir.",
+      "stage": 4
+    }
+  ],
   "metric_blocks": {
     "Buyume": [
       "rev_growth_ttm",
@@ -211,6 +369,28 @@
       "ev_sales_own_5y_pct_max": 50.0
     },
     "track_b_operating_margin_pct": 5.0
+  },
+  "stage_info": {
+    "0": {
+      "name": "Evren",
+      "plain": "ABD borsalarinda islem goren, yeterince buyuk ve likit adi hisseler. Finans, gayrimenkul ve hasilatsiz biyoteknoloji harictir."
+    },
+    "1": {
+      "name": "Sert filtreler",
+      "plain": "Is modeli calisiyor mu? Brut marj, buyume, nakit uretimi, borc ve seyrelme esikleri."
+    },
+    "2": {
+      "name": "Tuzak eleme",
+      "plain": "Ucuz gorunup aslinda bozuk olanlari ayikla: muhasebe oynamasi, iflas riski, karin nakde donmemesi."
+    },
+    "3": {
+      "name": "Goreli ucuzluk",
+      "plain": "Sektor emsallerine ve kendi gecmisine gore gercekten ucuz mu? Havuzun tamami bitmeden hesaplanamaz."
+    },
+    "4": {
+      "name": "Puanlama",
+      "plain": "Kalanlari puanla, sektor basina kota uygula, ilk 50'yi sec."
+    }
   },
   "thresholds": {
     "altman_z": {
