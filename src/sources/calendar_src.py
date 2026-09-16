@@ -95,8 +95,13 @@ def macro_releases(*, days_ahead: int = 45) -> list[dict]:
 # Bilanco tarihleri (Finnhub — zaten cekilmis takvimden)
 # --------------------------------------------------------------------------
 def earnings_events(earnings: dict[str, str], tickers: set[str],
-                    *, days_ahead: int = 45) -> list[dict]:
-    """``{ticker: tarih}`` sozlugunu takvim olaylarina cevirir."""
+                    *, days_ahead: int = 120) -> list[dict]:
+    """``{ticker: tarih}`` sozlugunu takvim olaylarina cevirir.
+
+    Pencere makro yayinlardan GENIS: bilancolar ceyrekte bir geliyor, 45
+    gunluk pencere sezon disinda hepsini disarida birakiyordu (en yakini
+    64 gun sonraydi ve takvimde tek bir bilanco gorunmuyordu).
+    """
     start = today_iso()
     end = (date.today() + timedelta(days=days_ahead)).isoformat()
     out = []

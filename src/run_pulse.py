@@ -47,11 +47,15 @@ def tracked_tickers(limit: int | None = None) -> tuple[set[str], dict[str, int]]
         if row.get("ticker"):
             tickers.add(str(row["ticker"]).upper())
 
+    # CIK kartlarda TUTULMUYOR (kart semasinda boyle bir alan yok); onceki
+    # surum kartlardan okumaya calisip hepsini bos buluyordu ve SEC olaylari
+    # sessizce hic gelmiyordu. Dogru kaynak EDGAR'in sembol->CIK eslemesi.
+    from .sources import edgar_api
     cik_by_ticker: dict[str, int] = {}
-    for path in config.CARDS_DIR.glob("*.json"):
-        card = read_json(path)
-        if isinstance(card, dict) and card.get("ticker") in tickers and card.get("cik"):
-            cik_by_ticker[card["ticker"]] = card["cik"]
+    for ticker in sorted(tickers):
+        cik = try_fetch(edgar_api.cik_for, ticker, label=f"cik {ticker}")
+        if cik:
+            cik_by_ticker[ticker] = cik
 
     return tickers, cik_by_ticker
 
