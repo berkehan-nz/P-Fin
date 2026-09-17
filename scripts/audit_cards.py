@@ -49,8 +49,13 @@ class Audit:
 
         tol = 0.005
         if den:
-            # Paydanin son basamagi +-yarim birim oynayabilir.
+            # Girdinin son basamagi +-yarim birim oynayabilir.
             tol = max(tol, (0.5 * 10 ** -_decimals(den)) / abs(den))
+        # Girdi ve cikti yuvarlamasi BIRLIKTE olusabilir: MQ'da EBIT -12,9
+        # (gercegi -12,95'e kadar) -> -1,3079 -> kartta -1,31. Ikisini ayri
+        # ayri tolere etmek bu durumu hata sayiyordu; belirsizlikler toplanir.
+        if stored:
+            tol += (0.5 * 10 ** -_decimals(stored)) / abs(stored)
         if abs(expected) > 1e-9 and abs(stored - expected) / abs(expected) <= tol:
             return
         self.errors[name].append(
@@ -88,10 +93,12 @@ def audit_card(a: Audit, c: dict) -> None:
                          ("ev_sales", rev), ("ev_gross_profit", gp)):
             a.check(c, f"{key} = EV / kalem", val(c, key),
                     (ev / den) if den else None, den=den)
+        # Pay da yuvarlanmis saklaniyor (EBIT 0,1 mn hassasiyetle); kucuk
+        # EBIT'te bu tek basina %0,5'i asan goreli fark yaratir.
         a.check(c, "fcf_yield_ev = FCF / EV", val(c, "fcf_yield_ev"),
-                (fcf / ev * 100) if fcf is not None else None)
+                (fcf / ev * 100) if fcf is not None else None, den=fcf)
         a.check(c, "earnings_yield = EBIT / EV", val(c, "earnings_yield"),
-                (ebit / ev * 100) if ebit is not None else None)
+                (ebit / ev * 100) if ebit is not None else None, den=ebit)
     if mcap:
         a.check(c, "fcf_yield_mcap = FCF / piyasa degeri", val(c, "fcf_yield_mcap"),
                 (fcf / mcap * 100) if fcf is not None else None)
