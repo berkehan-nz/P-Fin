@@ -13,6 +13,10 @@ def isolated(tmp_path, monkeypatch):
     """Gercek data/ klasorune dokunmadan calis."""
     monkeypatch.setattr(scan, "STATE_PATH", tmp_path / "scan_state.json")
     monkeypatch.setattr(scan, "SURVIVOR_DIR", tmp_path / "survivors")
+    # interim() huni gunlugunu ve aday dosyasini DATA_DIR'e yazar; yamalanmazsa
+    # testler gercek data/funnel_log.json'u kirletir.
+    from src import pipeline
+    monkeypatch.setattr(pipeline, "DATA_DIR", tmp_path)
     (tmp_path / "survivors").mkdir()
     return tmp_path
 
