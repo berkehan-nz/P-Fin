@@ -170,7 +170,18 @@ def refresh_candidates_from_disk(partial: dict | None = None) -> bool:
 
     Gunluk kosuda tam huni calismaz; kartlarin fiyat/haber alanlari
     guncellenir ve ozet dosyasi bu fonksiyonla tazelenir.
+
+    GECICI LISTE ISARETI KORUNUR. Tarama turu surerken aday listesi
+    "partial" isaretlidir (siralama havuzun tamami bitmeden yapildi).
+    Gunluk, birlestirme ve yeniden hesaplama kosulari bu fonksiyonu
+    parametresiz cagirdigi icin isaret siliniyor, pano gecici listeyi
+    kesinlesmis gibi gosteriyordu. Tur hala suruyorsa mevcut isaret tasinir.
     """
+    if partial is None:
+        state = read_json(DATA_DIR / "scan_state.json", {}) or {}
+        queue = state.get("queue") or []
+        if queue and (state.get("cursor") or 0) < len(queue):
+            partial = (read_json(DATA_DIR / "candidates.json", {}) or {}).get("partial")
     seed, funnel_rows, manual = [], [], []
     for path in sorted(CARDS_DIR.glob("*.json")):
         card = read_json(path)
