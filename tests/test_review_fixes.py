@@ -697,3 +697,170 @@ class TestMacroNotClobbered:
             "cpi_yoy": {"label": "TUFE (yillik)", "value": None, "series": []}})
         pipeline.write_macro()
         assert json.loads(path.read_text())["series"]["cpi_yoy"]["value"] == 3.3
+
+
+# ------------------------------------------------ SEC etiket secimi (guncellik)
+def _facts(**tags):
+    """{etiket: [(end, val, start|None, form)]} -> companyfacts bicimi."""
+    gaap = {}
+    for tag, rows in tags.items():
+        gaap[tag] = {"units": {"USD": [
+            {"end": end, "val": val, "start": start, "form": form,
+             "filed": end, "accn": f"a-{end}", "fp": "Q2" if start else "Q2"}
+            for end, val, start, form in rows]}}
+    return {"facts": {"us-gaap": gaap}}
+
+
+class TestFreshTagSelection:
+    """Corpay 2014'te birakilan LongTermDebtNoncurrent ile 2013'te birakilan
+    InterestExpense yuzunden 10,6 mlr $ borcu ve faiz giderini kaybediyordu:
+    listedeki ilk etiketin GECMISI vardi, o yuzden guncel etiket hic okunmadi."""
+
+    def test_stale_first_tag_does_not_hide_current_stock(self):
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            LongTermDebtNoncurrent=[("2014-03-31", 460e6, None, "10-Q")],
+            LongTermDebt=[("2026-03-31", 10_360e6, None, "10-Q"),
+                          ("2026-06-30", 10_623e6, None, "10-Q")])
+        out = ea._collect_stock(facts, ["LongTermDebtNoncurrent", "LongTermDebt"])
+        assert out["2026-06-30"] == 10_623e6
+        assert out["2014-03-31"] == 460e6            # eski gecmis kaybolmadi
+
+    def test_list_order_kept_among_current_tags(self):
+        """Iki etiket de guncelse liste sirasi kazanir (alt kalem ana etiketi ezmesin)."""
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            A=[("2026-03-31", 100.0, None, "10-Q")],
+            B=[("2026-06-30", 5.0, None, "10-Q")])
+        assert ea._freshness_order([("A", "2026-03-31"), ("B", "2026-06-30")])[0] == "A"
+
+    def test_abandoned_tag_loses_even_if_first(self):
+        from src.sources import edgar_api as ea
+        order = ea._freshness_order([("InterestExpense", "2013-09-30"),
+                                     ("InterestExpenseNonoperating", "2026-06-30")])
+        assert order[0] == "InterestExpenseNonoperating"
+
+
+class TestDebtComponents:
+    def test_components_summed_when_no_total_tag(self):
+        """Collegium: vadeli kredi + konvertibl, toplam etiketi yok."""
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            Revenues=[("2026-06-30", 180e6, "2026-04-01", "10-Q"),
+                      ("2025-12-31", 700e6, "2025-01-01", "10-K")],
+            LongTermLoansPayable=[("2026-06-30", 797.8e6, None, "10-Q")],
+            ConvertibleLongTermNotesPayable=[("2026-06-30", 238.7e6, None, "10-Q")],
+            LongTermDebt=[("2019-12-31", 11.5e6, None, "10-K")])
+        f = ea.fundamentals_from_facts(facts, "COLL")
+        p = next(q for q in f.quarters if q.period_end == "2026-06-30")
+        assert p.long_term_debt == pytest.approx(1036.5, abs=0.1)
+
+    def test_total_tag_wins_over_components(self):
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            Revenues=[("2026-06-30", 180e6, "2026-04-01", "10-Q"),
+                      ("2025-12-31", 700e6, "2025-01-01", "10-K")],
+            LongTermDebtNoncurrent=[("2026-06-30", 900e6, None, "10-Q")],
+            LongTermLoansPayable=[("2026-06-30", 700e6, None, "10-Q")],
+            ConvertibleLongTermNotesPayable=[("2026-06-30", 200e6, None, "10-Q")])
+        f = ea.fundamentals_from_facts(facts, "X")
+        p = next(q for q in f.quarters if q.period_end == "2026-06-30")
+        assert p.long_term_debt == pytest.approx(900.0)   # toplanip 1800 olmadi
+
+    def test_current_portion_not_double_counted(self):
+        """LongTermDebt cari kismi icerir; LongTermDebtCurrent ile birlikte cift sayilmamali."""
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            Revenues=[("2026-06-30", 180e6, "2026-04-01", "10-Q"),
+                      ("2025-12-31", 700e6, "2025-01-01", "10-K")],
+            LongTermDebt=[("2026-06-30", 10_623.5e6, None, "10-Q")],
+            LongTermDebtCurrent=[("2026-06-30", 4_525.4e6, None, "10-Q")])
+        f = ea.fundamentals_from_facts(facts, "CPAY")
+        p = next(q for q in f.quarters if q.period_end == "2026-06-30")
+        assert p.long_term_debt + p.short_term_debt == pytest.approx(10_623.5, abs=0.1)
+
+
+class TestStaleCoverShares:
+    def test_cover_page_from_2011_is_rejected(self):
+        """Bel Fuse: tek kapak kaydi 2011'den; 7 kat kucuk piyasa degeri."""
+        from src.sources import edgar_api as ea
+        facts = {"facts": {"dei": {"EntityCommonStockSharesOutstanding": {"units": {"shares": [
+            {"end": "2011-08-01", "val": 2_174_912, "accn": "x", "filed": "2011-08-09"}]}}}}}
+        shares, source = ea._shares_outstanding(facts)
+        assert shares is None and source == "yok"
+
+    def test_unverifiable_cover_is_marked(self):
+        from datetime import date
+        from src.sources import edgar_api as ea
+        today = date.today().isoformat()
+        facts = {"facts": {"dei": {"EntityCommonStockSharesOutstanding": {"units": {"shares": [
+            {"end": today, "val": 30_000_000, "accn": "x", "filed": today}]}}}}}
+        shares, source = ea._shares_outstanding(facts)
+        assert shares == 30.0 and source == "kapak_sayfasi_dogrulanmamis"
+
+    def test_reconcile_uses_all_class_count(self, monkeypatch):
+        from src import pipeline
+        from src.sources import prices
+        f = fixtures.frsh()
+        f.shares_outstanding = None
+        f.sources["shares"] = "yok"
+        monkeypatch.setattr(prices, "implied_shares", lambda t: 14.44)
+        pipeline.reconcile_shares(f)
+        assert f.shares_outstanding == 14.44
+        assert f.sources["shares"] == "yfinance_tum_siniflar"
+
+    def test_reconcile_skips_verified_counts(self, monkeypatch):
+        """Dogrulanmis EDGAR sayisi icin ek istek ATILMAMALI."""
+        from src import pipeline
+        from src.sources import prices
+        f = fixtures.frsh()
+        f.sources["shares"] = "kapak_sayfasi"
+        called = []
+        monkeypatch.setattr(prices, "implied_shares", lambda t: called.append(t) or 99.0)
+        pipeline.reconcile_shares(f)
+        assert called == []
+
+
+class TestStage1Refinements:
+    def test_growth_exemption_needs_known_margin_and_sane_growth(self):
+        """ABUS: %1078 buyume, brut marj bilinmiyor, FCF negatif -> gecmemeli."""
+        r = funnel.evaluate(fixtures.frsh())
+        r["meta"]["fcf_ttm_musd"] = -40.0
+        r["metrics"].update({"rev_growth_ttm": 1078.0, "rule_of_40": 1057.0,
+                             "gross_margin": None, "net_debt_to_ebitda": 0.0,
+                             "share_count_change_1y": 0.0, "sbc_to_fcf": None})
+        reason = funnel.stage1(r)
+        assert reason and "makul sinirin" in reason and "brut marj bilinmiyor" in reason
+
+    def test_normal_high_growth_still_exempt(self):
+        r = funnel.evaluate(fixtures.frsh())
+        r["meta"]["fcf_ttm_musd"] = -40.0
+        r["metrics"].update({"rev_growth_ttm": 45.0, "rule_of_40": 48.0,
+                             "gross_margin": 75.0, "net_debt_to_ebitda": 0.0,
+                             "share_count_change_1y": 0.0, "sbc_to_fcf": None})
+        assert funnel.stage1(r) is None
+
+    def test_share_decline_window_skips_missing_quarter(self):
+        """MNTN: Aralik ceyregi eksik; eksik atilmadan pencere 2 degere dusuyordu."""
+        from src.fundamentals import Period
+        r = funnel.evaluate(fixtures.frsh())
+        f = r["fundamentals"]
+        f.quarters = [Period(period_end=e, period_type="Q", shares_diluted=v)
+                      for e, v in (("2025-09-30", 80.7), ("2025-12-31", None),
+                                   ("2026-03-31", 78.9), ("2026-06-30", 78.6))]
+        assert funnel._share_count_declining(r) is True
+
+
+class TestOneOffWithOperatingLoss:
+    def test_lyft_style_tax_asset_gain_flagged(self):
+        """EBIT -188, net kar +2.844: oran testi EBIT>0 sartiyla atlaniyordu."""
+        from src.fundamentals import Period
+        from src.metrics import _one_off_earnings
+        assert _one_off_earnings(Period(period_end="2026-06-30", operating_income=-188.0,
+                                        net_income=2844.0)) is True
+
+    def test_small_profit_on_small_loss_not_flagged(self):
+        from src.fundamentals import Period
+        from src.metrics import _one_off_earnings
+        assert _one_off_earnings(Period(period_end="2026-06-30", operating_income=-50.0,
+                                        net_income=20.0)) is False

@@ -40,6 +40,42 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 		version: "1.0.0",
 	});
 
+	/**
+	 * Arac kaydi + GitHub hata cevirisi.
+	 *
+	 * "Bad credentials" (401) ajana hicbir sey anlatmiyordu ve bazi araclar
+	 * calisirken digerleri bu hatayi veriyordu. Olasi sebep: GitHub bir OAuth
+	 * uygulamasi icin kullanici basina ~10 jetonu gecince EN ESKISINI iptal
+	 * eder; baglayici birden fazla oturum actiginda eski oturumdaki jeton
+	 * gecersiz kalir. Hata artik ne yapilacagini soyluyor.
+	 */
+	private tool(name: string, description: string, schema: any, handler: (args: any) => Promise<any>) {
+		this.server.tool(name, description, schema, async (args: any) => {
+			try {
+				return await handler(args);
+			} catch (err: any) {
+				const status = err?.status;
+				if (status === 401) {
+					return fail(
+						"GitHub oturum jetonu gecersiz (401). Jeton iptal edilmis olabilir — " +
+							"GitHub bir uygulama icin cok sayida oturum acilinca en eskisini iptal eder. " +
+							"Cozum: claude.ai > Settings > Connectors'ta P-Fin baglayicisini " +
+							"kaldirip yeniden bagla. Bu bir veri hatasi degildir.",
+					);
+				}
+				if (status === 403) {
+					return fail(`GitHub erisimi reddedildi (403): ${err?.message ?? ""}. ` +
+						"Hiz limiti ya da yetki kapsami olabilir; biraz bekleyip tekrar dene.");
+				}
+				if (status === 409 || status === 422) {
+					return fail(`GitHub cakisma (${status}): ${err?.message ?? ""}. ` +
+						"Ayni dosyaya es zamanli yazma olmus olabilir; list_pending_changes ile kontrol edip tekrar dene.");
+				}
+				return fail(`Beklenmeyen hata: ${err?.message ?? String(err)}`);
+			}
+		});
+	}
+
 	private repo(): Repo {
 		return new Repo(
 			new Octokit({ auth: this.props!.accessToken }),
@@ -61,7 +97,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 
 		/* ------------------------------------------------------------ OKUMA */
 
-		this.server.tool(
+		this.tool(
 			"list_candidates",
 			"Adaylari puana gore siralar. Once buna bak; hangi sirketin analize " +
 				"ihtiyaci oldugunu buradan gorursun.",
@@ -107,12 +143,17 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 					ticker: r.ticker,
 					uyari: r.warning_count ?? 0,
 					veri_kalitesi: r.data_quality,
+					// Kola gore degismeyen ortak metrikler (headline kola gore degisir).
+					cekirdek: r.core ?? null,
+					dusuk_kapsamali_bloklar: r.low_coverage_blocks ?? {},
+					yuzdelik_havuzu: r.percentile_pool ?? null,
+					fiyat_tarihi: r.price_as_of ?? null,
 				}));
 				return ok(JSON.stringify({ gosterilen: out.length, toplam: rows.length, satirlar: out }, null, 1));
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"get_card",
 			"Bir sirketin kartini okur. Kartlar buyuk oldugu icin bolum sec; " +
 				"'ozet' puanlari, bayraklari ve veri kalitesini verir.",
@@ -156,7 +197,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"list_pending_changes",
 			"Henuz birlestirilmemis (PR'daki veya PR'a girecek) degisiklikleri listeler. " +
 				"Yazmadan once buna bak ki ayni dosyayi iki kez yazmayasin.",
@@ -173,7 +214,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 		);
 
 		if (!canWrite) {
-			this.server.tool(
+			this.tool(
 				"whoami",
 				"Oturum acan GitHub kullanicisini ve yetkisini soyler.",
 				{},
@@ -188,7 +229,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 
 		/* ------------------------------------------------------------ YAZMA */
 
-		this.server.tool(
+		this.tool(
 			"write_analysis",
 			"Bir sirketin analiz metnini claude_inbox'a yazar. SAYISAL ALAN YAZAMAZ — " +
 				"metrikler ve puanlar veri hattinin isidir. Bos birakilan alanlar kartta " +
@@ -218,7 +259,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"set_decision",
 			"AL / BEKLE / ELE kararini ve gerekcesini yazar.",
 			{
@@ -239,7 +280,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"set_catalyst_score",
 			"Katalizor puani (0-100). Toplam puanin %25'i budur ve otomatik " +
 				"hesaplanmaz — yeniden fiyatlanmayi tetikleyecek somut bir olay var mi?",
@@ -256,7 +297,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"add_to_watchlist",
 			"Izleme listesine sirket ekler.",
 			{
@@ -291,7 +332,66 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
+			"record_position",
+			"Portfoye yeni pozisyon ekler (GERCEK veya KAGIT). Maliyet + komisyon nakitten " +
+				"dusulur; nakit yetmezse yazmaz. PR ile sunulur — birlestirilene kadar " +
+				"portfoy sayfasinda gorunmez.",
+			{
+				entry_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+				entry_price: z.number().positive(),
+				fees_usd: z.number().min(0).default(0),
+				notes: z.string().max(1000).default(""),
+				review_date: z
+					.string()
+					.regex(/^\d{4}-\d{2}-\d{2}$/)
+					.optional()
+					.describe("Tezi yeniden gozden gecirme tarihi"),
+				shares: z.number().positive(),
+				target_price: z.number().min(0).default(0),
+				ticker: tickerSchema,
+				type: z.enum(["GERCEK", "KAGIT"]).default("KAGIT"),
+			},
+			async (a) => {
+				const repo = this.repo();
+				const branch = await repo.existingBranch();
+				const doc =
+					(branch ? await repo.readJson<any>("data/portfolio.json", branch) : null) ??
+					(await repo.readJson<any>("data/portfolio.json")) ?? {
+						cash_usd: 0, closed: [], positions: [],
+					};
+
+				const cost = a.entry_price * a.shares + a.fees_usd;
+				const cash = Number(doc.cash_usd ?? 0);
+				if (cost > cash + 1e-6) {
+					return fail(
+						`Nakit yetmiyor: pozisyon ${cost.toFixed(2)} $, portfoyde ${cash.toFixed(2)} $ nakit var. ` +
+							"Hisse adedini azalt ya da once nakit ekle.",
+					);
+				}
+				const position = {
+					broker: "Midas", entry_date: a.entry_date, entry_price: a.entry_price,
+					fees_usd: a.fees_usd, notes: a.notes, review_date: a.review_date ?? "",
+					shares: a.shares, status: "OPEN", target_price: a.target_price,
+					thesis_breakers: [], ticker: a.ticker, type: a.type,
+				};
+				const next = {
+					...doc,
+					as_of: today(),
+					cash_usd: Math.round((cash - cost) * 100) / 100,
+					positions: [...(doc.positions ?? []), position],
+				};
+				const b = await repo.writeJson("data/portfolio.json", next,
+					`portfoy: ${a.type} ${a.ticker} ${a.shares} @ ${a.entry_price}`);
+				return ok(
+					`${a.type} ${a.ticker}: ${a.shares} adet @ ${a.entry_price} $ (maliyet ${cost.toFixed(2)} $) ` +
+						`${b} dalina yazildi. Kalan nakit ${next.cash_usd.toFixed(2)} $. ` +
+						`Tum pozisyonlari girdikten sonra submit_for_review ile PR ac.`,
+				);
+			},
+		);
+
+		this.tool(
 			"report_data_issue",
 			"Veride hata bulduysan HAM DONEM VERISINI duzeltir (metrigi degil) — " +
 				"brut kar, hasilat, nakit gibi. Duzeltilen degerden marjlar, puanlar ve " +
@@ -360,7 +460,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 
 		/* ---------------------------------------------------------- INCELEME */
 
-		this.server.tool(
+		this.tool(
 			"submit_for_review",
 			"Biriken tum degisiklikler icin TEK bir PR acar (veya acik olani gunceller). " +
 				"Berke bu PR'i birlestirdiginde degisiklikler yayina girer.",
@@ -393,7 +493,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"whoami",
 			"Oturum acan GitHub kullanicisini ve yetkisini soyler.",
 			{},

@@ -340,6 +340,18 @@ INTERIM_MIN_SURVIVORS = 15      # bu sayinin altinda siralama anlamsiz
 INTERIM_CARDS_PER_BATCH = 12    # her partide en fazla kac yeni tam kart
 
 
+def _stage_log(state: dict) -> list[dict]:
+    """Asama 0-2 sayaclarini gunluk bicimine cevirir."""
+    counts = state.get("stage_counts") or {}
+    out = []
+    for n in (0, 1, 2):
+        c = counts.get(str(n))
+        if c:
+            out.append({"stage": n, "name": funnel.STAGE_NAMES[n],
+                        "input": c["in"], "output": c["out"]})
+    return out
+
+
 def interim(state: dict, *, ctx: dict | None = None, bench: list | None = None,
             build_cards: bool = True) -> dict | None:
     """Biriken hayatta kalanlari siralar ve GECICI aday listesi yazar.
@@ -353,8 +365,17 @@ def interim(state: dict, *, ctx: dict | None = None, bench: list | None = None,
         return None
 
     rows = [from_snapshot(s) for s in snapshots]
-    log = {"stages": []}
+    log = {"stages": _stage_log(state)}
     selected, sector_table = funnel.rank(rows, log=log, compute_own_pct=False)
+
+    # HUNI GUNLUGU HER PARTIDE. Onceden yalnizca tur sonunda (finalize)
+    # yaziliyordu; tur 1 bir kilitlenme duzeltmesiyle sifirlaninca finalize
+    # hic calismadi ve funnel_log.json 9 Eylul'den beri bos kaldi. Ayni
+    # gunun kaydi uzerine yazilir; tur ici kayitlar "partial" isaretlidir.
+    log["kill_reasons"] = dict(sorted(state["kill_counts"].items(),
+                                      key=lambda kv: kv[1], reverse=True)[:30])
+    pipeline.append_funnel_log(log, partial=True, cycle=state.get("cycle"),
+                               scanned=progress(state)["done"])
 
     p = progress(state)
     if build_cards:
@@ -422,14 +443,7 @@ def finalize(state: dict, *, ctx: dict | None = None,
 
     rows = [from_snapshot(s) for s in snapshots]
 
-    log = {"stages": [
-        {"stage": 0, "name": funnel.STAGE_NAMES[0],
-         "input": state["stage_counts"]["0"]["in"], "output": state["stage_counts"]["0"]["out"]},
-        {"stage": 1, "name": funnel.STAGE_NAMES[1],
-         "input": state["stage_counts"]["1"]["in"], "output": state["stage_counts"]["1"]["out"]},
-        {"stage": 2, "name": funnel.STAGE_NAMES[2],
-         "input": state["stage_counts"]["2"]["in"], "output": state["stage_counts"]["2"]["out"]},
-    ]}
+    log = {"stages": _stage_log(state)}
 
     # own_pct anlik goruntude hazir; yeniden hesaplamak icin fiyat gecmisi gerekirdi
     selected, sector_table = funnel.rank(rows, log=log, compute_own_pct=False)

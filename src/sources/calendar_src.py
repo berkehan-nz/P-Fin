@@ -163,6 +163,35 @@ def sec_events(cik_by_ticker: dict[str, int], *, days_back: int = 10,
     return out
 
 
+def estimate_next_earnings(cik: int | None) -> str | None:
+    """Son 10-Q/10-K tarihinden sonraki bilanco gununu TAHMIN eder.
+
+    Finnhub takvimi cogu sirkette bos donuyor (103 kartin 84'unde). Sirketler
+    ceyreklik raporu ~13 hafta arayla dosyalar; son dosyalama + 91 gun makul
+    bir tahmindir. Gecmiste kaliyorsa bir ceyrek daha eklenir. Sonuc karta
+    TAHMIN olarak isaretlenir — kesin tarihle karistirilmamali.
+    """
+    if not cik:
+        return None
+    from . import edgar_api
+
+    recent = ((edgar_api.submissions(cik) or {}).get("filings") or {}).get("recent") or {}
+    last = None
+    for form, day in zip(recent.get("form") or [], recent.get("filingDate") or []):
+        if form in ("10-Q", "10-K") and day:
+            last = day
+            break                      # liste tarihe gore yeniden eskiye
+    if not last:
+        return None
+    try:
+        guess = date.fromisoformat(last) + timedelta(days=91)
+    except ValueError:
+        return None
+    while guess < date.today():
+        guess += timedelta(days=91)
+    return guess.isoformat()
+
+
 def build(*, earnings: dict[str, str], tickers: set[str],
           cik_by_ticker: dict[str, int]) -> dict:
     """Takvimin tamami: gecmis olaylar + yaklasan tarihler, tarihe gore sirali."""

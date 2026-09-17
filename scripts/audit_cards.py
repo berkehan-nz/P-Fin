@@ -149,6 +149,14 @@ def audit_card(a: Audit, c: dict) -> None:
             a.check(c, "toplam puan = agirlikli ortalama", sc["total"], acc / used)
         a.check(c, "weight_coverage", sc.get("weight_coverage"), used / sum(W.values()))
 
+    # --- dusuk kapsama: HANGI alt metrikler bos ---
+    for block, detail in (c.get("score_detail") or {}).items():
+        if isinstance(detail, dict) and detail.get("low_coverage"):
+            missing = [k for k, v in (detail.get("components") or {}).items()
+                       if not isinstance(v, dict) or v.get("percentile") is None]
+            a.note(f"dusuk kapsama ({block})",
+                   f"{c['ticker']}: kapsama {detail.get('coverage')}, bos: {', '.join(missing)}")
+
     # --- grafik ile metrik ayni seyi mi soyluyor ---
     s = c.get("series") or {}
     if s.get("basis") != "annual":

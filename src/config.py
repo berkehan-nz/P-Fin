@@ -148,6 +148,8 @@ STAGE1 = {
     # FCF > 0  VEYA  (buyume > X VE Rule of 40 >= Y)
     "high_growth_exemption_growth_pct": 25.0,
     "high_growth_exemption_rule40_min": 40.0,
+    # Bunun ustundeki buyume istisnaya dayanak olamaz (tek seferlik gelir izi).
+    "high_growth_exemption_growth_max_pct": 150.0,
     "net_debt_to_ebitda_max": 3.0,
     "share_count_growth_max_pct": 5.0,
     # Yillik hisse artisi tek seferlik olaylarla sisebilir: IPO'da imtiyazli
@@ -736,6 +738,9 @@ MARKET_RISK = {
     "vix_high": 25.0,   # ustunde piyasa gergin
     "vix_low": 14.0,    # altinda rehavet
 }
+
+# EDGAR hisse sayisi ikinci kaynagin bu oranindan kucukse tek sinif sayilir.
+SHARE_RECONCILE_RATIO = 0.8
 
 # Genel bakis "nabiz" kosusunun kapsami. Tum adaylarin haberini her saat
 # cekmek Finnhub kotasini bosuna yakar; en yuksek puanlilar + portfoy +

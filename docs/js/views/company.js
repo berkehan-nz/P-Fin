@@ -73,6 +73,7 @@ window.ViewCompany = (function () {
             ${Fmt.esc(card.sector)} <span class="tiny dim">(SIC ${Fmt.esc(card.sic)})</span></div>
         </div>
         <div>
+          <div class="tiny dim">${card.price_as_of ? `${Fmt.date(card.price_as_of)} kapanisi` : 'fiyat tarihi yok'}</div>
           <div class="price">${Fmt.money(card.price, { digits: 2 })}
             ${Fmt.isNum(chg) ? `<span class="${Fmt.pnlClass(chg)}" style="font-size:15px">
               ${Fmt.signedPct(chg)}</span>` : ''}</div>
@@ -89,7 +90,9 @@ window.ViewCompany = (function () {
                Fmt.isNum(card.net_debt_musd) && card.net_debt_musd < 0
                  ? 'Negatif: borctan cok nakdi var' : 'Borc eksi nakit')}
         ${stat('Sonraki bilanco', Fmt.date((card.calendar || {}).next_earnings),
-               'Kazanc aciklamasi tarihi')}
+               (card.calendar || {}).estimated
+                 ? 'TAHMINI — son SEC raporu + 13 hafta; kesin tarih henuz aciklanmadi'
+                 : 'Kazanc aciklamasi tarihi')}
       </div>
 
       <h3>Puan dagilimi</h3>
@@ -97,6 +100,7 @@ window.ViewCompany = (function () {
         <b>ayni sektordeki diger sirketlere gore</b> hesaplanir — 70 puan
         "sektorun en iyi %30'unda" demektir, mutlak bir not degildir.
         Yanindaki sayi o basligin genel puandaki agirligi.</p>
+      ${poolNote()}
       <div class="grid score-blocks" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr))">
         ${['value', 'quality', 'safety', 'momentum', 'earnings_quality', 'catalyst']
           .map((k) => {
@@ -197,6 +201,18 @@ window.ViewCompany = (function () {
     const f = ((card.scores || {}).coverage_factors || {})[block];
     if (!Fmt.isNum(f) || f >= 0.999) return `agirlik ${w}`;
     return `agirlik ${w} → ${Fmt.num(w * f, 1)} (kapsama ×${Fmt.num(f, 2)})`;
+  }
+
+  /* Yuzdelik HAVUZU. Tarama bitene kadar havuz kucuk: 70 puan 60 sirketlik
+     havuzda "en iyi %30" demek, 3.000 sirketlik havuzda baska bir sey. */
+  function poolNote() {
+    const pool = card.percentile_pool || {};
+    if (!pool.universe) return '';
+    const small = pool.universe < 300;
+    return `<p class="tiny ${small ? 'c-yellow' : 'dim'}" style="margin:-4px 0 8px">
+      Yuzdelik tabani: <b>${pool.universe}</b> sirket
+      (${Fmt.esc(card.sector || 'sektor')} icinde ${pool.sector}).
+      ${small ? 'Havuz kucuk — tarama tamamlaninca puanlar degisebilir.' : ''}</p>`;
   }
 
   function lowCoverage(block) {

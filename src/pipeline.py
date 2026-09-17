@@ -34,7 +34,32 @@ def load_company(ticker: str, *, with_price: bool = True) -> Fundamentals | None
         quote = try_fetch(prices.quote, ticker, label=f"fiyat {ticker}")
         if quote:
             prices.attach(f, quote)
+
+    reconcile_shares(f)
     return f
+
+
+def reconcile_shares(f: Fundamentals) -> None:
+    """EDGAR hisse sayisini dogrulayamadiysa ikinci kaynakla kontrol et.
+
+    Yalnizca SUPHELI durumlarda cagrilir (hisse yok ya da kapak sayfasi
+    seyreltilmis sayiyla karsilastirilamadi) — her sirket icin ek istek
+    atilmaz. Ikinci kaynak belirgin buyukse o kullanilir: kucuk hisse sayisi
+    tek sinif demektir ve piyasa degerini kati kati kucuk gosterir.
+    """
+    source = f.sources.get("shares") or ""
+    if f.shares_outstanding is not None and source != "kapak_sayfasi_dogrulanmamis":
+        return
+    alt = try_fetch(prices.implied_shares, f.ticker, label=f"hisse {f.ticker}")
+    if alt is None:
+        return
+    edgar = f.shares_outstanding
+    if edgar is None or edgar < alt * config.SHARE_RECONCILE_RATIO:
+        print(f"  [hisse] {f.ticker}: EDGAR {edgar} -> yfinance {alt:.3f} mn "
+              f"(tum siniflar)")
+        f.shares_outstanding = alt
+        f.sources["shares"] = ("yfinance_tum_siniflar" if edgar is None
+                               else "yfinance_tum_siniflar (EDGAR tek sinif)")
 
 
 def benchmarks() -> dict[str, list[tuple[str, float]]]:
@@ -51,6 +76,17 @@ def context(tickers: list[str]) -> dict:
                          label="kazanc takvimi") or {}
     shorts = try_fetch(finra_short.load, label="FINRA kisa pozisyon") or {}
     return {"earnings": earnings, "shorts": shorts}
+
+
+def earnings_entry(ticker: str, confirmed: str | None) -> dict:
+    """Bilanco tarihi: Finnhub'da varsa KESIN, yoksa SEC'ten TAHMIN."""
+    if confirmed:
+        return {"next_earnings": confirmed, "estimated": False}
+    from .sources import calendar_src
+    cik = try_fetch(edgar_api.cik_for, ticker, label=f"cik {ticker}")
+    guess = try_fetch(calendar_src.estimate_next_earnings, cik,
+                      label=f"bilanco tahmini {ticker}")
+    return {"next_earnings": guess, "estimated": bool(guess)}
 
 
 def build_cards(rows: list[dict], *, source: str, sector_table: dict,
@@ -90,6 +126,7 @@ def build_cards(rows: list[dict], *, source: str, sector_table: dict,
             is_manual=row.get("is_manual", False),
             both_tracks=ticker in config.SEED_BOTH_TRACKS,
         )
+        card["calendar"] = earnings_entry(ticker, ctx["earnings"].get(ticker))
         cards.save(card)
         built.append(card)
     return built
@@ -228,13 +265,21 @@ def _sector_counts(rows: list[dict]) -> dict:
     return dict(sorted(out.items(), key=lambda kv: kv[1], reverse=True))
 
 
-def append_funnel_log(log: dict) -> bool:
-    """Her kosuyu ``funnel_log.json``'a ekler — esik degisimlerinin etkisi izlensin."""
+def append_funnel_log(log: dict, *, partial: bool = False, cycle: int | None = None,
+                      scanned: int | None = None) -> bool:
+    """Her kosuyu ``funnel_log.json``'a ekler — esik degisimlerinin etkisi izlensin.
+
+    ``partial``: tur bitmeden yazilan ara kayit. Asama 3-4 sayilari o anki
+    hayatta kalan havuzuna gore; tur sonunda degisebilir.
+    """
     path = DATA_DIR / "funnel_log.json"
     existing = read_json(path, {"runs": []})
     runs = existing.get("runs", [])
     entry = {
         "date": today_iso(),
+        "partial": partial,
+        "cycle": cycle,
+        "scanned": scanned,
         "stages": log.get("stages", []),
         "kill_reasons": log.get("kill_reasons", {}),
         "sector_distribution": log.get("sector_distribution", {}),

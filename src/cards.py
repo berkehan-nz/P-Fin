@@ -177,6 +177,27 @@ def build(f: Fundamentals, *,
             f"yanlis olcekte alinmis. F/K, PEG ve kazanc kalitesi puani bu sayidan "
             f"turedigi icin guvenilmez.")
 
+    # FAIZ ILE BORC TUTARLI MI? Borc etiketi kacirilinca sirket "borcsuz"
+    # gorunuyor, faiz karsilama tavan degeri (100) aliyor ve saglamlik puaninda
+    # en guvenli sirket gibi puanlaniyordu (COLL: 1.036 mn $ borc, 76 mn $ faiz,
+    # kartta borc sifir). Odenen faizden ima edilen oran bu ayrismayi yakalar.
+    _last, _cur = f.latest_period(), f.ttm_period()
+    _debt = (num(_last.long_term_debt) or 0.0) + (num(_last.short_term_debt) or 0.0) if _last else 0.0
+    _interest = abs(num(_cur.interest_expense) or 0.0) if _cur else 0.0
+    _ebit = num(_cur.operating_income) if _cur else None
+    if _interest > 0 and _ebit and _interest > abs(_ebit) * 0.02:
+        if _debt <= 0:
+            warnings.append(
+                f"BORC GORUNMUYOR AMA FAIZ ODENIYOR: TTM faiz gideri "
+                f"{_interest:,.1f} mn $, bilancoda finansal borc yok. Borc donem "
+                f"icinde kapanmis olabilir ya da borc etiketi okunamadi; "
+                f"net borc ve isletme degeri eksik olabilir.")
+        elif _interest / _debt > 0.15:
+            warnings.append(
+                f"BORC EKSIK OLABILIR: {_interest:,.1f} mn $ faiz, {_debt:,.1f} mn $ "
+                f"borca %{_interest / _debt * 100:.0f} faiz orani ima ediyor. "
+                f"Bir borc kalemi okunamamis olabilir.")
+
     not_scored = (score_block or {}).get("not_scored")
     if not_scored:
         warnings.append(f"PUANLANAMADI: {not_scored}")
@@ -273,6 +294,11 @@ def build(f: Fundamentals, *,
         "source": source,
         "as_of": today_iso(),
         "price": _round(f.price, None, 2),
+        "price_as_of": (f.price_history[-1][0] if f.price_history else None),
+        # Yuzdeliklerin hangi havuza gore hesaplandigi. Tarama bitene kadar
+        # havuz kucuk; 40'lik bir puan 50 sirketlik havuzda baska, 3.000'lik
+        # havuzda baska sey demek.
+        "percentile_pool": _pool_size(sector_table, sector),
         "market_cap_musd": _round(meta["market_cap_musd"], None, 1),
         "enterprise_value_musd": _round(meta["enterprise_value_musd"], None, 1),
         # Gunluk kosu fiyat degisince EV ve carpanlari BUNLARDAN yeniden
@@ -297,7 +323,7 @@ def build(f: Fundamentals, *,
         "series": series,
         "flags": flags,
         "news": news or [],
-        "calendar": {"next_earnings": next_earnings},
+        "calendar": {"next_earnings": next_earnings, "estimated": False},
         "analyst": analyst or {},
         "short_interest": short_interest or {},
         "insider": insider or {},
@@ -522,6 +548,32 @@ def _story_age(card: dict) -> int | None:
         return None
 
 
+def low_coverage_blocks(card: dict) -> dict[str, list[str]]:
+    """Kapsamasi dusuk bloklar ve o bloklarda HESAPLANAMAYAN alt metrikler.
+
+    "Veri yetersiz" rozeti tek basina neyin eksik oldugunu soylemiyor;
+    eksik metrigi bilmek veriyi duzeltmenin ilk adimi.
+    """
+    out: dict[str, list[str]] = {}
+    for block, detail in (card.get("score_detail") or {}).items():
+        if not isinstance(detail, dict) or not detail.get("low_coverage"):
+            continue
+        missing = [k for k, v in (detail.get("components") or {}).items()
+                   if not isinstance(v, dict) or v.get("percentile") is None]
+        out[block] = missing
+    return out
+
+
+def _pool_size(sector_table: dict | None, sector: str | None) -> dict:
+    """Yuzdelik havuzunun buyuklugu: tum evren ve sirketin sektoru."""
+    if not sector_table:
+        return {"universe": 0, "sector": 0}
+    def widest(block):
+        return max((len(v) for v in (block or {}).values()), default=0)
+    return {"universe": widest(sector_table.get("__ALL__")),
+            "sector": widest(sector_table.get(sector))}
+
+
 def summary_row(card: dict) -> dict:
     """``candidates.json`` icin kompakt satir — dashboard izgarasi bunu okur."""
     m = card.get("metrics", {})
@@ -539,6 +591,15 @@ def summary_row(card: dict) -> dict:
         "market_cap_musd": card.get("market_cap_musd"),
         "scores": card.get("scores", {}),
         "headline": {k: m.get(k, {}) for k in headline_keys},
+        # Kol fark etmeksizin HER satirda olan cekirdek metrikler. headline
+        # kola gore degisiyor (Kol A'da buyume yok); karsilastirma ve Chat
+        # ajani icin ortak bir set gerekiyordu.
+        "core": {k: (m.get(k) or {}).get("value") for k in
+                 ("rev_growth_ttm", "gross_margin", "fcf_yield_ev",
+                  "piotroski_f", "roic", "net_debt_to_ebitda")},
+        "price_as_of": card.get("price_as_of"),
+        "percentile_pool": card.get("percentile_pool"),
+        "low_coverage_blocks": low_coverage_blocks(card),
         "why_cheap": (card.get("story") or {}).get("why_cheap_diagnosis", ""),
         "claude_verdict": verdict[:140],
         "story_age_days": card.get("story_age_days"),

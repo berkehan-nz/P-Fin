@@ -157,6 +157,24 @@ def quote(ticker: str, **kw) -> dict:
     }
 
 
+def implied_shares(ticker: str) -> float | None:
+    """Tum hisse siniflarini kapsayan tedavuldeki hisse sayisi (milyon).
+
+    yfinance ``impliedSharesOutstanding`` TUM SINIFLARI toplar;
+    ``sharesOutstanding`` yalnizca islem goren sinifi verir (GOOGL: 5,9 mlr
+    yerine 12,2 mlr). EDGAR cok sinifli sirketlerde guncel toplami
+    tasimadiginda ikinci kaynak olarak kullanilir.
+    """
+    try:
+        import yfinance as yf
+        info = yf.Ticker(ticker).info or {}
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [uyari] yfinance hisse {ticker}: {str(exc)[:60]}")
+        return None
+    val = num(info.get("impliedSharesOutstanding")) or num(info.get("sharesOutstanding"))
+    return val / 1e6 if val and val > 0 else None
+
+
 def attach(f, quote_data: dict | None = None) -> None:
     """Fiyat verisini bir ``Fundamentals`` nesnesine yazar."""
     q = quote_data or quote(f.ticker)

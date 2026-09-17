@@ -53,6 +53,9 @@ def main(argv: list[str] | None = None) -> int:
         # --- fiyata bagli alanlari tazele ---
         if quote and quote.get("price"):
             card["price"] = round(quote["price"], 2)
+            # Fiyat HANGI KAPANISA ait? as_of kartin yazildigi gun; fiyat
+            # genelde bir onceki islem gununun kapanisidir.
+            card["price_as_of"] = quote.get("as_of")
             card["change_1d_pct"] = (round(quote["change_1d_pct"], 2)
                                      if quote.get("change_1d_pct") is not None else None)
             card["series"]["price_sparkline"] = prices.sparkline(quote["history"])
@@ -64,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
             news = try_fetch(finnhub_api.news, ticker, label=f"haber {ticker}")
             if news:
                 card["news"] = news
-        card["calendar"] = {"next_earnings": ctx["earnings"].get(ticker)}
+        card["calendar"] = pipeline.earnings_entry(ticker, ctx["earnings"].get(ticker))
 
         analyst = try_fetch(analyst_src.consensus, ticker, card.get("price"),
                             label=f"analist {ticker}")

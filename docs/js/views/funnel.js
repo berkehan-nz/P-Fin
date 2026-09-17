@@ -43,6 +43,10 @@ window.ViewFunnel = (function () {
   }
 
   function subtitle(scan, fromFullRun, latest, uni) {
+    if (fromFullRun && latest.partial) {
+      return `Tur ${latest.cycle || '?'} devam ediyor · ${latest.scanned || 0} sirket tarandi · `
+        + `asama 3-4 sayilari su anki havuza gore, tur sonunda degisebilir`;
+    }
     if (fromFullRun) {
       return `Tam evren taramasi · ${Fmt.date(latest.date)} · `
         + `${uni.total_evaluated || 0} sirket degerlendirildi`;

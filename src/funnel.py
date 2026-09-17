@@ -128,14 +128,37 @@ def stage1(row: dict) -> str | None:
     fcf = num(row["meta"].get("fcf_ttm_musd"))
     rule40 = num(m.get("rule_of_40"))
     fcf_ok = fcf is not None and fcf > 0
+    # YUKSEK BUYUME ISTISNASI, is modelinin saglam oldugunu varsayar: nakit
+    # yakiyor ama hizli ve verimli buyuyor. Bu varsayim iki kosulda kurulamaz:
+    #  * brut marj BILINMIYORSA (istisna "iyi marjli buyume" icindir), ve
+    #  * buyume makul ust sinirin USTUNDEYSE — %1078 buyume is modeli degil,
+    #    tek seferlik lisans/tazminat gelirinin izidir. Arbutus (ABUS) FCF
+    #    negatifken, brut marji bilinmezken bu yoldan Kol A'ya girmisti.
     exemption = (growth is not None
                  and growth > STAGE1["high_growth_exemption_growth_pct"]
+                 and growth <= STAGE1["high_growth_exemption_growth_max_pct"]
+                 and gm is not None
                  and rule40 is not None
                  and rule40 >= STAGE1["high_growth_exemption_rule40_min"])
     if not (fcf_ok or exemption):
-        return ("FCF negatif ve yuksek buyume istisnasi saglanmadi "
-                f"(buyume {'yok' if growth is None else f'%{growth:.1f}'}, "
-                f"40 Kurali {rule40 if rule40 is None else round(rule40, 1)})")
+        # Sebebi ACIK yaz: "buyume %1078, 40 Kurali 1057 -> saglanmadi" okuyana
+        # iki sayi da esigin ustunde gorundugu icin anlamsiz geliyordu.
+        why = []
+        if growth is None:
+            why.append("buyume bilinmiyor")
+        elif growth <= STAGE1["high_growth_exemption_growth_pct"]:
+            why.append(f"buyume %{growth:.1f} <= %{STAGE1['high_growth_exemption_growth_pct']:.0f}")
+        elif growth > STAGE1["high_growth_exemption_growth_max_pct"]:
+            why.append(f"buyume %{growth:.0f} makul sinirin (%"
+                       f"{STAGE1['high_growth_exemption_growth_max_pct']:.0f}) ustunde — "
+                       f"tek seferlik gelir izi")
+        if gm is None:
+            why.append("brut marj bilinmiyor")
+        if rule40 is None:
+            why.append("40 Kurali hesaplanamadi")
+        elif rule40 < STAGE1["high_growth_exemption_rule40_min"]:
+            why.append(f"40 Kurali {rule40:.0f} < {STAGE1['high_growth_exemption_rule40_min']:.0f}")
+        return "FCF negatif ve yuksek buyume istisnasi saglanmadi (" + "; ".join(why) + ")"
 
     nd_ebitda = num(m.get("net_debt_to_ebitda"))
     if nd_ebitda is not None and nd_ebitda >= STAGE1["net_debt_to_ebitda_max"]:
@@ -207,8 +230,11 @@ def _share_count_declining(row: dict) -> bool:
     f: Fundamentals = row.get("fundamentals")
     if f is None:
         return False
-    counts = [num(q.shares_diluted) for q in f.sorted_quarters()[-3:]]
-    counts = [c for c in counts if c is not None]
+    # Once BOSLARI AT, sonra son uc degeri al. Tersi sirada bir ceyregi eksik
+    # sirkette (MNTN: Aralik ceyregi raporlanmamis) geriye iki deger kaliyor
+    # ve istisna hic uygulanamiyordu.
+    counts = [num(q.shares_diluted) for q in f.sorted_quarters()[-5:]]
+    counts = [c for c in counts if c is not None][-3:]
     if len(counts) < 3:
         return False
     return counts[-1] < counts[-2] < counts[-3]

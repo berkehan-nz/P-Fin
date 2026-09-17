@@ -135,8 +135,20 @@ STOCK_TAGS = {
         "ShortTermInvestments", "MarketableSecuritiesCurrent",
         "AvailableForSaleSecuritiesDebtSecuritiesCurrent",
     ],
-    "long_term_debt": ["LongTermDebtNoncurrent", "LongTermDebt"],
-    "short_term_debt": ["LongTermDebtCurrent", "ShortTermBorrowings", "DebtCurrent"],
+    # Oncelik sirasi KAPSAMLI etiketten parcali olana. Hepsi alternatiftir,
+    # toplanmaz; guncellik secimi (_freshness_order) raporlama etiketini
+    # degistiren sirketin guncel etiketini one alir. Collegium borcunu
+    # yalnizca ConvertibleLongTermNotesPayable ile raporluyor; liste bunu
+    # icermediginde borc SIFIR sayiliyor, FCF verimi %55 cikiyordu.
+    # YALNIZCA TOPLAM etiketleri. Bilesenler (vadeli kredi, konvertibl...)
+    # asagidaki LONG_TERM_DEBT_COMPONENTS ile ayrica toplanir.
+    "long_term_debt": [
+        "LongTermDebtNoncurrent", "LongTermDebt",
+        "LongTermDebtAndCapitalLeaseObligations",
+    ],
+    "short_term_debt": ["LongTermDebtCurrent", "ShortTermBorrowings", "DebtCurrent",
+                        "ConvertibleNotesPayableCurrent", "LineOfCredit",
+                        "NotesPayableCurrent"],
     "operating_lease_current": ["OperatingLeaseLiabilityCurrent"],
     "operating_lease_noncurrent": ["OperatingLeaseLiabilityNoncurrent"],
     "goodwill": ["Goodwill"],
@@ -163,6 +175,25 @@ SHARE_FLOW_TAGS = {
         "WeightedAverageNumberOfSharesOutstanding",
     ],
 }
+
+# UZUN VADELI BORC BILESENLERI. Bazi sirketler toplam etiketi hic kullanmaz,
+# borcu arac arac raporlar. Collegium: LongTermLoansPayable 797,8 mn +
+# ConvertibleLongTermNotesPayable 238,7 mn; toplam etiketi yok. Tek alternatif
+# secmek borcun dortte ucunu kaybettiriyordu (76 mn $ faiz, 239 mn $ borc).
+#
+# Kural: o donem icin TOPLAM etiketi varsa o kullanilir; yoksa gruplar
+# TOPLANIR. Grup ICINDEKI etiketler ayni seyin farkli adlaridir, en buyugu
+# alinir (orn. SeniorNotes, LongTermNotesPayable'in alt kumesidir).
+# Secured/UnsecuredLongTermDebt kasitli olarak YOK: arac turlerini capraz
+# kesen siniflandirma, eklenirse cift sayar.
+LONG_TERM_DEBT_COMPONENTS = [
+    ["LongTermLoansPayable"],
+    ["ConvertibleLongTermNotesPayable", "ConvertibleDebtNoncurrent",
+     "ConvertibleNotesPayable"],
+    ["LongTermNotesPayable", "SeniorNotes"],
+    ["LongTermLineOfCredit"],
+    ["OtherLongTermDebtNoncurrent"],
+]
 
 # 2 yilda vadesi gelen borc (vade duvari testi)
 MATURITY_TAGS = [
@@ -353,6 +384,38 @@ def _collect_cumulative_quarterly(facts: dict, tags: list[str],
     return out
 
 
+# Bir etiketin en son verisi, en guncel etiketinkinden bu kadar gun geride
+# kalmiyorsa "guncel" sayilir ve liste sirasi korunur. Tolerans olmadan tek
+# bir cikisli alt kalem etiketi, kapsamli ana etiketi bir ceyrek farkla
+# yerinden edebilirdi.
+TAG_FRESHNESS_TOLERANCE_DAYS = 120
+
+
+def _freshness_order(latest_by_tag: list[tuple[str, str]]) -> list[str]:
+    """Etiketleri GUNCELLIGE gore sirala; guncel olanlar arasinda liste sirasi.
+
+    NEDEN: etiket listeleri "ilk dolu olan kazanir" mantigiyla okunuyordu.
+    Sirket raporlama etiketini degistirdiginde eski etiketin GECMISI hala
+    duruyor; liste basindaki o eski etiket kazaniyor ve guncel veri hic
+    okunmuyordu. Corpay 2014'te birakilan LongTermDebtNoncurrent yuzunden
+    10,6 mlr $ borcu, 2013'te birakilan InterestExpense yuzunden faiz
+    giderini kaybediyordu.
+
+    ``latest_by_tag``: [(etiket, en_son_donem_sonu)] — LISTE SIRASINDA.
+    """
+    if not latest_by_tag:
+        return []
+    freshest = max(end for _, end in latest_by_tag)
+    try:
+        cutoff = (date.fromisoformat(freshest)
+                  - timedelta(days=TAG_FRESHNESS_TOLERANCE_DAYS)).isoformat()
+    except ValueError:
+        cutoff = freshest
+    current = [tag for tag, end in latest_by_tag if end >= cutoff]
+    stale = [tag for tag, end in latest_by_tag if end < cutoff]
+    return current + stale
+
+
 def _pick_best(entries: list[dict]) -> dict | None:
     """Ayni donem icin birden fazla kayit varsa en son DOSYALANANI sec.
 
@@ -374,15 +437,26 @@ def _collect_field(facts: dict, tags: list[str]) -> tuple[dict, dict, str | None
     Once hem yillik hem ceyreklik verisi olan ilk etiket denenir; boyle
     bir etiket yoksa en cok veri tasiyan tercih edilir.
     """
-    best: tuple[dict, dict, str] | None = None
+    collected = []
     for tag in tags:
         annual = _collect_single_tag(facts, tag, annual=True)
         quarterly = _collect_single_tag(facts, tag, annual=False)
+        if annual or quarterly:
+            latest = max([*annual, *quarterly])
+            collected.append((tag, latest, annual, quarterly))
+    if not collected:
+        return {}, {}, None
+
+    # Etiket yine TEK secilir (Q4 turetimi icin sart), ama secim guncellige
+    # gore yapilir: gecmisi olan ama yillar once birakilmis etiket kazanamaz.
+    by_tag = {tag: (annual, quarterly) for tag, _, annual, quarterly in collected}
+    ordered = _freshness_order([(tag, latest) for tag, latest, _, _ in collected])
+    for tag in ordered:
+        annual, quarterly = by_tag[tag]
         if annual and quarterly:
             return annual, quarterly, tag
-        if (annual or quarterly) and best is None:
-            best = (annual, quarterly, tag)
-    return best if best is not None else ({}, {}, None)
+    tag = ordered[0]
+    return by_tag[tag][0], by_tag[tag][1], tag
 
 
 def _collect_single_tag(facts: dict, tag: str, *, annual: bool) -> dict[str, float]:
@@ -405,45 +479,58 @@ def _collect_single_tag(facts: dict, tag: str, *, annual: bool) -> dict[str, flo
 
 def _collect_flow(facts: dict, tags: list[str], *, annual: bool) -> dict[str, float]:
     """{donem_sonu: deger} — ilk dolu etiket alternatifini kullanir."""
-    out: dict[str, float] = {}
+    buckets: dict[str, dict[str, list[dict]]] = {}
     for tag in tags:
-        entries = _facts_for_tag(facts, tag)
-        if not entries:
-            continue
         bucket: dict[str, list[dict]] = {}
-        for e in entries:
+        for e in _facts_for_tag(facts, tag):
             ok = _is_annual(e) if annual else _is_quarter(e)
             if ok and e.get("val") is not None:
                 bucket.setdefault(e["end"], []).append(e)
-        for end, group in bucket.items():
+        if bucket:
+            buckets[tag] = bucket
+
+    # Tek etiket, guncellige gore (bkz. _freshness_order).
+    ordered = _freshness_order([(t, max(b)) for t, b in buckets.items()])
+    if not ordered:
+        return {}
+    out: dict[str, float] = {}
+    for end, group in buckets[ordered[0]].items():
+        best = _pick_best(group)
+        if best is not None:
+            out[end] = float(best["val"])
+    return out
+
+
+def _collect_stock_src(facts: dict, tags: list[str]) -> dict[str, tuple[float, str]]:
+    """{donem_sonu: (deger, etiket)} — anlik kalemler, kaynak etiketiyle.
+
+    En GUNCEL etiket birincildir; onun kapsamadigi (eski) donemler diger
+    etiketlerden liste sirasinda tamamlanir. Kaynak etiketi dondurulur ki
+    ayni kavramin farkli kapsamli etiketleri (LongTermDebt = cari dahil,
+    LongTermDebtNoncurrent = cari haric) ayirt edilebilsin.
+    """
+    buckets: dict[str, dict[str, list[dict]]] = {}
+    for tag in tags:
+        bucket: dict[str, list[dict]] = {}
+        for e in _facts_for_tag(facts, tag):
+            if e.get("start") is None and e.get("val") is not None:
+                bucket.setdefault(e["end"], []).append(e)
+        if bucket:
+            buckets[tag] = bucket
+
+    out: dict[str, tuple[float, str]] = {}
+    for tag in _freshness_order([(t, max(b)) for t, b in buckets.items()]):
+        for end, group in buckets[tag].items():
             if end not in out:
                 best = _pick_best(group)
                 if best is not None:
-                    out[end] = float(best["val"])
-        if out:
-            break
+                    out[end] = (float(best["val"]), tag)
     return out
 
 
 def _collect_stock(facts: dict, tags: list[str]) -> dict[str, float]:
     """{donem_sonu: deger} — anlik (instant) kalemler."""
-    out: dict[str, float] = {}
-    for tag in tags:
-        entries = _facts_for_tag(facts, tag)
-        if not entries:
-            continue
-        bucket: dict[str, list[dict]] = {}
-        for e in entries:
-            if e.get("start") is None and e.get("val") is not None:
-                bucket.setdefault(e["end"], []).append(e)
-        for end, group in bucket.items():
-            if end not in out:
-                best = _pick_best(group)
-                if best is not None:
-                    out[end] = float(best["val"])
-        if out:
-            break
-    return out
+    return {end: val for end, (val, _tag) in _collect_stock_src(facts, tags).items()}
 
 
 def _shares_outstanding(facts: dict) -> tuple[float | None, str]:
@@ -461,16 +548,46 @@ def _shares_outstanding(facts: dict) -> tuple[float | None, str]:
     cover = _cover_page_shares(facts)
     diluted = _latest_diluted_shares(facts)
 
+    # ESKIMIS KAPAK SAYFASI. Cok sinifli sirketlerde companyfacts boyutlu
+    # guncel kayitlari dusurur; geriye yillar onceki TEK bir kayit kalabilir.
+    # Bel Fuse icin 2011-08-01 tarihli 2,17 mn hisse kullaniliyordu (gercek
+    # ~14 mn) ve piyasa degeri 7 kat kucuk, FCF verimi %65 cikiyordu.
+    cover_end = _cover_page_end(facts)
+    if cover is not None and cover_end:
+        try:
+            age = (date.today() - date.fromisoformat(cover_end)).days
+        except ValueError:
+            age = 0
+        if age > COVER_PAGE_MAX_AGE_DAYS:
+            cover = None
+
     if cover is None:
         if diluted is None:
             return None, "yok"
         return diluted, "seyreltilmis_agirlikli_ortalama"
+
+    if diluted is None:
+        # Karsilastiracak bir deger yok: tek sinif mi toplam mi bilinemez.
+        # Veri hatti bunu gorup ikinci bir kaynakla dogrular.
+        return cover, "kapak_sayfasi_dogrulanmamis"
 
     if diluted is not None and cover < diluted * SHARE_COUNT_SANITY_RATIO:
         # Kapak sayfasi seyreltilmisin belirgin altinda -> muhtemelen tek sinif
         return diluted, "seyreltilmis_agirlikli_ortalama (kapak tek sinif gorunuyor)"
 
     return cover, "kapak_sayfasi"
+
+
+# Kapak sayfasi hisse sayisi bundan eskiyse kullanilmaz (gun).
+COVER_PAGE_MAX_AGE_DAYS = 550
+
+
+def _cover_page_end(facts: dict) -> str | None:
+    """Kapak sayfasi hisse sayisinin en guncel tarihi."""
+    entries = (_facts_for_tag(facts, "EntityCommonStockSharesOutstanding")
+               or _facts_for_tag(facts, "CommonStockSharesOutstanding"))
+    ends = [e.get("end") for e in entries if e.get("val") is not None and e.get("end")]
+    return max(ends) if ends else None
 
 
 def _cover_page_shares(facts: dict) -> float | None:
@@ -608,9 +725,34 @@ def fundamentals_from_facts(facts: dict, ticker: str, *,
         a_flows[field] = annual
 
     # --- stok kalemleri ---
+    stock_src = {field: _collect_stock_src(facts, tags)
+                 for field, tags in STOCK_TAGS.items()}
     stocks: dict[str, dict[str, float]] = {
-        field: _collect_stock(facts, tags) for field, tags in STOCK_TAGS.items()
+        field: {end: val for end, (val, _t) in series.items()}
+        for field, series in stock_src.items()
     }
+
+    # Toplam etiketi olmayan donemlerde bilesenleri topla.
+    component_sum: dict[str, float] = {}
+    for group in LONG_TERM_DEBT_COMPONENTS:
+        per_end: dict[str, float] = {}
+        for tag in group:
+            for end, val in _collect_stock(facts, [tag]).items():
+                per_end[end] = max(per_end.get(end, 0.0), val)
+        for end, val in per_end.items():
+            component_sum[end] = component_sum.get(end, 0.0) + val
+    for end, val in component_sum.items():
+        if end not in stock_src["long_term_debt"]:
+            stock_src["long_term_debt"][end] = (val, "bilesen_toplami")
+            stocks["long_term_debt"][end] = val
+
+    # CIFT SAYIM. us-gaap:LongTermDebt CARI KISMI DA ICERIR. Uzun vadeli borc
+    # bu etiketten, kisa vadeli borc LongTermDebtCurrent'tan geliyorsa cari
+    # kisim iki kez sayilir. O donemde uzun vadeliden cari kisim dusulur.
+    for end, (ltd, ltd_tag) in stock_src["long_term_debt"].items():
+        std = stock_src["short_term_debt"].get(end)
+        if ltd_tag == "LongTermDebt" and std and std[1] == "LongTermDebtCurrent":
+            stocks["long_term_debt"][end] = max(ltd - std[0], 0.0)
 
     # 2 yilda vadesi gelen borc = 12 ay + 2. yil
     maturity: dict[str, float] = {}
