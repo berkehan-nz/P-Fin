@@ -10,13 +10,13 @@
     "target_high": 223.0,
     "target_low": 190.0,
     "target_median": 215.0,
-    "upside_to_median": 19.56400845289734
+    "upside_to_median": 19.564003582955646
   },
   "as_of": "2026-09-17",
   "calendar": {
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-10-30"
   },
-  "change_1d_pct": 0.58,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -54,30 +54,29 @@
       3
     ],
     "rev_growth_organic_suspect": true,
-    "roic_method": "b",
+    "roic_method": "a",
     "stage1_missing": [],
     "warnings": [
-      "Buyume satin alma kaynakli olabilir; serefiye artisi ve 8-K devralma duyurulari kontrol edilmeli.",
-      "bilesen eksik"
+      "Buyume satin alma kaynakli olabilir; serefiye artisi ve 8-K devralma duyurulari kontrol edilmeli."
     ],
     "would_fail_at": null,
-    "z_unreliable": true,
-    "z_unreliable_reason": "bilesen eksik"
+    "z_unreliable": false,
+    "z_unreliable_reason": null
   },
-  "generated_at": "2026-09-17T01:34:47+00:00",
+  "generated_at": "2026-09-17T13:27:57+00:00",
   "insider": {
     "form4_count": 24,
     "last_form4": "2026-09-16",
     "window_days": 180
   },
-  "market_cap_musd": 6937.2,
+  "market_cap_musd": 6937.1,
   "metrics": {
     "altman_z": {
-      "color": "gray",
+      "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "none",
-      "sector_pct": null,
-      "value": null
+      "pct_basis": "sector",
+      "sector_pct": 59.4,
+      "value": 9.26
     },
     "beneish_m": {
       "color": "green",
@@ -160,7 +159,7 @@
       "color": "yellow",
       "own_5y_pct": 83.3,
       "pct_basis": "sector",
-      "sector_pct": 77.5,
+      "sector_pct": 82.5,
       "value": 4.83
     },
     "fcf_yield_mcap": {
@@ -206,11 +205,11 @@
       "value": 1.08
     },
     "interest_coverage": {
-      "color": "gray",
+      "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "none",
-      "sector_pct": null,
-      "value": null
+      "pct_basis": "sector",
+      "sector_pct": 34.6,
+      "value": 12.71
     },
     "maturity_wall_2y": {
       "color": "gray",
@@ -230,7 +229,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 75.0,
+      "sector_pct": 71.1,
       "value": 0.82
     },
     "operating_margin": {
@@ -314,7 +313,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 17.5,
+      "sector_pct": 22.5,
       "value": 6.48
     },
     "roic": {
@@ -427,13 +426,18 @@
     }
   ],
   "overrides": [],
+  "percentile_pool": {
+    "sector": 20,
+    "universe": 266
+  },
   "price": 179.82,
+  "price_as_of": "2026-09-16",
   "reverse_dcf": {
     "actual_growth_pct": 7.06,
     "discount_rate": 0.1,
     "enterprise_value_musd": 7336.8,
     "fcf_ttm_musd": 354.3,
-    "implied_growth_pct": 7.620386519642556,
+    "implied_growth_pct": 7.62,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -467,8 +471,8 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 67.5,
-          "scaled": 67.5,
+          "percentile": 62.5,
+          "scaled": 62.5,
           "weight": 0.6
         },
         "rel_strength_6m": {
@@ -514,8 +518,9 @@
     "safety": {
       "components": {
         "altman_z": {
-          "contribution": null,
-          "percentile": null
+          "percentile": 59.4,
+          "scaled": 59.4,
+          "weight": 0.3
         },
         "current_ratio": {
           "percentile": 44.7,
@@ -523,17 +528,18 @@
           "weight": 0.2
         },
         "interest_coverage": {
-          "contribution": null,
-          "percentile": null
+          "percentile": 34.6,
+          "scaled": 34.6,
+          "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 75.0,
-          "scaled": 25.0,
+          "percentile": 71.1,
+          "scaled": 28.9,
           "weight": 0.3
         }
       },
-      "coverage": 0.5,
-      "low_coverage": true
+      "coverage": 1.0,
+      "low_coverage": false
     },
     "value": {
       "components": {
@@ -558,8 +564,8 @@
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 77.5,
-          "scaled": 77.5,
+          "percentile": 82.5,
+          "scaled": 82.5,
           "weight": 0.25
         }
       },
@@ -573,11 +579,11 @@
         "A": 0.24829454882181934,
         "B": 0.6389667389451745,
         "C": 0.1588184712653531,
-        "D": null
+        "D": 1.1681896297382848
       },
-      "reason": "bilesen eksik",
-      "unreliable": true,
-      "z": null
+      "reason": null,
+      "unreliable": false,
+      "z": 9.255703047360775
     },
     "beneish": {
       "m": -2.6007366579787643,
@@ -598,10 +604,7 @@
         "turnover_up": true
       }
     },
-    "solvency_fallback": {
-      "fcf_to_total_debt": 0.5907503868317149,
-      "interest_coverage": null
-    }
+    "solvency_fallback": null
   },
   "scores": {
     "catalyst": null,
@@ -609,16 +612,16 @@
       "earnings_quality": 1.0,
       "momentum": 1.0,
       "quality": 1.0,
-      "safety": 0.5,
+      "safety": 1.0,
       "value": 1.0
     },
     "earnings_quality": 53.7,
-    "momentum": 51.5,
+    "momentum": 48.5,
     "quality": 50.4,
-    "safety": 32.9,
-    "total": 57.5,
-    "value": 73.4,
-    "weight_coverage": 0.68
+    "safety": 42.4,
+    "total": 57.2,
+    "value": 74.7,
+    "weight_coverage": 0.75
   },
   "sector": "Olcum ve tibbi cihaz",
   "series": {
