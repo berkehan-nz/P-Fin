@@ -864,3 +864,22 @@ class TestOneOffWithOperatingLoss:
         from src.metrics import _one_off_earnings
         assert _one_off_earnings(Period(period_end="2026-06-30", operating_income=-50.0,
                                         net_income=20.0)) is False
+
+
+class TestProxyStatementExcluded:
+    def test_def14a_pay_vs_performance_does_not_override_10k(self):
+        """LOPE: 10-K 216.170.000, sonradan dosyalanan DEF 14A 216.170 (binlik)."""
+        from src.sources import edgar_api as ea
+        facts = {"facts": {"us-gaap": {"NetIncomeLoss": {"units": {"USD": [
+            {"start": "2025-01-01", "end": "2025-12-31", "val": 216_170_000,
+             "form": "10-K", "fp": "FY", "filed": "2026-02-18", "accn": "a"},
+            {"start": "2025-01-01", "end": "2025-12-31", "val": 216_170,
+             "form": "DEF 14A", "fp": None, "filed": "2026-04-23", "accn": "b"},
+        ]}}}}}
+        annual, _q, _tag = ea._collect_field(facts, ["NetIncomeLoss"])
+        assert annual["2025-12-31"] == 216_170_000
+
+    def test_proxy_form_detection(self):
+        from src.sources.edgar_api import _is_proxy_form
+        assert _is_proxy_form("DEF 14A") and _is_proxy_form("DEFA14A") and _is_proxy_form("PRE 14A")
+        assert not _is_proxy_form("10-K") and not _is_proxy_form("10-Q") and not _is_proxy_form(None)

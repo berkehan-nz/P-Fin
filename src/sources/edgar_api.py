@@ -271,15 +271,31 @@ def submissions(cik: int) -> dict | None:
 # --------------------------------------------------------------------------
 # XBRL ayristirma
 # --------------------------------------------------------------------------
+def _is_proxy_form(form: str | None) -> bool:
+    """Vekalet beyani (DEF 14A, DEFA14A, PRE 14A, DEF 14C...)."""
+    return bool(form) and ("14A" in form or "14C" in form)
+
+
 def _facts_for_tag(facts: dict, tag: str) -> list[dict]:
-    """Bir etiketin USD (veya shares) birimli tum kayitlari."""
+    """Bir etiketin USD (veya shares) birimli tum kayitlari.
+
+    VEKALET BEYANLARI DISARIDA. 2022'den beri zorunlu "Pay versus Performance"
+    tablosu DEF 14A icinde sirketin net karini etiketliyor ve bunu siklikla
+    BINLIK birimde, olceklemeden yapiyor. Vekalet beyani 10-K'dan SONRA
+    dosyalandigi icin "en son dosyalanan kazanir" kurali onu seciyordu:
+    Grand Canyon Education 2025 net kari 216.170.000 yerine 216.170, ConEd
+    2,02 mlr yerine 2,02 mn okunuyordu. Bozuk yillik deger Q4 turetimini de
+    "makul degil" diye engelliyor, ceyrek boslugu TTM'i o bozuk yillik
+    degere dusuruyordu — F/K 20.000'i asiyordu.
+    """
     for ns in ("us-gaap", "ifrs-full", "dei"):
         block = facts.get("facts", {}).get(ns, {}).get(tag)
         if not block:
             continue
         for unit in ("USD", "shares", "USD/shares"):
             if unit in block.get("units", {}):
-                return block["units"][unit]
+                return [e for e in block["units"][unit]
+                        if not _is_proxy_form(e.get("form"))]
     return []
 
 
