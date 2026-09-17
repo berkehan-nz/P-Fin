@@ -1139,6 +1139,147 @@
       "as_of": "2026-09-17",
       "claude_verdict": "",
       "core": {
+        "fcf_yield_ev": 5.02,
+        "gross_margin": 59.21,
+        "net_debt_to_ebitda": -2.89,
+        "piotroski_f": 5.0,
+        "rev_growth_ttm": 11.39,
+        "roic": 73.76
+      },
+      "data_quality": "iyi",
+      "decision": "",
+      "flags": {
+        "is_manual": false,
+        "one_off_earnings": false,
+        "rev_growth_organic_suspect": false,
+        "z_unreliable": false
+      },
+      "headline": {
+        "ev_ebit": {
+          "color": "red",
+          "own_5y_pct": 50.0,
+          "pct_basis": "sector",
+          "sector_pct": 47.2,
+          "value": 25.85
+        },
+        "fcf_yield_ev": {
+          "color": "yellow",
+          "own_5y_pct": 80.0,
+          "pct_basis": "sector",
+          "sector_pct": 60.5,
+          "value": 5.02
+        },
+        "roic": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "sector",
+          "sector_pct": 97.4,
+          "value": 73.76
+        }
+      },
+      "low_coverage_blocks": {},
+      "market_cap_musd": 1317.5,
+      "name": "NAPCO SECURITY TECHNOLOGIES, INC",
+      "percentile_pool": {
+        "sector": 19,
+        "universe": 254
+      },
+      "price": 36.83,
+      "price_as_of": "2026-09-17",
+      "scores": {
+        "catalyst": null,
+        "coverage_factors": {
+          "earnings_quality": 0.8,
+          "momentum": 1.0,
+          "quality": 1.0,
+          "safety": 1.0,
+          "value": 1.0
+        },
+        "earnings_quality": 51.2,
+        "momentum": 60.5,
+        "quality": 90.0,
+        "safety": 84.9,
+        "total": 68.9,
+        "value": 49.8,
+        "weight_coverage": 0.73
+      },
+      "sector": "Elektronik ve elektrikli ekipman",
+      "source": "funnel",
+      "sparkline": [
+        42.32,
+        42.67,
+        41.5,
+        38.31,
+        39.39,
+        40.24,
+        42.59,
+        42.75,
+        44.17,
+        44.69,
+        45.91,
+        45.29,
+        45.91,
+        45.18,
+        46.72,
+        41.82,
+        41.58,
+        40.21,
+        37.89,
+        36.22,
+        35.82,
+        36.69,
+        36.16,
+        37.53,
+        36.2,
+        35.77,
+        35.01,
+        35.23,
+        37.22,
+        37.49,
+        37.5,
+        37.42,
+        37.29,
+        37.98,
+        37.79,
+        38.4,
+        36.09,
+        35.74,
+        36.67,
+        36.05,
+        35.57,
+        35.74,
+        37.25,
+        36.37,
+        38.09,
+        40.34,
+        41.36,
+        38.87,
+        38.32,
+        37.81,
+        37.77,
+        37.59,
+        35.73,
+        35.35,
+        35.24,
+        37.01,
+        35.91,
+        36.26,
+        35.95,
+        36.835
+      ],
+      "story_age_days": null,
+      "ticker": "NSSC",
+      "track": "A",
+      "warning_count": 1,
+      "warnings": [
+        "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
+      ],
+      "why_cheap": ""
+    },
+    {
+      "as_of": "2026-09-17",
+      "claude_verdict": "",
+      "core": {
         "fcf_yield_ev": 6.19,
         "gross_margin": 68.55,
         "net_debt_to_ebitda": -0.65,
@@ -9495,12 +9636,20 @@
     }
   ],
   "counts": {
-    "funnel": 67,
+    "funnel": 68,
     "manual": 0,
     "seed": 36
   },
   "manual": [],
-  "partial": null,
+  "partial": {
+    "cycle": 2,
+    "is_partial": true,
+    "pct": 65.8,
+    "ranked": 50,
+    "scanned": 2520,
+    "survivors": 254,
+    "universe": 3831
+  },
   "seed": [
     {
       "as_of": "2026-09-17",
