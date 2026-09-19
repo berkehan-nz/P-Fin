@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-18",
+  "as_of": "2026-09-19",
   "candidates": [
     {
       "as_of": "2026-09-18",
@@ -1825,6 +1825,159 @@
       "warning_count": 2,
       "warnings": [
         "Ertelenmis gelir kisa vadeli yukumlulugun buyuk kismi ve sirket net nakit pozisyonunda — Z'' abonelik modelinde yaniltici. Faiz karsilama ve FCF/borc ile degerlendir.",
+        "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
+      ],
+      "why_cheap": ""
+    },
+    {
+      "as_of": "2026-09-19",
+      "claude_verdict": "",
+      "core": {
+        "fcf_yield_ev": 26.72,
+        "gross_margin": 49.13,
+        "net_debt_to_ebitda": -0.36,
+        "piotroski_f": 5.0,
+        "rev_growth_ttm": 5.85,
+        "roic": 26.69
+      },
+      "data_quality": "iyi",
+      "decision": "",
+      "flags": {
+        "is_manual": false,
+        "one_off_earnings": false,
+        "rev_growth_organic_suspect": true,
+        "z_unreliable": true
+      },
+      "headline": {
+        "ev_ebit": {
+          "color": "green",
+          "own_5y_pct": 0.0,
+          "pct_basis": "universe",
+          "sector_pct": 0.8,
+          "value": 3.7
+        },
+        "fcf_yield_ev": {
+          "color": "green",
+          "own_5y_pct": 100.0,
+          "pct_basis": "universe",
+          "sector_pct": 98.4,
+          "value": 26.72
+        },
+        "roic": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "universe",
+          "sector_pct": 72.7,
+          "value": 26.69
+        }
+      },
+      "low_coverage_blocks": {
+        "earnings_quality": [
+          "beneish_m",
+          "cash_conversion"
+        ],
+        "safety": [
+          "altman_z",
+          "current_ratio"
+        ]
+      },
+      "market_cap_musd": 998.7,
+      "name": "UPBOUND GROUP, INC.",
+      "percentile_pool": {
+        "sector": 7,
+        "universe": 350
+      },
+      "price": 17.13,
+      "price_as_of": "2026-09-18",
+      "scores": {
+        "catalyst": null,
+        "coverage_factors": {
+          "earnings_quality": 0.5,
+          "momentum": 1.0,
+          "quality": 1.0,
+          "safety": 0.5,
+          "value": 1.0
+        },
+        "earnings_quality": 43.0,
+        "momentum": 32.2,
+        "quality": 51.5,
+        "safety": 37.0,
+        "total": 66.6,
+        "value": 99.1,
+        "weight_coverage": 0.62
+      },
+      "sector": "Is hizmetleri",
+      "source": "funnel",
+      "sparkline": [
+        17.21,
+        18.46,
+        18.42,
+        18.01,
+        17.88,
+        17.46,
+        18.5,
+        18.58,
+        18.92,
+        19.91,
+        19.78,
+        19.54,
+        19.17,
+        19.76,
+        18.48,
+        19.01,
+        18.78,
+        17.96,
+        17.41,
+        17.23,
+        17.51,
+        17.84,
+        19.42,
+        19.06,
+        17.89,
+        18.27,
+        18.88,
+        18.59,
+        18.72,
+        17.46,
+        18.69,
+        19.84,
+        20.86,
+        20.73,
+        20.53,
+        19.85,
+        21.16,
+        21.08,
+        22.16,
+        21.91,
+        21.08,
+        20.61,
+        20.95,
+        19.39,
+        20.53,
+        19.51,
+        19.22,
+        19.68,
+        19.42,
+        19.5,
+        18.8,
+        19.36,
+        19.29,
+        18.3,
+        18.8,
+        18.45,
+        18.2,
+        18.25,
+        17.78,
+        17.13
+      ],
+      "story_age_days": null,
+      "ticker": "UPBD",
+      "track": "A",
+      "warning_count": 4,
+      "warnings": [
+        "Buyume satin alma kaynakli olabilir; serefiye artisi ve 8-K devralma duyurulari kontrol edilmeli.",
+        "bilesen eksik",
+        "BORC GORUNMUYOR AMA FAIZ ODENIYOR: TTM faiz gideri 109.1 mn $, bilancoda finansal borc yok. Borc donem icinde kapanmis olabilir ya da borc etiketi okunamadi; net borc ve isletme degeri eksik olabilir.",
         "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
       ],
       "why_cheap": ""
@@ -10745,7 +10898,7 @@
     }
   ],
   "counts": {
-    "funnel": 76,
+    "funnel": 77,
     "manual": 0,
     "seed": 36
   },
@@ -10753,10 +10906,10 @@
   "partial": {
     "cycle": 2,
     "is_partial": true,
-    "pct": 90.8,
+    "pct": 94.0,
     "ranked": 50,
-    "scanned": 3480,
-    "survivors": 335,
+    "scanned": 3600,
+    "survivors": 350,
     "universe": 3831
   },
   "seed": [
