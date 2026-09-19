@@ -262,13 +262,12 @@
       "cycle": 2,
       "date": "2026-09-19",
       "kill_reasons": {
-        "30 gunluk ortalama dolar hacmi < 5M USD": 142,
-        "Borsa disi/uygunsuz kotasyon (OTC)": 509,
-        "Brut marj %11.9 <= %30": 4,
-        "Brut marj %17.3 <= %30": 4,
+        "30 gunluk ortalama dolar hacmi < 5M USD": 147,
+        "Borsa disi/uygunsuz kotasyon (OTC)": 530,
+        "Brut marj %20.9 <= %30": 5,
         "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; brut marj bilinmiyor; 40 Kurali hesaplanamadi)": 30,
         "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume yok, 40 Kurali None)": 68,
-        "Fiyat < 5 USD": 133,
+        "Fiyat < 5 USD": 136,
         "Hasilat buyumesi %-7.3 <= %5": 5,
         "Hasilat buyumesi %0.3 <= %5": 5,
         "Hasilat buyumesi %0.4 <= %5": 5,
@@ -285,19 +284,20 @@
         "Hasilat buyumesi %4.3 <= %5": 5,
         "Hasilat buyumesi %4.4 <= %5": 5,
         "Hasilat buyumesi %4.9 <= %5": 5,
-        "Hasilatsiz biyoteknoloji": 98,
-        "Net borc/FAVOK 4.2 >= 3.0": 5,
-        "Piotroski F 3 < 4 (Kol A)": 7,
-        "Piyasa degeri < 300M USD": 983,
-        "Piyasa degeri > 50000M USD": 199,
+        "Hasilatsiz biyoteknoloji": 101,
+        "Net borc/FAVOK 3.1 >= 3.0": 6,
+        "Net borc/FAVOK 3.4 >= 3.0": 5,
+        "Piotroski F 3 < 4 (Kol A)": 8,
+        "Piyasa degeri < 300M USD": 1005,
+        "Piyasa degeri > 50000M USD": 208,
         "Piyasa degeri hesaplanamadi": 39,
         "SIC 6000-6799 (finans/gayrimenkul) haric": 8
       },
       "partial": true,
-      "scanned": 3600,
+      "scanned": 3720,
       "sector_distribution": {
         "Egitim": 1,
-        "Elektronik ve elektrikli ekipman": 5,
+        "Elektronik ve elektrikli ekipman": 4,
         "Gida ve tutun": 1,
         "Is hizmetleri": 2,
         "Kaucuk, plastik, cam": 1,
@@ -311,37 +311,38 @@
         "Tekstil ve giyim": 1,
         "Toptan ticaret": 3,
         "Ulasim ekipmani": 1,
+        "Ulastirma": 1,
         "Veri isleme ve sistem entegrasyonu": 2,
         "Yazilim ve programlama": 11
       },
       "sector_quota_overflow": 0,
       "stages": [
         {
-          "input": 3595,
+          "input": 3715,
           "name": "Evren",
-          "output": 1484,
+          "output": 1541,
           "stage": 0
         },
         {
-          "input": 1484,
+          "input": 1541,
           "name": "Sert filtreler",
-          "output": 373,
+          "output": 388,
           "stage": 1
         },
         {
-          "input": 373,
+          "input": 388,
           "name": "Tuzak eleme",
-          "output": 350,
+          "output": 364,
           "stage": 2
         },
         {
-          "input": 350,
+          "input": 364,
           "name": "Goreli ucuzluk",
-          "output": 127,
+          "output": 130,
           "stage": 3
         },
         {
-          "input": 127,
+          "input": 130,
           "name": "Puanlama",
           "output": 50,
           "stage": 4
