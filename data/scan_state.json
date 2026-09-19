@@ -1,14 +1,61 @@
 {
   "as_of": "2026-09-19",
   "batch_size": 120,
-  "cursor": 0,
+  "cursor": 120,
   "cycle": 3,
   "cycle_started": "2026-09-19",
   "failed": [],
-  "kill_counts": {},
-  "last_batch_at": null,
+  "kill_counts": {
+    "30 gunluk ortalama dolar hacmi < 5M USD": 3,
+    "Beneish M -0.92 > -1.78 (manipulasyon suphesi)": 1,
+    "Borsa disi/uygunsuz kotasyon (OTC)": 21,
+    "Brut marj %-3.1 <= %30": 1,
+    "Brut marj %0.0 <= %30": 1,
+    "Brut marj %12.0 <= %30": 1,
+    "Brut marj %16.9 <= %30": 1,
+    "Brut marj %17.1 <= %30": 1,
+    "Brut marj %18.8 <= %30": 1,
+    "Brut marj %19.4 <= %30": 1,
+    "Brut marj %20.3 <= %30": 1,
+    "Brut marj %20.9 <= %30": 1,
+    "Brut marj %21.1 <= %30": 1,
+    "Brut marj %21.5 <= %30": 1,
+    "Brut marj %22.6 <= %30": 1,
+    "Brut marj %22.8 <= %30": 1,
+    "Brut marj %25.3 <= %30": 1,
+    "Brut marj %25.6 <= %30": 1,
+    "Brut marj %27.2 <= %30": 1,
+    "Brut marj %28.9 <= %30": 1,
+    "Brut marj %29.1 <= %30": 1,
+    "Brut marj %5.7 <= %30": 1,
+    "Brut marj %6.3 <= %30": 1,
+    "Brut marj %7.1 <= %30": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (40 Kurali -231 < 40)": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (40 Kurali -44 < 40)": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (40 Kurali 16 < 40)": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (brut marj bilinmiyor; 40 Kurali -103 < 40)": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume %1079 makul sinirin (%150) ustunde — tek seferlik gelir izi; brut marj bilinmiyor)": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume %6.8 <= %25; brut marj bilinmiyor; 40 Kurali -6 < 40)": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; 40 Kurali hesaplanamadi)": 1,
+    "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; brut marj bilinmiyor; 40 Kurali hesaplanamadi)": 1,
+    "Fiyat < 5 USD": 2,
+    "Hasilat buyumesi %-15.2 <= %5": 1,
+    "Hasilat buyumesi %-3.3 <= %5": 1,
+    "Hasilat buyumesi %-5.4 <= %5": 1,
+    "Hasilat buyumesi %-56.1 <= %5": 1,
+    "Hasilat buyumesi %0.3 <= %5": 1,
+    "Hasilat buyumesi %2.1 <= %5": 1,
+    "Hasilat buyumesi %3.8 <= %5": 1,
+    "Hasilatsiz biyoteknoloji": 5,
+    "Hisse sayisi artisi %5.8 >= %5": 1,
+    "Net borc/FAVOK 6.0 >= 3.0": 1,
+    "Piyasa degeri < 300M USD": 29,
+    "Piyasa degeri > 50000M USD": 9,
+    "SBC/FCF 1.82 >= 1.0": 1
+  },
+  "last_batch_at": "2026-09-19T14:35:44+00:00",
   "last_finalized": "2026-09-19",
-  "processed": 0,
+  "processed": 120,
   "queue": [
     "A",
     "AA",
@@ -3839,17 +3886,17 @@
   "source": "scan",
   "stage_counts": {
     "0": {
-      "in": 0,
-      "out": 0
+      "in": 120,
+      "out": 51
     },
     "1": {
-      "in": 0,
-      "out": 0
+      "in": 51,
+      "out": 12
     },
     "2": {
-      "in": 0,
-      "out": 0
+      "in": 12,
+      "out": 11
     }
   },
-  "survivor_count": 0
+  "survivor_count": 11
 }
