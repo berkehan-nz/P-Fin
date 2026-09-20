@@ -6365,6 +6365,152 @@
       "why_cheap": ""
     },
     {
+      "as_of": "2026-09-20",
+      "claude_verdict": "",
+      "core": {
+        "fcf_yield_ev": 7.07,
+        "gross_margin": 33.01,
+        "net_debt_to_ebitda": -17.65,
+        "piotroski_f": 5.0,
+        "rev_growth_ttm": 22.37,
+        "roic": -0.18
+      },
+      "data_quality": "iyi",
+      "decision": "",
+      "flags": {
+        "is_manual": false,
+        "one_off_earnings": false,
+        "rev_growth_organic_suspect": false,
+        "z_unreliable": false
+      },
+      "headline": {
+        "ev_sales": {
+          "color": "green",
+          "own_5y_pct": 50.0,
+          "pct_basis": "sector",
+          "sector_pct": 16.7,
+          "value": 2.01
+        },
+        "rev_growth_ttm": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "sector",
+          "sector_pct": 50.0,
+          "value": 22.37
+        },
+        "rule_of_40": {
+          "color": "yellow",
+          "own_5y_pct": null,
+          "pct_basis": "sector",
+          "sector_pct": 72.2,
+          "value": 36.56
+        }
+      },
+      "low_coverage_blocks": {
+        "earnings_quality": [
+          "cash_conversion",
+          "sloan_accruals"
+        ]
+      },
+      "market_cap_musd": 409.7,
+      "name": "Clearfield, Inc.",
+      "percentile_pool": {
+        "sector": 9,
+        "universe": 80
+      },
+      "price": 30.16,
+      "price_as_of": "2026-09-18",
+      "scores": {
+        "catalyst": null,
+        "coverage_factors": {
+          "earnings_quality": 0.45,
+          "momentum": 1.0,
+          "quality": 1.0,
+          "safety": 1.0,
+          "value": 0.7
+        },
+        "earnings_quality": 47.8,
+        "momentum": 54.4,
+        "quality": 28.9,
+        "safety": 93.1,
+        "total": 57.6,
+        "value": 63.5,
+        "weight_coverage": 0.62
+      },
+      "sector": "Elektronik ve elektrikli ekipman",
+      "source": "funnel",
+      "sparkline": [
+        27.77,
+        29.49,
+        28.71,
+        26.65,
+        26.02,
+        26.0,
+        26.99,
+        27.71,
+        27.82,
+        29.98,
+        32.34,
+        30.37,
+        29.27,
+        28.89,
+        29.37,
+        30.28,
+        40.04,
+        45.15,
+        44.57,
+        43.25,
+        42.2,
+        43.73,
+        46.7,
+        48.24,
+        45.13,
+        40.04,
+        39.37,
+        39.99,
+        40.09,
+        38.88,
+        37.16,
+        37.63,
+        38.75,
+        38.5,
+        34.96,
+        32.94,
+        33.77,
+        33.01,
+        30.64,
+        32.02,
+        30.5,
+        32.12,
+        29.51,
+        30.26,
+        33.74,
+        26.66,
+        28.79,
+        28.74,
+        29.46,
+        27.89,
+        27.54,
+        29.45,
+        29.96,
+        29.01,
+        28.72,
+        28.9,
+        28.28,
+        28.73,
+        30.09,
+        30.16
+      ],
+      "story_age_days": null,
+      "ticker": "CLFD",
+      "track": "B",
+      "warning_count": 1,
+      "warnings": [
+        "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (net_income, cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
+      ],
+      "why_cheap": ""
+    },
+    {
       "as_of": "2026-09-18",
       "claude_verdict": "",
       "core": {
@@ -11741,7 +11887,7 @@
     }
   ],
   "counts": {
-    "funnel": 83,
+    "funnel": 84,
     "manual": 0,
     "seed": 36
   },
@@ -11749,10 +11895,10 @@
   "partial": {
     "cycle": 3,
     "is_partial": true,
-    "pct": 22.0,
-    "ranked": 26,
-    "scanned": 840,
-    "survivors": 68,
+    "pct": 25.1,
+    "ranked": 35,
+    "scanned": 960,
+    "survivors": 80,
     "universe": 3825
   },
   "seed": [
