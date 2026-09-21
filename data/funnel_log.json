@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-20",
+  "as_of": "2026-09-21",
   "runs": [
     {
       "cycle": 2,
@@ -463,6 +463,136 @@
           "input": 47,
           "name": "Puanlama",
           "output": 44,
+          "stage": 4
+        }
+      ],
+      "thresholds_snapshot": {
+        "stage1": {
+          "gross_margin_min_pct": 30.0,
+          "high_growth_exemption_growth_max_pct": 150.0,
+          "high_growth_exemption_growth_pct": 25.0,
+          "high_growth_exemption_rule40_min": 40.0,
+          "kill_on_missing_data": false,
+          "net_debt_to_ebitda_max": 3.0,
+          "rev_growth_ttm_min_pct": 5.0,
+          "sbc_to_fcf_max": 1.0,
+          "share_count_growth_max_pct": 5.0,
+          "share_count_recent_decline_exempts": true
+        },
+        "stage2": {
+          "altman_z_min": 1.1,
+          "beneish_m_max": -1.78,
+          "cash_conversion_consecutive_years": 3,
+          "cash_conversion_min": 0.7,
+          "declining_years": 2,
+          "ipo_lockup_months": 12,
+          "maturity_wall_max": 1.0,
+          "piotroski_f_min_track_a": 4,
+          "z_deferred_revenue_share_of_current_liabilities": 0.4
+        },
+        "stage3": {
+          "implied_growth_absolute_headroom_pct": 5.0,
+          "implied_growth_vs_cagr_max_multiple": 1.5,
+          "track_a": {
+            "ev_ebit_own_5y_pct_max": 50.0,
+            "ev_ebit_sector_pct_max": 40.0,
+            "fcf_yield_min_pct": 4.0
+          },
+          "track_b": {
+            "ev_gross_profit_sector_pct_max": 40.0,
+            "ev_sales_own_5y_pct_max": 50.0
+          },
+          "track_b_operating_margin_pct": 5.0
+        }
+      }
+    },
+    {
+      "cycle": 3,
+      "date": "2026-09-21",
+      "kill_reasons": {
+        "30 gunluk ortalama dolar hacmi < 5M USD": 54,
+        "Borsa disi/uygunsuz kotasyon (OTC)": 198,
+        "Brut marj %12.0 <= %30": 3,
+        "Brut marj %18.8 <= %30": 3,
+        "Brut marj %20.0 <= %30": 3,
+        "Brut marj %20.3 <= %30": 3,
+        "Brut marj %23.3 <= %30": 3,
+        "Brut marj %28.8 <= %30": 3,
+        "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; 40 Kurali hesaplanamadi)": 5,
+        "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; brut marj bilinmiyor; 40 Kurali hesaplanamadi)": 38,
+        "Fiyat < 5 USD": 49,
+        "Hasilat buyumesi %-0.1 <= %5": 3,
+        "Hasilat buyumesi %0.3 <= %5": 3,
+        "Hasilat buyumesi %0.7 <= %5": 4,
+        "Hasilat buyumesi %1.5 <= %5": 3,
+        "Hasilat buyumesi %2.4 <= %5": 4,
+        "Hasilat buyumesi %3.0 <= %5": 3,
+        "Hasilat buyumesi %3.7 <= %5": 4,
+        "Hasilat buyumesi %3.9 <= %5": 3,
+        "Hasilat buyumesi %4.9 <= %5": 3,
+        "Hasilatsiz biyoteknoloji": 44,
+        "Net borc/FAVOK 3.1 >= 3.0": 3,
+        "Net borc/FAVOK 3.4 >= 3.0": 5,
+        "Net borc/FAVOK 3.5 >= 3.0": 3,
+        "Net borc/FAVOK 3.6 >= 3.0": 3,
+        "Net borc/FAVOK 4.2 >= 3.0": 4,
+        "Net borc/FAVOK 4.4 >= 3.0": 3,
+        "Piyasa degeri < 300M USD": 390,
+        "Piyasa degeri > 50000M USD": 80,
+        "Piyasa degeri hesaplanamadi": 11
+      },
+      "partial": true,
+      "scanned": 1440,
+      "sector_distribution": {
+        "Diger is hizmetleri": 5,
+        "Egitim": 2,
+        "Elektronik ve elektrikli ekipman": 5,
+        "Gida ve tutun": 1,
+        "Iletisim": 1,
+        "Is hizmetleri": 1,
+        "Kamu hizmetleri": 1,
+        "Kaucuk, plastik, cam": 3,
+        "Kimya ve ilac": 3,
+        "Madencilik": 3,
+        "Makine ve bilgisayar donanimi": 1,
+        "Metal": 1,
+        "Muhendislik ve arastirma": 1,
+        "Olcum ve tibbi cihaz": 1,
+        "Perakende": 5,
+        "Tekstil ve giyim": 1,
+        "Veri isleme ve sistem entegrasyonu": 2,
+        "Yazilim ve programlama": 12
+      },
+      "sector_quota_overflow": 5,
+      "stages": [
+        {
+          "input": 1440,
+          "name": "Evren",
+          "output": 611,
+          "stage": 0
+        },
+        {
+          "input": 611,
+          "name": "Sert filtreler",
+          "output": 145,
+          "stage": 1
+        },
+        {
+          "input": 145,
+          "name": "Tuzak eleme",
+          "output": 134,
+          "stage": 2
+        },
+        {
+          "input": 134,
+          "name": "Goreli ucuzluk",
+          "output": 54,
+          "stage": 3
+        },
+        {
+          "input": 54,
+          "name": "Puanlama",
+          "output": 49,
           "stage": 4
         }
       ],
