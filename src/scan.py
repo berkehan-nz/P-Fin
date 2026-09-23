@@ -67,8 +67,28 @@ def empty_state() -> dict:
     }
 
 
+class CorruptStateError(RuntimeError):
+    """Durum dosyasi var ama okunamiyor."""
+
+
 def load_state() -> dict:
+    """Tarama durumunu yukler.
+
+    Dosya YOKSA bos durum doner (ilk kosu). Ama dosya VARSA ve
+    okunamiyorsa sessizce sifirdan baslamak, gunlerdir suren bir turu
+    yok etmek demektir — ve kimse fark etmez. Boyle bir durumda GURULTULU
+    basarisiz oluyoruz: bir sonraki kosu yeniden dener, insan mudahalesi
+    gerekirse gorunur olur. Bu, "sessizce YANLIS, acikca EKSIKten
+    tehlikelidir" ilkesinin durum dosyasina uygulanmis halidir.
+    """
     state = read_json(STATE_PATH)
+    if state is None:
+        if STATE_PATH.exists():
+            raise CorruptStateError(
+                f"{STATE_PATH} okunamiyor (bozuk JSON). Tur sifirlanmasin diye "
+                f"duruldu. Dosyayi git gecmisinden geri alin: "
+                f"git checkout HEAD~1 -- {STATE_PATH}")
+        return empty_state()
     if not isinstance(state, dict) or "queue" not in state:
         return empty_state()
     base = empty_state()

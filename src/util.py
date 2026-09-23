@@ -185,7 +185,20 @@ def write_json(path: Path | str, payload: Any, *, source: str | None = None,
         if old is not None and _strip_stamps(old) == _strip_stamps(payload):
             return False
 
-    p.write_text(new_text + "\n", encoding="utf-8")
+    # ATOMIK YAZIM. Once gecici dosyaya yaz, sonra yerine TASI (os.replace
+    # POSIX'te atomiktir). Dogrudan uzerine yazmak, yazim ortasinda surec
+    # olurse dosyayi YARIM birakir. Tarama durumu icin bu felakettir:
+    # yarim scan_state.json okunamaz, load_state sessizce bos duruma doner
+    # ve gunlerdir suren tur SIFIRDAN baslar. Bekci sureci her an
+    # kapatabildigi ve durum artik her 10 sirkette bir yazildigi icin bu
+    # ihtimal gercektir.
+    tmp = p.with_name(p.name + f".tmp{os.getpid()}")
+    try:
+        tmp.write_text(new_text + "\n", encoding="utf-8")
+        os.replace(tmp, p)
+    except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
     return True
 
 

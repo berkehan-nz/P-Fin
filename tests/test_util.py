@@ -103,3 +103,44 @@ class TestSourceBreaker:
         assert not b.ok()
         b.reset()
         assert b.ok()
+
+
+class TestAtomicWrite:
+    """Yarim yazilmis JSON, hic yazilmamis JSON'dan cok daha tehlikelidir.
+
+    Bekci sureci her an kapatabildigi ve tarama durumu her 10 sirkette bir
+    yazildigi icin, dosyanin uzerine dogrudan yazmak gunlerdir suren bir
+    turu yok edebilir.
+    """
+
+    def test_interrupted_write_leaves_old_content_intact(self, tmp_path, monkeypatch):
+        import src.util as util
+
+        path = tmp_path / "durum.json"
+        util.write_json(path, {"cursor": 1920, "queue": ["A", "B"]})
+        saglam = path.read_text(encoding="utf-8")
+
+        real_replace = util.os.replace
+
+        def olen_replace(src, dst):
+            raise KeyboardInterrupt("surec kapandi")
+
+        monkeypatch.setattr(util.os, "replace", olen_replace)
+        with pytest.raises(KeyboardInterrupt):
+            util.write_json(path, {"cursor": 9999, "queue": ["C"]})
+
+        monkeypatch.setattr(util.os, "replace", real_replace)
+        # Eski icerik BOZULMAMIS olmali
+        assert path.read_text(encoding="utf-8") == saglam
+        assert util.read_json(path)["cursor"] == 1920
+        # Gecici dosya da ortalikta kalmamali
+        assert list(tmp_path.glob("*.tmp*")) == []
+
+    def test_normal_write_replaces_content(self, tmp_path):
+        import src.util as util
+
+        path = tmp_path / "durum.json"
+        util.write_json(path, {"cursor": 1})
+        util.write_json(path, {"cursor": 2})
+        assert util.read_json(path)["cursor"] == 2
+        assert list(tmp_path.glob("*.tmp*")) == []

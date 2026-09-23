@@ -535,3 +535,22 @@ class TestStallDetection:
         st["last_batch_at"] = naive.isoformat()
         p = scan.progress(st)
         assert 4.5 < p["idle_hours"] < 5.5
+
+
+class TestCorruptState:
+    """Bozuk durum dosyasi SESSIZCE turu sifirlamamali."""
+
+    def test_missing_file_is_a_fresh_start(self, isolated):
+        assert scan.load_state()["cursor"] == 0
+
+    def test_corrupt_file_raises_instead_of_resetting(self, isolated):
+        # 1920 sirketlik ilerlemeyi sessizce cope atmak yerine dur.
+        scan.STATE_PATH.write_text('{"cursor": 1920, "queue": ["A", "B"', encoding="utf-8")
+        with pytest.raises(scan.CorruptStateError):
+            scan.load_state()
+
+    def test_valid_file_loads_normally(self, isolated):
+        state = scan.empty_state()
+        state.update({"cursor": 5, "queue": ["A"] * 10})
+        scan.save_state(state)
+        assert scan.load_state()["cursor"] == 5
