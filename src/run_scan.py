@@ -41,7 +41,13 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         print(f"[tarama] Tur {p['cycle']} · {p['done']}/{p['total']} (%{p['pct']}) · "
               f"hayatta kalan {p['survivors']} · kalan {p['remaining']}")
-        print(f"          son parti: {state.get('last_batch_at') or '—'}")
+        idle = p["idle_hours"]
+        print(f"          son parti: {state.get('last_batch_at') or '—'}"
+              f"{f' ({idle} saat once)' if idle is not None else ''}")
+        if p["stalled"]:
+            print(f"::warning::Tarama {idle} saattir ilerlemedi "
+                  f"(imlec {p['done']}/{p['total']}). Son parti kosusunun "
+                  f"gunlugune bakin.")
         print(f"          son tur sonu: {state.get('last_finalized') or '—'}")
         if state.get("failed"):
             print(f"          yuklenemeyen (son {len(state['failed'])}): "

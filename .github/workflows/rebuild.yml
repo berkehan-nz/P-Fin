@@ -46,5 +46,6 @@ jobs:
       - name: Tutarlilik denetimi
         run: python scripts/audit_cards.py || true
       - name: Commit
+        if: always()
         run: |
           scripts/commit_data.sh "veri: kartlar yeniden hesaplandi $(date -u +'%Y-%m-%d %H:%M')" data/

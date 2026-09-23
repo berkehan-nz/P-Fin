@@ -44,5 +44,6 @@ jobs:
         run: python -m src.run_daily
 
       - name: Commit (yalnizca degisiklik varsa)
+        if: always()
         run: |
           scripts/commit_data.sh "veri: gunluk guncelleme $(date -u +%Y-%m-%d)" data/

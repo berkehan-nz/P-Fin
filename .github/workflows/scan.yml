@@ -54,6 +54,7 @@ jobs:
           SEC_USER_AGENT:  ${{ secrets.SEC_USER_AGENT }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           FRED_API_KEY:    ${{ secrets.FRED_API_KEY }}
+          PYTHONUNBUFFERED: '1'
         run: |
           if [ -z "$SEC_USER_AGENT" ]; then
             echo "::error::SEC_USER_AGENT secret'i tanimli degil — SEC 403 doner."
@@ -69,6 +70,11 @@ jobs:
         run: |
           python -m src.run_scan --status >> $GITHUB_STEP_SUMMARY 2>&1 || true
 
+      # ILERLEME HER HALUKARDA KAYDEDILMELI. 22 Eylul 2026'da parti adimi
+      # 50 dakikalik sinira carpti; bu adim ATLANDI ve tarama imleci hic
+      # ilerlemedi. Her saat ayni sirkette ayni yere takildi. `always()`
+      # iptal durumunda da calisir; yarim parti bile kayittir.
       - name: Commit
+        if: always()
         run: |
           scripts/commit_data.sh "veri: tarama partisi $(date -u +'%Y-%m-%d %H:%M')" data/

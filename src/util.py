@@ -8,8 +8,12 @@ from __future__ import annotations
 
 import json
 import math
+import os
+import signal
+import sys
 import threading
 import time
+from contextlib import contextmanager
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable, Sequence
@@ -258,6 +262,160 @@ def sec_get(url: str, **kw) -> requests.Response:
     hdrs = {"User-Agent": config.SEC_USER_AGENT, "Accept-Encoding": "gzip, deflate"}
     hdrs.update(kw.pop("headers", None) or {})
     return http_get(url, headers=hdrs, limiter=SEC_LIMITER, **kw)
+
+
+# --------------------------------------------------------------------------
+# BEKCI — tek bir sirket tum partiyi kilitlemesin
+# --------------------------------------------------------------------------
+# 2026-09-22'de tarama tam burada durdu: borsadan cikmis bir sembolde yfinance
+# sonsuza kadar asildi, is adimi 50 dakikalik sinira carpti, "Commit" adimi
+# atlandi ve ILERLEME HIC KAYDEDILMEDI. Her saat ayni sirkette ayni yere
+# takildi. Uc katmanli savunma kuruyoruz:
+#   1) time_limit  — sirket basina yumusak sinir; sadece o sirket atlanir
+#   2) batch butce — parti erken ve duzgun biter, commit mutlaka calisir
+#   3) Watchdog    — C seviyesinde kitlenmede sureci temiz sonlandirir
+# Ucu de ayni ilkeye hizmet eder: ILERLEME ASLA GERI GITMEZ.
+
+
+class TimeoutHit(BaseException):
+    """Bekci zamanlayicisi.
+
+    Bilerek ``BaseException`` — kutuphanelerin genis ``except Exception``
+    bloklari bunu yutup akisi surdurmesin.
+    """
+
+
+@contextmanager
+def time_limit(seconds: int | None, label: str = ""):
+    """Blogu ``seconds`` saniye ile sinirlar; asarsa ``TimeoutHit`` firlatir.
+
+    SIGALRM kullanir (Unix, ana is parcacigi). Baska ortamda sessizce
+    devre disi kalir — sinir yoksa da kod calismaya devam etmeli.
+    Ic ice kullanilabilir: dis sayacin kalan suresi cikista geri yuklenir.
+    """
+    if not seconds or seconds <= 0 or not hasattr(signal, "SIGALRM"):
+        yield
+        return
+
+    def _fire(signum, frame):  # noqa: ARG001
+        raise TimeoutHit(f"{label or 'islem'} {seconds} sn icinde bitmedi")
+
+    try:
+        prev_handler = signal.signal(signal.SIGALRM, _fire)
+    except ValueError:
+        yield  # ana is parcacigi degil
+        return
+
+    started = time.monotonic()
+    prev_remaining = signal.alarm(int(seconds))
+    try:
+        yield
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, prev_handler)
+        if prev_remaining:  # dis sayaci geri kur
+            left = prev_remaining - (time.monotonic() - started)
+            signal.alarm(max(1, int(left)) if left > 0 else 1)
+
+
+class Watchdog:
+    """Son care: surec C seviyesinde kilitlenirse temiz cikis yapar.
+
+    ``time_limit`` yalnizca Python yorumlayicisina donuldugunde is gorur.
+    Bir kutuphane GIL'i birakip C icinde asilirsa sinyal calismaz. O zaman
+    bu ayri is parcacigi devreye girer: diske yazilmis ilerleme zaten
+    guvendedir, surec 0 ile kapanir ve is akisinin "Commit" adimi CALISIR.
+    Alternatifi — 50 dakikalik sinirla iptal edilmek — commit'i atlatir ve
+    ilerlemeyi tamamen kaybettirir.
+    """
+
+    def __init__(self, limit_sec: int, *, on_timeout: Callable | None = None):
+        self.limit = limit_sec
+        self.on_timeout = on_timeout
+        self._label = "baslangic"
+        self._beat = time.monotonic()
+        self._lock = threading.Lock()
+        self._stop = threading.Event()
+        self._thread: threading.Thread | None = None
+
+    def beat(self, label: str = "") -> None:
+        """Hayat belirtisi. Her sirketten once cagrilir."""
+        with self._lock:
+            self._beat = time.monotonic()
+            if label:
+                self._label = label
+
+    def start(self) -> "Watchdog":
+        if self.limit <= 0:
+            return self
+        self._thread = threading.Thread(target=self._loop, daemon=True,
+                                        name="bekci")
+        self._thread.start()
+        return self
+
+    def stop(self) -> None:
+        self._stop.set()
+
+    def _loop(self) -> None:
+        while not self._stop.wait(5.0):
+            with self._lock:
+                idle = time.monotonic() - self._beat
+                label = self._label
+            if idle < self.limit:
+                continue
+            print(f"\n[bekci] '{label}' {int(idle)} sn yanit vermedi — "
+                  f"surec sonlandiriliyor. Kaydedilmis ilerleme korunuyor; "
+                  f"bu sirket sonraki kosuda atlanacak.", flush=True)
+            sys.stdout.flush()
+            sys.stderr.flush()
+            if self.on_timeout is not None:
+                try:
+                    self.on_timeout(label)
+                except Exception as exc:  # noqa: BLE001
+                    print(f"[bekci] kapanis kaydi basarisiz: {exc}", flush=True)
+                sys.stdout.flush()
+            # os._exit: atexit/finally calistirmaz — asili is parcacigi
+            # normal cikisi engelleyebilir. Cikis kodu 0 ki "Commit" adimi
+            # atlanmasin.
+            os._exit(0)
+
+
+class SourceBreaker:
+    """Devre kesici: cokmus bir kaynagi her sirkette yeniden beklemeyelim.
+
+    Stooq 22 Eylul'de erisilemez hale geldi. Her sembol icin 5 deneme +
+    ustel geri cekilme = hisse basina 30-212 saniye. 120 sirketlik parti
+    saatlerce surmeye basladi ve is akisi siniri her seferinde partiyi
+    iptal etti. Kaynagin kapali oldugunu bir kez ogrenmek yeter.
+
+    Yalnizca KAYNAK HATASI sayilir (ag/zaman asimi). "Bu sembol yok"
+    gecerli bir yanittir ve sayaci sifirlar.
+    """
+
+    def __init__(self, name: str, threshold: int | None = None):
+        self.name = name
+        self.threshold = threshold or config.SOURCE_BREAKER_THRESHOLD
+        self.consecutive = 0
+        self.open = False
+
+    def ok(self) -> bool:
+        return not self.open
+
+    def hit(self) -> None:
+        """Kaynak yanit verdi (bos yanit da olsa)."""
+        self.consecutive = 0
+
+    def miss(self, detail: str = "") -> None:
+        self.consecutive += 1
+        if not self.open and self.consecutive >= self.threshold:
+            self.open = True
+            print(f"  [devre] {self.name} ust uste {self.consecutive} kez "
+                  f"cevap vermedi — bu kosunun geri kalaninda atlanacak."
+                  f"{(' ' + detail) if detail else ''}", flush=True)
+
+    def reset(self) -> None:
+        self.consecutive = 0
+        self.open = False
 
 
 def try_fetch(fn: Callable, *args, label: str = "", **kwargs):

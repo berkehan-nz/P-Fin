@@ -13,10 +13,15 @@ import io
 from datetime import datetime, timedelta
 
 from .. import config
-from ..util import http_get, num, read_json, write_json
+from ..util import (FetchError, SourceBreaker, TimeoutHit, http_get, num,
+                    read_json, time_limit, write_json)
 
 CACHE_DIR = config.CACHE_DIR / "prices"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+# Fiyat kaynaklari istege baglidir; cokerlerse tum partiyi bekletmesinler.
+STOOQ_BREAKER = SourceBreaker("Stooq")
+YF_BREAKER = SourceBreaker("yfinance")
 
 
 def _cache_path(ticker: str):
@@ -36,7 +41,10 @@ def _fresh(path, max_age_hours: int) -> bool:
 def from_stooq(ticker: str) -> list[dict] | None:
     """Gunluk OHLCV. Stooq bilinmeyen sembolde bos/hatali CSV doner."""
     url = config.STOOQ_URL.format(symbol=ticker.lower())
-    resp = http_get(url, timeout=30)
+    # SEC'in sabirli politikasi DEGIL: fiyat gelmezse kart yine uretilir,
+    # ama 120 sirketlik parti tek kaynagin coktugu icin saatlerce surmemeli.
+    resp = http_get(url, timeout=config.PRICE_TIMEOUT_SEC,
+                    max_retries=config.PRICE_MAX_RETRIES)
     text = resp.text.strip()
     if not text or text.lower().startswith("<") or "No data" in text:
         return None
@@ -63,14 +71,33 @@ def from_stooq(ticker: str) -> list[dict] | None:
 # yfinance yedek
 # --------------------------------------------------------------------------
 def from_yfinance(ticker: str) -> list[dict] | None:
+    """Stooq'un tasimadigi semboller icin yedek.
+
+    ZAMAN SINIRI SART: yfinance borsadan cikmis sembollerde yanit vermeden
+    asilabiliyor ve kendi zaman asimi her yolda islemiyor. 22 Eylul 2026'da
+    tarama tam burada, "L" harfinde donup kaldi; her saat ayni sirkette
+    50 dakikalik is akisi sinirina carpti ve HICBIR ILERLEME KAYDEDILMEDI.
+    """
     try:
         import yfinance as yf
     except ImportError:
         return None
     try:
-        hist = yf.Ticker(ticker).history(period="3y", interval="1d", auto_adjust=False)
+        with time_limit(config.YF_TIMEOUT_SEC, f"yfinance {ticker}"):
+            try:
+                hist = yf.Ticker(ticker).history(
+                    period="3y", interval="1d", auto_adjust=False,
+                    timeout=config.YF_TIMEOUT_SEC)
+            except TypeError:  # eski surumlerde timeout parametresi yok
+                hist = yf.Ticker(ticker).history(
+                    period="3y", interval="1d", auto_adjust=False)
+    except TimeoutHit as exc:
+        # Zaman asimi KAYNAK sorunudur; "sembol yok" degil.
+        YF_BREAKER.miss()
+        print(f"  [uyari] yfinance {ticker}: {exc}", flush=True)
+        return None
     except Exception as exc:  # noqa: BLE001
-        print(f"  [uyari] yfinance {ticker}: {exc}")
+        print(f"  [uyari] yfinance {ticker}: {str(exc)[:120]}")
         return None
     if hist is None or hist.empty:
         return None
@@ -104,15 +131,23 @@ def history(ticker: str, *, max_age_hours: int = 12,
 
     rows = None
     source = None
-    try:
-        rows = from_stooq(ticker)
-        source = "stooq" if rows else None
-    except Exception as exc:  # noqa: BLE001
-        print(f"  [uyari] stooq {ticker}: {exc}")
+    if STOOQ_BREAKER.ok():
+        try:
+            rows = from_stooq(ticker)
+            STOOQ_BREAKER.hit()       # yanit verdi (bos olsa da sorun kaynakta degil)
+            source = "stooq" if rows else None
+        except FetchError as exc:
+            STOOQ_BREAKER.miss(str(exc)[:80])
+        except Exception as exc:  # noqa: BLE001
+            STOOQ_BREAKER.miss()
+            print(f"  [uyari] stooq {ticker}: {str(exc)[:120]}")
 
-    if not rows:
+    if not rows and YF_BREAKER.ok():
+        before = YF_BREAKER.consecutive
         rows = from_yfinance(ticker)
         source = "yfinance" if rows else None
+        if YF_BREAKER.consecutive == before:
+            YF_BREAKER.hit()
 
     if not rows:
         cached = read_json(path, {})
@@ -167,7 +202,11 @@ def implied_shares(ticker: str) -> float | None:
     """
     try:
         import yfinance as yf
-        info = yf.Ticker(ticker).info or {}
+        with time_limit(config.YF_TIMEOUT_SEC, f"yfinance bilgi {ticker}"):
+            info = yf.Ticker(ticker).info or {}
+    except TimeoutHit as exc:
+        print(f"  [uyari] yfinance hisse {ticker}: {exc}", flush=True)
+        return None
     except Exception as exc:  # noqa: BLE001
         print(f"  [uyari] yfinance hisse {ticker}: {str(exc)[:60]}")
         return None

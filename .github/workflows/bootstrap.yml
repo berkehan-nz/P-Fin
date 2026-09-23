@@ -62,5 +62,6 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Commit
+        if: always()
         run: |
           scripts/commit_data.sh "veri: tohum listesi kartlari (bootstrap)" data/

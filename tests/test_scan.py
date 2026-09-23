@@ -49,8 +49,10 @@ class TestState:
         s = scan.empty_state()
         s.update({"queue": ["A"] * 200, "cursor": 50, "survivor_count": 7, "cycle": 2})
         p = scan.progress(s)
-        assert p == {"cycle": 2, "done": 50, "total": 200, "pct": 25.0,
-                     "remaining": 150, "survivors": 7}
+        assert {k: p[k] for k in ("cycle", "done", "total", "pct",
+                                  "remaining", "survivors")} == {
+            "cycle": 2, "done": 50, "total": 200, "pct": 25.0,
+            "remaining": 150, "survivors": 7}
 
     def test_progress_handles_empty_queue(self):
         assert scan.progress(scan.empty_state())["pct"] == 0.0
@@ -383,3 +385,153 @@ class TestInterimResults:
                             lambda path, payload, **kw: written.update(payload) or True)
         pipeline.write_candidates([], [], [], partial={"is_partial": True, "pct": 12.5})
         assert written["partial"]["is_partial"] is True
+
+
+class TestHangProtection:
+    """22 Eylul 2026 kilitlenmesi — tek sirket tum partiyi durdurmasin.
+
+    Borsadan cikmis bir sembolde yfinance sonsuza kadar asildi. Parti
+    50 dakikalik is akisi sinirina carpti, "Commit" adimi atlandi ve
+    imlec 1920'de dondu; her saat ayni yere takildi. Uc savunma:
+    sirket basina zaman siniri, parti sure butcesi, tekrar eden
+    sembolu atlama. Ucu de ILERLEME ASLA DURMAZ ilkesine hizmet eder.
+    """
+
+    def test_hanging_company_does_not_stall_batch(self, isolated, monkeypatch):
+        import time as _t
+
+        from src import config, pipeline
+
+        monkeypatch.setattr(config, "COMPANY_TIMEOUT_SEC", 1)
+
+        def maybe_hang(ticker, **kw):
+            if ticker == "HANG":
+                _t.sleep(30)          # bekci devreye girmezse test kilitlenir
+            f = fixtures.ALL["DBX"]()
+            f.avg_dollar_volume_30d = 50e6
+            return f
+
+        monkeypatch.setattr(pipeline, "load_company", maybe_hang)
+
+        state = scan.start_cycle(scan.empty_state(),
+                                 tickers=["DBX", "HANG", "LSCC"])
+        started = _t.monotonic()
+        state = scan.run_batch(state, size=3)
+
+        assert _t.monotonic() - started < 10      # 30 sn beklemedi
+        assert state["cursor"] == 3               # kuyruk sonuna kadar ilerledi
+        assert state["timeouts"]["HANG"] == 1
+        assert "HANG" in state["failed"]
+
+    def test_repeated_timeouts_skip_the_symbol(self, isolated, monkeypatch):
+        from src import config, pipeline
+
+        calls = []
+
+        def counted(ticker, **kw):
+            calls.append(ticker)
+            raise AssertionError("bu sembol hic denenmemeliydi")
+
+        monkeypatch.setattr(pipeline, "load_company", counted)
+        monkeypatch.setattr(config, "COMPANY_TIMEOUT_SKIP_AFTER", 2)
+
+        state = scan.start_cycle(scan.empty_state(), tickers=["BAD"])
+        state["timeouts"] = {"BAD": 2}
+        state = scan.run_batch(state, size=1)
+
+        assert calls == []                # hic denenmedi
+        assert state["cursor"] == 1       # yine de ilerledi
+
+    def test_deadline_ends_batch_cleanly(self, isolated, monkeypatch):
+        import time as _t
+
+        from src import pipeline
+
+        def quick(ticker, **kw):
+            f = fixtures.ALL["DBX"]()
+            f.avg_dollar_volume_30d = 50e6
+            return f
+
+        monkeypatch.setattr(pipeline, "load_company", quick)
+
+        state = scan.start_cycle(scan.empty_state(),
+                                 tickers=[f"T{i}" for i in range(20)])
+        # Butce ZATEN dolmus: tek sirket bile islenmeden duzgun donmeli
+        state = scan.run_batch(state, size=20, deadline=_t.monotonic() - 1)
+
+        assert state["cursor"] == 0
+        assert state["processed"] == 0
+
+    def test_cursor_is_saved_after_every_company(self, isolated, monkeypatch):
+        """Surec parti ortasinda olurse diskteki imlec o ana kadar ilerlemis olmali."""
+        from src import config, pipeline
+
+        monkeypatch.setattr(config, "STATE_FLUSH_EVERY", 1)
+
+        seen = []
+
+        def quick(ticker, **kw):
+            # Her sirketten sonra diskteki duruma bak
+            on_disk = json.loads(scan.STATE_PATH.read_text()) \
+                if scan.STATE_PATH.exists() else {"cursor": 0}
+            seen.append(on_disk.get("cursor", 0))
+            f = fixtures.ALL["DBX"]()
+            f.avg_dollar_volume_30d = 50e6
+            return f
+
+        monkeypatch.setattr(pipeline, "load_company", quick)
+
+        state = scan.start_cycle(scan.empty_state(), tickers=["A", "B", "C"])
+        scan.run_batch(state, size=3)
+
+        # 1. sirkette disk bos (0), 2.'de 1, 3.'te 2 olmali
+        assert seen == [0, 1, 2]
+        assert json.loads(scan.STATE_PATH.read_text())["cursor"] == 3
+
+
+class TestStallDetection:
+    """Duraklama GORUNUR olmali.
+
+    22 Eylul 2026'da tarama iki gun boyunca ayni sirkette takildi ve
+    hicbir yerde "en son ne zaman ilerledi" yazmadigi icin fark edilmedi.
+    """
+
+    def _state(self, hours_ago, *, cursor=10, total=100):
+        from datetime import datetime, timedelta, timezone
+
+        st = scan.empty_state()
+        st["queue"] = [f"T{i}" for i in range(total)]
+        st["cursor"] = cursor
+        if hours_ago is not None:
+            stamp = datetime.now(timezone.utc) - timedelta(hours=hours_ago)
+            st["last_batch_at"] = stamp.isoformat()
+        return st
+
+    def test_fresh_batch_is_not_stalled(self):
+        p = scan.progress(self._state(0.5))
+        assert p["stalled"] is False
+        assert p["idle_hours"] < 1
+
+    def test_old_batch_is_stalled(self):
+        p = scan.progress(self._state(33))
+        assert p["stalled"] is True
+        assert p["idle_hours"] > 32
+
+    def test_finished_cycle_is_never_stalled(self):
+        """Kuyruk bittiyse beklemek normaldir; alarm verme."""
+        p = scan.progress(self._state(48, cursor=100, total=100))
+        assert p["stalled"] is False
+
+    def test_missing_timestamp_is_not_an_alarm(self):
+        p = scan.progress(self._state(None))
+        assert p["idle_hours"] is None
+        assert p["stalled"] is False
+
+    def test_naive_timestamp_is_treated_as_utc(self):
+        from datetime import datetime, timedelta, timezone
+
+        st = self._state(1)
+        naive = (datetime.now(timezone.utc) - timedelta(hours=5)).replace(tzinfo=None)
+        st["last_batch_at"] = naive.isoformat()
+        p = scan.progress(st)
+        assert 4.5 < p["idle_hours"] < 5.5

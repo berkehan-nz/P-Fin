@@ -169,3 +169,35 @@ class TestDataFiles:
         payload = json.loads(path.read_text(encoding="utf-8"))
         assert set(payload["thresholds"]) == set(THRESHOLDS), \
             "thresholds.json bayat — `python scripts/init_data.py` calistir"
+
+
+class TestTimeBudgets:
+    """Kendi butcemiz is akisinin sert sinirindan ONCE dolmali.
+
+    Aksi halde GitHub adimi iptal eder, "Commit" atlanir ve parti bosa gider.
+    """
+
+    def test_budgets_fit_inside_workflow_timeout(self):
+        from src import config
+
+        workflow_limit_sec = 50 * 60      # scan.yml: timeout-minutes: 50
+        assert config.BATCH_BUDGET_SEC < config.RUN_BUDGET_SEC
+        # Kurulum + commit icin en az 5 dakika pay kalsin
+        assert config.RUN_BUDGET_SEC <= workflow_limit_sec - 5 * 60
+
+    def test_company_timeout_is_shorter_than_batch_budget(self):
+        from src import config
+
+        assert config.COMPANY_TIMEOUT_SEC < config.BATCH_BUDGET_SEC
+        assert config.YF_TIMEOUT_SEC < config.COMPANY_TIMEOUT_SEC
+
+    def test_workflow_timeout_matches_assumption(self):
+        """scan.yml degisirse bu test uyarsin — butceler ona gore secildi."""
+        import pathlib
+        import re
+
+        text = (pathlib.Path(__file__).resolve().parents[1]
+                / ".github/workflows/scan.yml").read_text(encoding="utf-8")
+        m = re.search(r"timeout-minutes:\s*(\d+)", text)
+        assert m, "scan.yml icinde timeout-minutes bulunamadi"
+        assert int(m.group(1)) == 50

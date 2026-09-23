@@ -253,6 +253,24 @@ window.Fmt = (function () {
     } catch (_) { return s; }
   }
 
+  /* Tarama saatte bir ilerler. "Ne zaman guncellendi" yazmazsak bir
+     duraklama fark edilmeden gunlerce surebilir — 22 Eylul'de oyle oldu. */
+  function sinceLabel(iso) {
+    if (!iso) return '—';
+    const t = new Date(iso).getTime();
+    if (!t) return '—';
+    const h = (Date.now() - t) / 36e5;
+    if (h < 1) return `${Math.max(1, Math.round(h * 60))} dakika once`;
+    if (h < 24) return `${Math.round(h)} saat once`;
+    return `${Math.round(h / 24)} gun once`;
+  }
+
+  function hoursSince(iso) {
+    if (!iso) return null;
+    const t = new Date(iso).getTime();
+    return t ? (Date.now() - t) / 36e5 : null;
+  }
+
   function daysLabel(n) {
     if (!isNum(n)) return '—';
     if (n < 0) return `${Math.abs(Math.round(n))} gun gecti`;
@@ -273,7 +291,8 @@ window.Fmt = (function () {
 
   return { setThresholds, spec, isNum, num, metricValue, money, pct, pctText, signedPct,
            pnlClass, colorFor, arrow, fillRatio, label, cell, chip,
-           percentileBar, esc, date, daysLabel, trackBadge, decisionBadge,
+           percentileBar, esc, date, daysLabel, sinceLabel, hoursSince,
+           trackBadge, decisionBadge,
            sentence, plain, unitName, percentileSentence, ownHistorySentence,
            colorMeaning, hasOwnHistory };
 })();

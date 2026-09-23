@@ -40,6 +40,33 @@ HTTP_MAX_RETRIES = 5
 HTTP_BACKOFF_BASE_SEC = 2.0  # 2, 4, 8, 16, 32
 
 # --------------------------------------------------------------------------
+# ZAMAN BUTCELERI — bir sirket tum partiyi kilitlemesin
+# --------------------------------------------------------------------------
+# Is akisinin sert siniri 50 dk. O sinira carpilirsa adim IPTAL edilir ve
+# "Commit" adimi ATLANIR; yani parti bosa gider ve imlec hic ilerlemez.
+# Bu yuzden kendi butcemiz her zaman is akisinin sinirindan once dolmali.
+COMPANY_TIMEOUT_SEC = 90       # tek sirket icin yumusak sinir (SIGALRM)
+YF_TIMEOUT_SEC = 40            # yfinance cagrisi — en sik asilan yer
+BATCH_BUDGET_SEC = 26 * 60     # parti bu sureden sonra duzgun biter
+RUN_BUDGET_SEC = 40 * 60       # kart uretimi dahil tum kosu
+WATCHDOG_LIMIT_SEC = 6 * 60    # hic hayat belirtisi yoksa sureci sonlandir
+STATE_FLUSH_EVERY = 10         # kac sirkette bir durum diske yazilsin
+COMPANY_TIMEOUT_SKIP_AFTER = 2  # bu kadar kez asan sembol artik denenmez
+
+# FIYAT KAYNAKLARI SABIRSIZ OLMALI. SEC'in 5 denemeli/ustel geri cekilmeli
+# politikasi tek dogru kaynak oldugu icin dogru; Stooq ve yfinance ise
+# ISTEGE BAGLI zenginlestirmedir — fiyat gelmezse kart yine uretilir.
+# Eski ayarla (5 deneme x 30 sn + 62 sn bekleme) erisilemeyen Stooq hisse
+# basina 212 saniyeye kadar yakabiliyordu; 22 Eylul kilitlenmesinin sebebi
+# buydu: 48 dakika boyunca birkac hisse.
+PRICE_TIMEOUT_SEC = 12
+PRICE_MAX_RETRIES = 2
+# Bir kaynak ust uste bu kadar kez COKERSE o kosu boyunca bir daha aranmaz.
+# Kaynak tamamen kapaliyken 120 sirketin her birinde zaman asimi beklemenin
+# anlami yok; bir kez ogren, gerisini atla.
+SOURCE_BREAKER_THRESHOLD = 8
+
+# --------------------------------------------------------------------------
 # TOHUM LISTESI — 9 Eylul 2026 Finviz on taramasi
 # --------------------------------------------------------------------------
 SEED_DATE = "2026-09-09"

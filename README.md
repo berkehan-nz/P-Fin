@@ -356,6 +356,31 @@ Her saat  →  kuyruktan 120 sirket  →  Asama 0, 1, 2 (sirket bazli)
 
 Parti boyutunu degistirmek icin: Actions → **Scan** → Run workflow → `batch`.
 
+#### Tarama neden bir daha durmaz
+
+22 Eylul 2026'da tarama iki gun boyunca %50,2'de dondu. Sebep zincirdi:
+Stooq erisilemez oldu → her sembol 5 deneme + ustel geri cekilme ile
+**31-212 saniye** yakmaya basladi → 120'lik parti 50 dakikalik is akisi
+sinirina carpti → adim IPTAL edildi → `Commit` adimi ATLANDI → imlec hic
+ilerlemedi → ertesi saat ayni yerden ayni sekilde takildi. Panoda "en son
+ne zaman ilerledi" yazmadigi icin iki gun fark edilmedi.
+
+Bes ayri savunma eklendi; her biri tek basina bu dongusu kirar:
+
+| Savunma | Nerede | Ne yapar |
+|---|---|---|
+| **Sabirsiz fiyat politikasi** | `PRICE_MAX_RETRIES=2`, `PRICE_TIMEOUT_SEC=12` | Fiyat istege bagli zenginlestirmedir; SEC gibi sabirli denenmez |
+| **Devre kesici** | `SourceBreaker` | Bir kaynak ust uste 8 kez cokerse o kosu boyunca aranmaz (olculdu: 20 hisse 626 sn → 20 sn) |
+| **Sirket basina zaman siniri** | `COMPANY_TIMEOUT_SEC=90` | Tek sembol partiyi kilitleyemez; 2 kez asan sembol o tur atlanir |
+| **Parti sure butcesi** | `BATCH_BUDGET_SEC=26 dk` | Parti is akisi sinirindan ONCE duzgun biter, commit mutlaka calisir |
+| **Bekci** | `Watchdog` | C icinde kilitlenmede sureci 0 ile kapatir ki commit adimi atlanmasin |
+
+Ayrica: imlec **her sirketten sonra** ilerler ve durum 10 sirkette bir diske
+yazilir (eskiden yalnizca parti sonunda), `Commit` adimlari `if: always()`
+ile korunur (iptal edilse bile ilerleme islenir), ve tarama 3 saattir
+ilerlemediyse hem `--status` ciktisi hem de panodaki aday listesi bunu
+acikca yazar.
+
 ## Test verisi hakkinda
 
 `tests/fixtures.py` icindeki DBX / LSCC / KVYO rakamlari, sirketlerin kamuya

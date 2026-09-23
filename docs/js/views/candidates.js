@@ -52,7 +52,24 @@ window.ViewCandidates = (function () {
       Puanlar <b>ayni sektordeki digerlerine gore</b> hesaplandigi icin havuz
       buyudukce siralama DEGISECEK. Tarama bitince liste yeniden kurulur.
       Tohum listesindeki 36 sirket bundan etkilenmez.
+      ${progressLine(partial)}
     </div>`;
+  }
+
+  /* Tarama saatte bir parti isler. Kac saattir ilerlemedigi YAZILI olmali:
+     22 Eylul 2026'da tarama iki gun boyunca durdu ve panoda bunu gosteren
+     hicbir sey olmadigi icin fark edilmedi. */
+  function progressLine(partial) {
+    const h = Fmt.hoursSince(partial.last_batch_at);
+    if (h === null) return '';
+    const kalan = partial.remaining != null
+      ? ` Kalan ${partial.remaining} sirket.` : '';
+    if (h >= 3) {
+      return `<br><b class="neg">Dikkat: tarama ${Fmt.sinceLabel(partial.last_batch_at)}
+        ilerledi.</b> Saatlik kosu normalde her saat bir parti isler;
+        bu kadar beklemek bir aksaklik anlamina gelir.${kalan}`;
+    }
+    return `<br>Son parti: <b>${Fmt.sinceLabel(partial.last_batch_at)}</b>.${kalan}`;
   }
 
   function fillSectorFilter() {
