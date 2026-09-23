@@ -35,7 +35,15 @@ from .util import (TimeoutHit, Watchdog, num, read_json, time_limit, today_iso,
 STATE_PATH = DATA_DIR / "scan_state.json"
 SURVIVOR_DIR = DATA_DIR / "survivors"
 
-DEFAULT_BATCH_SIZE = 120
+# PARTI BOYUTU ARTIK BIR TAVAN, hedef degil. Gercek sinirlayici
+# config.BATCH_BUDGET_SEC (26 dk): parti sure dolunca duzgun biter.
+# Neden buyudu: GitHub saatlik cron'u bu repoda saatte bir DEGIL, 3-5
+# saatte bir tetikliyor (14 gunde 82 kosu ~ gunde 6). 120'lik parti ile
+# gunde ancak 720 sirket isleniyor. Olcum: 75. kosu 120 sirketi 3 dakikadan
+# kisa surede bitirdi (~1,5 sn/sirket), yani 26 dakikada 300 sirket rahat
+# sigar. Butce olmadan bu artis tehlikeliydi; butce oldugu icin guvenli.
+DEFAULT_BATCH_SIZE = 300
+LEGACY_BATCH_SIZE = 120     # durum dosyasinda kalmis eski deger
 
 # Anlik goruntude saklanan yillik kalemler — Asama 2'nin nakit donusumu ve
 # "hasilat + brut marj birlikte dusuyor" testleri bunlari ister.
@@ -639,7 +647,14 @@ def run(*, batch_size: int | None = None, new_cycle: bool = False,
 
     # Tek seferlik --batch, kayitli parti boyutunu KALICI degistirmesin;
     # yalnizca bu kosuda gecerli olsun.
-    run_batch_size = batch_size or state.get("batch_size", DEFAULT_BATCH_SIZE)
+    stored = state.get("batch_size") or DEFAULT_BATCH_SIZE
+    if stored == LEGACY_BATCH_SIZE:
+        # ESKI VARSAYILANIN GOCU. 120, kullanicinin sectigi bir deger degil;
+        # sure butcesi yokken guvenli olan tavandi. Butce geldigi icin tavan
+        # yukseldi. Bilincli olarak konmus BASKA bir deger (ornegin
+        # --batch 60 --new-cycle) aynen korunur.
+        stored = DEFAULT_BATCH_SIZE
+    run_batch_size = batch_size or stored
 
     # ZAMAN BUTCESI. Is akisinin sert siniri (50 dk) partiyi IPTAL eder ve
     # "Commit" adimini atlar; o noktaya gelinirse kosu bosa gider. Kendi

@@ -331,7 +331,7 @@ Tam evren taramasi tek seferde saatler surer: ucretsiz kotalarda kirilgandir
 ve tek bir hata butun kosuyu cope atar. Bunun yerine **evren bir kuyruktur**:
 
 ```
-Her saat  →  kuyruktan 120 sirket  →  Asama 0, 1, 2 (sirket bazli)
+Her kosu  →  kuyruktan en fazla 300 sirket  →  Asama 0, 1, 2 (sirket bazli)
                                        ↓
                               hayatta kalanlar data/survivors/ altina
                                        ↓
@@ -340,8 +340,19 @@ Her saat  →  kuyruktan 120 sirket  →  Asama 0, 1, 2 (sirket bazli)
                         ilk 50 icin tam kart  →  yeni tur baslar
 ```
 
-- **~4.900 sembol / 120 = ~41 saat**, yani tur basina yaklasik 1,7 gun.
-  Dashboard'un Huni ekraninda kuyrugun eridigini canli gorursun.
+- **Parti boyutu bir TAVAN, hedef degil.** Gercek sinirlayici 26 dakikalik
+  sure butcesi: parti sure dolunca duzgun biter ve ilerleme kaydedilir.
+  Hizli kosu (sicak onbellek, cok erken eleme) daha cok is yapar, yavas
+  kosu daha az — kendiliginden ayarlanir.
+- **Kosu sayisi saatlik DEGIL.** GitHub zamanlanmis kosulari "best-effort"
+  tetikler; bu repoda olculen sıklık 3-5 saatte bir (14 gunde 82 kosu,
+  gunde ~6). Tavan bu yuzden 120'den 300'e cikarildi: olcum, 120 sirketin
+  3 dakikadan kisa surdugunu gosterdi (~1,5 sn/sirket), yani 26 dakikaya
+  300 rahat sigiyor. Butce olmadan bu artis tehlikeliydi; butce oldugu
+  icin guvenli.
+- **~3.800 sembol**, kosu basina ~300 ve gunde ~6 kosu ile tur basina
+  yaklasik 2 gun. Dashboard'un Huni ekraninda kuyrugun eridigini canli
+  gorursun.
 - **Asama 0-2 partide calisir** cunku sirket bazlidir, komsuya ihtiyac duymaz.
 - **Asama 3-4 tur sonunda calisir** cunku goreli ucuzluk ve sektor yuzdelikleri
   havuzun tamamini gerektirir.

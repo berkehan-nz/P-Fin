@@ -554,3 +554,90 @@ class TestCorruptState:
         state.update({"cursor": 5, "queue": ["A"] * 10})
         scan.save_state(state)
         assert scan.load_state()["cursor"] == 5
+
+
+class TestBatchSizeCeiling:
+    """Parti boyutu bir TAVAN; gercek sinirlayici sure butcesi.
+
+    GitHub saatlik cron'u bu repoda 3-5 saatte bir tetikliyor. Durum
+    dosyasinda kalmis eski 120 degeri, kosu basina isi gereksiz kisitliyordu.
+    """
+
+    def test_legacy_stored_value_does_not_throttle(self, isolated, monkeypatch):
+        seen = {}
+
+        def spy(state, *, size=None, **kw):
+            seen["size"] = size
+            state["cursor"] = len(state["queue"])
+            return state
+
+        monkeypatch.setattr(scan, "run_batch", spy)
+        monkeypatch.setattr(scan, "interim", lambda *a, **k: None)
+        monkeypatch.setattr(scan, "write_survivors_index", lambda: False)
+        monkeypatch.setattr(scan, "finalize", lambda st, **k: st)
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {})
+        # context() FINRA/Finnhub'a gider; testte ag beklemesin.
+        monkeypatch.setattr(pipeline, "context", lambda *a, **k: {})
+        monkeypatch.setattr(scan, "start_cycle",
+                            lambda st, **k: dict(st, queue=["A"], cursor=0))
+
+        state = scan.empty_state()
+        state.update({"queue": ["A"] * 50, "batch_size": scan.LEGACY_BATCH_SIZE})
+        scan.save_state(state)
+        scan.run(build_cards=False)
+
+        assert seen["size"] == scan.DEFAULT_BATCH_SIZE
+
+    def test_explicit_batch_still_wins(self, isolated, monkeypatch):
+        seen = {}
+
+        def spy(state, *, size=None, **kw):
+            seen["size"] = size
+            state["cursor"] = len(state["queue"])
+            return state
+
+        monkeypatch.setattr(scan, "run_batch", spy)
+        monkeypatch.setattr(scan, "interim", lambda *a, **k: None)
+        monkeypatch.setattr(scan, "write_survivors_index", lambda: False)
+        monkeypatch.setattr(scan, "finalize", lambda st, **k: st)
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {})
+        # context() FINRA/Finnhub'a gider; testte ag beklemesin.
+        monkeypatch.setattr(pipeline, "context", lambda *a, **k: {})
+        monkeypatch.setattr(scan, "start_cycle",
+                            lambda st, **k: dict(st, queue=["A"], cursor=0))
+
+        state = scan.empty_state()
+        state.update({"queue": ["A"] * 50})
+        scan.save_state(state)
+        scan.run(batch_size=25, build_cards=False)
+
+        assert seen["size"] == 25      # kullanici acikca istedi, saygi goster
+
+    def test_deliberate_stored_value_is_respected(self, isolated, monkeypatch):
+        """Goc YALNIZCA eski varsayilani (120) yukseltir.
+
+        Bilincli konmus bir deger (ornegin --batch 10 --new-cycle ile
+        kaydedilmis) aynen korunmali; yoksa kullanicinin karari sessizce
+        eziliyor demektir.
+        """
+        seen = {}
+
+        def spy(state, *, size=None, **kw):
+            seen["size"] = size
+            return state
+
+        monkeypatch.setattr(scan, "run_batch", spy)
+        monkeypatch.setattr(scan, "interim", lambda *a, **k: None)
+        monkeypatch.setattr(scan, "write_survivors_index", lambda: False)
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {})
+        monkeypatch.setattr(pipeline, "context", lambda *a, **k: {})
+
+        state = scan.empty_state()
+        state.update({"queue": ["A"] * 500, "cursor": 0, "batch_size": 10})
+        scan.save_state(state)
+        scan.run(build_cards=False)
+
+        assert seen["size"] == 10
