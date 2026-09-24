@@ -66,6 +66,19 @@ def empty_state() -> dict:
         "failed": [],
         "timeouts": {},
         "kill_counts": {},
+        # Sebep METNI yerine sabit KOD sayaci. Metin esigi icinde tasidigi
+        # icin ("%3,0 <= %5", "%3,1 <= %5", ...) her sirket ayri anahtar
+        # uretiyordu: 632 benzersiz anahtar, sisik JSON, kirilgan sayim.
+        "kill_codes": {},
+        # ELENDI (kural ihlali) / VERI_YOK (hesaplanamadi) ayrimi.
+        "kill_kinds": {},
+        # VERI_YOK ile giden sirketler. Bunlar ELENMEDI — bakamadik.
+        # Tur sonunda tekrar denenirler ki sessizce kaybolmasinlar.
+        "retry_queue": [],
+        # Bu turda onbellek atlanarak yeniden denenecekler (onceki turun
+        # retry_queue'su).
+        "retry_pending": [],
+        "universe_size_at_cycle_start": 0,
         "stage_counts": {"0": {"in": 0, "out": 0},
                          "1": {"in": 0, "out": 0},
                          "2": {"in": 0, "out": 0}},
@@ -133,6 +146,7 @@ def progress(state: dict) -> dict:
     total = len(state.get("queue") or [])
     done = min(state.get("cursor", 0), total)
     idle = stalled_hours(state)
+    kinds = state.get("kill_kinds") or {}
     return {
         "cycle": state.get("cycle", 0),
         "done": done,
@@ -142,6 +156,10 @@ def progress(state: dict) -> dict:
         "survivors": state.get("survivor_count", 0),
         "last_batch_at": state.get("last_batch_at"),
         "idle_hours": idle,
+        # ELENDI: kurali ihlal etti. VERI_YOK: bakamadik — eleme degil.
+        "eliminated": kinds.get(funnel.ELENDI, 0),
+        "data_missing": kinds.get(funnel.VERI_YOK, 0),
+        "retry_queue": len(state.get("retry_queue") or []),
         "stalled": bool(idle is not None and idle >= STALL_HOURS
                         and done < total),
     }
@@ -180,6 +198,14 @@ def start_cycle(state: dict, *, tickers: list[str] | None = None,
         "batch_size": batch_size or state.get("batch_size", DEFAULT_BATCH_SIZE),
         "queue": queue,
         "last_finalized": state.get("last_finalized"),
+        # Onceki turda VERI_YOK ile giden sirketler. Bu turda ONBELLEK
+        # ATLANARAK yeniden cekilirler; yoksa "tekrar dene" ayni eksik
+        # dosyayi bir daha okumak olurdu (companyfacts onbellegi 3 gun).
+        "retry_pending": list(state.get("retry_queue") or []),
+        # Payda tur icinde DEGISMEMELI: dashboard "%58" derken toplamin
+        # altindan kaymasi guveni bozar (evren 4.551 -> 6.227 -> 3.825
+        # diye oynamisti).
+        "universe_size_at_cycle_start": len(queue),
     })
     print(f"[tarama] Tur {new['cycle']} basladi — kuyrukta {len(queue)} sembol")
     return new
@@ -306,7 +332,7 @@ def load_survivors() -> list[dict]:
 # --------------------------------------------------------------------------
 # Parti
 # --------------------------------------------------------------------------
-def load_one(ticker: str, state: dict) -> object | None:
+def load_one(ticker: str, state: dict, *, fresh: bool = False) -> object | None:
     """Tek sirketi ZAMAN SINIRI ile yukler. Asilirsa None doner, parti surer.
 
     Ayni sembol ust uste ``COMPANY_TIMEOUT_SKIP_AFTER`` kez asarsa artik hic
@@ -317,7 +343,7 @@ def load_one(ticker: str, state: dict) -> object | None:
         return None
     try:
         with time_limit(config.COMPANY_TIMEOUT_SEC, f"{ticker} verisi"):
-            return pipeline.load_company(ticker)
+            return pipeline.load_company(ticker, fresh=fresh)
     except TimeoutHit as exc:
         timeouts[ticker] = timeouts.get(ticker, 0) + 1
         print(f"  [zaman asimi] {exc} — atlandi "
@@ -352,8 +378,8 @@ def run_batch(state: dict, *, size: int | None = None,
 
     SURVIVOR_DIR.mkdir(parents=True, exist_ok=True)
     counts = state["stage_counts"]
-    kills = state["kill_counts"]
     timeouts = state.setdefault("timeouts", {})
+    retry_pending = set(state.get("retry_pending") or [])
 
     print(f"[tarama] Tur {state['cycle']} · {start + 1}-{start + len(batch)} "
           f"/ {len(queue)}", flush=True)
@@ -373,7 +399,11 @@ def run_batch(state: dict, *, size: int | None = None,
             print(f"  [atlandi] {ticker}: daha once "
                   f"{timeouts[ticker]} kez zaman asimina ugradi", flush=True)
         else:
-            f = load_one(ticker, state)
+            tekrar = ticker in retry_pending
+            if tekrar:
+                print(f"  [tekrar] {ticker}: gecen turda veri eksikti, "
+                      f"onbellek atlanarak cekiliyor", flush=True)
+            f = load_one(ticker, state, fresh=tekrar)
             if f is None:
                 state["failed"] = (state["failed"] + [ticker])[-200:]
             else:
@@ -382,7 +412,7 @@ def run_batch(state: dict, *, size: int | None = None,
 
                 killed_at, reason = _run_early_stages(row, counts)
                 if reason:
-                    kills[reason] = kills.get(reason, 0) + 1
+                    _record_kill(state, ticker, reason)
                     # Onceki turdan kalan bir kayit varsa temizle
                     path = survivor_path(ticker)
                     if path.exists():
@@ -407,6 +437,30 @@ def run_batch(state: dict, *, size: int | None = None,
     state["last_batch_at"] = utc_now_iso()
     save_state(state)
     return state
+
+
+def _record_kill(state: dict, ticker: str, reason) -> None:
+    """Elemeyi uc ayri sekilde kaydeder: metin, kod ve SINIF.
+
+    Sinif onemli: "kurali ihlal etti" ile "hesaplayamadik" ayni sey degil.
+    Ikincisi bir eleme degil, veri boslugudur; o sirketler tekrar denenmek
+    uzere ``retry_queue``'ya girer. Onceki surumde ikisi ayni sepetteydi ve
+    175 sirket sessizce kayboluyordu.
+    """
+    state["kill_counts"][reason] = state["kill_counts"].get(reason, 0) + 1
+
+    code = funnel.kill_code(reason) or "UNCODED"
+    codes = state.setdefault("kill_codes", {})
+    codes[code] = codes.get(code, 0) + 1
+
+    kind = funnel.kill_kind(reason) or funnel.ELENDI
+    kinds = state.setdefault("kill_kinds", {})
+    kinds[kind] = kinds.get(kind, 0) + 1
+
+    if kind == funnel.VERI_YOK:
+        queue = state.setdefault("retry_queue", [])
+        if ticker not in queue:
+            queue.append(ticker)
 
 
 def _run_early_stages(row: dict, counts: dict) -> tuple[int | None, str | None]:
@@ -448,6 +502,24 @@ INTERIM_MIN_SURVIVORS = 15      # bu sayinin altinda siralama anlamsiz
 INTERIM_CARDS_PER_BATCH = 12    # her partide en fazla kac yeni tam kart
 
 
+def _attach_kill_log(log: dict, state: dict) -> None:
+    """Huni gunlugune elemeleri UC gorunumde yazar.
+
+    - ``kill_reasons``: okunur cumleler (ilk 30) — ayrinti icin.
+    - ``kill_codes``: sabit kodlar — sayim buradan yapilir, esik degistiginde
+      anahtar degismez.
+    - ``kill_kinds``: ELENDI / VERI_YOK. Bu ayrim olmadan "elendi" sayisi
+      yaniltici: 175 sirket kotu oldugu icin degil, verisine bakamadigimiz
+      icin listeden dusmustu.
+    """
+    log["kill_reasons"] = dict(sorted(state["kill_counts"].items(),
+                                      key=lambda kv: kv[1], reverse=True)[:30])
+    log["kill_codes"] = dict(sorted((state.get("kill_codes") or {}).items(),
+                                    key=lambda kv: kv[1], reverse=True))
+    log["kill_kinds"] = dict(state.get("kill_kinds") or {})
+    log["retry_queue_size"] = len(state.get("retry_queue") or [])
+
+
 def _stage_log(state: dict) -> list[dict]:
     """Asama 0-2 sayaclarini gunluk bicimine cevirir."""
     counts = state.get("stage_counts") or {}
@@ -481,8 +553,7 @@ def interim(state: dict, *, ctx: dict | None = None, bench: list | None = None,
     # yaziliyordu; tur 1 bir kilitlenme duzeltmesiyle sifirlaninca finalize
     # hic calismadi ve funnel_log.json 9 Eylul'den beri bos kaldi. Ayni
     # gunun kaydi uzerine yazilir; tur ici kayitlar "partial" isaretlidir.
-    log["kill_reasons"] = dict(sorted(state["kill_counts"].items(),
-                                      key=lambda kv: kv[1], reverse=True)[:30])
+    _attach_kill_log(log, state)
     pipeline.append_funnel_log(log, partial=True, cycle=state.get("cycle"),
                                scanned=progress(state)["done"])
 
@@ -570,8 +641,7 @@ def finalize(state: dict, *, ctx: dict | None = None,
     # own_pct anlik goruntude hazir; yeniden hesaplamak icin fiyat gecmisi gerekirdi
     selected, sector_table = funnel.rank(rows, log=log, compute_own_pct=False)
 
-    log["kill_reasons"] = dict(sorted(state["kill_counts"].items(),
-                                      key=lambda kv: kv[1], reverse=True)[:30])
+    _attach_kill_log(log, state)
 
     for s in log["stages"]:
         print(f"   Asama {s['stage']} {s['name']:16} {s['input']:6} -> {s['output']:6}")

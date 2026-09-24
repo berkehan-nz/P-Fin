@@ -694,3 +694,21 @@ section[id] { scroll-margin-top: calc(var(--topbar-h) + 12px); }
   html { scroll-behavior: auto; }
   * { transition: none !important; animation: none !important; }
 }
+
+/* Huni: "elendi" ile "veri yok" ayrimi -------------------------------- */
+/* Bu iki sayi ayni sepette gosterilince 175 sirket "elenmis" gibi
+   okunuyordu. Oysa biri sirket hakkinda bir yargi, digeri bizim
+   eksigimiz. Yan yana ve AYRI renkte durmalilar. */
+.split-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.split-cell { flex: 1 1 240px; min-width: 0; }
+.split-num { font-size: 28px; font-weight: 700; line-height: 1.1; }
+.split-label { margin: 2px 0 6px; }
+.split-bar {
+  background: var(--gray-bg);
+  border-radius: 4px;
+  height: 6px;
+  overflow: hidden;
+}
+.split-bar > span { background: var(--gray); display: block; height: 100%; }
+.split-bar.warn > span { background: var(--yellow); }
+.split-cell.warn .split-num { color: var(--yellow); }

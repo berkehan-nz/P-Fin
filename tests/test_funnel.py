@@ -1,6 +1,6 @@
 """funnel.py — asama mantigi ve eleme sebepleri."""
 
-from src import funnel
+from src import config, funnel
 from tests import fixtures
 
 
@@ -255,3 +255,87 @@ class TestMissingDataIsNotAKill:
         r = clean_row()
         r["metrics"]["gross_margin"] = None
         assert funnel.stage1(r) == "Brut marj hesaplanamadi"
+
+
+class TestKillClassification:
+    """'Elendi' ile 'hesaplayamadik' ayni sey degildir.
+
+    Huni gunlugunde 175 sirket "FCF negatif ve yuksek buyume istisnasi
+    saglanmadi (buyume bilinmiyor; brut marj bilinmiyor)" ile gitmisti.
+    Bu bir eleme degil, veri boslugudur: sirket kotu oldugu icin degil,
+    bakamadigimiz icin dustu. Projenin kurali net — sert filtreler bilinen
+    kotu degerde eler, verinin yoklugunda asla.
+    """
+
+    def test_kill_carries_code_and_kind(self):
+        k = funnel.Kill("MCAP_LOW", "Piyasa degeri < 300M USD")
+        assert k == "Piyasa degeri < 300M USD"   # str gibi davranir
+        assert k.code == "MCAP_LOW"
+        assert k.kind == funnel.ELENDI
+        assert {k: 1}[k] == 1                     # sozluk anahtari olarak
+        import json
+        assert json.dumps({"r": k}) == '{"r": "Piyasa degeri < 300M USD"}'
+
+    def test_missing_market_cap_is_not_an_elimination(self):
+        row = row_for("DBX")
+        row["meta"]["market_cap_musd"] = None
+        reason = funnel.stage0(row)
+        assert reason is not None
+        assert funnel.kill_kind(reason) == funnel.VERI_YOK
+        assert funnel.kill_code(reason) == "MCAP_UNKNOWN"
+
+    def test_small_market_cap_is_an_elimination(self):
+        row = row_for("DBX")
+        row["meta"]["market_cap_musd"] = 50.0
+        reason = funnel.stage0(row)
+        assert funnel.kill_kind(reason) == funnel.ELENDI
+        assert funnel.kill_code(reason) == "MCAP_LOW"
+
+    def test_biotech_without_revenue_data_is_data_missing(self):
+        """Hasilati BILINMEYEN biyotek elenmis sayilmamali."""
+        row = row_for("DBX")
+        row["sic"] = sorted(config.UNIVERSE["biotech_sic_codes"])[0]
+        row["meta"]["revenue_ttm_musd"] = None
+        reason = funnel.stage0(row)
+        assert funnel.kill_kind(reason) == funnel.VERI_YOK
+
+    def test_biotech_with_known_low_revenue_is_eliminated(self):
+        row = row_for("DBX")
+        row["sic"] = sorted(config.UNIVERSE["biotech_sic_codes"])[0]
+        row["meta"]["revenue_ttm_musd"] = 0.0
+        reason = funnel.stage0(row)
+        assert funnel.kill_kind(reason) == funnel.ELENDI
+        assert funnel.kill_code(reason) == "BIOTECH_NO_REVENUE"
+
+    def test_fcf_exemption_unevaluable_is_data_missing(self):
+        """Kurtulus kapisina bakamadiysak, kapiyi kapali sayamayiz."""
+        row = row_for("DBX")
+        # Buyume Asama 1'in kendi esigini GECSIN ki akis FCF testine ulassin.
+        row["metrics"]["rev_growth_ttm"] = 20.0
+        row["meta"]["fcf_ttm_musd"] = -10.0
+        row["metrics"]["gross_margin"] = None      # istisna degerlendirilemez
+        row["metrics"]["rule_of_40"] = None
+        reason = funnel.stage1(row)
+        assert reason is not None
+        assert funnel.kill_code(reason) == "FCF_NEG_NO_EXEMPTION"
+        assert funnel.kill_kind(reason) == funnel.VERI_YOK
+
+    def test_fcf_exemption_evaluated_and_failed_is_elimination(self):
+        """Tum girdiler varsa ve istisna saglanmiyorsa, bu gercek bir eleme."""
+        row = row_for("DBX")
+        row["meta"]["fcf_ttm_musd"] = -10.0
+        row["metrics"]["gross_margin"] = 55.0
+        # Asama 1 buyume esigini gecer ama YUKSEK BUYUME istisnasina yetmez.
+        row["metrics"]["rev_growth_ttm"] = 20.0
+        row["metrics"]["rule_of_40"] = 10.0
+        reason = funnel.stage1(row)
+        assert reason is not None
+        assert funnel.kill_kind(reason) == funnel.ELENDI
+
+    def test_codes_are_stable_across_thresholds(self):
+        """Kod esik degerini TASIMAZ; metin tasir."""
+        a, b = row_for("DBX"), row_for("DBX")
+        a["meta"]["market_cap_musd"] = 10.0
+        b["meta"]["market_cap_musd"] = 299.0
+        ra, rb = funnel.stage0(a), funnel.stage0(b)
+        assert ra.code == rb.code == "MCAP_LOW"

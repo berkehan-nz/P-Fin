@@ -11,7 +11,8 @@ from . import overrides
 from .util import read_json, today_iso, try_fetch, write_json
 
 
-def load_company(ticker: str, *, with_price: bool = True) -> Fundamentals | None:
+def load_company(ticker: str, *, with_price: bool = True,
+                 fresh: bool = False) -> Fundamentals | None:
     """EDGAR temel verisi + fiyat serisi + elle veri duzeltmeleri.
 
     Duzeltmeler BURADA uygulanir cunku her kosu yolu (tohum, tarama, gunluk)
@@ -19,7 +20,7 @@ def load_company(ticker: str, *, with_price: bool = True) -> Fundamentals | None
     yerde uygulansaydi bir kosuda duzeltilmis, digerinde duzeltilmemis veri
     ile calisilirdi.
     """
-    f = try_fetch(edgar_api.load, ticker, label=f"edgar {ticker}")
+    f = try_fetch(edgar_api.load, ticker, label=f"edgar {ticker}", fresh=fresh)
     if f is None:
         return None
 

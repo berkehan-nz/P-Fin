@@ -847,14 +847,20 @@ def _backfill_balance_sheet(periods: list[Period], stocks: dict[str, dict[str, f
                     continue
 
 
-def load(ticker: str, *, cik: int | None = None) -> Fundamentals | None:
-    """Bir sembol icin tam Fundamentals kur (meta veri dahil)."""
+def load(ticker: str, *, cik: int | None = None,
+         fresh: bool = False) -> Fundamentals | None:
+    """Bir sembol icin tam Fundamentals kur (meta veri dahil).
+
+    ``fresh=True`` onbellegi atlar. VERI_YOK kuyrugundaki sirketler icin
+    sart: onbellek 3 gun gecerli ve bir tur ~1-2 gun suruyor, yani "tekrar
+    dene" ayni eksik dosyayi yeniden okumak olurdu.
+    """
     cik = cik or cik_for(ticker)
     if cik is None:
         print(f"  [uyari] {ticker}: CIK bulunamadi")
         return None
 
-    facts = company_facts(cik)
+    facts = company_facts(cik, max_age_days=0 if fresh else 3)
     if not facts:
         return None
 

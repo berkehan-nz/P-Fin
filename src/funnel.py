@@ -59,38 +59,87 @@ def _kill(row: dict, stage: int, reason: str) -> None:
 # --------------------------------------------------------------------------
 # Asama 0 — Evren
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# ELEME SEBEBI — cumle degil, sinifi ve kodu olan bir nesne
+# --------------------------------------------------------------------------
+# Iki ayri sorun ayni sepetteydi:
+#
+#  1) "Elendi" ile "hesaplanamadi" birbirine karisiyordu. Huni gunlugunde
+#     "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor;
+#     brut marj bilinmiyor)" diyen 82 sirket vardi. Bu bir ELEME DEGIL, veri
+#     boslugudur: sirket kotu oldugu icin degil, BAKAMADIGIMIZ icin gitti.
+#     Projenin kurali zaten net — sert filtreler bilinen kotu degerde eler,
+#     verinin yoklugunda asla. Bu sirketler sessizce kayboluyordu.
+#
+#  2) Sebep metni esik degerini ICINDE tasidigi icin her sirket ayri bir
+#     sozluk anahtari uretiyordu ("%3,0 <= %5", "%3,1 <= %5", ...): 632
+#     benzersiz anahtar, 3108 eleme. Sayim kirilgan, JSON sisik.
+#
+# Kill bir ``str`` ALT SINIFIDIR: mevcut tum kullanimlar (dogruluk testi,
+# sozluk anahtari, JSON'a yazma, Counter) aynen calisir; yeni kod ise
+# ``.code`` ve ``.kind`` okuyabilir.
+
+ELENDI = "ELENDI"      # kural ihlali — bilinen, kotu bir deger
+VERI_YOK = "VERI_YOK"  # karar verilemedi — girdi hesaplanamadi
+
+
+class Kill(str):
+    """Eleme sebebi: okunur cumle + sabit kod + sinif."""
+
+    code: str
+    kind: str
+
+    def __new__(cls, code: str, text: str, kind: str = ELENDI):
+        obj = super().__new__(cls, text)
+        obj.code = code
+        obj.kind = kind
+        return obj
+
+
+def kill_code(reason) -> str | None:
+    return getattr(reason, "code", None) if reason else None
+
+
+def kill_kind(reason) -> str | None:
+    return getattr(reason, "kind", ELENDI) if reason else None
+
+
 def stage0(row: dict) -> str | None:
     """Eleme sebebi doner; gecerse None."""
     sic = row.get("sic")
     if config.is_excluded_sic(sic):
-        return "SIC 6000-6799 (finans/gayrimenkul) haric"
+        return Kill("SIC_EXCLUDED", "SIC 6000-6799 (finans/gayrimenkul) haric")
 
     if sic in UNIVERSE["biotech_sic_codes"]:
         revenue = num(row["meta"].get("revenue_ttm_musd"))
-        if revenue is None or revenue < UNIVERSE["biotech_min_revenue_musd"]:
-            return "Hasilatsiz biyoteknoloji"
+        # Hasilat BILINMIYORSA bu bir eleme degil, veri boslugudur.
+        if revenue is None:
+            return Kill("BIOTECH_REV_UNKNOWN",
+                        "Biyoteknoloji; hasilat bilinmiyor", VERI_YOK)
+        if revenue < UNIVERSE["biotech_min_revenue_musd"]:
+            return Kill("BIOTECH_NO_REVENUE", "Hasilatsiz biyoteknoloji")
 
     exchange = (row.get("exchange") or "").strip()
     if exchange and exchange not in UNIVERSE["allowed_exchanges"]:
-        return f"Borsa disi/uygunsuz kotasyon ({exchange})"
+        return Kill("EXCHANGE_BAD", f"Borsa disi/uygunsuz kotasyon ({exchange})")
 
     mcap = num(row["meta"].get("market_cap_musd"))
     if mcap is None:
-        return "Piyasa degeri hesaplanamadi"
+        return Kill("MCAP_UNKNOWN", "Piyasa degeri hesaplanamadi", VERI_YOK)
     if mcap < UNIVERSE["market_cap_musd_min"]:
-        return f"Piyasa degeri < {UNIVERSE['market_cap_musd_min']:.0f}M USD"
+        return Kill("MCAP_LOW", f"Piyasa degeri < {UNIVERSE['market_cap_musd_min']:.0f}M USD")
     if mcap > UNIVERSE["market_cap_musd_max"]:
-        return f"Piyasa degeri > {UNIVERSE['market_cap_musd_max']:.0f}M USD"
+        return Kill("MCAP_HIGH", f"Piyasa degeri > {UNIVERSE['market_cap_musd_max']:.0f}M USD")
 
     price = num(row["meta"].get("price"))
     if price is None:
-        return "Fiyat alinamadi"
+        return Kill("PRICE_UNKNOWN", "Fiyat alinamadi", VERI_YOK)
     if price < UNIVERSE["price_min_usd"]:
-        return f"Fiyat < {UNIVERSE['price_min_usd']:.0f} USD"
+        return Kill("PRICE_LOW", f"Fiyat < {UNIVERSE['price_min_usd']:.0f} USD")
 
     adv = num(row.get("avg_dollar_volume_30d"))
     if adv is not None and adv < UNIVERSE["avg_dollar_volume_30d_min_usd"]:
-        return f"30 gunluk ortalama dolar hacmi < {UNIVERSE['avg_dollar_volume_30d_min_usd']/1e6:.0f}M USD"
+        return Kill("VOLUME_LOW", f"30 gunluk ortalama dolar hacmi < {UNIVERSE['avg_dollar_volume_30d_min_usd']/1e6:.0f}M USD")
     return None
 
 
@@ -111,18 +160,18 @@ def stage1(row: dict) -> str | None:
     gm = num(m.get("gross_margin"))
     if gm is None:
         if strict:
-            return "Brut marj hesaplanamadi"
+            return Kill("GM_UNKNOWN", "Brut marj hesaplanamadi", VERI_YOK)
         missing.append("gross_margin")
     elif gm <= STAGE1["gross_margin_min_pct"]:
-        return f"Brut marj %{gm:.1f} <= %{STAGE1['gross_margin_min_pct']:.0f}"
+        return Kill("GM_LOW", f"Brut marj %{gm:.1f} <= %{STAGE1['gross_margin_min_pct']:.0f}")
 
     growth = num(m.get("rev_growth_ttm"))
     if growth is None:
         if strict:
-            return "Hasilat buyumesi hesaplanamadi"
+            return Kill("REV_GROWTH_UNKNOWN", "Hasilat buyumesi hesaplanamadi", VERI_YOK)
         missing.append("rev_growth_ttm")
     elif growth <= STAGE1["rev_growth_ttm_min_pct"]:
-        return f"Hasilat buyumesi %{growth:.1f} <= %{STAGE1['rev_growth_ttm_min_pct']:.0f}"
+        return Kill("REV_GROWTH_LOW", f"Hasilat buyumesi %{growth:.1f} <= %{STAGE1['rev_growth_ttm_min_pct']:.0f}")
 
     # FCF > 0  VEYA  (yuksek buyume VE 40 Kurali)
     fcf = num(row["meta"].get("fcf_ttm_musd"))
@@ -158,11 +207,20 @@ def stage1(row: dict) -> str | None:
             why.append("40 Kurali hesaplanamadi")
         elif rule40 < STAGE1["high_growth_exemption_rule40_min"]:
             why.append(f"40 Kurali {rule40:.0f} < {STAGE1['high_growth_exemption_rule40_min']:.0f}")
-        return "FCF negatif ve yuksek buyume istisnasi saglanmadi (" + "; ".join(why) + ")"
+        # SINIF: FCF'nin kendisi bilinmiyorsa ya da istisna girdilerinden
+        # biri eksikse, bu bir eleme DEGILDIR — kurtulus kapisina
+        # bakamadik. Sirketi kotu oldugu icin degil, koru oldugumuz icin
+        # atmis oluruz. Bunlar VERI_YOK kuyruguna gider ve tekrar denenir.
+        kararsiz = fcf is None or growth is None or gm is None or rule40 is None
+        return Kill(
+            "FCF_NEG_NO_EXEMPTION",
+            "FCF negatif ve yuksek buyume istisnasi saglanmadi (" + "; ".join(why) + ")",
+            VERI_YOK if kararsiz else ELENDI,
+        )
 
     nd_ebitda = num(m.get("net_debt_to_ebitda"))
     if nd_ebitda is not None and nd_ebitda >= STAGE1["net_debt_to_ebitda_max"]:
-        return f"Net borc/FAVOK {nd_ebitda:.1f} >= {STAGE1['net_debt_to_ebitda_max']}"
+        return Kill("LEVERAGE_HIGH", f"Net borc/FAVOK {nd_ebitda:.1f} >= {STAGE1['net_debt_to_ebitda_max']}")
 
     share_change = num(m.get("share_count_change_1y"))
     if share_change is not None and share_change >= STAGE1["share_count_growth_max_pct"]:
@@ -180,7 +238,7 @@ def stage1(row: dict) -> str | None:
 
     sbc_fcf = num(m.get("sbc_to_fcf"))
     if sbc_fcf is not None and sbc_fcf >= STAGE1["sbc_to_fcf_max"]:
-        return f"SBC/FCF {sbc_fcf:.2f} >= {STAGE1['sbc_to_fcf_max']}"
+        return Kill("SBC_HIGH", f"SBC/FCF {sbc_fcf:.2f} >= {STAGE1['sbc_to_fcf_max']}")
     return None
 
 
@@ -193,17 +251,17 @@ def stage2(row: dict, track: str) -> str | None:
 
     beneish = num(m.get("beneish_m"))
     if beneish is not None and beneish > STAGE2["beneish_m_max"]:
-        return f"Beneish M {beneish:.2f} > {STAGE2['beneish_m_max']} (manipulasyon suphesi)"
+        return Kill("BENEISH_HIGH", f"Beneish M {beneish:.2f} > {STAGE2['beneish_m_max']} (manipulasyon suphesi)")
 
     z = num(m.get("altman_z"))
     if z is not None and not row["flags"].get("z_unreliable") and z < STAGE2["altman_z_min"]:
-        return f"Altman Z'' {z:.2f} < {STAGE2['altman_z_min']} (sikinti bolgesi)"
+        return Kill("ALTMAN_LOW", f"Altman Z'' {z:.2f} < {STAGE2['altman_z_min']} (sikinti bolgesi)")
 
     # Piotroski esigi SADECE Kol A icin — Kol B'de zaten dusuk cikar
     if track == "A":
         piotroski = num(m.get("piotroski_f"))
         if piotroski is not None and piotroski < STAGE2["piotroski_f_min_track_a"]:
-            return f"Piotroski F {int(piotroski)} < {STAGE2['piotroski_f_min_track_a']} (Kol A)"
+            return Kill("PIOTROSKI_LOW", f"Piotroski F {int(piotroski)} < {STAGE2['piotroski_f_min_track_a']} (Kol A)")
 
     reason = _cash_conversion_streak(f)
     if reason:
@@ -217,7 +275,7 @@ def stage2(row: dict, track: str) -> str | None:
     fcf = num(row["meta"].get("fcf_ttm_musd"))
     if (wall is not None and wall > STAGE2["maturity_wall_max"]
             and fcf is not None and fcf < 0):
-        return f"Vade duvari {wall:.2f} > {STAGE2['maturity_wall_max']} ve FCF negatif"
+        return Kill("MATURITY_WALL", f"Vade duvari {wall:.2f} > {STAGE2['maturity_wall_max']} ve FCF negatif")
 
     reason = _ipo_lockup(row)
     if reason:
@@ -292,7 +350,7 @@ def _two_year_decline(f: Fundamentals) -> str | None:
         for i in range(1, len(gms))
     )
     if rev_down and gm_down:
-        return f"Hasilat VE brut marj {years} yildir birlikte dusuyor"
+        return Kill("REV_AND_GM_FALLING", f"Hasilat VE brut marj {years} yildir birlikte dusuyor")
     return None
 
 
@@ -307,7 +365,7 @@ def _ipo_lockup(row: dict) -> str | None:
     except ValueError:
         return None
     if months < STAGE2["ipo_lockup_months"]:
-        return f"Halka arz {months:.0f} ay once — kilit suresi bitmemis olabilir"
+        return Kill("IPO_LOCKUP", f"Halka arz {months:.0f} ay once — kilit suresi bitmemis olabilir")
     return None
 
 
@@ -517,7 +575,7 @@ def rank(survivors: list[dict], *, log: dict | None = None,
     for row in ranked:
         if per_sector[row["sector"]] >= max_per_sector:
             overflow.append(row)
-            row["kill_reason"] = f"Sektor kotasi dolu (en fazla {max_per_sector})"
+            row["kill_reason"] = Kill("SECTOR_QUOTA_FULL", f"Sektor kotasi dolu (en fazla {max_per_sector})")
             continue
         per_sector[row["sector"]] += 1
         selected.append(row)

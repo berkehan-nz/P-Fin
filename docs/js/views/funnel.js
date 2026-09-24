@@ -37,6 +37,7 @@ window.ViewFunnel = (function () {
 
     renderScan(scan);
     renderPipeline(stages, kills, scan, cand);
+    renderKindSplit(fromFullRun ? latest : scan);
     renderKills(kills);
     renderSurvivors();
     renderSim(stages);
@@ -228,6 +229,50 @@ window.ViewFunnel = (function () {
       acc[key].raw.push([reason, count]);
     });
     return Object.values(acc);
+  }
+
+  /* ELENDI ile VERI_YOK ayrimi.
+
+     Bu ikisi eskiden ayni sepetteydi ve tehlikeliydi: "FCF negatif ve yuksek
+     buyume istisnasi saglanmadi (buyume bilinmiyor; brut marj bilinmiyor)"
+     diyen 175 sirket, kotu olduklari icin degil BAKAMADIGIMIZ icin listeden
+     dusuyordu. Sessizce kaybolan aday, elenmis adaydan farklidir; ayri
+     gosterilmeli ki tekrar denendigi gorunsun. */
+  function renderKindSplit(src) {
+    const el = $('funnelKindSplit');
+    if (!el) return;
+    const kinds = (src && src.kill_kinds) || {};
+    const elendi = kinds.ELENDI || 0;
+    const veriYok = kinds.VERI_YOK || 0;
+    if (!elendi && !veriYok) { el.innerHTML = ''; return; }
+
+    const kuyruk = (src && (src.retry_queue_size ?? src.retry_queue)) || 0;
+    const kuyrukN = typeof kuyruk === 'number' ? kuyruk : (kuyruk.length || 0);
+    const toplam = elendi + veriYok;
+    const pay = (n) => toplam ? Math.round((n / toplam) * 100) : 0;
+
+    el.innerHTML = `
+      <div class="card">
+        <h3>Listeden dusenler neden dustu?</h3>
+        <div class="split-row">
+          <div class="split-cell">
+            <div class="split-num">${elendi.toLocaleString('tr-TR')}</div>
+            <div class="split-label"><b>Elendi</b> — bir kurali ihlal etti</div>
+            <div class="split-bar"><span style="width:${pay(elendi)}%"></span></div>
+            <div class="muted">Piyasa degeri cok kucuk, marj dusuk, borc yuksek gibi
+              BILINEN ve kotu bir deger yuzunden.</div>
+          </div>
+          <div class="split-cell warn">
+            <div class="split-num">${veriYok.toLocaleString('tr-TR')}</div>
+            <div class="split-label"><b>Veri yok</b> — karar verilemedi</div>
+            <div class="split-bar warn"><span style="width:${pay(veriYok)}%"></span></div>
+            <div class="muted">Sirket kotu oldugu icin degil, gerekli sayiyi
+              hesaplayamadigimiz icin dustu. <b>Eleme sayilmaz.</b>
+              ${kuyrukN ? `${kuyrukN} tanesi onumuzdeki turda onbellek atlanarak
+                yeniden denenecek.` : ''}</div>
+          </div>
+        </div>
+      </div>`;
   }
 
   function renderKills(kills) {
