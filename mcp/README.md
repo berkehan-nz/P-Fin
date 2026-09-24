@@ -117,3 +117,38 @@ npm run dev                        # http://localhost:8788/mcp
 3. `submit_for_review` tek PR acar.
 4. Sen PR'i okursun, birlestirirsin.
 5. **Merge** is akisi kartlari gunceller, GitHub Pages yayinlar (~1 dk).
+
+
+## Jeton, yetki ve okuma yolu
+
+**Okumalar jeton istemez.** Depo public; `list_candidates`, `get_card` gibi
+araclar `raw.githubusercontent.com` uzerinden okur. Bunun sebebi somut: GitHub
+bir OAuth uygulamasi icin kullanici basina jeton sayisi asilinca **en eskisini
+iptal eder**. Baglayici birden fazla oturum actiginda eski jeton olur ve
+eskiden TUM araclar (okumalar dahil) 401 veriyordu. Artik jeton yalnizca
+YAZMA icin gerekli.
+
+Calisma dalindan yapilan okumalar API'den gider: raw CDN birkac dakika
+onbelleklidir ve bayat icerik, ajanin kendi yazdigini ezmesine yol acar.
+
+**`whoami` gercek dogrulama yapar.** `GET /user` + depo izin kontrolu calistirir.
+Onceki surum hicbir cagri yapmadan "yazma yetkin var" diyordu; jeton iptal
+edilmisken bile. Simdi jeton olmusse acikca soyler ve ne yapilacagini yazar.
+
+**Jeton gecersizse:** claude.ai > Settings > Connectors > P-Fin baglayicisini
+kaldirip yeniden bagla.
+
+## Dagitim
+
+Bu sunucu bir Cloudflare Worker'dir ve **GitHub Actions ile dagitilmaz**.
+`mcp/` altindaki degisiklikler ancak elle dagitildiginda canliya gecer:
+
+```bash
+cd mcp
+npm ci
+npm run type-check
+npm run deploy      # wrangler deploy — Cloudflare kimligi gerekir
+```
+
+Depodaki kod ile canlidaki surum birbirinden ayrilabilir; bir MCP davranisi
+beklendigi gibi degilse once dagitimin guncel olup olmadigina bak.

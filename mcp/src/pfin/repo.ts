@@ -39,13 +39,48 @@ export class Repo {
 		private ref: RepoRef,
 	) {}
 
+	/**
+	 * Depo PUBLIC oldugu icin okumalar jeton istemez.
+	 *
+	 * Neden onemli: GitHub bir OAuth uygulamasi icin kullanici basina jeton
+	 * sayisi asilinca EN ESKISINI iptal eder. Jeton olunce okuma araclari da
+	 * kilitleniyordu — oysa okunan her sey zaten herkese acik. Artik jeton
+	 * YALNIZCA YAZMA icin gerekli; 401 bir daha list_candidates'i durdurmaz.
+	 *
+	 * Yalnizca `main` icin kullanilir: raw CDN birkac dakika onbelleklidir ve
+	 * CALISMA DALINDAN okurken bayat icerik ajanin kendi yazdigini ezmesine
+	 * yol acar. Dal okumalari API'den (taze) yapilir.
+	 */
+	private async readRaw(path: string, ref: string): Promise<string | null> {
+		const url = `https://raw.githubusercontent.com/${this.ref.owner}/${this.ref.repo}/${ref}/${path}`;
+		const res = await fetch(url, { headers: { "User-Agent": "pfin-mcp" } });
+		if (res.status === 404) return null;
+		if (!res.ok) throw Object.assign(new Error(`raw ${res.status} ${path}`), {
+			status: res.status,
+		});
+		return await res.text();
+	}
+
 	/** Dosyayi verilen daldan okur. Yoksa null doner (hata degil). */
 	async readFile(path: string, ref?: string): Promise<string | null> {
+		const target = ref ?? this.ref.base;
+		if (target === this.ref.base) {
+			// main: once jetonsuz raw; CDN/ag sorunlarinda API'ye dus.
+			try {
+				return await this.readRaw(path, target);
+			} catch {
+				/* API'ye dusulecek */
+			}
+		}
+		return await this.readViaApi(path, target);
+	}
+
+	private async readViaApi(path: string, ref: string): Promise<string | null> {
 		try {
 			const res = await this.octokit.rest.repos.getContent({
 				owner: this.ref.owner,
 				path,
-				ref: ref ?? this.ref.base,
+				ref,
 				repo: this.ref.repo,
 			});
 			const data = res.data as { content?: string; encoding?: string };
@@ -178,6 +213,28 @@ export class Repo {
 			repo: this.ref.repo,
 		});
 		return (data.files ?? []).map((f) => f.filename);
+	}
+
+	/**
+	 * GERCEK kimlik dogrulama — jetonla bir GitHub cagrisi yapar.
+	 *
+	 * Onceki `whoami` hicbir cagri yapmadan "yazma yetkin var" diyordu:
+	 * OAuth oturumundaki login adini tekrarliyordu. Jeton iptal edilmisken
+	 * bile ayni cumleyi kuruyor, kullanici ancak ilk yazma denemesinde
+	 * ogreniyordu. Bir durum aracinin yalan soylemesi, hic olmamasindan
+	 * kotudur.
+	 */
+	async verify(): Promise<{ login: string; canPush: boolean; repo: string }> {
+		const { data: user } = await this.octokit.rest.users.getAuthenticated();
+		const { data: repo } = await this.octokit.rest.repos.get({
+			owner: this.ref.owner,
+			repo: this.ref.repo,
+		});
+		return {
+			canPush: repo.permissions?.push ?? false,
+			login: user.login,
+			repo: repo.full_name,
+		};
 	}
 
 	/** Tek PR'i acar veya basligini/govdesini gunceller. */

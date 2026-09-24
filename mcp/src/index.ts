@@ -214,16 +214,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 		);
 
 		if (!canWrite) {
-			this.tool(
-				"whoami",
-				"Oturum acan GitHub kullanicisini ve yetkisini soyler.",
-				{},
-				async () =>
-					ok(
-						`GitHub: ${writer}. Bu depoya YAZMA yetkin yok — yalnizca okuma ` +
-							`araclari acik.`,
-					),
-			);
+			this.registerWhoami(writer, false);
 			return;
 		}
 
@@ -493,11 +484,58 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
+		this.registerWhoami(writer, true);
+	}
+
+	/**
+	 * whoami — GERCEK dogrulama yapar, oturumdaki adi tekrarlamaz.
+	 *
+	 * Onceki surum hicbir GitHub cagrisi yapmadan "okuma ve yazma yetkisi var"
+	 * diyordu. Jeton iptal edilmisken bile ayni cumleyi kuruyordu: ayni anda
+	 * list_candidates "401" verirken whoami "her sey yolunda" diyordu.
+	 * Bir durum araci yanlis guven veriyorsa, hic olmamasindan kotudur.
+	 */
+	private registerWhoami(sessionLogin: string, allowedByConfig: boolean) {
 		this.tool(
 			"whoami",
-			"Oturum acan GitHub kullanicisini ve yetkisini soyler.",
+			"Oturum acan GitHub kullanicisini ve yetkisini DOGRULAR (gercek GitHub " +
+				"cagrisi yapar). Yazma denemeden once buna bak.",
 			{},
-			async () => ok(`GitHub: ${writer} — okuma ve yazma yetkisi var.`),
+			async () => {
+				const v = await this.repo().verify();   // 401 ise sarmalayici anlatir
+				const lines = [
+					`GitHub kullanicisi: ${v.login}`,
+					`Depo: ${v.repo}`,
+					`Jeton: GECERLI (dogrulandi)`,
+				];
+
+				if (v.login !== sessionLogin) {
+					lines.push(
+						`UYARI: oturumdaki ad (${sessionLogin}) jetonun sahibinden ` +
+							`(${v.login}) farkli. Baglayiciyi yeniden baglaman gerekebilir.`,
+					);
+				}
+
+				if (!allowedByConfig) {
+					lines.push(
+						`Yazma: KAPALI — bu sunucu yalnizca ALLOWED_LOGIN icin yazma ` +
+							`araclarini acar. Okuma araclari calisir.`,
+					);
+				} else if (!v.canPush) {
+					lines.push(
+						`Yazma: KAPALI — GitHub bu depoda push yetkisi vermiyor. ` +
+							`Jetonun kapsami dar olabilir; baglayiciyi kaldirip yeniden bagla.`,
+					);
+				} else {
+					lines.push(`Yazma: ACIK (push yetkisi dogrulandi, PR akisiyla).`);
+				}
+
+				lines.push(
+					`Not: okumalar jeton gerektirmez (depo public, raw'dan okunur); ` +
+						`jeton yalnizca yazma icin kullanilir.`,
+				);
+				return ok(lines.join("\n"));
+			},
 		);
 	}
 }
