@@ -712,3 +712,15 @@ section[id] { scroll-margin-top: calc(var(--topbar-h) + 12px); }
 .split-bar > span { background: var(--gray); display: block; height: 100%; }
 .split-bar.warn > span { background: var(--yellow); }
 .split-cell.warn .split-num { color: var(--yellow); }
+
+/* Siralama icin kirpilmis uc deger rozeti ---------------------------- */
+/* Ham deger gorunur kalir; rozet yalnizca puana hangi degerin girdigini
+   soyler. Gizlemek veriyi saklamak, sessizce kirpmak ise "neden ilk
+   sirada degil" sorusunu cevapsiz birakmak olurdu. */
+.chip.capped {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 10px;
+  opacity: 0.85;
+  vertical-align: middle;
+}

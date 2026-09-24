@@ -272,6 +272,11 @@ COVERAGE = {
 # anlamina gelmez, paydanin kucuk oldugu anlamina gelir.
 SCORE_CAPS = {
     "roic": (None, 60.0),
+    # 40 Kurali = buyume% + marj%. Saglikli bir sirkette 40-80 arasidir.
+    # ABUS'ta 1057 cikmisti: paya giren %1079 "buyume", tek seferlik bir
+    # lisans/tazminat gelirinin izi. Kirpilmazsa tek sirket tum sektorun
+    # yuzdelik dagilimini kendine cekiyor.
+    "rule_of_40": (None, 100.0),
     "cash_conversion": (None, 5.0),
     "interest_coverage": (None, 100.0),
     "gross_profitability": (None, 2.0),

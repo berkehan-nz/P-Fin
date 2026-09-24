@@ -120,6 +120,21 @@ window.Fmt = (function () {
       <span class="bar ${color}" style="width:34px;display:inline-block;vertical-align:middle;margin-left:5px"><i style="width:${fill}%"></i></span>`;
   }
 
+  /* SIRALAMA ICIN KIRPILDI rozeti.
+
+     Kartta ham deger gorunmeye devam eder — CVLT'nin ROIC'i gercekten
+     %1.263 hesaplaniyor ve bunu gizlemek veriyi saklamak olurdu. Ama
+     okuyan, o sayinin puana %60 olarak girdigini BILMELI; yoksa "bu sirket
+     neden ilk sirada degil" sorusunun cevabi hicbir yerde yazmiyor. */
+  function cappedBadge(metric, cappedMap) {
+    const c = cappedMap && cappedMap[metric];
+    if (!c) return '';
+    const kirpilan = metricValue(metric, c.used);
+    return `<span class="chip gray tiny capped"
+      title="Bu deger uc noktada. Siralamada ${esc(kirpilan)} olarak kullanildi; ustteki sayi gercek hesap sonucudur.">
+      siralamada ${esc(kirpilan)}</span>`;
+  }
+
   function chip(metric, v, color) {
     const c = color || colorFor(metric, v);
     return `<span class="chip ${c}"><span class="arrow">${arrow(metric, c)}</span>${esc(metricValue(metric, v))}</span>`;
@@ -291,7 +306,7 @@ window.Fmt = (function () {
 
   return { setThresholds, spec, isNum, num, metricValue, money, pct, pctText, signedPct,
            pnlClass, colorFor, arrow, fillRatio, label, cell, chip,
-           percentileBar, esc, date, daysLabel, sinceLabel, hoursSince,
+           percentileBar, esc, date, daysLabel, sinceLabel, hoursSince, cappedBadge,
            trackBadge, decisionBadge,
            sentence, plain, unitName, percentileSentence, ownHistorySentence,
            colorMeaning, hasOwnHistory };

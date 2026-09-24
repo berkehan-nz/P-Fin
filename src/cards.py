@@ -319,6 +319,12 @@ def build(f: Fundamentals, *,
         },
         "scores": score_block,
         "score_detail": score_detail,
+        # SIRALAMA ICIN KIRPILAN metrikler. Kartta ham deger gorunur
+        # (CVLT'nin ROIC'i gercekten %1.263 hesaplaniyor; gizlemek veriyi
+        # saklamak olurdu) ama puana %60 olarak girdigi YAZILI olmali.
+        # Yoksa "bu sirket neden ilk sirada degil" sorusunun cevabi
+        # hicbir yerde yok.
+        "capped_for_scoring": scoring.capped_metrics(m),
         "metrics": cells,
         "series": series,
         "flags": flags,

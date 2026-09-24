@@ -364,6 +364,7 @@ window.ViewCompany = (function () {
           ${Fmt.esc(spec.plain || '')}</div>
       </td>
       <td>${Fmt.cell(key, cell)}
+        ${Fmt.cappedBadge(key, card.capped_for_scoring)}
         ${Fmt.isNum(v) ? `<div class="tiny dim">${Fmt.esc(Fmt.colorMeaning(color))}</div>` : ''}</td>
       <td style="text-align:left;white-space:normal;line-height:1.45">${meaning}</td>
       <td style="text-align:left;white-space:normal">

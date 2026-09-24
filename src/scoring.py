@@ -31,6 +31,30 @@ def cap_for_scoring(metric: str, value):
     return v
 
 
+def capped_metrics(metrics: dict) -> dict:
+    """Siralama icin KIRPILAN metrikleri listeler.
+
+    Kirpma yalnizca yuzdelik hesabini etkiler; kartta ham deger gorunur ve
+    gorunmeye devam etmeli — CVLT'nin ROIC'i gercekten %1.263 hesaplaniyor
+    ve bunu gizlemek veriyi saklamak olur. Ama okuyan, o %1.263'un puana
+    %60 olarak girdigini BILMELI; yoksa "bu sirket neden ilk sirada degil"
+    sorusunun cevabi hicbir yerde yazmiyor.
+    """
+    out: dict[str, dict] = {}
+    for metric, (lo, hi) in SCORE_CAPS.items():
+        raw = num(metrics.get(metric))
+        if raw is None:
+            continue
+        used = raw
+        if lo is not None:
+            used = max(used, lo)
+        if hi is not None:
+            used = min(used, hi)
+        if used != raw:
+            out[metric] = {"raw": round(raw, 4), "used": round(used, 4)}
+    return out
+
+
 def score_block(block: str, percentiles: dict[str, float | None]) -> tuple[float | None, dict]:
     """Bir ana puani (0-100) ve alt bilesen katkilarini hesaplar.
 
