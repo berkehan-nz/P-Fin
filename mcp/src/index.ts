@@ -205,10 +205,35 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			async () => {
 				const repo = this.repo();
 				const branch = await repo.existingBranch();
-				if (!branch) return ok("Bekleyen degisiklik yok; calisma dali temiz.");
+				const stale = await repo.staleBranches();
+				const uyari = stale.length
+					? {
+							bayat_dallar: stale.map((b) =>
+								`${b.name} (${b.ahead} commit ileride, ${b.behind} geride)`,
+							),
+							not:
+								"Bu dallar 7 gunden eski oldugu icin yeni yazmalar ORAYA GITMEZ. " +
+								"Icinde birlestirilmemis is olabilir: GitHub'da PR acip birlestir " +
+								"ya da dali sil.",
+						}
+					: null;
+
+				if (!branch) {
+					return ok(
+						JSON.stringify(
+							{ bekleyen: "yok — calisma dali temiz", ...(uyari ?? {}) },
+							null,
+							1,
+						),
+					);
+				}
 				const files = await repo.pendingFiles();
 				return ok(
-					JSON.stringify({ dal: branch, degisen_dosyalar: files }, null, 1),
+					JSON.stringify(
+						{ dal: branch, degisen_dosyalar: files, ...(uyari ?? {}) },
+						null,
+						1,
+					),
 				);
 			},
 		);

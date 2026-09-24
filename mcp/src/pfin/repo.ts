@@ -21,7 +21,30 @@ import { Octokit } from "octokit";
  * acdigi dallara uyar.
  */
 const BRANCH_PREFIX = "claude/mcp-";
-const BRANCH_RE = /^claude\/mcp-\d{4}-\d{2}-\d{2}$/;
+const BRANCH_RE = /^claude\/mcp-(\d{4}-\d{2}-\d{2})$/;
+
+/**
+ * Bir calisma dali en fazla bu kadar gun yeniden kullanilir.
+ *
+ * "Ileride olan her dali yeniden kullan" kurali tek basina tehlikeli:
+ * birlestirilmeden kalmis ESKI bir dal (ornegin 13 gun once acilmis,
+ * main'in 146 commit gerisinde) sonsuza dek secilmeye devam ederdi.
+ * Uzerine yazilan her yeni analiz, o daldaki BAYAT data/cards surumleriyle
+ * ayni PR'a girer; birlestirildiginde 13 gunluk veri geri gelir.
+ *
+ * Yine de "dun yazdim, bugun devam ediyorum" akisi bozulmamali. Bu yuzden
+ * pencere gun degil, birkac gun: taze dal birikmeye devam eder, bayat dal
+ * kendi PR'ini bekler ve list_pending_changes onu ayrica bildirir.
+ */
+const MAX_BRANCH_AGE_DAYS = 7;
+
+function branchAgeDays(name: string, now = new Date()): number {
+	const m = BRANCH_RE.exec(name);
+	if (!m) return Number.POSITIVE_INFINITY;
+	const then = Date.parse(`${m[1]}T00:00:00Z`);
+	if (Number.isNaN(then)) return Number.POSITIVE_INFINITY;
+	return (now.getTime() - then) / 86_400_000;
+}
 
 export type RepoRef = { owner: string; repo: string; base: string };
 
@@ -123,6 +146,8 @@ export class Repo {
 			.reverse(); // tarih adin icinde; en yenisi basta
 
 		for (const name of names) {
+			// Cok eski bir dala yazma: bayat veri tasir (yukaridaki nota bak).
+			if (branchAgeDays(name) > MAX_BRANCH_AGE_DAYS) continue;
 			// main'e gore ilerlemis mi? Birlestirilmis eski bir dal yeniden
 			// kullanilmamali, yoksa kapali bir PR'a yazmaya calisiriz.
 			const { data: cmp } = await this.octokit.rest.repos.compareCommitsWithBasehead({
@@ -133,6 +158,36 @@ export class Repo {
 			if ((cmp.ahead_by ?? 0) > 0) return name;
 		}
 		return null;
+	}
+
+	/**
+	 * Yasi gecmis ama hala birlestirilmemis dallar.
+	 *
+	 * Bunlar sessizce unutulmamali: icinde gercek kararlar olabilir.
+	 * list_pending_changes bunlari ayrica bildirir ki kullanici ya PR acsin
+	 * ya da silsin.
+	 */
+	async staleBranches(): Promise<{ name: string; ahead: number; behind: number }[]> {
+		const { data } = await this.octokit.rest.git.listMatchingRefs({
+			owner: this.ref.owner,
+			ref: `heads/${BRANCH_PREFIX}`,
+			repo: this.ref.repo,
+		});
+		const out: { name: string; ahead: number; behind: number }[] = [];
+		for (const r of data) {
+			const name = r.ref.replace("refs/heads/", "");
+			if (!BRANCH_RE.test(name)) continue;
+			if (branchAgeDays(name) <= MAX_BRANCH_AGE_DAYS) continue;
+			const { data: cmp } = await this.octokit.rest.repos.compareCommitsWithBasehead({
+				basehead: `${this.ref.base}...${name}`,
+				owner: this.ref.owner,
+				repo: this.ref.repo,
+			});
+			if ((cmp.ahead_by ?? 0) > 0) {
+				out.push({ ahead: cmp.ahead_by ?? 0, behind: cmp.behind_by ?? 0, name });
+			}
+		}
+		return out;
 	}
 
 	/**
