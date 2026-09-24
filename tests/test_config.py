@@ -201,3 +201,16 @@ class TestTimeBudgets:
         m = re.search(r"timeout-minutes:\s*(\d+)", text)
         assert m, "scan.yml icinde timeout-minutes bulunamadi"
         assert int(m.group(1)) == 50
+
+
+class TestSectorQuota:
+    def test_quota_fits_current_candidate_pool(self):
+        """SIC 7300'ler alt gruplara bolununce 'sektor' cok daraldi.
+
+        12'lik tavan, dar bir grupta gercekten iyi sirketleri kotaya
+        takildi diye eliyordu: yalniz "Yazilim ve programlama"da 18 aday
+        var. Bu test, tavanin bu bolunmeden haberdar kalmasini saglar.
+        """
+        from src import config
+
+        assert config.MAX_PER_SECTOR >= 15

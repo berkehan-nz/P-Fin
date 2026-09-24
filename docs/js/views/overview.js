@@ -18,15 +18,35 @@ window.ViewOverview = (function () {
 
     const nasdaq = (s.vs_benchmark || {}).nasdaq100;
 
-    $('summaryBoxes').innerHTML = [
+    /* Portfoy BOSKEN ilk uc kutu "—" gosteriyordu ve genel bakis olu bir
+       sayfa oluyordu. Oysa sistemin urettigi is ortada: tarama nerede,
+       kac sirket Asama 2'yi gecti, kaca karar verildi. Pozisyon acilinca
+       kutular portfoye doner. */
+    const k = (ov && ov.kpis) || {};
+    const portfoyVar = (s.position_count || 0) > 0;
+
+    const ilkUc = portfoyVar ? [
       box('Portfoy degeri', Fmt.money(s.portfolio_value_usd, { digits: 0 }),
-          s.position_count ? `${s.position_count} pozisyon · nakit ${Fmt.money(s.cash_usd, { digits: 0 })}`
-                           : 'Pozisyon yok'),
+          `${s.position_count} pozisyon · nakit ${Fmt.money(s.cash_usd, { digits: 0 })}`),
       box('Toplam K/Z', Fmt.money(s.pnl_usd, { digits: 0 }),
           Fmt.isNum(s.pnl_pct) ? Fmt.signedPct(s.pnl_pct) : '—',
           Fmt.pnlClass(s.pnl_usd)),
       box('Nasdaq 100\'e gore', Fmt.isNum(nasdaq) ? Fmt.signedPct(nasdaq) : '—',
           'Giris tarihlerinden itibaren, agirlikli', Fmt.pnlClass(nasdaq)),
+    ] : [
+      box('Evren taramasi', Fmt.isNum(k.scan_pct) ? `%${Fmt.num(k.scan_pct, 1)}` : '—',
+          Fmt.isNum(k.scan_total)
+            ? `${(k.scan_done || 0).toLocaleString('tr-TR')} / ${(k.scan_total || 0).toLocaleString('tr-TR')} sirket`
+            : 'Tarama henuz baslamadi'),
+      box('Sert filtreleri gecen', String(k.scan_survivors || 0),
+          k.data_missing ? `${k.data_missing} sirket veri eksikliginden bekliyor`
+                         : 'Asama 0-1-2 sonrasi'),
+      box('Karar verilen', String(k.decided_count || 0),
+          `${(k.seed_count || 0) + (k.candidate_count || 0)} sirketin icinde`),
+    ];
+
+    $('summaryBoxes').innerHTML = [
+      ...ilkUc,
       box('Aday sayisi', String(totalCandidates),
           `${counts.seed || 0} tohum · ${counts.funnel || 0} huni · ${counts.manual || 0} elle`),
       box('Uyari', String(warnCount),

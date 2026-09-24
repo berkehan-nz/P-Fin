@@ -365,8 +365,52 @@ def write_overview(ctx: dict, quotes: dict) -> bool:
         "movers": movers[:20],
         "news": news_items[:25],
         "watched_count": len(watched),
+        # KPI KUTULARI portfolio_state.summary'den besleniyordu; portfoy
+        # bosken hepsi "—" gorunuyor ve genel bakis olu bir sayfa oluyordu.
+        # Oysa sistemin uretttigi is ORTADA: aday sayisi, kac karta uyari
+        # dustu, tarama nerede. Bunlar portfoyden bagimsiz.
+        "kpis": _overview_kpis(rows, cand),
         "source": "prices+finnhub",
     })
+
+
+def _overview_kpis(rows: list[dict], cand: dict) -> dict:
+    """Portfoyden BAGIMSIZ ozet sayilar."""
+    scan = read_json(DATA_DIR / "scan_state.json", {}) or {}
+    total = (scan.get("universe_size_at_cycle_start")
+             or len(scan.get("queue") or []) or 0)
+    done = min(scan.get("cursor", 0), total) if total else 0
+
+    uyarili = 0
+    for path in CARDS_DIR.glob("*.json"):
+        c = read_json(path)
+        if not isinstance(c, dict):
+            continue
+        flags = c.get("flags") or {}
+        dq = c.get("data_quality") or {}
+        if (flags.get("warnings") or dq.get("issue_count")):
+            uyarili += 1
+
+    # candidates.json satirlarinda "decision" duz metin (kartta sozluk).
+    # Iki bicimi de kabul et; birini varsaymak sessizce sifir sayar.
+    def _has_decision(r: dict) -> bool:
+        d = r.get("decision")
+        if isinstance(d, dict):
+            return bool(d.get("action"))
+        return bool(d)
+
+    kararli = sum(1 for r in rows if _has_decision(r))
+    return {
+        "candidate_count": len(cand.get("candidates") or []),
+        "seed_count": len(cand.get("seed") or []),
+        "decided_count": kararli,
+        "cards_with_warnings": uyarili,
+        "scan_done": done,
+        "scan_total": total,
+        "scan_pct": round(done / total * 100, 1) if total else 0.0,
+        "scan_survivors": scan.get("survivor_count", 0),
+        "data_missing": (scan.get("kill_kinds") or {}).get("VERI_YOK", 0),
+    }
 
 
 def universe_tickers(limit: int | None = None, *, auto_sync: bool = True) -> list[str]:

@@ -323,7 +323,12 @@ SCORE_COMPONENTS = {
     ],
 }
 
-MAX_PER_SECTOR = 12       # Asama 4 ciktisinda sektor basina en fazla
+# Asama 4 ciktisinda sektor basina en fazla kac aday.
+# 12'den 15'e cikarildi: SIC 7300'ler alt gruplara bolunduğunden (yazilim,
+# veri isleme, bilgi hizmetleri ayri ayri) "sektor" artik cok daha dar bir
+# kume. Dar bir grupta 12 tavani, gercekten iyi sirketleri kotaya takiliyor
+# diye eliyordu — su an yalniz "Yazilim ve programlama"da 18 aday var.
+MAX_PER_SECTOR = 15
 FINAL_CANDIDATE_COUNT = 50
 
 # --------------------------------------------------------------------------
