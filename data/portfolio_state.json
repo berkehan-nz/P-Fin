@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-10",
+  "as_of": "2026-09-24",
   "closed": [],
   "positions": [],
   "source": "manual+prices",
@@ -7,13 +7,60 @@
     "cash_usd": 1000.0,
     "cost_usd": 0.0,
     "equity_value_usd": 0.0,
+    "fx": {
+      "as_of": "2026-09-24",
+      "change_1w_pct": 0.38,
+      "pair": "USDTRY",
+      "rate": 48.85029983520508,
+      "source": "stooq/yfinance"
+    },
     "largest_position_pct": null,
+    "peak_value_usd": 1000.0,
     "pnl_pct": null,
     "pnl_usd": 0.0,
     "portfolio_value_usd": 1000.0,
     "position_count": 0,
     "sector_mix_pct": {},
+    "slices": [
+      {
+        "actual_pct": 0.0,
+        "drift_pp": -40.0,
+        "label": "Motor (tek hisse)",
+        "off_target": true,
+        "slice": "motor",
+        "target_pct": 40.0,
+        "value_usd": 0.0
+      },
+      {
+        "actual_pct": 0.0,
+        "drift_pp": -30.0,
+        "label": "Cekirdek ETF",
+        "off_target": true,
+        "slice": "cekirdek",
+        "target_pct": 30.0,
+        "value_usd": 0.0
+      },
+      {
+        "actual_pct": 100.0,
+        "drift_pp": 80.0,
+        "label": "Nakit capasi",
+        "off_target": true,
+        "slice": "nakit",
+        "target_pct": 20.0,
+        "value_usd": 1000.0
+      },
+      {
+        "actual_pct": 0.0,
+        "drift_pp": -10.0,
+        "label": "TL mevduat",
+        "off_target": true,
+        "slice": "tl",
+        "target_pct": 10.0,
+        "value_usd": 0.0
+      }
+    ],
     "vs_benchmark": {
+      "kucuk_deger": null,
       "nasdaq100": null,
       "sp500": null
     }
