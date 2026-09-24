@@ -43,6 +43,17 @@ window.ViewFunnel = (function () {
     renderSim(stages);
   }
 
+  /* PAYDA TUR ICINDE DEGISMEMELI.
+
+     Evren toplami turlar arasinda 4.551 -> 4.671 -> 6.227 -> 3.825 diye
+     oynadi (SEC sembol listesi her senkronda degisiyor). Kuyruk uzunlugunu
+     dogrudan kullanmak, "%58" derken paydanin altindan kaymasi demek.
+     Tur basinda dondurulan deger varsa o kullanilir. */
+  function scanTotal(scan) {
+    if (!scan) return 0;
+    return scan.universe_size_at_cycle_start || (scan.queue || []).length || 0;
+  }
+
   function subtitle(scan, fromFullRun, latest, uni) {
     if (fromFullRun && latest.partial) {
       return `Tur ${latest.cycle || '?'} devam ediyor · ${latest.scanned || 0} sirket tarandi · `
@@ -53,8 +64,9 @@ window.ViewFunnel = (function () {
         + `${uni.total_evaluated || 0} sirket degerlendirildi`;
     }
     if (!scan || !scan.queue) return 'Tarama henuz baslamadi.';
-    const done = Math.min(scan.cursor || 0, scan.queue.length);
-    return `Kademeli tarama · Tur ${scan.cycle} · ${done} / ${scan.queue.length} sirket islendi`
+    const toplam = scanTotal(scan);
+    const done = Math.min(scan.cursor || 0, toplam);
+    return `Kademeli tarama · Tur ${scan.cycle} · ${done} / ${toplam} sirket islendi`
       + ` · <b>${scan.survivor_count || 0}</b> tanesi Asama 2'yi gecti`;
   }
 
@@ -82,7 +94,7 @@ window.ViewFunnel = (function () {
         Saatlik <b>Scan</b> is akisi calistiginda ilerleme burada gorunur.</div>`;
       return;
     }
-    const total = scan.queue.length;
+    const total = scanTotal(scan);
     const done = Math.min(scan.cursor || 0, total);
     const pct = total ? (done / total) * 100 : 0;
     const perBatch = scan.batch_size || 120;
@@ -127,7 +139,7 @@ window.ViewFunnel = (function () {
     const byStage = {};
     grouped.forEach((g) => { (byStage[g.stage] = byStage[g.stage] || []).push(g); });
 
-    const queueTotal = (scan && scan.queue) ? scan.queue.length : null;
+    const queueTotal = scan ? (scanTotal(scan) || null) : null;
     const maxIn = Math.max(...stages.map((s) => s.input), 1);
     const interimCount = ((cand && cand.candidates) || []).length;
     const finalized = scan && scan.last_finalized;
