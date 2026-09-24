@@ -307,13 +307,26 @@ def append_funnel_log(log: dict, *, partial: bool = False, cycle: int | None = N
 
 
 def write_portfolio_state(quotes: dict, bench: dict, ctx: dict) -> bool:
+    """Portfoy durumunu yazar. POZISYON YOKKEN DE yazar.
+
+    Onceki surumde dosya 10 Eylul'de kalmisti: icerik degismediginden
+    write_json dosyaya dokunmuyordu ve "as_of" 13 gun geride gorunuyordu.
+    Bos bir portfoyun bugun de bos oldugunu BILMEK, dosyanin bayat mi yoksa
+    guncel mi oldugunu bilmemekten iyidir.
+    """
     card_map = {}
     for path in CARDS_DIR.glob("*.json"):
         c = read_json(path)
         if isinstance(c, dict) and c.get("ticker"):
             card_map[c["ticker"]] = c
-    state = portfolio.compute(quotes, bench, ctx["earnings"], card_map)
-    return write_json(DATA_DIR / "portfolio_state.json", state)
+
+    # TL mevduat dilimi kur olmadan degerlenemez.
+    fx = try_fetch(prices.fx_rate, "USDTRY", label="USD/TRY kuru") or {}
+
+    state = portfolio.compute(quotes, bench, ctx["earnings"], card_map, fx=fx)
+    # stamp_matters: icerik ayni olsa bile "as_of" tazelensin.
+    return write_json(DATA_DIR / "portfolio_state.json", state,
+                      stamp_matters=True)
 
 
 def write_overview(ctx: dict, quotes: dict) -> bool:

@@ -152,7 +152,7 @@ def read_json(path: Path | str, default: Any = None) -> Any:
 
 
 def write_json(path: Path | str, payload: Any, *, source: str | None = None,
-               as_of: str | None = None) -> bool:
+               as_of: str | None = None, stamp_matters: bool = False) -> bool:
     """JSON yaz. Icerik degismediyse dosyaya DOKUNMA (bos commit onlemek icin).
 
     ``as_of``/``source`` alanlarini sozluk kokunde otomatik ekler. Degisiklik
@@ -170,10 +170,17 @@ def write_json(path: Path | str, payload: Any, *, source: str | None = None,
         if source is not None:
             payload.setdefault("source", source)
 
+    # Bazi dosyalarda TARIHIN KENDISI bilgidir. portfolio_state.json icerik
+    # olarak degismese bile "bugun de bakildi" demek zorunda: 10 Eylul'de
+    # kalmis bir dosyaya bakan, gunluk kosunun calisip calismadigini
+    # bilemez. Digerlerinde damgayi disarida birakmak dogru — yoksa her
+    # kosu bos bir commit uretir.
+    ignored = () if stamp_matters else ("as_of", "generated_at", "updated_at")
+
     def _strip_stamps(obj: Any) -> Any:
         if isinstance(obj, dict):
             return {k: _strip_stamps(v) for k, v in obj.items()
-                    if k not in ("as_of", "generated_at", "updated_at")}
+                    if k not in ignored}
         if isinstance(obj, list):
             return [_strip_stamps(v) for v in obj]
         return obj

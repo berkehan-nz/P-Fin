@@ -38,9 +38,13 @@ def _fresh(path, max_age_hours: int) -> bool:
 # --------------------------------------------------------------------------
 # Stooq
 # --------------------------------------------------------------------------
-def from_stooq(ticker: str) -> list[dict] | None:
-    """Gunluk OHLCV. Stooq bilinmeyen sembolde bos/hatali CSV doner."""
-    url = config.STOOQ_URL.format(symbol=ticker.lower())
+def from_stooq(ticker: str, *, fx: bool = False) -> list[dict] | None:
+    """Gunluk OHLCV. Stooq bilinmeyen sembolde bos/hatali CSV doner.
+
+    ``fx=True`` doviz sembolleri icindir: onlar ".us" soneki almaz.
+    """
+    tmpl = config.STOOQ_FX_URL if fx else config.STOOQ_URL
+    url = tmpl.format(symbol=ticker.lower())
     # SEC'in sabirli politikasi DEGIL: fiyat gelmezse kart yine uretilir,
     # ama 120 sirketlik parti tek kaynagin coktugu icin saatlerce surmemeli.
     resp = http_get(url, timeout=config.PRICE_TIMEOUT_SEC,
@@ -244,3 +248,46 @@ def sparkline(history_rows: list[tuple[str, float]], points: int = 60,
     # Kartta guncel fiyat yaninda duran grafik ondan %5-8 sapabiliyordu.
     step = (len(window) - 1) / (points - 1)
     return [round(window[round(i * step)][1], 4) for i in range(points)]
+
+
+# --------------------------------------------------------------------------
+# Doviz — USD/TRY
+# --------------------------------------------------------------------------
+# TL vadeli mevduatin dolar karsiligi ve BASA BAS KUR bunsuz hesaplanamaz.
+# Mevduat TL kazandirir; sorulmasi gereken "faiz ne kadar" degil, "kur ne
+# kadar artarsa bu faiz erir" sorusudur. Stooq 'usdtry' sembolunu tasir;
+# yfinance yedegi 'TRY=X'.
+FX_SYMBOLS = {"USDTRY": ("usdtry", "TRY=X")}
+
+
+def fx_rate(pair: str = "USDTRY", *, max_age_hours: int = 12) -> dict:
+    """Guncel kur + 1 hafta once. Bulunamazsa deger None doner, hata atmaz."""
+    stooq_sym, yf_sym = FX_SYMBOLS.get(pair.upper(), (pair.lower(), pair))
+    rows = None
+    if STOOQ_BREAKER.ok():
+        try:
+            rows = from_stooq(stooq_sym, fx=True)
+            STOOQ_BREAKER.hit()
+        except FetchError as exc:
+            STOOQ_BREAKER.miss(str(exc)[:80])
+        except Exception as exc:  # noqa: BLE001
+            STOOQ_BREAKER.miss()
+            print(f"  [uyari] stooq {stooq_sym}: {str(exc)[:100]}")
+    if not rows and YF_BREAKER.ok():
+        rows = from_yfinance(yf_sym)
+
+    if not rows:
+        return {"pair": pair.upper(), "rate": None, "as_of": None,
+                "change_1w_pct": None, "source": None}
+
+    last = rows[-1]
+    week = rows[-6] if len(rows) >= 6 else rows[0]
+    change = ((last["close"] / week["close"] - 1) * 100
+              if week["close"] else None)
+    return {
+        "pair": pair.upper(),
+        "rate": last["close"],
+        "as_of": last["date"],
+        "change_1w_pct": round(change, 2) if change is not None else None,
+        "source": "stooq/yfinance",
+    }

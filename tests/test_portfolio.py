@@ -157,3 +157,161 @@ class TestSectorMix:
         write(sample, [pos])
         r = portfolio.compute({"DBX": {"price": 30.0}})
         assert r["summary"]["position_count"] == 0
+
+
+class TestAssetClasses:
+    """Portfoy artik yalnizca hisse tasimiyor: ETF ve TL mevduat da var.
+
+    Her sinif FARKLI degerlenir. TL mevduatta "adet x fiyat" yoktur;
+    anapara + tahakkuk eden net faiz, kurla dolara cevrilir.
+    """
+
+    def test_tl_deposit_accrues_net_interest(self):
+        from src import portfolio as P
+
+        pos = {
+            "asset_class": "TL_DEPOSIT",
+            "principal_try": 100_000.0,
+            "annual_rate_pct": 50.0,
+            "withholding_pct": 15.0,
+            "start_date": days_ago(365),
+            "maturity_date": days_ago(0),
+            "usdtry_at_entry": 40.0,
+        }
+        out = P.tl_deposit_value(pos, usdtry=48.0)
+        # Bir yil, %50 brut -> 50.000 TL; %15 stopaj -> 42.500 TL net
+        assert round(out["gross_interest_try"]) == 50_000
+        assert round(out["net_interest_try"]) == 42_500
+        assert round(out["value_try"]) == 142_500
+        assert round(out["value_usd"], 2) == round(142_500 / 48.0, 2)
+
+    def test_breakeven_rate_is_reported(self):
+        """Sorulmasi gereken 'faiz ne kadar' degil, 'kur ne kadar artarsa erir'."""
+        from src import portfolio as P
+
+        pos = {
+            "asset_class": "TL_DEPOSIT", "principal_try": 100_000.0,
+            "annual_rate_pct": 50.0, "withholding_pct": 15.0,
+            "start_date": days_ago(30), "maturity_date": days_ago(-335),
+            "usdtry_at_entry": 40.0,
+        }
+        out = P.tl_deposit_value(pos, usdtry=42.0)
+        # Giriste 2.500 USD; vade sonunda 142.500 TL -> basa bas 57,0
+        assert round(out["usdtry_breakeven"], 1) == 57.0
+        assert out["breakeven_headroom_pct"] > 0
+
+    def test_missing_fields_do_not_crash(self):
+        from src import portfolio as P
+
+        out = P.tl_deposit_value({"asset_class": "TL_DEPOSIT"}, usdtry=42.0)
+        assert out["note"]
+        assert out.get("value_usd") is None
+
+    def test_slice_comes_from_asset_class(self):
+        from src import portfolio as P
+
+        assert P.slice_for({"asset_class": "STOCK"}) == "motor"
+        assert P.slice_for({"asset_class": "ETF"}) == "cekirdek"
+        assert P.slice_for({"asset_class": "TL_DEPOSIT"}) == "tl"
+
+    def test_explicit_slice_wins(self):
+        """SGOV bir ETF'tir ama cekirdek degil NAKIT CAPASIDIR."""
+        from src import portfolio as P
+
+        assert P.slice_for({"asset_class": "ETF", "slice": "nakit"}) == "nakit"
+
+
+class TestSlices:
+    def test_drift_is_flagged(self, sample):
+        from src import portfolio as P
+
+        pos = P.json_snippet("DBX", days_ago(10), 25.0, 10)   # 250 USD motor
+        write(sample, [pos], cash=750.0)
+        r = P.compute({"DBX": {"price": 25.0}})
+        slices = {s["slice"]: s for s in r["summary"]["slices"]}
+        assert slices["motor"]["actual_pct"] == 25.0          # hedef 40
+        assert slices["nakit"]["actual_pct"] == 75.0          # hedef 20
+        assert slices["nakit"]["off_target"] is True
+        assert any(w["type"] == "dilim_sapmasi" for w in r["warnings"])
+
+    def test_empty_portfolio_is_not_nagged(self):
+        """Dengelenecek bir sey yokken dort dilim birden uyarmasin."""
+        from src import portfolio as P
+
+        r = P.compute({})
+        assert r["summary"]["slices"]                      # ozet yine uretilir
+        assert not any(w["type"] == "dilim_sapmasi" for w in r["warnings"])
+
+    def test_slices_sum_to_targets(self):
+        from src.config import PORTFOLIO
+
+        assert sum(s["target_pct"] for s in PORTFOLIO["slices"].values()) == 100.0
+
+
+class TestBreakerEngine:
+    """Kiricilar artik MAKINE tarafindan degerlendiriliyor."""
+
+    def test_structured_breaker_triggers_without_manual_flag(self, sample):
+        from src import portfolio as P
+
+        pos = P.json_snippet("DBX", days_ago(10), 25.0, 10)
+        pos["thesis_breakers"] = [{
+            "metric": "gross_margin", "op": "<", "value": 70.0,
+            "consecutive_quarters": 1,
+            "description": "Brut marj %70 altina inerse",
+        }]
+        write(sample, [pos], cash=1000.0)
+        card = {"metrics": {"gross_margin": {"value": 65.0}}}
+        r = P.compute({"DBX": {"price": 25.0}}, cards={"DBX": card})
+        assert any(w["type"] == "tez_kirici" for w in r["warnings"])
+
+    def test_structured_breaker_stays_quiet_when_healthy(self, sample):
+        from src import portfolio as P
+
+        pos = P.json_snippet("DBX", days_ago(10), 25.0, 10)
+        pos["thesis_breakers"] = [{
+            "metric": "gross_margin", "op": "<", "value": 70.0,
+            "consecutive_quarters": 1, "description": "x",
+        }]
+        write(sample, [pos], cash=1000.0)
+        card = {"metrics": {"gross_margin": {"value": 80.0}}}
+        r = P.compute({"DBX": {"price": 25.0}}, cards={"DBX": card})
+        assert not any(w["type"] == "tez_kirici" for w in r["warnings"])
+
+    def test_price_collapse_is_a_reevaluation_not_a_sale(self, sample):
+        from src import portfolio as P
+
+        pos = P.json_snippet("DBX", days_ago(10), 100.0, 10)
+        write(sample, [pos], cash=1000.0)
+        r = P.compute({"DBX": {"price": 60.0}})      # -%40
+        w = [x for x in r["warnings"] if x["type"] == "kirici_fiyat_cokusu"]
+        assert len(w) == 1
+        assert "otomatik satis degil" in w[0]["message"].lower()
+
+    def test_manual_breaker_can_still_be_triggered_by_hand(self, sample):
+        """Makine degerlendirmesi EKLENDI, elle tetikleme KALDIRILMADI."""
+        from src import portfolio as P
+
+        pos = P.json_snippet("DBX", days_ago(10), 25.0, 10)
+        pos["thesis_breakers"] = [
+            {"description": "Rakip pazar payi alirsa", "triggered": True},
+        ]
+        write(sample, [pos], cash=1000.0)
+        r = P.compute({"DBX": {"price": 25.0}})
+        assert any(w["type"] == "tez_kirici" for w in r["warnings"])
+
+    def test_unevaluable_breaker_does_not_cry_wolf(self, sample):
+        """Veri yoksa alarm calmaz — guvenilmez alarm bir sure sonra
+        hepsinin gormezden gelinmesine yol acar."""
+        from src import portfolio as P
+
+        pos = P.json_snippet("DBX", days_ago(10), 25.0, 10)
+        pos["thesis_breakers"] = [{
+            "metric": "gross_margin", "op": "<", "value": 70.0,
+            "consecutive_quarters": 4, "description": "x",
+        }]
+        write(sample, [pos], cash=1000.0)
+        card = {"metrics": {"gross_margin": {"value": 10.0}}, "series": {}}
+        r = P.compute({"DBX": {"price": 25.0}}, cards={"DBX": card})
+        assert not any(w["type"] == "tez_kirici" for w in r["warnings"])
+        assert any(w["type"] == "kirici_veri_yok" for w in r["warnings"])

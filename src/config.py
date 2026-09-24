@@ -717,8 +717,76 @@ PORTFOLIO = {
     "earnings_warning_days": 7,
     "tax_year_warning_days": 30,        # 1 yil dolmasina kalan gun
     "review_overdue_grace_days": 0,
-    "benchmarks": {"nasdaq100": "QQQ", "sp500": "SPY"},
+    # Dilim bazli kiyas: motor dilimini QQQ ile olcmek yaniltici. Motor
+    # kucuk/deger egilimli tek hisselerden olusuyor; dogru kiyas AVUV.
+    "benchmarks": {"nasdaq100": "QQQ", "sp500": "SPY", "kucuk_deger": "AVUV"},
+    "slice_benchmarks": {"motor": "kucuk_deger", "cekirdek": "nasdaq100"},
     "default_broker": "Midas",
+
+    # ----------------------------------------------------------------
+    # DILIMLER — hedef agirliklar
+    # ----------------------------------------------------------------
+    # DIKKAT: bu oranlar VARSAYILANDIR, Berke'nin onayindan gecmedi.
+    # Sapma uyarilari bunlara gore uretildigi icin ilk kullanimdan once
+    # gozden gecirilmeli. Degistirmek icin yalnizca burasi yeter.
+    "slices": {
+        "motor":    {"label": "Motor (tek hisse)", "target_pct": 40.0},
+        "cekirdek": {"label": "Cekirdek ETF",      "target_pct": 30.0},
+        "nakit":    {"label": "Nakit capasi",      "target_pct": 20.0},
+        "tl":       {"label": "TL mevduat",        "target_pct": 10.0},
+    },
+    # Hedeften bu kadar YUZDE PUAN sapinca uyari uretilir.
+    "slice_drift_warn_pp": 5.0,
+
+    # Varlik sinifindan dilime varsayilan esleme. Pozisyon kendi "slice"
+    # alanini yazarsa o kazanir: SGOV bir ETF'tir ama nakit capasidir.
+    "asset_class_slice": {
+        "STOCK": "motor",
+        "ETF": "cekirdek",
+        "TL_DEPOSIT": "tl",
+    },
+}
+
+# --------------------------------------------------------------------------
+# TEZ KIRICILAR — uc katman
+# --------------------------------------------------------------------------
+# Onceki surumde kiricilar yalnizca ELLE `triggered: true` yapilinca
+# raporlaniyordu; hicbir sey kendiliginden tetiklenmiyordu. Yani "tez
+# kirilirsa cik" kurali kagit uzerinde kaliyordu.
+#
+# Katmanlar bilerek farkli siddette:
+#   thesis      — yapisal bozulma. Tezin dayandigi sayi bozulduysa cikilir.
+#   catastrophic— fiyat cokusu. OTOMATIK SATIS DEGIL: zorunlu yeniden
+#                 degerlendirme. Fiyat duserken satmak, tezin yanlis
+#                 oldugunu degil paniklendigimizi gosterir.
+#   take_profit — hedefe ulasildi. Yarisini sat, kalanini birak.
+BREAKERS = {
+    "catastrophic_price_pct": -30.0,      # girise gore
+    "portfolio_drawdown_pct": -20.0,      # zirveden
+    "take_profit_sell_fraction": 0.5,
+    # Yapisal kirici kac CEYREK ust uste saglanirsa tetiklenir (varsayilan).
+    "default_consecutive_quarters": 2,
+    "levels": {
+        "thesis": {"level": "high",
+                   "action": "SAT, SGOV'a al"},
+        "catastrophic_price": {"level": "high",
+                               "action": "ZORUNLU yeniden degerlendirme "
+                                         "(otomatik satis degil)"},
+        "take_profit": {"level": "medium",
+                        "action": "Yarisini sat"},
+        "portfolio_drawdown": {"level": "high",
+                               "action": "Motor dilimine ekleme durdur"},
+    },
+}
+
+# Yapilandirilmis kiricinin kullanabilecegi karsilastirmalar.
+BREAKER_OPS = {"<", "<=", ">", ">=" }
+
+# TL mevduat hesabi icin gun sayimi. Turkiye'de mevduat faizi basit faizle
+# ve 365 gun uzerinden isler.
+TL_DEPOSIT = {
+    "day_count": 365,
+    "default_withholding_pct": 15.0,   # stopaj; vadeye gore degisir
 }
 
 # --------------------------------------------------------------------------
@@ -736,6 +804,9 @@ FRED_SERIES = {
 # Fiyat kaynaklari
 # --------------------------------------------------------------------------
 STOOQ_URL = "https://stooq.com/q/d/l/?s={symbol}.us&i=d"
+# Doviz sembolleri ".us" soneki ALMAZ; hisse URL'siyle cekilirse Stooq
+# "usdtry.us" diye bir sembol arar ve bos doner.
+STOOQ_FX_URL = "https://stooq.com/q/d/l/?s={symbol}&i=d"
 BENCHMARK_TICKERS = ["QQQ", "SPY"]
 PRICE_HISTORY_DAYS = 800          # ~3 yil; 52 hafta ve 12 aylik getiri icin yeterli
 AVG_VOLUME_WINDOW_DAYS = 30
