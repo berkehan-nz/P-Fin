@@ -4102,6 +4102,154 @@
       "as_of": "2026-09-24",
       "claude_verdict": "",
       "core": {
+        "fcf_yield_ev": 1.42,
+        "gross_margin": null,
+        "net_debt_to_ebitda": -0.72,
+        "piotroski_f": 4.0,
+        "rev_growth_ttm": 157.01,
+        "roic": 147.75
+      },
+      "data_quality": "sinirli",
+      "decision": "",
+      "flags": {
+        "is_manual": false,
+        "one_off_earnings": false,
+        "rev_growth_organic_suspect": false,
+        "z_unreliable": true
+      },
+      "headline": {
+        "ev_ebit": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "universe",
+          "sector_pct": 13.2,
+          "value": 6.08
+        },
+        "fcf_yield_ev": {
+          "color": "red",
+          "own_5y_pct": 100.0,
+          "pct_basis": "universe",
+          "sector_pct": 23.9,
+          "value": 1.42
+        },
+        "roic": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "universe",
+          "sector_pct": 95.2,
+          "value": 147.75
+        }
+      },
+      "low_coverage_blocks": {
+        "earnings_quality": [
+          "beneish_m",
+          "cash_conversion"
+        ]
+      },
+      "market_cap_musd": 1542.9,
+      "name": "ANAPTYSBIO, INC",
+      "percentile_pool": {
+        "sector": 3,
+        "universe": 23
+      },
+      "price": 51.61,
+      "price_as_of": "2026-09-24",
+      "scores": {
+        "catalyst": null,
+        "coverage_factors": {
+          "earnings_quality": 0.5,
+          "momentum": 1.0,
+          "quality": 0.6,
+          "safety": 0.7,
+          "value": 0.8
+        },
+        "earnings_quality": 51.1,
+        "momentum": 41.3,
+        "quality": 81.1,
+        "safety": 66.5,
+        "total": 62.5,
+        "value": 57.5,
+        "weight_coverage": 0.53
+      },
+      "sector": "Kimya ve ilac",
+      "source": "funnel",
+      "sparkline": [
+        43.5933,
+        38.2667,
+        36.9733,
+        38.4533,
+        41.42,
+        46.7333,
+        46.8133,
+        44.6,
+        50.95,
+        53.55,
+        58.88,
+        66.11,
+        65.73,
+        69.28,
+        66.96,
+        67.92,
+        62.685,
+        63.15,
+        59.77,
+        60.41,
+        57.77,
+        57.02,
+        51.26,
+        51.67,
+        51.36,
+        52.1,
+        56.07,
+        57.61,
+        57.51,
+        59.43,
+        63.15,
+        67.5,
+        63.42,
+        67.325,
+        66.59,
+        69.81,
+        55.82,
+        58.0,
+        52.61,
+        54.15,
+        52.11,
+        55.04,
+        53.66,
+        54.99,
+        56.61,
+        57.87,
+        56.02,
+        58.99,
+        56.69,
+        58.44,
+        58.0,
+        56.28,
+        55.28,
+        57.46,
+        56.6,
+        53.87,
+        54.68,
+        55.06,
+        54.92,
+        51.61
+      ],
+      "story_age_days": null,
+      "ticker": "ANAB",
+      "track": "A",
+      "warning_count": 3,
+      "warnings": [
+        "bilesen eksik",
+        "BORC GORUNMUYOR AMA FAIZ ODENIYOR: TTM faiz gideri 80.0 mn $, bilancoda finansal borc yok. Borc donem icinde kapanmis olabilir ya da borc etiketi okunamadi; net borc ve isletme degeri eksik olabilir.",
+        "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (revenue, operating_income, net_income, cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
+      ],
+      "why_cheap": ""
+    },
+    {
+      "as_of": "2026-09-24",
+      "claude_verdict": "",
+      "core": {
         "fcf_yield_ev": 7.22,
         "gross_margin": 69.82,
         "net_debt_to_ebitda": -1.42,
@@ -13447,12 +13595,22 @@
     }
   ],
   "counts": {
-    "funnel": 95,
+    "funnel": 96,
     "manual": 0,
     "seed": 36
   },
   "manual": [],
-  "partial": null,
+  "partial": {
+    "cycle": 4,
+    "is_partial": true,
+    "last_batch_at": "2026-09-24T19:24:13+00:00",
+    "pct": 7.8,
+    "ranked": 10,
+    "remaining": 3526,
+    "scanned": 300,
+    "survivors": 23,
+    "universe": 3826
+  },
   "seed": [
     {
       "as_of": "2026-09-24",
