@@ -1,7 +1,6 @@
 {
   "analyst": {
     "analyst_count": 4,
-    "as_of": "2026-09-21",
     "buy": 4,
     "hold": 0,
     "recommendation": "strong_buy",
@@ -10,14 +9,19 @@
     "target_high": 140.0,
     "target_low": 111.0,
     "target_median": 120.0,
-    "upside_to_median": 66.689818030282
+    "upside_to_median": 66.68982297663395
   },
   "as_of": "2026-09-24",
   "calendar": {
     "estimated": true,
     "next_earnings": "2026-11-05"
   },
-  "change_1d_pct": 2.89,
+  "capped_for_scoring": {
+    "interest_coverage": {
+      "raw": 174.1179,
+      "used": 100.0
+    }
+  },
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -68,7 +72,7 @@
     "z_unreliable": false,
     "z_unreliable_reason": null
   },
-  "generated_at": "2026-09-19T11:17:22+00:00",
+  "generated_at": "2026-09-24T15:20:14+00:00",
   "insider": {
     "form4_count": 22,
     "last_form4": "2026-09-15",
@@ -86,8 +90,8 @@
     "beneish_m": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 64.3,
+      "pct_basis": "sector",
+      "sector_pct": 88.9,
       "value": -2.52
     },
     "cash_conversion": {
@@ -108,7 +112,7 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 33.3,
+      "sector_pct": 16.7,
       "value": 1.79
     },
     "ebitda_margin": {
@@ -122,26 +126,26 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 66.7,
-      "value": 55.76
+      "sector_pct": 83.3,
+      "value": 55.8
     },
     "ev_ebitda": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 75.0,
-      "value": 46.25
+      "sector_pct": 83.3,
+      "value": 46.28
     },
     "ev_gross_profit": {
       "color": "red",
-      "own_5y_pct": 42.9,
+      "own_5y_pct": 85.7,
       "pct_basis": "sector",
       "sector_pct": 100.0,
       "value": 22.36
     },
     "ev_sales": {
       "color": "red",
-      "own_5y_pct": 14.3,
+      "own_5y_pct": 42.9,
       "pct_basis": "sector",
       "sector_pct": 75.0,
       "value": 7.01
@@ -200,7 +204,7 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 22.58
+      "value": 22.56
     },
     "implied_vs_actual_growth": {
       "color": "gray",
@@ -213,7 +217,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 72.7,
+      "sector_pct": 87.5,
       "value": 174.12
     },
     "maturity_wall_2y": {
@@ -234,7 +238,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 9.1,
+      "sector_pct": 8.3,
       "value": -5.21
     },
     "operating_margin": {
@@ -255,7 +259,7 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 100.0,
+      "sector_pct": 83.3,
       "value": 42.47
     },
     "pe": {
@@ -263,7 +267,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 75.0,
-      "value": 53.23
+      "value": 53.25
     },
     "peg": {
       "color": "yellow",
@@ -284,27 +288,27 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -23.37
+      "value": -23.28
     },
     "rel_strength_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 50.0,
-      "value": 35.58
+      "sector_pct": 83.3,
+      "value": 37.34
     },
     "return_12m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 50.0,
+      "sector_pct": 75.0,
       "value": -0.29
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 66.7,
+      "sector_pct": 83.3,
       "value": 62.51
     },
     "rev_cagr_3y": {
@@ -433,7 +437,7 @@
   "overrides": [],
   "percentile_pool": {
     "sector": 12,
-    "universe": 374
+    "universe": 356
   },
   "price": 71.99,
   "price_as_of": "2026-09-23",
@@ -442,7 +446,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 2224.8,
     "fcf_ttm_musd": 35.6,
-    "implied_growth_pct": 22.582899234024715,
+    "implied_growth_pct": 22.56,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -450,8 +454,8 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "percentile": 64.3,
-          "scaled": 35.7,
+          "percentile": 88.9,
+          "scaled": 11.1,
           "weight": 0.2
         },
         "cash_conversion": {
@@ -481,8 +485,8 @@
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 50.0,
-          "scaled": 50.0,
+          "percentile": 83.3,
+          "scaled": 83.3,
           "weight": 0.4
         }
       },
@@ -532,13 +536,13 @@
           "weight": 0.2
         },
         "interest_coverage": {
-          "percentile": 72.7,
-          "scaled": 72.7,
+          "percentile": 87.5,
+          "scaled": 87.5,
           "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 9.1,
-          "scaled": 90.9,
+          "percentile": 8.3,
+          "scaled": 91.7,
           "weight": 0.3
         }
       },
@@ -548,13 +552,13 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 33.3,
-          "scaled": 33.3,
+          "percentile": 16.7,
+          "scaled": 16.7,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 66.7,
-          "scaled": 33.3,
+          "percentile": 83.3,
+          "scaled": 16.7,
           "weight": 0.3
         },
         "ev_gross_profit": {
@@ -619,12 +623,12 @@
       "safety": 1.0,
       "value": 1.0
     },
-    "earnings_quality": 7.1,
-    "momentum": 20.0,
+    "earnings_quality": 2.2,
+    "momentum": 33.3,
     "quality": 19.6,
-    "safety": 66.8,
-    "total": 25.3,
-    "value": 17.1,
+    "safety": 70.0,
+    "total": 24.2,
+    "value": 10.4,
     "weight_coverage": 0.94
   },
   "sector": "Veri isleme ve sistem entegrasyonu",

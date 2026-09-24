@@ -9,14 +9,23 @@
     "target_high": 46.0,
     "target_low": 39.0,
     "target_median": 42.0,
-    "upside_to_median": 37.38959764474976
+    "upside_to_median": 37.38959901628978
   },
   "as_of": "2026-09-24",
   "calendar": {
     "estimated": true,
     "next_earnings": "2026-11-05"
   },
-  "change_1d_pct": -7.84,
+  "capped_for_scoring": {
+    "interest_coverage": {
+      "raw": 400.5136,
+      "used": 100.0
+    },
+    "roic": {
+      "raw": 129.0436,
+      "used": 60.0
+    }
+  },
   "data_quality": {
     "issue_count": 1,
     "issues": [
@@ -67,7 +76,7 @@
     "z_unreliable": false,
     "z_unreliable_reason": null
   },
-  "generated_at": "2026-09-19T11:16:44+00:00",
+  "generated_at": "2026-09-24T15:19:39+00:00",
   "insider": {
     "form4_count": 42,
     "last_form4": "2026-09-17",
@@ -85,8 +94,8 @@
     "beneish_m": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 2.6,
+      "pct_basis": "sector",
+      "sector_pct": 16.7,
       "value": -3.78
     },
     "cash_conversion": {
@@ -133,16 +142,16 @@
     },
     "ev_gross_profit": {
       "color": "green",
-      "own_5y_pct": 33.3,
+      "own_5y_pct": 25.0,
       "pct_basis": "sector",
-      "sector_pct": 40.0,
+      "sector_pct": 18.2,
       "value": 2.98
     },
     "ev_sales": {
       "color": "green",
       "own_5y_pct": 12.5,
       "pct_basis": "sector",
-      "sector_pct": 41.7,
+      "sector_pct": 33.3,
       "value": 2.75
     },
     "fcf_margin": {
@@ -177,7 +186,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 85.0,
+      "sector_pct": 86.4,
       "value": 92.32
     },
     "gross_margin_change_3y": {
@@ -191,7 +200,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 85.0,
+      "sector_pct": 86.4,
       "value": 1.61
     },
     "implied_growth": {
@@ -212,7 +221,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 72.7,
+      "sector_pct": 87.5,
       "value": 400.51
     },
     "maturity_wall_2y": {
@@ -233,7 +242,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 59.1,
+      "sector_pct": 45.8,
       "value": -0.46
     },
     "operating_margin": {
@@ -254,7 +263,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 41.7,
+      "sector_pct": 50.0,
       "value": 25.84
     },
     "pe": {
@@ -275,7 +284,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 66.7,
+      "sector_pct": 62.5,
       "value": 7.0
     },
     "rel_strength_12m": {
@@ -283,27 +292,27 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -41.21
+      "value": -41.12
     },
     "rel_strength_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 16.7,
-      "value": -37.93
+      "value": -36.17
     },
     "return_12m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 50.0,
+      "sector_pct": 41.7,
       "value": -18.13
     },
     "return_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 33.3,
+      "sector_pct": 8.3,
       "value": -11.0
     },
     "rev_cagr_3y": {
@@ -381,6 +390,18 @@
   "net_debt_musd": -122.14,
   "news": [
     {
+      "date": "2026-09-24",
+      "headline": "CarGurus (NASDAQ:CARG) Offers a GARP Profile With High ROIC and No Debt",
+      "source": "ChartMill",
+      "url": "https://finnhub.io/api/news?id=80ee479bdce3c39511f3a3fe2f939660c3e21d4f0d5b88a7b183dd7ce941898f"
+    },
+    {
+      "date": "2026-09-23",
+      "headline": "Etsy, CarGurus, Cars.com, and EverQuote Shares Are Falling, What You Need To Know",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=f9127521bf8b88db6c8f8828e851fea27728593ba760ad89cac203c894dd6a69"
+    },
+    {
       "date": "2026-09-22",
       "headline": "Cars.com, Booking, EverQuote, Expedia, and CarGurus Stocks Trade Down, What You Need To Know",
       "source": "Yahoo",
@@ -415,24 +436,12 @@
       "headline": "CarGurus: Consistent Dealer Adds And Shrinking Share Count",
       "source": "SeekingAlpha",
       "url": "https://finnhub.io/api/news?id=06231b704ce702b9f690fef8d2ad8f6ce5b66bc87390d1ac5cf6f57cbe4f2f0c"
-    },
-    {
-      "date": "2026-09-04",
-      "headline": "Q2 Earnings Outperformers: CarGurus (NASDAQ:CARG) And The Rest Of The Online Marketplace Stocks",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=0307ba8075e88e6976784fa126977ef816e700db49d5fbdaf095379782c04595"
-    },
-    {
-      "date": "2026-09-03",
-      "headline": "CarGurus Appoints Matthew Mandel as Chief Financial Officer",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=fca8ace4a6cd5f48d578b800d75b44d3084c23407a6779eb38a0f8b5f45c435d"
     }
   ],
   "overrides": [],
   "percentile_pool": {
     "sector": 12,
-    "universe": 374
+    "universe": 356
   },
   "price": 30.57,
   "price_as_of": "2026-09-23",
@@ -441,7 +450,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 2662.1,
     "fcf_ttm_musd": 315.2,
-    "implied_growth_pct": -4.697170883785902,
+    "implied_growth_pct": -4.7,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -449,8 +458,8 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "percentile": 2.6,
-          "scaled": 97.4,
+          "percentile": 16.7,
+          "scaled": 83.3,
           "weight": 0.2
         },
         "cash_conversion": {
@@ -459,8 +468,8 @@
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 66.7,
-          "scaled": 66.7,
+          "percentile": 62.5,
+          "scaled": 62.5,
           "weight": 0.25
         },
         "sloan_accruals": {
@@ -475,8 +484,8 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 33.3,
-          "scaled": 33.3,
+          "percentile": 25.0,
+          "scaled": 25.0,
           "weight": 0.6
         },
         "rel_strength_6m": {
@@ -496,13 +505,13 @@
           "weight": 0.15
         },
         "gross_margin": {
-          "percentile": 85.0,
-          "scaled": 85.0,
+          "percentile": 86.4,
+          "scaled": 86.4,
           "weight": 0.2
         },
         "gross_profitability": {
-          "percentile": 85.0,
-          "scaled": 85.0,
+          "percentile": 86.4,
+          "scaled": 86.4,
           "weight": 0.2
         },
         "roic": {
@@ -532,13 +541,13 @@
           "weight": 0.2
         },
         "interest_coverage": {
-          "percentile": 72.7,
-          "scaled": 72.7,
+          "percentile": 87.5,
+          "scaled": 87.5,
           "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 59.1,
-          "scaled": 40.9,
+          "percentile": 45.8,
+          "scaled": 54.2,
           "weight": 0.3
         }
       },
@@ -558,13 +567,13 @@
           "weight": 0.3
         },
         "ev_gross_profit": {
-          "percentile": 40.0,
-          "scaled": 60.0,
+          "percentile": 18.2,
+          "scaled": 81.8,
           "weight": 0.2
         },
         "ev_sales": {
-          "percentile": 41.7,
-          "scaled": 58.3,
+          "percentile": 33.3,
+          "scaled": 66.7,
           "weight": 0.15
         },
         "fcf_yield_ev": {
@@ -619,12 +628,12 @@
       "safety": 1.0,
       "value": 1.0
     },
-    "earnings_quality": 67.2,
-    "momentum": 26.7,
-    "quality": 85.0,
-    "safety": 60.5,
-    "total": 72.0,
-    "value": 79.5,
+    "earnings_quality": 63.3,
+    "momentum": 21.7,
+    "quality": 85.6,
+    "safety": 67.4,
+    "total": 74.6,
+    "value": 85.1,
     "weight_coverage": 0.75
   },
   "sector": "Veri isleme ve sistem entegrasyonu",

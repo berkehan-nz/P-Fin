@@ -1,6 +1,7 @@
 {
   "analyst": {
     "analyst_count": 22,
+    "as_of": "2026-09-24",
     "buy": 13,
     "hold": 11,
     "recommendation": "none",
@@ -9,14 +10,23 @@
     "target_high": 184.0,
     "target_low": 70.0,
     "target_median": 118.5,
-    "upside_to_median": 50.78254230818169
+    "upside_to_median": 50.78254933429429
   },
   "as_of": "2026-09-24",
   "calendar": {
     "estimated": true,
     "next_earnings": "2026-10-29"
   },
-  "change_1d_pct": -2.04,
+  "capped_for_scoring": {
+    "interest_coverage": {
+      "raw": 327.8171,
+      "used": 100.0
+    },
+    "roic": {
+      "raw": 130.0542,
+      "used": 60.0
+    }
+  },
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -70,7 +80,7 @@
     "z_unreliable": true,
     "z_unreliable_reason": "bilesen eksik"
   },
-  "generated_at": "2026-09-19T11:16:53+00:00",
+  "generated_at": "2026-09-24T15:19:47+00:00",
   "insider": {
     "form4_count": 39,
     "last_form4": "2026-09-02",
@@ -89,7 +99,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 62.6,
+      "sector_pct": 60.1,
       "value": -2.53
     },
     "cash_conversion": {
@@ -110,7 +120,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 100.0,
+      "sector_pct": 91.7,
       "value": 13.74
     },
     "ebitda_margin": {
@@ -124,28 +134,28 @@
       "color": "green",
       "own_5y_pct": 0.0,
       "pct_basis": "sector",
-      "sector_pct": 0.0,
+      "sector_pct": 8.3,
       "value": 7.28
     },
     "ev_ebitda": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 0.0,
+      "sector_pct": 16.7,
       "value": 6.86
     },
     "ev_gross_profit": {
       "color": "green",
       "own_5y_pct": 0.0,
       "pct_basis": "sector",
-      "sector_pct": 25.0,
+      "sector_pct": 33.3,
       "value": 2.85
     },
     "ev_sales": {
       "color": "green",
       "own_5y_pct": 0.0,
       "pct_basis": "sector",
-      "sector_pct": 25.0,
+      "sector_pct": 33.3,
       "value": 1.65
     },
     "fcf_margin": {
@@ -166,14 +176,14 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 100.0,
+      "sector_pct": 91.7,
       "value": 12.03
     },
     "fcf_yield_mcap": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 100.0,
+      "sector_pct": 91.7,
       "value": 10.24
     },
     "gross_margin": {
@@ -215,7 +225,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 87.5,
+      "sector_pct": 95.5,
       "value": 327.82
     },
     "maturity_wall_2y": {
@@ -236,7 +246,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 8.3,
+      "sector_pct": 4.2,
       "value": -1.21
     },
     "operating_margin": {
@@ -257,14 +267,14 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 91.7,
+      "sector_pct": 83.3,
       "value": 35.73
     },
     "pe": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 0.0,
+      "sector_pct": 10.0,
       "value": 10.56
     },
     "peg": {
@@ -286,27 +296,27 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -54.02
+      "value": -53.93
     },
     "rel_strength_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 0.0,
-      "value": -50.21
+      "sector_pct": 8.3,
+      "value": -48.45
     },
     "return_12m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 8.3,
+      "sector_pct": 16.7,
       "value": -30.93
     },
     "return_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 0.0,
+      "sector_pct": 16.7,
       "value": -23.29
     },
     "rev_cagr_3y": {
@@ -384,6 +394,24 @@
   "net_debt_musd": -1602.59,
   "news": [
     {
+      "date": "2026-09-24",
+      "headline": "Deckers Outdoor Corp (NYSE:DECK) Meets the Growth at a Reasonable Price Test",
+      "source": "ChartMill",
+      "url": "https://finnhub.io/api/news?id=081168a124cfffd563a0856f5e5c514818b8c38099891e9aa8113bf4627a4c00"
+    },
+    {
+      "date": "2026-09-24",
+      "headline": "2 Mid-Cap Stocks with Exciting Potential and 1 We Avoid",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=f0badc54248f0e05d1cfb1df60f56b10c775dc65add55feaa5e430b0f41ed54b"
+    },
+    {
+      "date": "2026-09-24",
+      "headline": "Deckers Outdoor (DECK) Stock May Be 48% Undervalued As UGG Campaign Starts",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=8f9c16dcf8317ab600b5f2100b26846e5ffb566552f7e5f8c2f69daa9aa38f54"
+    },
+    {
       "date": "2026-09-23",
       "headline": "Deckers (DECK): Buy, Sell, or Hold Post Q2 Earnings?",
       "source": "Yahoo",
@@ -412,30 +440,12 @@
       "headline": "UGG Season Returns This Fall, Bringing the Rituals That Make Fall Feel Like Fall to Life Across North America",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=d88d3144e49dbf9ae8b52d45cbc375aff97a4abad3511861d6ff6a59d3b8a9f9"
-    },
-    {
-      "date": "2026-09-22",
-      "headline": "UGG® Launches & Invites Consumers to Experience the Born to Feel Platform, Turning Iconic Comfort Into a Global Movement",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=3ef5af0bca2ab04d4c6e5ed6affaa37a26f37041d2a7298c99b3e8862655c11d"
-    },
-    {
-      "date": "2026-09-21",
-      "headline": "Deckers Outdoor: Risky, Because It's So Cheap -- Strong Sell",
-      "source": "SeekingAlpha",
-      "url": "https://finnhub.io/api/news?id=b0a470487324dcd4db740aa0887ae1c402bd4f7283c78eaff69ee419bfe9c7c2"
-    },
-    {
-      "date": "2026-09-21",
-      "headline": "Nike, On Holding, and Deckers Outdoor Are Down Between 23% and 43%. Here's the Stock to Buy, Even if the Fed Keeps Hiking Interest Rates.",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=ef3fbc36b7643ee25db840aa280de62365466d277c9eb071e97f1aa5635deb07"
     }
   ],
   "overrides": [],
   "percentile_pool": {
     "sector": 12,
-    "universe": 374
+    "universe": 356
   },
   "price": 78.59,
   "price_as_of": "2026-09-23",
@@ -444,7 +454,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 9118.2,
     "fcf_ttm_musd": 1097.3,
-    "implied_growth_pct": -4.92829078419194,
+    "implied_growth_pct": -4.93,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -452,8 +462,8 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "percentile": 62.6,
-          "scaled": 37.4,
+          "percentile": 60.1,
+          "scaled": 39.9,
           "weight": 0.2
         },
         "cash_conversion": {
@@ -483,8 +493,8 @@
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 0.0,
-          "scaled": 0.0,
+          "percentile": 8.3,
+          "scaled": 8.3,
           "weight": 0.4
         }
       },
@@ -534,13 +544,13 @@
           "weight": 0.2
         },
         "interest_coverage": {
-          "percentile": 87.5,
-          "scaled": 87.5,
+          "percentile": 95.5,
+          "scaled": 95.5,
           "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 8.3,
-          "scaled": 91.7,
+          "percentile": 4.2,
+          "scaled": 95.8,
           "weight": 0.3
         }
       },
@@ -550,28 +560,28 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 100.0,
-          "scaled": 100.0,
+          "percentile": 91.7,
+          "scaled": 91.7,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 0.0,
-          "scaled": 100.0,
+          "percentile": 8.3,
+          "scaled": 91.7,
           "weight": 0.3
         },
         "ev_gross_profit": {
-          "percentile": 25.0,
-          "scaled": 75.0,
+          "percentile": 33.3,
+          "scaled": 66.7,
           "weight": 0.2
         },
         "ev_sales": {
-          "percentile": 25.0,
-          "scaled": 75.0,
+          "percentile": 33.3,
+          "scaled": 66.7,
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 100.0,
-          "scaled": 100.0,
+          "percentile": 91.7,
+          "scaled": 91.7,
           "weight": 0.25
         }
       },
@@ -624,12 +634,12 @@
       "safety": 0.7,
       "value": 1.0
     },
-    "earnings_quality": 49.3,
-    "momentum": 5.0,
+    "earnings_quality": 49.8,
+    "momentum": 8.3,
     "quality": 88.8,
-    "safety": 91.7,
-    "total": 78.5,
-    "value": 91.2,
+    "safety": 95.7,
+    "total": 76.5,
+    "value": 82.9,
     "weight_coverage": 0.7
   },
   "sector": "Kaucuk, plastik, cam",
