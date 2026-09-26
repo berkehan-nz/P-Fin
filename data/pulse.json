@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-25",
+  "as_of": "2026-09-26",
   "calendar": {
     "recent": [
       {
@@ -17,30 +17,6 @@
         "ticker": "TTD",
         "title": "TTD · DEF 14A",
         "url": "https://www.sec.gov/Archives/edgar/data/1671933/000167193326000102/a2026specialmeetingdefinit.htm"
-      },
-      {
-        "date": "2026-09-15",
-        "detail": "Onemli olay bildirimi",
-        "kind": "sec",
-        "ticker": "TTD",
-        "title": "TTD · 8-K",
-        "url": "https://www.sec.gov/Archives/edgar/data/1671933/000167193326000099/ttd-20260914.htm"
-      },
-      {
-        "date": "2026-09-15",
-        "detail": "Onemli olay bildirimi",
-        "kind": "sec",
-        "ticker": "DECK",
-        "title": "DECK · 8-K",
-        "url": "https://www.sec.gov/Archives/edgar/data/910521/000091052126000026/deck-20260914.htm"
-      },
-      {
-        "date": "2026-09-15",
-        "detail": "Onemli olay bildirimi",
-        "kind": "sec",
-        "ticker": "BKE",
-        "title": "BKE · 8-K",
-        "url": "https://www.sec.gov/Archives/edgar/data/885245/000088524526000039/bke-20260915.htm"
       }
     ],
     "source": "fred+finnhub+sec",
@@ -102,6 +78,13 @@
         "title": "Istihdam raporu"
       },
       {
+        "date": "2026-11-10",
+        "detail": "enflasyon",
+        "kind": "makro",
+        "ticker": null,
+        "title": "TUFE (CPI)"
+      },
+      {
         "date": "2026-11-19",
         "detail": null,
         "kind": "bilanco",
@@ -124,7 +107,7 @@
       }
     ]
   },
-  "generated_at": "2026-09-25T22:14:30+00:00",
+  "generated_at": "2026-09-26T01:28:42+00:00",
   "market": [
     {
       "as_of": "2026-09-25",
@@ -548,8 +531,8 @@
     },
     {
       "as_of": "2026-09-25",
-      "change_1d_pct": 0.16,
-      "change_5d_pct": 0.31,
+      "change_1d_pct": 0.13,
+      "change_5d_pct": 0.29,
       "group": "Kur",
       "label": "USD/TRY",
       "series": [
@@ -582,11 +565,11 @@
         48.8073,
         48.8362,
         48.8509,
-        48.928
+        48.9163
       ],
       "symbol": "TRY=X",
       "unit": "kur",
-      "value": 48.928
+      "value": 48.9163
     },
     {
       "as_of": "2026-09-25",
@@ -673,9 +656,9 @@
       "value": 4320.5
     },
     {
-      "as_of": "2026-09-25",
-      "change_1d_pct": -0.54,
-      "change_5d_pct": 3.43,
+      "as_of": "2026-09-26",
+      "change_1d_pct": -0.52,
+      "change_5d_pct": 3.45,
       "group": "Kripto",
       "label": "Bitcoin",
       "series": [
@@ -708,11 +691,11 @@
         86172.2812,
         84383.0078,
         84379.0625,
-        83924.1406
+        83942.0938
       ],
       "symbol": "BTC-USD",
       "unit": "USD",
-      "value": 83924.1406
+      "value": 83942.0938
     }
   ],
   "news": [
@@ -722,6 +705,13 @@
       "source": "Yahoo",
       "ticker": "CART",
       "url": "https://finnhub.io/api/news?id=8ab3d1272a9b73cff090e7833be66917e3c0a7d359eb0af3b32cfb44130fb795"
+    },
+    {
+      "date": "2026-09-25",
+      "headline": "Bernstein Initiates Coverage of CF Industries Holdings at Outperform",
+      "source": "Fintel",
+      "ticker": "CF",
+      "url": "https://finnhub.io/api/news?id=5de68c83dd54fb4ebdf76033df123209ecdf54f0ca924f3a92e58c05c3c1e5a2"
     },
     {
       "date": "2026-09-25",
@@ -739,13 +729,6 @@
     },
     {
       "date": "2026-09-25",
-      "headline": "This Tower Semiconductor Analyst Begins Coverage On A Bullish Note; Here Are Top 5 Initiations For Friday",
-      "source": "Benzinga",
-      "ticker": "CF",
-      "url": "https://finnhub.io/api/news?id=4a96eed643f4777abb5ca38eb7c3455d23487afb26f3745856dd4ad87c46f21b"
-    },
-    {
-      "date": "2026-09-25",
       "headline": "Veeva Unveils AI Study Builder Agent to Speed Clinical Trial Setup",
       "source": "Yahoo",
       "ticker": "GMED",
@@ -757,6 +740,13 @@
       "source": "Yahoo",
       "ticker": "GMED",
       "url": "https://finnhub.io/api/news?id=a9ff4d3ba263b75cc7992bb9bb5763803e41a2e984ca6e0e139ac9d5b22bbd62"
+    },
+    {
+      "date": "2026-09-25",
+      "headline": "Mirum Pharmaceuticals and Incyte Announce U.S. FDA Approval of Atebrioz™ (zilurgisertib) for Adult and Pediatric Patients with Fibrodysplasia Ossificans Progressiva",
+      "source": "Yahoo",
+      "ticker": "INCY",
+      "url": "https://finnhub.io/api/news?id=35a7a53435f6293704a9963de0e5dbe152bf4b44a46b7ad6f183aa81df7508ea"
     },
     {
       "date": "2026-09-25",
@@ -869,13 +859,6 @@
       "source": "Yahoo",
       "ticker": "INCY",
       "url": "https://finnhub.io/api/news?id=3828c89500c6869d3d4411c2f0c78565aac49ea0090f122d899558790e68480b"
-    },
-    {
-      "date": "2026-09-24",
-      "headline": "Incyte (INCY) Heads To EADV With New Skin Disease Trial Data",
-      "source": "Yahoo",
-      "ticker": "INCY",
-      "url": "https://finnhub.io/api/news?id=1b4559feffaf16a0ad76e770037599887130cf9a4c4f286289b8055186edae2f"
     },
     {
       "date": "2026-09-24",
