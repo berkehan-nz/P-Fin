@@ -83,6 +83,7 @@ window.DataLayer = (function () {
     pulse:         () => get('pulse.json', { market: [], news: [],
                                              calendar: { upcoming: [], recent: [] } }),
     macro:         () => get('macro.json', { series: {} }),
+    weekly:        () => get('weekly.json', {}),
     overview:      () => get('overview.json', { movers: [], news: [] }),
     portfolio:     () => get('portfolio_state.json', { positions: [], summary: {}, warnings: [] }),
     watchlist:     () => get('watchlist.json', { entries: [] }),

@@ -12,7 +12,8 @@ from __future__ import annotations
 import argparse
 import sys
 
-from . import cards, config, pipeline, portfolio, validate, watchlist
+from . import (cards, config, pipeline, portfolio, validate, watchlist,
+               weekly)
 from .config import CARDS_DIR
 from .sources import analyst as analyst_src, finnhub_api, prices
 from .util import read_json, try_fetch
@@ -21,6 +22,8 @@ from .util import read_json, try_fetch
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Gunluk guncelleme")
     parser.add_argument("--no-news", action="store_true")
+    parser.add_argument("--weekly", action="store_true",
+                        help="Cuma raporunu gun bakmadan yaz (data/weekly.json)")
     args = parser.parse_args(argv)
 
     portfolio.ensure_file()
@@ -86,6 +89,12 @@ def main(argv: list[str] | None = None) -> int:
     pipeline.write_portfolio_state(quotes, bench_map, ctx)
     pipeline.write_overview(ctx, quotes)
     pipeline.write_macro()
+
+    # CUMA RAPORU. Yalnizca cuma yazilir: "gecen rapordan bu yana yeni
+    # aday" hesabi raporun haftalik olmasina dayanir. Her gun yazilsa
+    # pencere bir gune duser ve bolum anlamini kaybeder.
+    if weekly.write(force=args.weekly):
+        print("[gunluk] Cuma raporu yazildi (data/weekly.json)")
 
     print(f"[gunluk] {changed} kart degisti, {len(quotes)} fiyat guncellendi")
     return 0

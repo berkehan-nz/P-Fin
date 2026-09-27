@@ -199,7 +199,14 @@ def tl_deposit_value(position: dict, usdtry: float | None) -> dict:
 
 def slice_summary(positions: list[dict], cash: float,
                   portfolio_value: float) -> list[dict]:
-    """Dilim bazinda gercek/hedef agirlik ve sapma."""
+    """Dilim bazinda gercek/hedef agirlik ve sapma.
+
+    POZISYON YOKKEN hicbir dilim "sapmis" sayilmaz. Henuz hicbir sey
+    almadiysan %100 nakit DOGRU durumdur, sapma degil. Aksi halde ilk
+    gunden dort dilim birden alarm verir ve bu, uyarilarin gormezden
+    gelinmesini ogretir. Kural tek yerde: hem uyarilar hem Cuma raporu
+    buradan okur.
+    """
     actual: dict[str, float] = defaultdict(float)
     for p in positions:
         if p.get("value_usd"):
@@ -219,7 +226,8 @@ def slice_summary(positions: list[dict], cash: float,
             "actual_pct": round(pct_now, 2),
             "target_pct": target,
             "drift_pp": round(drift, 2),
-            "off_target": abs(drift) > PORTFOLIO["slice_drift_warn_pp"],
+            "off_target": bool(positions)
+                          and abs(drift) > PORTFOLIO["slice_drift_warn_pp"],
         })
     return out
 
@@ -467,19 +475,18 @@ def warnings_for(positions: list[dict], summary: dict, *,
                 })
 
     # DILIM SAPMASI — hedeften uzaklasma tek tek pozisyonlarda gorunmez.
-    # Portfoy BOSKEN uyarmiyoruz: dort dilimin dordu birden "sapma" derse
-    # bu bilgi degil gurultudur ve ilk gunden itibaren uyarilarin
-    # gormezden gelinmesini ogretir. Dengelenecek bir sey olmali.
-    if positions:
-        for sl in summary.get("slices") or []:
-            if sl.get("off_target"):
-                yon = "uzerinde" if sl["drift_pp"] > 0 else "altinda"
-                out.append({
-                    "ticker": "", "level": "medium", "type": "dilim_sapmasi",
-                    "message": f"{sl['label']}: %{sl['actual_pct']:.1f} "
-                               f"(hedef %{sl['target_pct']:.0f}, "
-                               f"{abs(sl['drift_pp']):.1f} puan {yon})",
-                })
+    # "Portfoy bos" durumu slice_summary icinde ele aliniyor (off_target
+    # orada False kalir); burada ikinci bir kontrol OLMAMALI, yoksa kural
+    # iki yere dagilir ve biri degisince digeri sessizce eskir.
+    for sl in summary.get("slices") or []:
+        if sl.get("off_target"):
+            yon = "uzerinde" if sl["drift_pp"] > 0 else "altinda"
+            out.append({
+                "ticker": "", "level": "medium", "type": "dilim_sapmasi",
+                "message": f"{sl['label']}: %{sl['actual_pct']:.1f} "
+                           f"(hedef %{sl['target_pct']:.0f}, "
+                           f"{abs(sl['drift_pp']):.1f} puan {yon})",
+            })
 
     # KADEMELI ALIM — sirada bekleyen parca.
     for tr in planned or []:

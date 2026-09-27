@@ -392,6 +392,40 @@ ile korunur (iptal edilse bile ilerleme islenir), ve tarama 3 saattir
 ilerlemediyse hem `--status` ciktisi hem de panodaki aday listesi bunu
 acikca yazar.
 
+### Cuma raporu
+
+Sistem her gun veri uretir ama bu, her gun BAKILMASI gerektigi anlamina
+gelmez. Gunluk bakmak iki sekilde zarar verir: gurultuye alisip gercek
+sinyali kacirirsin, ya da her dalgalanmaya tepki verip islem maliyetini
+tezin getirisinden buyutursun.
+
+Bu yuzden haftada bir, sabit bir liste (`data/weekly.json`, panoda
+**Cuma raporu** sekmesi). Bolumler EYLEM SIRASINA gore dizilir:
+
+| # | Bolum | Neden bu sirada |
+|---|---|---|
+| 1 | Tetiklenen tez kiricilar | Karar gerektiren tek bolum |
+| 2 | Dilim sapmalari | Yeniden dengeleme |
+| 3 | 7 gun icindeki bilancolar | BILGI, eylem degil — once rakam, sonra tez |
+| 4 | Huniden yeni gelenler | Gecen rapordan bu yana giren/cikan |
+| 5 | USD/TRY ve TL basa bas | Mevduatin gercek durumu |
+| 6 | Evren taramasi | Ilerleme ve VERI_YOK kuyrugu |
+| 7 | Makro | Yaklasan kritik tarihler |
+
+Basta tek bir sayi var: **kac madde eylem gerektiriyor**. Bilanco tarihleri
+bu sayiya GIRMEZ — rapor bir karar ani degil, bir bilgi anidir.
+
+"Yeni aday" gecen rapora gore hesaplanir: rapor kendi onceki aday listesini
+tasir ve farki alir. Kart dosyasinin tarihine bakmak yaniltici olurdu,
+kartlar her tur yeniden uretiliyor.
+
+Rapor yalnizca **cuma** yazilir; her gun yazilsa "yeni" penceresi bir gune
+duser ve 4. bolum anlamsizlasir. Hemen uretmek icin:
+
+```bash
+python -m src.run_daily --weekly
+```
+
 ## Test verisi hakkinda
 
 `tests/fixtures.py` icindeki DBX / LSCC / KVYO rakamlari, sirketlerin kamuya

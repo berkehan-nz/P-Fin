@@ -724,3 +724,13 @@ section[id] { scroll-margin-top: calc(var(--topbar-h) + 12px); }
   opacity: 0.85;
   vertical-align: middle;
 }
+
+/* Cuma raporu: madde isaretsiz, nefes alan listeler ------------------- */
+/* Rapor okunmak icin var; standart <ul> girintisi ve madde isaretleri
+   satirlari sikistiriyor ve tarama hizini dusuruyor. */
+ul.plain { list-style: none; margin: 6px 0 0; padding: 0; }
+ul.plain > li {
+  border-top: 1px solid var(--line-soft);
+  padding: 7px 0;
+}
+ul.plain > li:first-child { border-top: none; }
