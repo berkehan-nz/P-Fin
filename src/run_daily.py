@@ -70,11 +70,21 @@ def main(argv: list[str] | None = None) -> int:
             news = try_fetch(finnhub_api.news, ticker, label=f"haber {ticker}")
             if news:
                 card["news"] = news
-        card["calendar"] = pipeline.earnings_entry(ticker, ctx["earnings"].get(ticker))
+        # BILANCO TARIHI: yeni sorgu bos dondurduyse kartta YAZILI olani
+        # koru. Onceki surum kosulsuz yaziyordu; Finnhub ve SEC tahmini
+        # ayni anda cevap vermedigi anda bilinen bir tarih siliniyor ve
+        # yerine {"next_earnings": null, "estimated": false} gibi kendi
+        # icinde tutarsiz bir kayit geliyordu.
+        yeni_takvim = pipeline.earnings_entry(ticker, ctx["earnings"].get(ticker))
+        if yeni_takvim.get("next_earnings") or not (card.get("calendar") or {}).get("next_earnings"):
+            card["calendar"] = yeni_takvim
 
         analyst = try_fetch(analyst_src.consensus, ticker, card.get("price"),
                             label=f"analist {ticker}")
-        if analyst:
+        # ICI BOS sozluk de yazmamali: kaynak "cevap verdim ama elimde bir
+        # sey yok" dediginde kartta duran hedefleri silmek dogru degil.
+        if analyst and any(v is not None for k, v in analyst.items()
+                           if k not in ("source", "recommendation")):
             card["analyst"] = analyst
 
         # Fiyat degisince carpanlar yeniden hesaplandi; denetimi tekrarla

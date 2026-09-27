@@ -81,3 +81,79 @@ class TestPriceRefresh:
         run_daily._refresh_price_derived(
             c, {"price": 25.0, "history": [], "high_52w": 50.0}, [])
         assert c["metrics"]["pct_off_52w_high"]["value"] == pytest.approx(50.0)
+
+
+class TestOptionalSourcesNeverErase:
+    """Cokmus bir ISTEGE BAGLI kaynak, kartta yazili olani SILMEMELI.
+
+    Gercek olay: yerel bir kosuda yfinance erisilemezken uc kartin analist
+    hedefleri ve bilanco tarihleri null'landi. Mekanizma sinsiydi —
+    analyst.consensus basarisizlikta ICI BOS BIR SOZLUK donduruyordu ve bos
+    sozluk truthy oldugu icin cagirandaki "if analyst:" korumasindan
+    geciyordu. Takvim ise hic korumasizdi.
+
+    null bir alan "veri yok" gibi gorunur, "vardi ve sildik" gibi gorunmez.
+    Bu yuzden en sessiz veri kaybi turudur.
+    """
+
+    def test_failed_analyst_fetch_returns_none(self, monkeypatch, tmp_path):
+        from src.sources import analyst
+
+        monkeypatch.setattr(analyst, "CACHE_DIR", tmp_path)
+
+        def boom(*a, **k):
+            raise RuntimeError("yfinance erisilemez")
+
+        import builtins
+        real_import = builtins.__import__
+
+        def fake_import(name, *a, **k):
+            if name == "yfinance":
+                raise ImportError("yok")
+            return real_import(name, *a, **k)
+
+        monkeypatch.setattr(builtins, "__import__", fake_import)
+        out = analyst.consensus("DBX", 25.0)
+        assert out is None, "bos sozluk degil None donmeli"
+
+    def test_hollow_analyst_dict_does_not_overwrite(self):
+        """Kaynak 'cevap verdim ama elimde bir sey yok' derse de yazmamali."""
+        hollow = {"buy": None, "hold": None, "sell": None, "target_low": None,
+                  "target_median": None, "target_high": None,
+                  "upside_to_median": None, "analyst_count": None,
+                  "source": "yfinance", "recommendation": "none"}
+        dolu = dict(hollow, analyst_count=7, target_median=390.0)
+
+        def yazilir_mi(a):
+            return bool(a) and any(v is not None for k, v in a.items()
+                                   if k not in ("source", "recommendation"))
+
+        assert yazilir_mi(hollow) is False
+        assert yazilir_mi(dolu) is True
+
+    def test_empty_calendar_keeps_known_date(self):
+        """Finnhub ve SEC tahmini ayni anda cevap vermezse tarih korunmali."""
+        card = {"calendar": {"next_earnings": "2027-01-06", "estimated": False}}
+        bos = {"next_earnings": None, "estimated": False}
+
+        # run_daily'deki kosulun aynisi
+        if bos.get("next_earnings") or not (card.get("calendar") or {}).get("next_earnings"):
+            card["calendar"] = bos
+
+        assert card["calendar"]["next_earnings"] == "2027-01-06"
+
+    def test_new_date_does_overwrite(self):
+        card = {"calendar": {"next_earnings": "2027-01-06", "estimated": True}}
+        yeni = {"next_earnings": "2027-01-20", "estimated": False}
+        if yeni.get("next_earnings") or not (card.get("calendar") or {}).get("next_earnings"):
+            card["calendar"] = yeni
+        assert card["calendar"]["next_earnings"] == "2027-01-20"
+        assert card["calendar"]["estimated"] is False
+
+    def test_empty_calendar_fills_a_card_that_had_none(self):
+        """Hic tarihi olmayan kart, bos kayitla da olsa alani kazanmali."""
+        card = {"calendar": {}}
+        bos = {"next_earnings": None, "estimated": False}
+        if bos.get("next_earnings") or not (card.get("calendar") or {}).get("next_earnings"):
+            card["calendar"] = bos
+        assert card["calendar"] == bos
