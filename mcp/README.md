@@ -152,3 +152,58 @@ npm run deploy      # wrangler deploy — Cloudflare kimligi gerekir
 
 Depodaki kod ile canlidaki surum birbirinden ayrilabilir; bir MCP davranisi
 beklendigi gibi degilse once dagitimin guncel olup olmadigina bak.
+
+
+## Araclar
+
+### Okuma (jeton gerektirmez)
+
+| Arac | Ne cevaplar |
+|---|---|
+| `list_candidates` | Puana gore siralanmis adaylar |
+| `get_card` | Tek sirketin tam karti |
+| `list_cards(filter)` | Kirici tetiklenmis / not bekleyen / dusuk kapsamali / veri sorunlu / karar yok |
+| `get_portfolio` | Deger, K/Z, dilim agirliklari ve sapmalari, uyarilar, TL basa bas |
+| `get_weekly_review` | Cuma raporu — kac madde eylem gerektiriyor |
+| `get_funnel_status` | Tarama nerede, ELENDI / VERI_YOK ayrimi, yeniden deneme kuyrugu |
+| `get_pulse` | Endeksler, VIX, risk notu, yaklasan kritik tarihler |
+| `list_pending_changes` | Birlestirilmemis degisiklikler + bayat dal uyarisi |
+| `whoami` | GERCEK dogrulama (GET /user + depo izni) |
+
+Her arac YALNIZCA kendi sorusunun cevabini dondurur. Ham dosyalar 100 KB'i
+asiyor ve cogu alan sorulan seyle ilgisiz; ajanin indirip ayiklamasi
+gereksiz.
+
+### Yazma (PR akisi)
+
+| Arac | Not |
+|---|---|
+| `write_analysis` | Analiz metni. SAYISAL ALAN YAZAMAZ |
+| `set_decision` | AL / BEKLE / ELE + gerekce |
+| `set_catalyst_score` | Katalizor puani (elle girilen tek puan) |
+| `add_to_watchlist` | Izleme listesi |
+| `record_position` | STOCK / ETF / **TL_DEPOSIT**, dilim, kademeli alim |
+| `close_position` | **Gerekce zorunlu**: tez_kirici / hedef_fiyat / yeniden_dengeleme / nakit_ihtiyaci / tez_degisti |
+| `set_thesis_breakers` | **Yapilandirilmis** kirici (metric/op/value/consecutive_quarters) |
+| `set_target_price` | Hedef + gerekce (zorunlu) |
+| `report_data_issue` | HAM donem verisi duzeltmesi, kaynak zorunlu |
+| `submit_for_review` | Tek PR acar |
+| `trigger_bootstrap` | Tek sembol icin karti yeniden uretir — **PR akisi disinda** |
+
+Iki tasarim notu:
+
+**Sayisal alan yasagi metriklere ve puanlara aittir**, pozisyon verisine
+degil. Bir kiricinin esik degeri bir TERCIHTIR, olculen bir buyukluk
+degil; hisse adedi ve mevduat anaparasi da oyle. Yasagin amaci, hesaplanan
+bir sayinin elle ezilip girdiyle ciktinin celismesini onlemek.
+
+**`set_thesis_breakers` yapilandirilmis bicim ister** cunku serbest metin
+bir kirici ("rakip pazar payi alirsa") makine tarafindan degerlendirilemez
+ve o yuzden hicbir zaman tetiklenmez. Yapilandirilmis bicimde gunluk kosu
+kart verisine bakip kendiliginden karar verir. Seri yoksa TETIKLEMEZ ve
+"veri_yok" der — yari bilgiyle alarm calmak, bir sure sonra tum alarmlarin
+gormezden gelinmesini ogretir.
+
+**`trigger_bootstrap` PR akisinin disindadir** ve bunu ciktisinda acikca
+soyler: is akisi biter bitmez kart main'e yazilir. Veri duzeltmesi
+birlestirildikten sonra ya da bilanco sonrasi kullanilir.
