@@ -138,20 +138,56 @@ edilmisken bile. Simdi jeton olmusse acikca soyler ve ne yapilacagini yazar.
 **Jeton gecersizse:** claude.ai > Settings > Connectors > P-Fin baglayicisini
 kaldirip yeniden bagla.
 
-## Dagitim
+## Dagitim — otomatik
 
-Bu sunucu bir Cloudflare Worker'dir ve **GitHub Actions ile dagitilmaz**.
-`mcp/` altindaki degisiklikler ancak elle dagitildiginda canliya gecer:
+`mcp/` altinda bir degisiklik main'e girince **MCP dagitimi** is akisi
+(`.github/workflows/mcp-deploy.yml`) sunucuyu kendiliginden gunceller.
+Tip hatasi olan kod canliya gitmez.
+
+Eskiden sunucu yalnizca bir bilgisayardan terminalle (`npm run deploy`)
+dagitilabiliyordu. Kod depoda guncellense bile canlidaki surum eski
+kaliyordu ve bunu kimse fark etmiyordu.
+
+### Tek seferlik kurulum (3 adim, ~5 dakika)
+
+**1. Cloudflare'den anahtar al**
+
+- https://dash.cloudflare.com adresine gir
+- Sag ustte profil simgesi > **My Profile**
+- Sol menude **API Tokens** > **Create Token**
+- **Edit Cloudflare Workers** satirinda **Use template**
+- *Account Resources*: kendi hesabini sec. *Zone Resources*: **All zones**
+- **Continue to summary** > **Create Token**
+- Cikan uzun metni KOPYALA. **Bir daha gosterilmez.**
+
+**2. GitHub'a kaydet**
+
+- Depo > **Settings** > **Secrets and variables** > **Actions**
+- **New repository secret**
+- Name: `CLOUDFLARE_API_TOKEN`
+- Secret: kopyaladigin metni yapistir > **Add secret**
+
+(SEC_USER_AGENT, FINNHUB_API_KEY ve FRED_API_KEY'i de ayni yerden
+eklemistin.)
+
+**3. Ilk dagitimi baslat**
+
+- Depo > **Actions** > sol listede **MCP dagitimi** > **Run workflow**
+- 1-2 dakika icinde yesil tik gormelisin
+
+**Dogrulama:** Claude sohbetinde "whoami calistir" de. Cikti
+`Jeton: GECERLI (dogrulandi)` ile baslamali.
+
+Kirmizi carpi cikarsa ve hata "CLOUDFLARE_ACCOUNT_ID" diyorsa, birden
+fazla Cloudflare hesabin var demektir: Cloudflare ana sayfasinda sag
+taraftaki **Account ID**'yi kopyalayip ayni yoldan `CLOUDFLARE_ACCOUNT_ID`
+adiyla ikinci bir secret olarak ekle.
+
+### Elle dagitim (gelistirici icin)
 
 ```bash
-cd mcp
-npm ci
-npm run type-check
-npm run deploy      # wrangler deploy — Cloudflare kimligi gerekir
+cd mcp && npm ci && npm run type-check && npm run deploy
 ```
-
-Depodaki kod ile canlidaki surum birbirinden ayrilabilir; bir MCP davranisi
-beklendigi gibi degilse once dagitimin guncel olup olmadigina bak.
 
 
 ## Araclar
