@@ -30,6 +30,7 @@ window.ViewPortfolio = (function () {
     ].join('');
 
     renderWarnings(p.warnings || []);
+    renderSlices(s.slices || [], s.fx || {});
     renderPositions(positions);
     renderSectorMix(s.sector_mix_pct || {});
 
@@ -43,6 +44,48 @@ window.ViewPortfolio = (function () {
     return `<div class="card stat"><div class="label">${Fmt.esc(label)}</div>
       <div class="value ${cls || ''}">${value}</div>
       <div class="sub">${Fmt.esc(sub || '')}</div></div>`;
+  }
+
+  /* DILIMLER — hedef/gercek agirlik ve sapma.
+
+     Portfoy artik dort parcadan olusuyor ve tek tek pozisyonlara bakarak
+     "motor dilimi hedefin 12 puan altinda" gorulmez. TL mevduat satiri
+     ayrica BASA BAS KURU tasir: mevduatta sorulmasi gereken "faiz ne
+     kadar" degil, "kur ne kadar artarsa bu faiz erir" sorusudur. */
+  function renderSlices(slices, fx) {
+    const el = $('portfolioSlices');
+    if (!el) return;
+    if (!slices.length) { el.innerHTML = ''; return; }
+
+    const kur = Fmt.isNum(fx.rate)
+      ? `<span class="muted small">USD/TRY <b>${Fmt.num(fx.rate, 2)}</b>${
+          Fmt.isNum(fx.change_1w_pct)
+            ? ` · 1 hafta ${Fmt.signedPct(fx.change_1w_pct)}` : ''}</span>`
+      : '<span class="muted small">USD/TRY alinamadi</span>';
+
+    const rows = slices.map((sl) => {
+      const sapma = sl.off_target ? 'c-yellow' : 'muted';
+      const yon = sl.drift_pp > 0 ? 'uzerinde' : 'altinda';
+      return `<tr>
+        <td>${Fmt.esc(sl.label)}</td>
+        <td style="text-align:right">${Fmt.money(sl.value_usd, { digits: 0 })}</td>
+        <td style="text-align:right"><b>${Fmt.pct(sl.actual_pct)}</b></td>
+        <td style="text-align:right" class="muted">${Fmt.pct(sl.target_pct)}</td>
+        <td style="text-align:right" class="${sapma}">
+          ${sl.drift_pp === 0 ? 'hedefte'
+            : `${Math.abs(sl.drift_pp).toFixed(1)} puan ${yon}`}</td>
+      </tr>`;
+    }).join('');
+
+    el.innerHTML = `<h2>Dilimler</h2>
+      <p class="muted small" style="margin:-4px 0 8px">Hedef oranlar
+        <code>config.PORTFOLIO.slices</code> icinde; sapma ${'±'}5 puani
+        gecince uyari uretilir. ${kur}</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Dilim</th><th style="text-align:right">Deger</th>
+          <th style="text-align:right">Gercek</th><th style="text-align:right">Hedef</th>
+          <th style="text-align:right">Sapma</th></tr></thead>
+        <tbody>${rows}</tbody></table></div>`;
   }
 
   function renderWarnings(warnings) {

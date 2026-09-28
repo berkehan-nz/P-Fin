@@ -23,7 +23,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--batch", type=int, default=None,
                         help=f"Bu kosuda islenecek sirket sayisi (varsayilan {scan.DEFAULT_BATCH_SIZE})")
     parser.add_argument("--new-cycle", action="store_true",
-                        help="Kuyrugu bastan kur (onceki turun hayatta kalanlari silinir)")
+                        help="Kuyrugu bastan kur. Devam eden bir tur varsa "
+                             "REDDEDILIR; zorlamak icin --force")
+    parser.add_argument("--force", action="store_true",
+                        help="Devam eden turu cope atarak yeni tur basla")
     parser.add_argument("--no-cards", action="store_true",
                         help="Tur sonunda kart uretme (yalnizca huni sonucu yaz)")
     parser.add_argument("--status", action="store_true",
@@ -38,7 +41,13 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         print(f"[tarama] Tur {p['cycle']} · {p['done']}/{p['total']} (%{p['pct']}) · "
               f"hayatta kalan {p['survivors']} · kalan {p['remaining']}")
-        print(f"          son parti: {state.get('last_batch_at') or '—'}")
+        idle = p["idle_hours"]
+        print(f"          son parti: {state.get('last_batch_at') or '—'}"
+              f"{f' ({idle} saat once)' if idle is not None else ''}")
+        if p["stalled"]:
+            print(f"::warning::Tarama {idle} saattir ilerlemedi "
+                  f"(imlec {p['done']}/{p['total']}). Son parti kosusunun "
+                  f"gunlugune bakin.")
         print(f"          son tur sonu: {state.get('last_finalized') or '—'}")
         if state.get("failed"):
             print(f"          yuklenemeyen (son {len(state['failed'])}): "
@@ -46,7 +55,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     state = scan.run(batch_size=args.batch, new_cycle=args.new_cycle,
-                     build_cards=not args.no_cards)
+                     build_cards=not args.no_cards, force=args.force)
     p = scan.progress(state)
 
     if p["total"] and p["done"] == 0 and state.get("last_finalized"):

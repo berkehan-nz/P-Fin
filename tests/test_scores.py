@@ -161,3 +161,47 @@ class TestImpliedGrowthRatio:
         s = scores.compute(f, r)
         assert r["metrics"]["rev_cagr_3y"] < 0
         assert s["metrics"]["implied_vs_actual_growth"] is None
+
+
+class TestCappedVisibility:
+    """Kirpilan uc degerler GORUNUR olmali.
+
+    Kirpma yalnizca siralamayi etkiler, kartta ham deger durur — CVLT'nin
+    ROIC'i gercekten %1.263 hesaplaniyor ve gizlemek veriyi saklamak
+    olurdu. Ama okuyan, o sayinin puana %60 olarak girdigini bilmeli;
+    yoksa "bu sirket neden ilk sirada degil" sorusu cevapsiz kaliyor.
+    """
+
+    def test_capped_metric_is_reported(self):
+        from src.scoring import capped_metrics
+
+        out = capped_metrics({"roic": 1263.3})
+        assert out["roic"]["raw"] == 1263.3
+        assert out["roic"]["used"] == 60.0
+
+    def test_uncapped_metric_is_not_reported(self):
+        from src.scoring import capped_metrics
+
+        assert capped_metrics({"roic": 45.0}) == {}
+
+    def test_rule_of_40_is_capped(self):
+        """ABUS'ta 1057 cikmisti: %1079'luk 'buyume' tek seferlik gelir izi."""
+        from src.config import SCORE_CAPS
+        from src.scoring import capped_metrics
+
+        assert "rule_of_40" in SCORE_CAPS
+        out = capped_metrics({"rule_of_40": 1057.0})
+        assert out["rule_of_40"]["used"] == 100.0
+
+    def test_missing_value_is_not_capped(self):
+        from src.scoring import capped_metrics
+
+        assert capped_metrics({"roic": None}) == {}
+
+    def test_capping_does_not_touch_displayed_value(self):
+        """Ham deger kirpma sonrasi DEGISMEMELI."""
+        from src.scoring import capped_metrics
+
+        metrics = {"roic": 1263.3}
+        capped_metrics(metrics)
+        assert metrics["roic"] == 1263.3

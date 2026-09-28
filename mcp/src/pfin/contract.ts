@@ -60,6 +60,75 @@ export const OVERRIDABLE_FIELDS = [
 	"shares_diluted", "shares_basic",
 ] as const;
 
+/**
+ * YAPILANDIRILMIS TEZ KIRICI.
+ *
+ * Serbest metin bir kirici ("rakip pazar payi alirsa") makine tarafindan
+ * degerlendirilemez ve o yuzden hicbir zaman tetiklenmez. Yapilandirilmis
+ * bicim, gunluk kosunun kart verisine bakip kendiliginden karar vermesini
+ * saglar — karar anini insanin fark etmesine birakmak, sistemin varlik
+ * sebebine aykiri.
+ *
+ * Bu SAYISAL ALAN YAZMA yasagini ihlal etmez: yasak METRIKLER ve PUANLAR
+ * icindir (onlar veri hattinin isidir). Esik degeri bir tercihtir, olculen
+ * bir buyukluk degil.
+ */
+export const breakerSchema = z.object({
+	consecutive_quarters: z
+		.number()
+		.int()
+		.min(1)
+		.max(8)
+		.default(2)
+		.describe("Kural kac ceyrek UST USTE saglanirsa tetiklenir"),
+	description: z.string().max(400).describe("Insan icin aciklama"),
+	metric: z
+		.string()
+		.max(60)
+		.describe("Kart metrigi, orn. gross_margin, roic, rev_growth_ttm"),
+	op: z.enum(["<", "<=", ">", ">="]),
+	value: z.number().describe("Esik deger, metrikle ayni birimde"),
+});
+
+export const assetClassSchema = z
+	.enum(["STOCK", "ETF", "TL_DEPOSIT"])
+	.default("STOCK");
+
+export const sliceSchema = z
+	.enum(["motor", "cekirdek", "nakit", "tl"])
+	.optional()
+	.describe(
+		"Hangi dilime yazilsin. Bos birakilirsa varlik sinifindan turetilir; " +
+			"SGOV gibi bir ETF nakit capasi ise acikca 'nakit' yaz.",
+	);
+
+/** TL vadeli mevduat — hisse gibi 'adet x fiyat' ile degerlenmez. */
+export const tlDepositSchema = z.object({
+	annual_rate_pct: z.number().positive().max(200),
+	maturity_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+	principal_try: z.number().positive(),
+	start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+	usdtry_at_entry: z.number().positive(),
+	withholding_pct: z.number().min(0).max(50).default(15),
+});
+
+/** Kademeli alim plani — tek seferde girmek yerine parcalara bolunmus. */
+export const trancheSchema = z.object({
+	amount_usd: z.number().positive(),
+	date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+	done: z.boolean().default(false),
+	ticker: tickerSchema.optional(),
+});
+
+/** close_position gerekcesi ZORUNLU: neden ciktigini bilmeyen tekrarlar. */
+export const closeReasonSchema = z.enum([
+	"tez_kirici",
+	"hedef_fiyat",
+	"yeniden_dengeleme",
+	"nakit_ihtiyaci",
+	"tez_degisti",
+]);
+
 export type Ticker = z.infer<typeof tickerSchema>;
 
 /** Bos string/dizi ALANI SILMEZ — kartta yazili olani ezmemek icin atlanir. */

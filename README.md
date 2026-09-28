@@ -75,6 +75,7 @@ devam eder**. SEC anahtari (User-Agent) olmadan hicbir sey calismaz.
 | `python -m src.run_funnel` | tam evren taramasi TEK SEFERDE (elle) | **saatler** |
 | `python -m src.run_funnel --limit 500` | hizli deneme | ~20 dk |
 | `python -m src.run_daily` | fiyat, haber, portfoy + `merge_story()` | ~2-5 dk |
+| `python -m src.run_pulse` | **saatlik nabiz** — kuresel piyasa, haber, kritik tarihler | ~1-2 dk |
 | `python -m src.run_merge` | claude_inbox -> kartlar (ag gerekmez) | saniyeler |
 | `python -m src.run_merge --check` | inbox dosyalarini yalnizca dogrula | anlik |
 | `python scripts/init_data.py` | `data/` klasorunu bos semalarla kurar | anlik |
@@ -105,10 +106,13 @@ src/
   run_scan.py         Saatlik kademeli tarama partisi
   run_funnel.py       Tam evren taramasi (elle, tek seferde)
   run_daily.py        Gunluk guncelleme
+  run_pulse.py        Saatlik nabiz — yalnizca data/pulse.json yazar
   sources/
     edgar_bulk.py     SEC toplu ZIP -> sqlite onbellek (API limiti yok)
     edgar_api.py      companyfacts, submissions, Form 4, XBRL -> Fundamentals
     prices.py         Stooq CSV (birincil) + yfinance (yedek)
+    market.py         Kuresel endeks/faiz/emtia/kur (yfinance, anahtarsiz)
+    calendar_src.py   Kritik tarihler: FRED yayin takvimi + bilanco + SEC 8-K
     finnhub_api.py    Haber, kazanc takvimi
     fred_api.py       Makro
     analyst.py        Analist konsensusu (BILGI alani, karar alani degil)
@@ -327,7 +331,7 @@ Tam evren taramasi tek seferde saatler surer: ucretsiz kotalarda kirilgandir
 ve tek bir hata butun kosuyu cope atar. Bunun yerine **evren bir kuyruktur**:
 
 ```
-Her saat  →  kuyruktan 120 sirket  →  Asama 0, 1, 2 (sirket bazli)
+Her kosu  →  kuyruktan en fazla 300 sirket  →  Asama 0, 1, 2 (sirket bazli)
                                        ↓
                               hayatta kalanlar data/survivors/ altina
                                        ↓
@@ -336,8 +340,19 @@ Her saat  →  kuyruktan 120 sirket  →  Asama 0, 1, 2 (sirket bazli)
                         ilk 50 icin tam kart  →  yeni tur baslar
 ```
 
-- **~4.900 sembol / 120 = ~41 saat**, yani tur basina yaklasik 1,7 gun.
-  Dashboard'un Huni ekraninda kuyrugun eridigini canli gorursun.
+- **Parti boyutu bir TAVAN, hedef degil.** Gercek sinirlayici 26 dakikalik
+  sure butcesi: parti sure dolunca duzgun biter ve ilerleme kaydedilir.
+  Hizli kosu (sicak onbellek, cok erken eleme) daha cok is yapar, yavas
+  kosu daha az — kendiliginden ayarlanir.
+- **Kosu sayisi saatlik DEGIL.** GitHub zamanlanmis kosulari "best-effort"
+  tetikler; bu repoda olculen sıklık 3-5 saatte bir (14 gunde 82 kosu,
+  gunde ~6). Tavan bu yuzden 120'den 300'e cikarildi: olcum, 120 sirketin
+  3 dakikadan kisa surdugunu gosterdi (~1,5 sn/sirket), yani 26 dakikaya
+  300 rahat sigiyor. Butce olmadan bu artis tehlikeliydi; butce oldugu
+  icin guvenli.
+- **~3.800 sembol**, kosu basina ~300 ve gunde ~6 kosu ile tur basina
+  yaklasik 2 gun. Dashboard'un Huni ekraninda kuyrugun eridigini canli
+  gorursun.
 - **Asama 0-2 partide calisir** cunku sirket bazlidir, komsuya ihtiyac duymaz.
 - **Asama 3-4 tur sonunda calisir** cunku goreli ucuzluk ve sektor yuzdelikleri
   havuzun tamamini gerektirir.
@@ -351,6 +366,65 @@ Her saat  →  kuyruktan 120 sirket  →  Asama 0, 1, 2 (sirket bazli)
 - SEC'e giden trafik saniyede 8 istek sinirinin cok altinda kalir.
 
 Parti boyutunu degistirmek icin: Actions → **Scan** → Run workflow → `batch`.
+
+#### Tarama neden bir daha durmaz
+
+22 Eylul 2026'da tarama iki gun boyunca %50,2'de dondu. Sebep zincirdi:
+Stooq erisilemez oldu → her sembol 5 deneme + ustel geri cekilme ile
+**31-212 saniye** yakmaya basladi → 120'lik parti 50 dakikalik is akisi
+sinirina carpti → adim IPTAL edildi → `Commit` adimi ATLANDI → imlec hic
+ilerlemedi → ertesi saat ayni yerden ayni sekilde takildi. Panoda "en son
+ne zaman ilerledi" yazmadigi icin iki gun fark edilmedi.
+
+Bes ayri savunma eklendi; her biri tek basina bu dongusu kirar:
+
+| Savunma | Nerede | Ne yapar |
+|---|---|---|
+| **Sabirsiz fiyat politikasi** | `PRICE_MAX_RETRIES=2`, `PRICE_TIMEOUT_SEC=12` | Fiyat istege bagli zenginlestirmedir; SEC gibi sabirli denenmez |
+| **Devre kesici** | `SourceBreaker` | Bir kaynak ust uste 8 kez cokerse o kosu boyunca aranmaz (olculdu: 20 hisse 626 sn → 20 sn) |
+| **Sirket basina zaman siniri** | `COMPANY_TIMEOUT_SEC=90` | Tek sembol partiyi kilitleyemez; 2 kez asan sembol o tur atlanir |
+| **Parti sure butcesi** | `BATCH_BUDGET_SEC=26 dk` | Parti is akisi sinirindan ONCE duzgun biter, commit mutlaka calisir |
+| **Bekci** | `Watchdog` | C icinde kilitlenmede sureci 0 ile kapatir ki commit adimi atlanmasin |
+
+Ayrica: imlec **her sirketten sonra** ilerler ve durum 10 sirkette bir diske
+yazilir (eskiden yalnizca parti sonunda), `Commit` adimlari `if: always()`
+ile korunur (iptal edilse bile ilerleme islenir), ve tarama 3 saattir
+ilerlemediyse hem `--status` ciktisi hem de panodaki aday listesi bunu
+acikca yazar.
+
+### Cuma raporu
+
+Sistem her gun veri uretir ama bu, her gun BAKILMASI gerektigi anlamina
+gelmez. Gunluk bakmak iki sekilde zarar verir: gurultuye alisip gercek
+sinyali kacirirsin, ya da her dalgalanmaya tepki verip islem maliyetini
+tezin getirisinden buyutursun.
+
+Bu yuzden haftada bir, sabit bir liste (`data/weekly.json`, panoda
+**Cuma raporu** sekmesi). Bolumler EYLEM SIRASINA gore dizilir:
+
+| # | Bolum | Neden bu sirada |
+|---|---|---|
+| 1 | Tetiklenen tez kiricilar | Karar gerektiren tek bolum |
+| 2 | Dilim sapmalari | Yeniden dengeleme |
+| 3 | 7 gun icindeki bilancolar | BILGI, eylem degil — once rakam, sonra tez |
+| 4 | Huniden yeni gelenler | Gecen rapordan bu yana giren/cikan |
+| 5 | USD/TRY ve TL basa bas | Mevduatin gercek durumu |
+| 6 | Evren taramasi | Ilerleme ve VERI_YOK kuyrugu |
+| 7 | Makro | Yaklasan kritik tarihler |
+
+Basta tek bir sayi var: **kac madde eylem gerektiriyor**. Bilanco tarihleri
+bu sayiya GIRMEZ — rapor bir karar ani degil, bir bilgi anidir.
+
+"Yeni aday" gecen rapora gore hesaplanir: rapor kendi onceki aday listesini
+tasir ve farki alir. Kart dosyasinin tarihine bakmak yaniltici olurdu,
+kartlar her tur yeniden uretiliyor.
+
+Rapor yalnizca **cuma** yazilir; her gun yazilsa "yeni" penceresi bir gune
+duser ve 4. bolum anlamsizlasir. Hemen uretmek icin:
+
+```bash
+python -m src.run_daily --weekly
+```
 
 ## Test verisi hakkinda
 

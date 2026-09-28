@@ -30,9 +30,46 @@ window.ViewCandidates = (function () {
                                           .map((e) => String(e.ticker).toUpperCase()));
     portSet = new Set((port.positions || []).map((p) => String(p.ticker).toUpperCase()));
 
+    renderPartialBanner(cand.partial);
     fillSectorFilter();
     bindOnce();
     apply();
+  }
+
+  /* Tarama surerken yazilan liste GECICIDIR. Havuz buyudukce sektor
+     yuzdelikleri ve dolayisiyla siralama degisir. Bunu soylemezsek
+     kullanici yarim veriye gore karar verir. */
+  function renderPartialBanner(partial) {
+    const el = $('partialBanner');
+    if (!el) return;
+    if (!partial || !partial.is_partial) { el.innerHTML = ''; return; }
+    el.innerHTML = `<div class="banner">
+      <b>Bu liste geçici.</b> Evren taramasi surüyor:
+      <b>${partial.scanned}/${partial.universe}</b> sirket islendi
+      (%${Fmt.num(partial.pct, 1)}), ${partial.survivors} tanesi sert
+      filtreleri gecti ve ${partial.ranked} tanesi aday olarak siralandi.
+      <br>
+      Puanlar <b>ayni sektordeki digerlerine gore</b> hesaplandigi icin havuz
+      buyudukce siralama DEGISECEK. Tarama bitince liste yeniden kurulur.
+      Tohum listesindeki 36 sirket bundan etkilenmez.
+      ${progressLine(partial)}
+    </div>`;
+  }
+
+  /* Tarama saatte bir parti isler. Kac saattir ilerlemedigi YAZILI olmali:
+     22 Eylul 2026'da tarama iki gun boyunca durdu ve panoda bunu gosteren
+     hicbir sey olmadigi icin fark edilmedi. */
+  function progressLine(partial) {
+    const h = Fmt.hoursSince(partial.last_batch_at);
+    if (h === null) return '';
+    const kalan = partial.remaining != null
+      ? ` Kalan ${partial.remaining} sirket.` : '';
+    if (h >= 3) {
+      return `<br><b class="neg">Dikkat: tarama ${Fmt.sinceLabel(partial.last_batch_at)}
+        ilerledi.</b> Saatlik kosu normalde her saat bir parti isler;
+        bu kadar beklemek bir aksaklik anlamina gelir.${kalan}`;
+    }
+    return `<br>Son parti: <b>${Fmt.sinceLabel(partial.last_batch_at)}</b>.${kalan}`;
   }
 
   function fillSectorFilter() {
@@ -174,9 +211,15 @@ window.ViewCandidates = (function () {
       ev_ebit: (x) => `${Fmt.num(x, 1)} yilda kendini oder`,
       ev_sales: (x) => `1$ satis icin ${Fmt.num(x, 1)}$`,
       ev_gross_profit: (x) => `brut karin ${Fmt.num(x, 1)} kati`,
-      fcf_yield_ev: (x) => `yilda %${Fmt.num(x, 1)} nakit getiri`,
-      roic: (x) => `sermaye getirisi %${Fmt.num(x, 0)}`,
-      rev_growth_ttm: (x) => `satislar %${Fmt.num(x, 1)} ${x < 0 ? 'dustu' : 'artti'}`,
+      // Negatifte hem isaret yeri hem de fiil degisir: nakit "getiri" degil
+      // "yakim"dir, sermaye "getiri" degil "zarar" uretir.
+      fcf_yield_ev: (x) => x < 0
+        ? `yilda ${Fmt.pctText(Math.abs(x), 1)} nakit yakiyor`
+        : `yilda ${Fmt.pctText(x, 1)} nakit getiri`,
+      roic: (x) => x < 0
+        ? `sermaye ${Fmt.pctText(Math.abs(x), 0)} zarar uretiyor`
+        : `sermaye getirisi ${Fmt.pctText(x, 0)}`,
+      rev_growth_ttm: (x) => `satislar ${Fmt.pctText(Math.abs(x), 1)} ${x < 0 ? 'dustu' : 'artti'}`,
       rule_of_40: (x) => `buyume+nakit = ${Fmt.num(x, 0)}`,
     };
     return map[key] ? map[key](v) : '';

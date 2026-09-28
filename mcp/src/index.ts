@@ -19,10 +19,16 @@ import { z } from "zod";
 import { GitHubHandler } from "./github-handler";
 import {
 	actionSchema,
+	assetClassSchema,
+	breakerSchema,
+	closeReasonSchema,
 	OVERRIDABLE_FIELDS,
 	pruneEmpty,
+	sliceSchema,
 	storySchema,
 	tickerSchema,
+	tlDepositSchema,
+	trancheSchema,
 	today,
 } from "./pfin/contract";
 import { parseRepo, Repo } from "./pfin/repo";
@@ -40,6 +46,42 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 		version: "1.0.0",
 	});
 
+	/**
+	 * Arac kaydi + GitHub hata cevirisi.
+	 *
+	 * "Bad credentials" (401) ajana hicbir sey anlatmiyordu ve bazi araclar
+	 * calisirken digerleri bu hatayi veriyordu. Olasi sebep: GitHub bir OAuth
+	 * uygulamasi icin kullanici basina ~10 jetonu gecince EN ESKISINI iptal
+	 * eder; baglayici birden fazla oturum actiginda eski oturumdaki jeton
+	 * gecersiz kalir. Hata artik ne yapilacagini soyluyor.
+	 */
+	private tool(name: string, description: string, schema: any, handler: (args: any) => Promise<any>) {
+		this.server.tool(name, description, schema, async (args: any) => {
+			try {
+				return await handler(args);
+			} catch (err: any) {
+				const status = err?.status;
+				if (status === 401) {
+					return fail(
+						"GitHub oturum jetonu gecersiz (401). Jeton iptal edilmis olabilir — " +
+							"GitHub bir uygulama icin cok sayida oturum acilinca en eskisini iptal eder. " +
+							"Cozum: claude.ai > Settings > Connectors'ta P-Fin baglayicisini " +
+							"kaldirip yeniden bagla. Bu bir veri hatasi degildir.",
+					);
+				}
+				if (status === 403) {
+					return fail(`GitHub erisimi reddedildi (403): ${err?.message ?? ""}. ` +
+						"Hiz limiti ya da yetki kapsami olabilir; biraz bekleyip tekrar dene.");
+				}
+				if (status === 409 || status === 422) {
+					return fail(`GitHub cakisma (${status}): ${err?.message ?? ""}. ` +
+						"Ayni dosyaya es zamanli yazma olmus olabilir; list_pending_changes ile kontrol edip tekrar dene.");
+				}
+				return fail(`Beklenmeyen hata: ${err?.message ?? String(err)}`);
+			}
+		});
+	}
+
 	private repo(): Repo {
 		return new Repo(
 			new Octokit({ auth: this.props!.accessToken }),
@@ -50,7 +92,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 	/** Inbox dosyasini calisma dalindan okur; yoksa main'den; yoksa bos. */
 	private async inboxFor(repo: Repo, ticker: string) {
 		const path = `claude_inbox/${ticker}.json`;
-		const branch = await repo.openReviewBranch();
+		const branch = await repo.existingBranch();
 		const staged = branch ? await repo.readJson<any>(path, branch) : null;
 		return { current: staged ?? (await repo.readJson<any>(path)) ?? { ticker }, path };
 	}
@@ -61,7 +103,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 
 		/* ------------------------------------------------------------ OKUMA */
 
-		this.server.tool(
+		this.tool(
 			"list_candidates",
 			"Adaylari puana gore siralar. Once buna bak; hangi sirketin analize " +
 				"ihtiyaci oldugunu buradan gorursun.",
@@ -107,12 +149,17 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 					ticker: r.ticker,
 					uyari: r.warning_count ?? 0,
 					veri_kalitesi: r.data_quality,
+					// Kola gore degismeyen ortak metrikler (headline kola gore degisir).
+					cekirdek: r.core ?? null,
+					dusuk_kapsamali_bloklar: r.low_coverage_blocks ?? {},
+					yuzdelik_havuzu: r.percentile_pool ?? null,
+					fiyat_tarihi: r.price_as_of ?? null,
 				}));
 				return ok(JSON.stringify({ gosterilen: out.length, toplam: rows.length, satirlar: out }, null, 1));
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"get_card",
 			"Bir sirketin kartini okur. Kartlar buyuk oldugu icin bolum sec; " +
 				"'ozet' puanlari, bayraklari ve veri kalitesini verir.",
@@ -156,39 +203,57 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"list_pending_changes",
 			"Henuz birlestirilmemis (PR'daki veya PR'a girecek) degisiklikleri listeler. " +
 				"Yazmadan once buna bak ki ayni dosyayi iki kez yazmayasin.",
 			{},
 			async () => {
 				const repo = this.repo();
-				const branch = await repo.openReviewBranch();
-				if (!branch) return ok("Bekleyen degisiklik yok; calisma dali temiz.");
+				const branch = await repo.existingBranch();
+				const stale = await repo.staleBranches();
+				const uyari = stale.length
+					? {
+							bayat_dallar: stale.map((b) =>
+								`${b.name} (${b.ahead} commit ileride, ${b.behind} geride)`,
+							),
+							not:
+								"Bu dallar bugunden eski oldugu icin yeni yazmalar ORAYA GITMEZ " +
+								"(calisma dali her gun guncel main'den acilir). Icinde " +
+								"birlestirilmemis is olabilir: PR'ini birlestir ya da dali sil.",
+						}
+					: null;
+
+				if (!branch) {
+					return ok(
+						JSON.stringify(
+							{ bekleyen: "yok — calisma dali temiz", ...(uyari ?? {}) },
+							null,
+							1,
+						),
+					);
+				}
 				const files = await repo.pendingFiles();
 				return ok(
-					JSON.stringify({ dal: branch, degisen_dosyalar: files }, null, 1),
+					JSON.stringify(
+						{ dal: branch, degisen_dosyalar: files, ...(uyari ?? {}) },
+						null,
+						1,
+					),
 				);
 			},
 		);
 
+		this.registerReads();
+
 		if (!canWrite) {
-			this.server.tool(
-				"whoami",
-				"Oturum acan GitHub kullanicisini ve yetkisini soyler.",
-				{},
-				async () =>
-					ok(
-						`GitHub: ${writer}. Bu depoya YAZMA yetkin yok — yalnizca okuma ` +
-							`araclari acik.`,
-					),
-			);
+			this.registerWhoami(writer, false);
 			return;
 		}
 
 		/* ------------------------------------------------------------ YAZMA */
 
-		this.server.tool(
+		this.tool(
 			"write_analysis",
 			"Bir sirketin analiz metnini claude_inbox'a yazar. SAYISAL ALAN YAZAMAZ — " +
 				"metrikler ve puanlar veri hattinin isidir. Bos birakilan alanlar kartta " +
@@ -218,7 +283,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"set_decision",
 			"AL / BEKLE / ELE kararini ve gerekcesini yazar.",
 			{
@@ -239,7 +304,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"set_catalyst_score",
 			"Katalizor puani (0-100). Toplam puanin %25'i budur ve otomatik " +
 				"hesaplanmaz — yeniden fiyatlanmayi tetikleyecek somut bir olay var mi?",
@@ -256,7 +321,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
 			"add_to_watchlist",
 			"Izleme listesine sirket ekler.",
 			{
@@ -266,7 +331,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 			async ({ ticker, reason, tags }) => {
 				const repo = this.repo();
-				const branch = await repo.openReviewBranch();
+				const branch = await repo.existingBranch();
 				const wl =
 					(branch ? await repo.readJson<any>("data/watchlist.json", branch) : null) ??
 					(await repo.readJson<any>("data/watchlist.json")) ?? { entries: [] };
@@ -291,7 +356,100 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
+		this.tool(
+			"record_position",
+			"Portfoye yeni pozisyon ekler (GERCEK veya KAGIT). Maliyet + komisyon nakitten " +
+				"dusulur; nakit yetmezse yazmaz. PR ile sunulur — birlestirilene kadar " +
+				"portfoy sayfasinda gorunmez.",
+			{
+				asset_class: assetClassSchema,
+				entry_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+				entry_price: z.number().positive().optional()
+					.describe("STOCK/ETF icin zorunlu; TL_DEPOSIT icin kullanilmaz"),
+				fees_usd: z.number().min(0).default(0),
+				notes: z.string().max(1000).default(""),
+				review_date: z
+					.string()
+					.regex(/^\d{4}-\d{2}-\d{2}$/)
+					.optional()
+					.describe("Tezi yeniden gozden gecirme tarihi"),
+				shares: z.number().positive().optional()
+					.describe("STOCK/ETF icin zorunlu; TL_DEPOSIT icin kullanilmaz"),
+				slice: sliceSchema,
+				target_price: z.number().min(0).default(0),
+				ticker: tickerSchema,
+				tl_deposit: tlDepositSchema.optional()
+					.describe("asset_class TL_DEPOSIT ise zorunlu"),
+				type: z.enum(["GERCEK", "KAGIT"]).default("KAGIT"),
+			},
+			async (a) => {
+				const repo = this.repo();
+				const branch = await repo.existingBranch();
+				const doc =
+					(branch ? await repo.readJson<any>("data/portfolio.json", branch) : null) ??
+					(await repo.readJson<any>("data/portfolio.json")) ?? {
+						cash_usd: 0, closed: [], positions: [],
+					};
+
+				// TL mevduat 'adet x fiyat' ile degerlenmez: maliyeti giristeki
+				// kurdan dolar karsiligidir.
+				const isDeposit = a.asset_class === "TL_DEPOSIT";
+				if (isDeposit && !a.tl_deposit) {
+					return fail(
+						"asset_class TL_DEPOSIT ise tl_deposit alanlari zorunlu: " +
+							"principal_try, annual_rate_pct, start_date, maturity_date, " +
+							"usdtry_at_entry.",
+					);
+				}
+				if (!isDeposit && !(a.entry_price && a.shares)) {
+					return fail(
+						`${a.asset_class} icin entry_price ve shares zorunlu.`,
+					);
+				}
+
+				const cost = isDeposit
+					? a.tl_deposit!.principal_try / a.tl_deposit!.usdtry_at_entry
+					: a.entry_price! * a.shares! + a.fees_usd;
+
+				const cash = Number(doc.cash_usd ?? 0);
+				if (cost > cash + 1e-6) {
+					return fail(
+						`Nakit yetmiyor: pozisyon ${cost.toFixed(2)} $, portfoyde ${cash.toFixed(2)} $ nakit var. ` +
+							"Miktari azalt ya da once nakit ekle.",
+					);
+				}
+				const position: Record<string, any> = {
+					asset_class: a.asset_class,
+					broker: "Midas", entry_date: a.entry_date,
+					entry_price: a.entry_price ?? 0,
+					fees_usd: a.fees_usd, notes: a.notes, review_date: a.review_date ?? "",
+					shares: a.shares ?? 0, status: "OPEN", target_price: a.target_price,
+					thesis_breakers: [], ticker: a.ticker, type: a.type,
+					...(a.slice ? { slice: a.slice } : {}),
+					...(isDeposit ? a.tl_deposit : {}),
+				};
+				const next = {
+					...doc,
+					as_of: today(),
+					cash_usd: Math.round((cash - cost) * 100) / 100,
+					positions: [...(doc.positions ?? []), position],
+				};
+				const b = await repo.writeJson("data/portfolio.json", next,
+					`portfoy: ${a.type} ${a.ticker} ${a.shares} @ ${a.entry_price}`);
+				const ne = isDeposit
+					? `${a.tl_deposit!.principal_try} TL mevduat @ %${a.tl_deposit!.annual_rate_pct} ` +
+						`(kur ${a.tl_deposit!.usdtry_at_entry})`
+					: `${a.shares} adet @ ${a.entry_price} $`;
+				return ok(
+					`${a.type} ${a.ticker} [${a.asset_class}]: ${ne} ` +
+						`(maliyet ${cost.toFixed(2)} $) ${b} dalina yazildi. ` +
+						`Kalan nakit ${next.cash_usd.toFixed(2)} $. ` +
+						`Tum pozisyonlari girdikten sonra submit_for_review ile PR ac.`,
+				);
+			},
+		);
+
+		this.tool(
 			"report_data_issue",
 			"Veride hata bulduysan HAM DONEM VERISINI duzeltir (metrigi degil) — " +
 				"brut kar, hasilat, nakit gibi. Duzeltilen degerden marjlar, puanlar ve " +
@@ -320,7 +478,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 			async ({ ticker, field, period_end, value, reason, source_url }) => {
 				const repo = this.repo();
-				const branch = await repo.openReviewBranch();
+				const branch = await repo.existingBranch();
 				const doc =
 					(branch ? await repo.readJson<any>("data/overrides.json", branch) : null) ??
 					(await repo.readJson<any>("data/overrides.json")) ?? { overrides: [] };
@@ -360,7 +518,7 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 
 		/* ---------------------------------------------------------- INCELEME */
 
-		this.server.tool(
+		this.tool(
 			"submit_for_review",
 			"Biriken tum degisiklikler icin TEK bir PR acar (veya acik olani gunceller). " +
 				"Berke bu PR'i birlestirdiginde degisiklikler yayina girer.",
@@ -393,11 +551,419 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 			},
 		);
 
-		this.server.tool(
-			"whoami",
-			"Oturum acan GitHub kullanicisini ve yetkisini soyler.",
+		this.registerPortfolioWrites();
+		this.registerWhoami(writer, true);
+	}
+
+	/* ----------------------------------------------------- YAZMA (D) */
+	/**
+	 * Portfoy ve tez yazmalari. Hepsi PR akisiyla; sayisal alan yasagi
+	 * METRIKLERE ve PUANLARA aittir, pozisyon verisine degil.
+	 */
+	private registerPortfolioWrites() {
+		const readPortfolio = async (repo: Repo) => {
+			const branch = await repo.existingBranch();
+			return (
+				(branch ? await repo.readJson<any>("data/portfolio.json", branch) : null) ??
+				(await repo.readJson<any>("data/portfolio.json")) ??
+				{ cash_usd: 0, closed: [], positions: [] }
+			);
+		};
+
+		this.tool(
+			"close_position",
+			"Pozisyonu kapatir. GEREKCE ZORUNLU: neden ciktigini kaydetmeyen " +
+				"ayni hatayi tekrarlar. Satis tutari nakde eklenir.",
+			{
+				exit_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).default(today()),
+				exit_price: z.number().positive(),
+				fees_usd: z.number().min(0).default(0),
+				note: z.string().max(1000).default("")
+					.describe("Serbest not; gerekceyi aciklar"),
+				reason: closeReasonSchema,
+				ticker: tickerSchema,
+			},
+			async (a) => {
+				const repo = this.repo();
+				const doc = await readPortfolio(repo);
+				const open = (doc.positions ?? []).filter(
+					(p: any) => p.ticker === a.ticker && (p.status ?? "OPEN") === "OPEN");
+				if (!open.length) {
+					return fail(`${a.ticker} icin acik pozisyon yok.`);
+				}
+				if (open.length > 1) {
+					return fail(
+						`${a.ticker} icin ${open.length} acik pozisyon var; hangisinin ` +
+							"kapatilacagi belirsiz. Once list ile bak ve tek tek gir.",
+					);
+				}
+				const pos = open[0];
+				const shares = Number(pos.shares ?? 0);
+				const proceeds = shares * a.exit_price - a.fees_usd;
+				const cost = shares * Number(pos.entry_price ?? 0)
+					+ Number(pos.fees_usd ?? 0);
+
+				const closed = {
+					...pos,
+					exit_date: a.exit_date,
+					exit_fees_usd: a.fees_usd,
+					exit_price: a.exit_price,
+					exit_reason: a.reason,
+					exit_note: a.note,
+					pnl_usd: Math.round((proceeds - cost) * 100) / 100,
+					status: "CLOSED",
+				};
+				const next = {
+					...doc,
+					as_of: today(),
+					cash_usd: Math.round((Number(doc.cash_usd ?? 0) + proceeds) * 100) / 100,
+					closed: [...(doc.closed ?? []), closed],
+					positions: (doc.positions ?? []).filter((p: any) => p !== pos),
+				};
+				const b = await repo.writeJson("data/portfolio.json", next,
+					`portfoy: ${a.ticker} kapatildi (${a.reason})`);
+				return ok(
+					`${a.ticker} kapatildi: ${shares} adet @ ${a.exit_price} $, ` +
+						`K/Z ${closed.pnl_usd.toFixed(2)} $ (${a.reason}). ` +
+						`${b} dalina yazildi. Nakit ${next.cash_usd.toFixed(2)} $.`,
+				);
+			},
+		);
+
+		this.tool(
+			"set_thesis_breakers",
+			"Bir pozisyonun YAPILANDIRILMIS tez kiricilarini yazar. Serbest " +
+				"metin kirici hicbir zaman tetiklenmez; bu bicimdekiler gunluk " +
+				"kosuda kart verisine gore kendiliginden degerlendirilir. " +
+				"Ornek: metric=gross_margin, op='<', value=70, " +
+				"consecutive_quarters=2.",
+			{
+				breakers: z.array(breakerSchema).min(1).max(8),
+				replace: z.boolean().default(true)
+					.describe("true: mevcut listeyi degistir, false: ekle"),
+				ticker: tickerSchema,
+			},
+			async (a) => {
+				const repo = this.repo();
+				const doc = await readPortfolio(repo);
+				const idx = (doc.positions ?? []).findIndex(
+					(p: any) => p.ticker === a.ticker && (p.status ?? "OPEN") === "OPEN");
+				if (idx < 0) return fail(`${a.ticker} icin acik pozisyon yok.`);
+
+				const pos = doc.positions[idx];
+				const mevcut = a.replace ? [] : (pos.thesis_breakers ?? []);
+				const positions = [...doc.positions];
+				positions[idx] = {
+					...pos,
+					thesis_breakers: [...mevcut,
+						...a.breakers.map((br: any) => ({ ...br, kind: "thesis" }))],
+				};
+				const b = await repo.writeJson(
+					"data/portfolio.json", { ...doc, as_of: today(), positions },
+					`portfoy: ${a.ticker} tez kiricilari (${a.breakers.length})`);
+				return ok(
+					`${a.ticker}: ${a.breakers.length} kirici ${a.replace ? "yazildi" : "eklendi"} ` +
+						`(${b}). Gunluk kosu bunlari kart verisine gore degerlendirir; ` +
+						`seri yoksa TETIKLEMEZ ve "veri_yok" der.`,
+				);
+			},
+		);
+
+		this.tool(
+			"set_target_price",
+			"Hedef fiyat ve gerekcesi. Hedefe ulasilinca 'yarisini sat' " +
+				"katmani tetiklenir (otomatik satis degil, uyari).",
+			{
+				rationale: z.string().min(10).max(2000)
+					.describe("Hedef neden bu seviyede? Zorunlu."),
+				target_price: z.number().positive(),
+				ticker: tickerSchema,
+			},
+			async (a) => {
+				const repo = this.repo();
+				const doc = await readPortfolio(repo);
+				const idx = (doc.positions ?? []).findIndex(
+					(p: any) => p.ticker === a.ticker && (p.status ?? "OPEN") === "OPEN");
+				if (idx < 0) return fail(`${a.ticker} icin acik pozisyon yok.`);
+
+				const positions = [...doc.positions];
+				positions[idx] = {
+					...positions[idx],
+					target_price: a.target_price,
+					target_rationale: a.rationale,
+				};
+				const b = await repo.writeJson(
+					"data/portfolio.json", { ...doc, as_of: today(), positions },
+					`portfoy: ${a.ticker} hedef ${a.target_price}`);
+				return ok(`${a.ticker} hedef fiyati ${a.target_price} $ (${b}).`);
+			},
+		);
+
+		this.tool(
+			"trigger_bootstrap",
+			"Tek bir sembol icin karti YENIDEN URETIR (GitHub Actions). Veri " +
+				"duzeltmesi birlestirildikten sonra ya da bilanco sonrasi " +
+				"kullanilir. PR akisi DISINDADIR: dogrudan is akisi tetikler.",
+			{
+				reason: z.string().min(5).max(300)
+					.describe("Neden yeniden uretiliyor? Kayit icin."),
+				ticker: tickerSchema,
+			},
+			async (a) => {
+				// Bu arac PR akisini atlar, o yuzden ne yaptigini acikca soyler.
+				const octokit = new Octokit({ auth: this.props!.accessToken });
+				const [owner, repo] = (this.env.GITHUB_REPO ?? "berkehan-nz/P-Fin")
+					.split("/");
+				await octokit.rest.actions.createWorkflowDispatch({
+					inputs: { tickers: a.ticker },
+					owner,
+					ref: "main",
+					repo,
+					workflow_id: "bootstrap.yml",
+				});
+				return ok(
+					`${a.ticker} icin kart yeniden uretimi baslatildi (${a.reason}). ` +
+						"Bu islem PR akisi DISINDADIR: is akisi biter bitmez kart " +
+						"main'e yazilir. Actions sekmesinden takip et.",
+				);
+			},
+		);
+	}
+
+	/* ---------------------------------------------------------- OKUMA (D) */
+	/**
+	 * Durum sorulari icin araclar. Hepsi JETONSUZ okur (depo public) —
+	 * iptal edilmis bir jeton bunlari kilitlemez.
+	 *
+	 * Neden ayri araclar: ajanin "portfoyde ne var" sorusunu cevaplamak icin
+	 * ham JSON'u indirip ayiklamasi gerekiyordu. Ham dosya 100 KB'i asiyor ve
+	 * cogu alan o soruyla ilgisiz. Her arac YALNIZCA kendi sorusunun cevabini
+	 * dondurur.
+	 */
+	private registerReads() {
+		this.tool(
+			"get_portfolio",
+			"Portfoyun ozeti: deger, K/Z, dilim agirliklari ve sapmalari, acik " +
+				"uyarilar, TL mevduatin basa bas kuru. Pozisyon onerisi yapmadan " +
+				"once buna bak.",
 			{},
-			async () => ok(`GitHub: ${writer} — okuma ve yazma yetkisi var.`),
+			async () => {
+				const st = await this.repo().readJson<any>("data/portfolio_state.json");
+				if (!st) return fail("data/portfolio_state.json okunamadi.");
+				const s = st.summary ?? {};
+				return ok(JSON.stringify({
+					as_of: st.as_of,
+					deger_usd: s.portfolio_value_usd,
+					dilimler: (s.slices ?? []).map((x: any) => ({
+						dilim: x.label, gercek_pct: x.actual_pct,
+						hedef_pct: x.target_pct, sapma_puan: x.drift_pp,
+						hedef_disi: x.off_target,
+					})),
+					kur: s.fx ?? null,
+					kz_pct: s.pnl_pct,
+					kz_usd: s.pnl_usd,
+					nakit_usd: s.cash_usd,
+					pozisyonlar: (st.positions ?? []).map((p: any) => ({
+						agirlik_pct: p.weight_pct, dilim: p.slice,
+						kz_pct: p.pnl_pct, sembol: p.ticker,
+						tetiklenen_kirici: (p.thesis_breakers ?? [])
+							.filter((b: any) => b?.triggered)
+							.map((b: any) => b.description),
+						tl_mevduat: p.tl_deposit ?? undefined,
+						varlik_sinifi: p.asset_class,
+					})),
+					uyarilar: st.warnings ?? [],
+				}, null, 1));
+			},
+		);
+
+		this.tool(
+			"get_weekly_review",
+			"CUMA RAPORU: haftada bir bakilmasi gerekenler. Tetiklenen tez " +
+				"kiricilar, dilim sapmalari, 7 gun icindeki bilancolar, huniden " +
+				"yeni gelenler, USD/TRY basa bas, makro takvim. Basta 'kac madde " +
+				"eylem gerektiriyor' yazar.",
+			{},
+			async () => {
+				const w = await this.repo().readJson<any>("data/weekly.json");
+				if (!w || !w.as_of) {
+					return ok(
+						"Henuz Cuma raporu uretilmemis. Rapor haftada bir, cuma gunu " +
+							"gunluk kosuda yazilir (data/weekly.json). Hemen uretmek icin " +
+							"Actions > Daily > Run workflow.",
+					);
+				}
+				return ok(JSON.stringify(w, null, 1));
+			},
+		);
+
+		this.tool(
+			"get_funnel_status",
+			"Evren taramasi nerede: ilerleme, hayatta kalanlar, ELENDI ile " +
+				"VERI_YOK ayrimi ve yeniden deneme kuyrugu. 'Veri yok' ELEME " +
+				"DEGILDIR — sirket kotu oldugu icin degil, gerekli sayiyi " +
+				"hesaplayamadigimiz icin dustu.",
+			{},
+			async () => {
+				const repo = this.repo();
+				const st = await repo.readJson<any>("data/scan_state.json");
+				if (!st) return fail("data/scan_state.json okunamadi.");
+				const total = st.universe_size_at_cycle_start
+					|| (st.queue ?? []).length || 0;
+				const done = Math.min(st.cursor ?? 0, total);
+				const kinds = st.kill_kinds ?? {};
+				const weekly = await repo.readJson<any>("data/weekly.json");
+				return ok(JSON.stringify({
+					elendi: kinds.ELENDI ?? 0,
+					en_cok_eleme_sebebi: Object.entries(st.kill_codes ?? {})
+						.sort((a: any, b: any) => b[1] - a[1]).slice(0, 8),
+					hayatta_kalan: st.survivor_count ?? 0,
+					islenen: done,
+					pct: total ? Math.round((done / total) * 1000) / 10 : 0,
+					son_parti: st.last_batch_at,
+					son_tur_sonu: st.last_finalized,
+					toplam: total,
+					tur: st.cycle,
+					veri_yok: kinds.VERI_YOK ?? 0,
+					yeni_adaylar_gecen_rapordan_beri:
+						(weekly?.new_candidates?.entered ?? []).map((c: any) => c.ticker),
+					yeniden_denenecek: (st.retry_queue ?? []).length,
+				}, null, 1));
+			},
+		);
+
+		this.tool(
+			"get_pulse",
+			"Piyasa nabzi: endeksler, VIX, risk notu, son SEC bildirimleri ve " +
+				"yaklasan kritik tarihler.",
+			{},
+			async () => {
+				const repo = this.repo();
+				const p = await repo.readJson<any>("data/pulse.json");
+				if (!p) return fail("data/pulse.json okunamadi.");
+				const macro = await repo.readJson<any>("data/macro.json");
+				return ok(JSON.stringify({
+					as_of: p.as_of,
+					haberler: (p.news ?? []).slice(0, 10),
+					makro: macro?.series ?? {},
+					piyasa: p.market ?? [],
+					risk_notu: p.risk_note,
+					takvim: p.calendar ?? {},
+				}, null, 1));
+			},
+		);
+
+		this.tool(
+			"list_cards",
+			"Kartlari duruma gore listeler: kirici tetiklenmis, Claude notu " +
+				"bekleyen, dusuk kapsamali, veri kalitesi sorunlu. Hangi sirketle " +
+				"ilgilenmen gerektigini buradan bul.",
+			{
+				filter: z
+					.enum(["kirici_tetiklendi", "not_bekleyen", "dusuk_kapsama",
+						"veri_sorunlu", "karar_yok", "hepsi"])
+					.default("not_bekleyen"),
+				limit: z.number().min(1).max(60).default(20),
+			},
+			async ({ filter, limit }) => {
+				const repo = this.repo();
+				const cand = await repo.readJson<any>("data/candidates.json");
+				if (!cand) return fail("data/candidates.json okunamadi.");
+				let rows = [
+					...(cand.seed ?? []), ...(cand.candidates ?? []), ...(cand.manual ?? []),
+				];
+				const seen = new Set<string>();
+				rows = rows.filter((r) => r?.ticker && !seen.has(r.ticker) && seen.add(r.ticker));
+
+				const st = await repo.readJson<any>("data/portfolio_state.json");
+				const tetiklenen = new Set<string>();
+				for (const p of st?.positions ?? []) {
+					if ((p.thesis_breakers ?? []).some((b: any) => b?.triggered)) {
+						tetiklenen.add(p.ticker);
+					}
+				}
+
+				const yasli = (r: any) =>
+					!r.claude_verdict || (r.story_age_days ?? 999) > 30;
+
+				const predicate: Record<string, (r: any) => boolean> = {
+					dusuk_kapsama: (r) => (r.low_coverage_blocks ?? []).length > 0,
+					hepsi: () => true,
+					karar_yok: (r) => !r.decision,
+					kirici_tetiklendi: (r) => tetiklenen.has(r.ticker),
+					not_bekleyen: yasli,
+					veri_sorunlu: (r) => (r.data_quality?.issue_count ?? 0) > 0
+						|| (r.flags?.warnings ?? []).length > 0,
+				};
+
+				const out = rows.filter(predicate[filter] ?? (() => true))
+					.sort((a, b) => ((b.scores?.total ?? -1) - (a.scores?.total ?? -1)))
+					.slice(0, limit)
+					.map((r) => ({
+						karar: r.decision || null,
+						not_yasi_gun: r.story_age_days ?? null,
+						puan: r.scores?.total ?? null,
+						sembol: r.ticker,
+						sorun: r.data_quality?.status ?? null,
+						unvan: r.name,
+					}));
+
+				return ok(out.length
+					? JSON.stringify({ filtre: filter, sayi: out.length, kartlar: out }, null, 1)
+					: `'${filter}' filtresine uyan kart yok.`);
+			},
+		);
+	}
+
+	/**
+	 * whoami — GERCEK dogrulama yapar, oturumdaki adi tekrarlamaz.
+	 *
+	 * Onceki surum hicbir GitHub cagrisi yapmadan "okuma ve yazma yetkisi var"
+	 * diyordu. Jeton iptal edilmisken bile ayni cumleyi kuruyordu: ayni anda
+	 * list_candidates "401" verirken whoami "her sey yolunda" diyordu.
+	 * Bir durum araci yanlis guven veriyorsa, hic olmamasindan kotudur.
+	 */
+	private registerWhoami(sessionLogin: string, allowedByConfig: boolean) {
+		this.tool(
+			"whoami",
+			"Oturum acan GitHub kullanicisini ve yetkisini DOGRULAR (gercek GitHub " +
+				"cagrisi yapar). Yazma denemeden once buna bak.",
+			{},
+			async () => {
+				const v = await this.repo().verify();   // 401 ise sarmalayici anlatir
+				const lines = [
+					`GitHub kullanicisi: ${v.login}`,
+					`Depo: ${v.repo}`,
+					`Jeton: GECERLI (dogrulandi)`,
+				];
+
+				if (v.login !== sessionLogin) {
+					lines.push(
+						`UYARI: oturumdaki ad (${sessionLogin}) jetonun sahibinden ` +
+							`(${v.login}) farkli. Baglayiciyi yeniden baglaman gerekebilir.`,
+					);
+				}
+
+				if (!allowedByConfig) {
+					lines.push(
+						`Yazma: KAPALI — bu sunucu yalnizca ALLOWED_LOGIN icin yazma ` +
+							`araclarini acar. Okuma araclari calisir.`,
+					);
+				} else if (!v.canPush) {
+					lines.push(
+						`Yazma: KAPALI — GitHub bu depoda push yetkisi vermiyor. ` +
+							`Jetonun kapsami dar olabilir; baglayiciyi kaldirip yeniden bagla.`,
+					);
+				} else {
+					lines.push(`Yazma: ACIK (push yetkisi dogrulandi, PR akisiyla).`);
+				}
+
+				lines.push(
+					`Not: okumalar jeton gerektirmez (depo public, raw'dan okunur); ` +
+						`jeton yalnizca yazma icin kullanilir.`,
+				);
+				return ok(lines.join("\n"));
+			},
 		);
 	}
 }

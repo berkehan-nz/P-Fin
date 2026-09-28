@@ -22,17 +22,28 @@ Asama 3-4 tur sonunda calisir (goreli ucuzluk ve yuzdelikler tum havuzu ister).
 from __future__ import annotations
 
 import shutil
+import time
+from datetime import datetime, timedelta, timezone
 
 from . import config, funnel, pipeline, validate, watchlist
 from .config import DATA_DIR, SEED_TICKERS, sector_for_sic
 from .fundamentals import build_annual_fundamentals
 from .metrics import track_for
-from .util import num, read_json, today_iso, utc_now_iso, write_json
+from .util import (TimeoutHit, Watchdog, num, read_json, time_limit, today_iso,
+                   utc_now_iso, write_json)
 
 STATE_PATH = DATA_DIR / "scan_state.json"
 SURVIVOR_DIR = DATA_DIR / "survivors"
 
-DEFAULT_BATCH_SIZE = 120
+# PARTI BOYUTU ARTIK BIR TAVAN, hedef degil. Gercek sinirlayici
+# config.BATCH_BUDGET_SEC (26 dk): parti sure dolunca duzgun biter.
+# Neden buyudu: GitHub saatlik cron'u bu repoda saatte bir DEGIL, 3-5
+# saatte bir tetikliyor (14 gunde 82 kosu ~ gunde 6). 120'lik parti ile
+# gunde ancak 720 sirket isleniyor. Olcum: 75. kosu 120 sirketi 3 dakikadan
+# kisa surede bitirdi (~1,5 sn/sirket), yani 26 dakikada 300 sirket rahat
+# sigar. Butce olmadan bu artis tehlikeliydi; butce oldugu icin guvenli.
+DEFAULT_BATCH_SIZE = 300
+LEGACY_BATCH_SIZE = 120     # durum dosyasinda kalmis eski deger
 
 # Anlik goruntude saklanan yillik kalemler — Asama 2'nin nakit donusumu ve
 # "hasilat + brut marj birlikte dusuyor" testleri bunlari ister.
@@ -53,7 +64,21 @@ def empty_state() -> dict:
         "processed": 0,
         "survivor_count": 0,
         "failed": [],
+        "timeouts": {},
         "kill_counts": {},
+        # Sebep METNI yerine sabit KOD sayaci. Metin esigi icinde tasidigi
+        # icin ("%3,0 <= %5", "%3,1 <= %5", ...) her sirket ayri anahtar
+        # uretiyordu: 632 benzersiz anahtar, sisik JSON, kirilgan sayim.
+        "kill_codes": {},
+        # ELENDI (kural ihlali) / VERI_YOK (hesaplanamadi) ayrimi.
+        "kill_kinds": {},
+        # VERI_YOK ile giden sirketler. Bunlar ELENMEDI — bakamadik.
+        # Tur sonunda tekrar denenirler ki sessizce kaybolmasinlar.
+        "retry_queue": [],
+        # Bu turda onbellek atlanarak yeniden denenecekler (onceki turun
+        # retry_queue'su).
+        "retry_pending": [],
+        "universe_size_at_cycle_start": 0,
         "stage_counts": {"0": {"in": 0, "out": 0},
                          "1": {"in": 0, "out": 0},
                          "2": {"in": 0, "out": 0}},
@@ -63,8 +88,28 @@ def empty_state() -> dict:
     }
 
 
+class CorruptStateError(RuntimeError):
+    """Durum dosyasi var ama okunamiyor."""
+
+
 def load_state() -> dict:
+    """Tarama durumunu yukler.
+
+    Dosya YOKSA bos durum doner (ilk kosu). Ama dosya VARSA ve
+    okunamiyorsa sessizce sifirdan baslamak, gunlerdir suren bir turu
+    yok etmek demektir — ve kimse fark etmez. Boyle bir durumda GURULTULU
+    basarisiz oluyoruz: bir sonraki kosu yeniden dener, insan mudahalesi
+    gerekirse gorunur olur. Bu, "sessizce YANLIS, acikca EKSIKten
+    tehlikelidir" ilkesinin durum dosyasina uygulanmis halidir.
+    """
     state = read_json(STATE_PATH)
+    if state is None:
+        if STATE_PATH.exists():
+            raise CorruptStateError(
+                f"{STATE_PATH} okunamiyor (bozuk JSON). Tur sifirlanmasin diye "
+                f"duruldu. Dosyayi git gecmisinden geri alin: "
+                f"git checkout HEAD~1 -- {STATE_PATH}")
+        return empty_state()
     if not isinstance(state, dict) or "queue" not in state:
         return empty_state()
     base = empty_state()
@@ -76,9 +121,69 @@ def save_state(state: dict) -> bool:
     return write_json(STATE_PATH, state)
 
 
+# Tarama saatte bir calisir. Uc saat hicbir parti islenmediyse bir sey
+# bozulmus demektir. 22 Eylul'de iki GUN boyunca kimse fark etmedi cunku
+# hicbir yerde "en son ne zaman ilerledi" yazmiyordu.
+STALL_HOURS = 3
+
+
+def stalled_hours(state: dict) -> float | None:
+    """Son partinin uzerinden gecen saat. Hic parti yoksa None."""
+    stamp = state.get("last_batch_at")
+    if not stamp:
+        return None
+    try:
+        last = datetime.fromisoformat(str(stamp))
+    except ValueError:
+        return None
+    if last.tzinfo is None:
+        last = last.replace(tzinfo=timezone.utc)
+    delta = datetime.now(timezone.utc) - last
+    return round(delta.total_seconds() / 3600, 1)
+
+
+def eta(state: dict) -> dict:
+    """Bu turun olculmus hizla tahmini bitisi.
+
+    Hiz, son partilerin gercek zaman damgalarindan hesaplanir (ilk parti
+    haric: onun baslangic ani bilinmiyor). En az 3 parti yoksa tahmin
+    YAPILMAZ — iki noktadan cizilen cizgi guven vermez, yanlis bir tarih
+    ise hic tarih olmamasindan kotudur.
+    """
+    total = (state.get("universe_size_at_cycle_start")
+             or len(state.get("queue") or []))
+    kalan = max(total - min(state.get("cursor", 0), total), 0)
+    gecmis = state.get("recent_batches") or []
+    out = {"remaining": kalan, "per_day": None, "eta_at": None, "eta_hours": None}
+    if kalan == 0 or len(gecmis) < 3:
+        return out
+    try:
+        t0 = datetime.fromisoformat(gecmis[0]["at"])
+        t1 = datetime.fromisoformat(gecmis[-1]["at"])
+    except (KeyError, ValueError):
+        return out
+    saat = (t1 - t0).total_seconds() / 3600
+    if saat <= 0:
+        return out
+    hiz = sum(b.get("n", 0) for b in gecmis[1:]) / saat      # sirket/saat
+    if hiz <= 0:
+        return out
+    kalan_saat = kalan / hiz
+    if t1.tzinfo is None:
+        t1 = t1.replace(tzinfo=timezone.utc)
+    out.update({
+        "per_day": round(hiz * 24),
+        "eta_hours": round(kalan_saat, 1),
+        "eta_at": (t1 + timedelta(hours=kalan_saat)).isoformat(timespec="minutes"),
+    })
+    return out
+
+
 def progress(state: dict) -> dict:
     total = len(state.get("queue") or [])
     done = min(state.get("cursor", 0), total)
+    idle = stalled_hours(state)
+    kinds = state.get("kill_kinds") or {}
     return {
         "cycle": state.get("cycle", 0),
         "done": done,
@@ -86,12 +191,27 @@ def progress(state: dict) -> dict:
         "pct": round(done / total * 100, 1) if total else 0.0,
         "remaining": max(total - done, 0),
         "survivors": state.get("survivor_count", 0),
+        "last_batch_at": state.get("last_batch_at"),
+        "idle_hours": idle,
+        # ELENDI: kurali ihlal etti. VERI_YOK: bakamadik — eleme degil.
+        "eliminated": kinds.get(funnel.ELENDI, 0),
+        "data_missing": kinds.get(funnel.VERI_YOK, 0),
+        "retry_queue": len(state.get("retry_queue") or []),
+        "eta": eta(state),
+        "stalled": bool(idle is not None and idle >= STALL_HOURS
+                        and done < total),
     }
 
 
 # --------------------------------------------------------------------------
 # Tur baslatma
 # --------------------------------------------------------------------------
+def cycle_in_progress(state: dict) -> bool:
+    """Tur devam ediyor mu? (kuyruk var ve bitmemis)"""
+    queue = state.get("queue") or []
+    return bool(queue) and state.get("cursor", 0) < len(queue)
+
+
 def start_cycle(state: dict, *, tickers: list[str] | None = None,
                 batch_size: int | None = None, keep_survivors: bool = False) -> dict:
     """Yeni bir tarama turu baslatir; kuyrugu bastan kurar.
@@ -99,6 +219,9 @@ def start_cycle(state: dict, *, tickers: list[str] | None = None,
     ``keep_survivors=False`` onceki turun hayatta kalanlarini siler — aksi
     halde artik evrende olmayan ya da artik filtreleri gecmeyen sirketler
     havuzda kalir ve yuzdelikleri bozar.
+
+    DIKKAT: bu islem YARIM KALAN BIR TURU COPE ATAR. Cagiran tarafin
+    ``cycle_in_progress`` ile kontrol etmesi gerekir; ``run()`` bunu yapar.
     """
     queue = tickers if tickers is not None else pipeline.universe_tickers()
 
@@ -113,6 +236,14 @@ def start_cycle(state: dict, *, tickers: list[str] | None = None,
         "batch_size": batch_size or state.get("batch_size", DEFAULT_BATCH_SIZE),
         "queue": queue,
         "last_finalized": state.get("last_finalized"),
+        # Onceki turda VERI_YOK ile giden sirketler. Bu turda ONBELLEK
+        # ATLANARAK yeniden cekilirler; yoksa "tekrar dene" ayni eksik
+        # dosyayi bir daha okumak olurdu (companyfacts onbellegi 3 gun).
+        "retry_pending": list(state.get("retry_queue") or []),
+        # Payda tur icinde DEGISMEMELI: dashboard "%58" derken toplamin
+        # altindan kaymasi guveni bozar (evren 4.551 -> 6.227 -> 3.825
+        # diye oynamisti).
+        "universe_size_at_cycle_start": len(queue),
     })
     print(f"[tarama] Tur {new['cycle']} basladi — kuyrukta {len(queue)} sembol")
     return new
@@ -188,6 +319,39 @@ def from_snapshot(snap: dict) -> dict:
     }
 
 
+def write_survivors_index() -> bool:
+    """``data/survivors.json`` — Asama 2'yi gecenlerin KOMPAKT listesi.
+
+    Pano bir klasoru listeleyemez; 157 ayri dosyayi tek tek cekmek de sacma.
+    Huni sayfasi bu tek dosyayi okur. Tur bitmeden puan olmadigi icin burada
+    puan YOKTUR — yalnizca kimlik ve ham metrikler vardir; sayfada da boyle
+    sunulur ki "puansiz" ile "puani dusuk" karistirilmasin.
+    """
+    rows = []
+    for snap in load_survivors():
+        m = snap.get("metrics") or {}
+        rows.append({
+            "ticker": snap.get("ticker"),
+            "name": snap.get("name"),
+            "sector": snap.get("sector"),
+            "track": snap.get("track"),
+            "exchange": snap.get("exchange"),
+            "market_cap_musd": (snap.get("meta") or {}).get("market_cap_musd"),
+            "scanned_at": snap.get("scanned_at"),
+            "cycle": snap.get("cycle"),
+            "metrics": {k: m.get(k) for k in (
+                "ev_ebit", "ev_sales", "ev_gross_profit", "fcf_yield_ev",
+                "rev_growth_ttm", "gross_margin", "roic", "rule_of_40",
+                "net_debt_to_ebitda", "piotroski_f")},
+        })
+    rows.sort(key=lambda r: (r.get("sector") or "", r.get("ticker") or ""))
+    # Yol SURVIVOR_DIR'den turetilir, DATA_DIR'den DEGIL: testler SURVIVOR_DIR'i
+    # gecici klasore yonlendiriyor ama DATA_DIR'i yonlendirmiyor. Sabit
+    # DATA_DIR kullanilirsa test kosusu GERCEK data/survivors.json'i sifirlar.
+    return write_json(SURVIVOR_DIR.parent / "survivors.json",
+                      {"count": len(rows), "survivors": rows, "source": "scan"})
+
+
 def survivor_path(ticker: str):
     return SURVIVOR_DIR / f"{ticker.upper()}.json"
 
@@ -206,12 +370,41 @@ def load_survivors() -> list[dict]:
 # --------------------------------------------------------------------------
 # Parti
 # --------------------------------------------------------------------------
+def load_one(ticker: str, state: dict, *, fresh: bool = False) -> object | None:
+    """Tek sirketi ZAMAN SINIRI ile yukler. Asilirsa None doner, parti surer.
+
+    Ayni sembol ust uste ``COMPANY_TIMEOUT_SKIP_AFTER`` kez asarsa artik hic
+    denenmez: bir sonraki turda da 90 saniye harcamasinin anlami yok.
+    """
+    timeouts = state.setdefault("timeouts", {})
+    if timeouts.get(ticker, 0) >= config.COMPANY_TIMEOUT_SKIP_AFTER:
+        return None
+    try:
+        with time_limit(config.COMPANY_TIMEOUT_SEC, f"{ticker} verisi"):
+            return pipeline.load_company(ticker, fresh=fresh)
+    except TimeoutHit as exc:
+        timeouts[ticker] = timeouts.get(ticker, 0) + 1
+        print(f"  [zaman asimi] {exc} — atlandi "
+              f"({timeouts[ticker]}. kez)", flush=True)
+        return None
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [hata] {ticker}: {str(exc)[:120]}", flush=True)
+        return None
+
+
 def run_batch(state: dict, *, size: int | None = None,
-              bench: list | None = None) -> dict:
+              bench: list | None = None, deadline: float | None = None,
+              beat=None) -> dict:
     """Kuyruktan bir parti isler: Asama 0, 1, 2.
 
     Asama 3-4 BURADA CALISMAZ — goreli ucuzluk ve sektor yuzdelikleri
     havuzun tamamini ister; onlar tur sonunda ``finalize`` ile calisir.
+
+    IMLEC HER SIRKETTEN SONRA ILERLER ve durum araliklarla diske yazilir.
+    Onceki surumde imlec yalnizca parti SONUNDA guncelleniyordu; tek bir
+    sirket asildiginda is akisi partiyi 50. dakikada iptal ediyor, "Commit"
+    adimi atlaniyor ve 120 sirketlik emek tamamen kayboluyordu. Sistem
+    22 Eylul'den beri her saat ayni sirkette bu sekilde takiliydi.
     """
     size = size or state.get("batch_size", DEFAULT_BATCH_SIZE)
     queue = state["queue"]
@@ -223,40 +416,103 @@ def run_batch(state: dict, *, size: int | None = None,
 
     SURVIVOR_DIR.mkdir(parents=True, exist_ok=True)
     counts = state["stage_counts"]
-    kills = state["kill_counts"]
+    timeouts = state.setdefault("timeouts", {})
+    retry_pending = set(state.get("retry_pending") or [])
 
-    print(f"[tarama] Tur {state['cycle']} · {start + 1}-{start + len(batch)} / {len(queue)}")
+    print(f"[tarama] Tur {state['cycle']} · {start + 1}-{start + len(batch)} "
+          f"/ {len(queue)}", flush=True)
 
     for i, ticker in enumerate(batch, 1):
-        if i % 25 == 0:
-            print(f"  {i}/{len(batch)}")
+        if deadline is not None and time.monotonic() >= deadline:
+            print(f"[tarama] Sure butcesi doldu — parti {i - 1}/{len(batch)} "
+                  f"sirkette duzgun sonlandi, ilerleme kaydedildi.", flush=True)
+            break
 
-        f = pipeline.load_company(ticker)
-        if f is None:
-            state["failed"] = (state["failed"] + [ticker])[-200:]
-            continue
+        if beat is not None:
+            beat(f"{ticker} ({start + i}/{len(queue)})")
+        if i % 10 == 0:
+            print(f"  {i}/{len(batch)} · {ticker}", flush=True)
 
-        row = funnel.evaluate(f, benchmark=bench or [])
-        row["cycle"] = state["cycle"]
-
-        killed_at, reason = _run_early_stages(row, counts)
-        if reason:
-            kills[reason] = kills.get(reason, 0) + 1
-            # Onceki turdan kalan bir kayit varsa temizle
-            path = survivor_path(ticker)
-            if path.exists():
-                path.unlink()
+        if timeouts.get(ticker, 0) >= config.COMPANY_TIMEOUT_SKIP_AFTER:
+            print(f"  [atlandi] {ticker}: daha once "
+                  f"{timeouts[ticker]} kez zaman asimina ugradi", flush=True)
         else:
-            from . import percentiles
-            row["own_pct"] = percentiles.own_history_percentiles(f, row["metrics"])
-            write_json(survivor_path(ticker), to_snapshot(row))
+            tekrar = ticker in retry_pending
+            if tekrar:
+                print(f"  [tekrar] {ticker}: gecen turda veri eksikti, "
+                      f"onbellek atlanarak cekiliyor", flush=True)
+            f = load_one(ticker, state, fresh=tekrar)
+            if f is None:
+                state["failed"] = (state["failed"] + [ticker])[-200:]
+            else:
+                row = funnel.evaluate(f, benchmark=bench or [])
+                row["cycle"] = state["cycle"]
 
+                killed_at, reason = _run_early_stages(row, counts)
+                if reason:
+                    _record_kill(state, ticker, reason)
+                    # Onceki turdan kalan bir kayit varsa temizle
+                    path = survivor_path(ticker)
+                    if path.exists():
+                        path.unlink()
+                else:
+                    from . import percentiles
+                    row["own_pct"] = percentiles.own_history_percentiles(
+                        f, row["metrics"])
+                    write_json(survivor_path(ticker), to_snapshot(row))
+
+        # Sirket bitti: imleci ILERLET. Buradan sonra surec olse bile bu
+        # sirket bir daha islenmez.
         state["processed"] += 1
+        state["cursor"] = start + i
+        state["last_batch_at"] = utc_now_iso()
 
-    state["cursor"] = start + len(batch)
+        if i % config.STATE_FLUSH_EVERY == 0:
+            state["survivor_count"] = len(list(SURVIVOR_DIR.glob("*.json")))
+            save_state(state)
+
     state["survivor_count"] = len(list(SURVIVOR_DIR.glob("*.json")))
     state["last_batch_at"] = utc_now_iso()
+
+    # HIZ KAYDI. Kullanici "bu tur ne zaman biter" diye sordugunda cevap
+    # tahminle degil olcumle verilmeli. GitHub zamanlanmis kosulari saatte
+    # bir degil 3-5 saatte bir tetikledigi icin "300 sirket/saat" gibi
+    # sabit bir varsayim yaniltici olurdu.
+    islenen = state["cursor"] - start
+    if islenen > 0:
+        gecmis = state.setdefault("recent_batches", [])
+        gecmis.append({"at": state["last_batch_at"], "n": islenen})
+        state["recent_batches"] = gecmis[-24:]
+    # Pano bu hesabi KENDISI tekrarlamasin: ayni kural iki yerde durursa
+    # biri degisince digeri sessizce eskir.
+    state["eta"] = eta(state)
+
+    save_state(state)
     return state
+
+
+def _record_kill(state: dict, ticker: str, reason) -> None:
+    """Elemeyi uc ayri sekilde kaydeder: metin, kod ve SINIF.
+
+    Sinif onemli: "kurali ihlal etti" ile "hesaplayamadik" ayni sey degil.
+    Ikincisi bir eleme degil, veri boslugudur; o sirketler tekrar denenmek
+    uzere ``retry_queue``'ya girer. Onceki surumde ikisi ayni sepetteydi ve
+    175 sirket sessizce kayboluyordu.
+    """
+    state["kill_counts"][reason] = state["kill_counts"].get(reason, 0) + 1
+
+    code = funnel.kill_code(reason) or "UNCODED"
+    codes = state.setdefault("kill_codes", {})
+    codes[code] = codes.get(code, 0) + 1
+
+    kind = funnel.kill_kind(reason) or funnel.ELENDI
+    kinds = state.setdefault("kill_kinds", {})
+    kinds[kind] = kinds.get(kind, 0) + 1
+
+    if kind == funnel.VERI_YOK:
+        queue = state.setdefault("retry_queue", [])
+        if ticker not in queue:
+            queue.append(ticker)
 
 
 def _run_early_stages(row: dict, counts: dict) -> tuple[int | None, str | None]:
@@ -288,10 +544,138 @@ def _run_early_stages(row: dict, counts: dict) -> tuple[int | None, str | None]:
 
 
 # --------------------------------------------------------------------------
+# Ara sonuc — tur bitmeden gosterilecek gecici siralama
+# --------------------------------------------------------------------------
+# Bir tur 5-10 gun suruyor. Asama 3-4'u yalnizca tur sonunda calistirmak,
+# kullanicinin bu sure boyunca HICBIR yeni sirket gormemesi demek. Oysa
+# biriken hayatta kalanlar uzerinden simdiden siralama yapilabilir; yalnizca
+# bunun GECICI oldugu ve havuz buyudukce degisecegi acikca soylenmeli.
+INTERIM_MIN_SURVIVORS = 15      # bu sayinin altinda siralama anlamsiz
+INTERIM_CARDS_PER_BATCH = 12    # her partide en fazla kac yeni tam kart
+
+
+def _attach_kill_log(log: dict, state: dict) -> None:
+    """Huni gunlugune elemeleri UC gorunumde yazar.
+
+    - ``kill_reasons``: okunur cumleler (ilk 30) — ayrinti icin.
+    - ``kill_codes``: sabit kodlar — sayim buradan yapilir, esik degistiginde
+      anahtar degismez.
+    - ``kill_kinds``: ELENDI / VERI_YOK. Bu ayrim olmadan "elendi" sayisi
+      yaniltici: 175 sirket kotu oldugu icin degil, verisine bakamadigimiz
+      icin listeden dusmustu.
+    """
+    log["kill_reasons"] = dict(sorted(state["kill_counts"].items(),
+                                      key=lambda kv: kv[1], reverse=True)[:30])
+    log["kill_codes"] = dict(sorted((state.get("kill_codes") or {}).items(),
+                                    key=lambda kv: kv[1], reverse=True))
+    log["kill_kinds"] = dict(state.get("kill_kinds") or {})
+    log["retry_queue_size"] = len(state.get("retry_queue") or [])
+
+
+def _stage_log(state: dict) -> list[dict]:
+    """Asama 0-2 sayaclarini gunluk bicimine cevirir."""
+    counts = state.get("stage_counts") or {}
+    out = []
+    for n in (0, 1, 2):
+        c = counts.get(str(n))
+        if c:
+            out.append({"stage": n, "name": funnel.STAGE_NAMES[n],
+                        "input": c["in"], "output": c["out"]})
+    return out
+
+
+def interim(state: dict, *, ctx: dict | None = None, bench: list | None = None,
+            build_cards: bool = True, deadline: float | None = None,
+            beat=None) -> dict | None:
+    """Biriken hayatta kalanlari siralar ve GECICI aday listesi yazar.
+
+    Tur sonundaki ``finalize`` ile ayni kodu (``funnel.rank``) kullanir;
+    fark, sonucun ``partial: true`` ile isaretlenmesi ve kart uretiminin
+    parti basina sinirlanmasi.
+    """
+    snapshots = load_survivors()
+    if len(snapshots) < INTERIM_MIN_SURVIVORS:
+        return None
+
+    rows = [from_snapshot(s) for s in snapshots]
+    log = {"stages": _stage_log(state)}
+    selected, sector_table = funnel.rank(rows, log=log, compute_own_pct=False)
+
+    # HUNI GUNLUGU HER PARTIDE. Onceden yalnizca tur sonunda (finalize)
+    # yaziliyordu; tur 1 bir kilitlenme duzeltmesiyle sifirlaninca finalize
+    # hic calismadi ve funnel_log.json 9 Eylul'den beri bos kaldi. Ayni
+    # gunun kaydi uzerine yazilir; tur ici kayitlar "partial" isaretlidir.
+    _attach_kill_log(log, state)
+    pipeline.append_funnel_log(log, partial=True, cycle=state.get("cycle"),
+                               scanned=progress(state)["done"])
+
+    p = progress(state)
+    if build_cards:
+        _build_missing_cards(selected, sector_table, ctx=ctx, bench=bench,
+                             limit=INTERIM_CARDS_PER_BATCH,
+                             deadline=deadline, state=state, beat=beat)
+
+    pipeline.refresh_candidates_from_disk(partial={
+        "is_partial": True,
+        "scanned": p["done"],
+        "universe": p["total"],
+        "pct": p["pct"],
+        "survivors": len(snapshots),
+        "ranked": len(selected),
+        "cycle": p["cycle"],
+        # Panoda "en son ne zaman ilerledi" yazsin ki bir daha iki gun
+        # sessizce durmasin.
+        "last_batch_at": p["last_batch_at"],
+        "remaining": p["remaining"],
+    })
+    print(f"[tarama] Ara sonuc: {len(snapshots)} hayatta kalan siralandi, "
+          f"{len(selected)} aday (tarama %{p['pct']})")
+    return {"selected": selected, "sector_table": sector_table}
+
+
+def _build_missing_cards(selected: list[dict], sector_table: dict, *,
+                         ctx: dict | None, bench: list | None,
+                         limit: int, deadline: float | None = None,
+                         state: dict | None = None, beat=None) -> int:
+    """Aday olup karti olmayan sirketler icin tam kart uretir (sinirli sayida).
+
+    Her kart bir companyfacts indirmesi demek; parti suresini sismemek icin
+    kosu basina ``limit`` taneyle sinirli. Kalanlar sonraki partilerde uretilir.
+    """
+    missing = [r for r in selected
+               if not (pipeline.CARDS_DIR / f"{r['ticker']}.json").exists()]
+    if not missing:
+        return 0
+
+    ctx = ctx if ctx is not None else pipeline.context([])
+    built = 0
+    for row in missing[:limit]:
+        if deadline is not None and time.monotonic() >= deadline:
+            print("[tarama] Sure butcesi doldu — kalan kartlar sonraki kosuda.",
+                  flush=True)
+            break
+        if beat is not None:
+            beat(f"kart {row['ticker']}")
+        f = load_one(row["ticker"], state if state is not None else {})
+        if f is None:
+            continue
+        full = funnel.evaluate(f, benchmark=bench or [])
+        full["passed_stages"] = row.get("passed_stages", [])
+        pipeline.build_cards([full], source="funnel", sector_table=sector_table,
+                             ctx=ctx, bench=bench or [])
+        built += 1
+    if built:
+        print(f"[tarama] {built} yeni kart uretildi "
+              f"({len(missing) - built} tanesi sonraki partilere kaldi)")
+    return built
+
+
+# --------------------------------------------------------------------------
 # Tur sonu
 # --------------------------------------------------------------------------
 def finalize(state: dict, *, ctx: dict | None = None,
-             bench: list | None = None, build_cards: bool = True) -> dict:
+             bench: list | None = None, build_cards: bool = True,
+             beat=None) -> dict:
     """Kuyruk bitince Asama 3-4'u calistirir, kartlari ve ozet dosyalari yazar."""
     snapshots = load_survivors()
     print(f"[tarama] Tur {state['cycle']} tamamlandi — "
@@ -304,20 +688,12 @@ def finalize(state: dict, *, ctx: dict | None = None,
 
     rows = [from_snapshot(s) for s in snapshots]
 
-    log = {"stages": [
-        {"stage": 0, "name": funnel.STAGE_NAMES[0],
-         "input": state["stage_counts"]["0"]["in"], "output": state["stage_counts"]["0"]["out"]},
-        {"stage": 1, "name": funnel.STAGE_NAMES[1],
-         "input": state["stage_counts"]["1"]["in"], "output": state["stage_counts"]["1"]["out"]},
-        {"stage": 2, "name": funnel.STAGE_NAMES[2],
-         "input": state["stage_counts"]["2"]["in"], "output": state["stage_counts"]["2"]["out"]},
-    ]}
+    log = {"stages": _stage_log(state)}
 
     # own_pct anlik goruntude hazir; yeniden hesaplamak icin fiyat gecmisi gerekirdi
     selected, sector_table = funnel.rank(rows, log=log, compute_own_pct=False)
 
-    log["kill_reasons"] = dict(sorted(state["kill_counts"].items(),
-                                      key=lambda kv: kv[1], reverse=True)[:30])
+    _attach_kill_log(log, state)
 
     for s in log["stages"]:
         print(f"   Asama {s['stage']} {s['name']:16} {s['input']:6} -> {s['output']:6}")
@@ -334,7 +710,9 @@ def finalize(state: dict, *, ctx: dict | None = None,
         by_ticker = {r["ticker"]: r for r in rows}
         card_rows = []
         for ticker in sorted(wanted):
-            f = pipeline.load_company(ticker)
+            if beat is not None:
+                beat(f"tur sonu karti {ticker}")
+            f = load_one(ticker, state)
             if f is None:
                 continue
             full = funnel.evaluate(f, benchmark=bench or [])
@@ -361,7 +739,10 @@ def finalize(state: dict, *, ctx: dict | None = None,
 
     pipeline.write_thresholds()
     pipeline.write_universe(rows, log)
-    pipeline.append_funnel_log(log)
+    # Tur numarasi YAZILMALI: onceki surumde tam kayitlar "tur: None"
+    # ile duruyordu ve hangi turun sonucu oldugu anlasilmiyordu.
+    pipeline.append_funnel_log(log, cycle=state.get("cycle"),
+                               scanned=progress(state)["done"])
     pipeline.refresh_candidates_from_disk()
 
     state["last_finalized"] = today_iso()
@@ -373,40 +754,94 @@ def finalize(state: dict, *, ctx: dict | None = None,
 # Ust seviye kosu
 # --------------------------------------------------------------------------
 def run(*, batch_size: int | None = None, new_cycle: bool = False,
-        tickers: list[str] | None = None, build_cards: bool = True) -> dict:
+        tickers: list[str] | None = None, build_cards: bool = True,
+        force: bool = False) -> dict:
     """Bir saatlik parti calistirir; kuyruk bittiyse tur sonunu isler."""
     state = load_state()
 
-    if new_cycle or not state.get("queue"):
+    if new_cycle and cycle_in_progress(state) and not force:
+        # Yarim kalan tur cope gitmesin. Haftalik kosu her pazar --new-cycle
+        # cagiriyordu; tur 5-10 gun surdugu icin her seferinde sifirlaniyor
+        # ve SONUC HIC URETILMIYORDU. Yeni tur ancak mevcut tur bitince
+        # ya da acikca --force verilince baslar.
+        p = progress(state)
+        print(f"[tarama] Tur {p['cycle']} devam ediyor ({p['done']}/{p['total']}, "
+              f"%{p['pct']}) — yeni tur baslatilmadi. Zorlamak icin --force.")
+    elif new_cycle or not state.get("queue"):
         state = start_cycle(state, tickers=tickers, batch_size=batch_size)
 
-    if batch_size:
-        state["batch_size"] = batch_size
+    # Tek seferlik --batch, kayitli parti boyutunu KALICI degistirmesin;
+    # yalnizca bu kosuda gecerli olsun.
+    stored = state.get("batch_size") or DEFAULT_BATCH_SIZE
+    if stored == LEGACY_BATCH_SIZE:
+        # ESKI VARSAYILANIN GOCU. 120, kullanicinin sectigi bir deger degil;
+        # sure butcesi yokken guvenli olan tavandi. Butce geldigi icin tavan
+        # yukseldi. Bilincli olarak konmus BASKA bir deger (ornegin
+        # --batch 60 --new-cycle) aynen korunur.
+        stored = DEFAULT_BATCH_SIZE
+    run_batch_size = batch_size or stored
+    # Panonun gostermesi gereken GERCEK parti boyu. Dosyada kalan eski
+    # "batch_size: 120" gosteriliyordu; oysa goc sonrasi her parti 300
+    # sirket. "Kalan parti" sayisi bu yuzden 2,5 kat fazla gorunuyordu.
+    state["effective_batch_size"] = run_batch_size
 
-    bench_map = pipeline.benchmarks()
-    bench = bench_map.get("QQQ", [])
+    # ZAMAN BUTCESI. Is akisinin sert siniri (50 dk) partiyi IPTAL eder ve
+    # "Commit" adimini atlar; o noktaya gelinirse kosu bosa gider. Kendi
+    # butcemiz her zaman once dolar, parti duzgun biter ve ilerleme islenir.
+    started = time.monotonic()
+    batch_deadline = started + config.BATCH_BUDGET_SEC
+    run_deadline = started + config.RUN_BUDGET_SEC
 
-    state = run_batch(state, bench=bench)
+    # SON CARE: Python sinyali C icinde kilitlenen bir kutuphaneye
+    # ulasamaz. O durumda bekci sureci 0 ile kapatir; diske yazilmis
+    # imlec korunur ve is akisi commit atar.
+    watchdog = Watchdog(config.WATCHDOG_LIMIT_SEC,
+                        on_timeout=lambda label: save_state(state)).start()
+    beat = watchdog.beat
 
-    p = progress(state)
-    print(f"[tarama] Ilerleme: {p['done']}/{p['total']} (%{p['pct']}) · "
-          f"hayatta kalan {p['survivors']}")
+    try:
+        beat("karsilastirma endeksi")
+        bench_map = pipeline.benchmarks()
+        bench = bench_map.get("QQQ", [])
 
-    if state["cursor"] >= len(state["queue"]):
-        ctx = pipeline.context([])
-        state = finalize(state, ctx=ctx, bench=bench, build_cards=build_cards)
-        # Tur sonu isini HEMEN kaydet. Yeni kuyrugu kurmak ag ister ve
-        # basarisiz olabilir; o yuzden once biten turu guvene al, yoksa
-        # saatlerce suren tarama sonucu tek bir ag hatasiyla cope gider.
-        save_state(state)
-        try:
-            state = start_cycle(state, tickers=tickers,
-                                batch_size=state.get("batch_size"))
-        except Exception as exc:  # noqa: BLE001
-            print(f"[tarama] Yeni tur kurulamadi ({exc}); "
-                  f"sonraki kosuda tekrar denenecek.")
-            state["queue"] = []
-            state["cursor"] = 0
+        state = run_batch(state, size=run_batch_size, bench=bench,
+                          deadline=batch_deadline, beat=beat)
+
+        # ARA SONUC: tur bitmesini beklemeden biriken hayatta kalanlari sirala.
+        # Tur 5 gun surerken kullanici hicbir yeni sirket gormemeli degil.
+        beat("ara sonuc")
+        interim(state, ctx=None, bench=bench, build_cards=build_cards,
+                deadline=run_deadline, beat=beat)
+
+        # Huni sayfasinin okudugu kompakt liste. Her partide tazelenir ki
+        # tur ortasinda da kimlerin gectigi gorunsun.
+        beat("hayatta kalanlar dizini")
+        write_survivors_index()
+
+        p = progress(state)
+        print(f"[tarama] Ilerleme: {p['done']}/{p['total']} (%{p['pct']}) · "
+              f"hayatta kalan {p['survivors']}", flush=True)
+
+        if state["cursor"] >= len(state["queue"]):
+            beat("tur sonu")
+            ctx = pipeline.context([])
+            state = finalize(state, ctx=ctx, bench=bench,
+                             build_cards=build_cards, beat=beat)
+            # Tur sonu isini HEMEN kaydet. Yeni kuyrugu kurmak ag ister ve
+            # basarisiz olabilir; o yuzden once biten turu guvene al, yoksa
+            # saatlerce suren tarama sonucu tek bir ag hatasiyla cope gider.
+            save_state(state)
+            try:
+                beat("yeni tur kuruluyor")
+                state = start_cycle(state, tickers=tickers,
+                                    batch_size=state.get("batch_size"))
+            except Exception as exc:  # noqa: BLE001
+                print(f"[tarama] Yeni tur kurulamadi ({exc}); "
+                      f"sonraki kosuda tekrar denenecek.")
+                state["queue"] = []
+                state["cursor"] = 0
+    finally:
+        watchdog.stop()
 
     save_state(state)
     return state

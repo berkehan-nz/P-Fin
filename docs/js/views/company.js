@@ -73,6 +73,7 @@ window.ViewCompany = (function () {
             ${Fmt.esc(card.sector)} <span class="tiny dim">(SIC ${Fmt.esc(card.sic)})</span></div>
         </div>
         <div>
+          <div class="tiny dim">${card.price_as_of ? `${Fmt.date(card.price_as_of)} kapanisi` : 'fiyat tarihi yok'}</div>
           <div class="price">${Fmt.money(card.price, { digits: 2 })}
             ${Fmt.isNum(chg) ? `<span class="${Fmt.pnlClass(chg)}" style="font-size:15px">
               ${Fmt.signedPct(chg)}</span>` : ''}</div>
@@ -89,7 +90,9 @@ window.ViewCompany = (function () {
                Fmt.isNum(card.net_debt_musd) && card.net_debt_musd < 0
                  ? 'Negatif: borctan cok nakdi var' : 'Borc eksi nakit')}
         ${stat('Sonraki bilanco', Fmt.date((card.calendar || {}).next_earnings),
-               'Kazanc aciklamasi tarihi')}
+               (card.calendar || {}).estimated
+                 ? 'TAHMINI — son SEC raporu + 13 hafta; kesin tarih henuz aciklanmadi'
+                 : 'Kazanc aciklamasi tarihi')}
       </div>
 
       <h3>Puan dagilimi</h3>
@@ -97,6 +100,7 @@ window.ViewCompany = (function () {
         <b>ayni sektordeki diger sirketlere gore</b> hesaplanir — 70 puan
         "sektorun en iyi %30'unda" demektir, mutlak bir not degildir.
         Yanindaki sayi o basligin genel puandaki agirligi.</p>
+      ${poolNote()}
       <div class="grid score-blocks" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr))">
         ${['value', 'quality', 'safety', 'momentum', 'earnings_quality', 'catalyst']
           .map((k) => {
@@ -199,6 +203,18 @@ window.ViewCompany = (function () {
     return `agirlik ${w} → ${Fmt.num(w * f, 1)} (kapsama ×${Fmt.num(f, 2)})`;
   }
 
+  /* Yuzdelik HAVUZU. Tarama bitene kadar havuz kucuk: 70 puan 60 sirketlik
+     havuzda "en iyi %30" demek, 3.000 sirketlik havuzda baska bir sey. */
+  function poolNote() {
+    const pool = card.percentile_pool || {};
+    if (!pool.universe) return '';
+    const small = pool.universe < 300;
+    return `<p class="tiny ${small ? 'c-yellow' : 'dim'}" style="margin:-4px 0 8px">
+      Yuzdelik tabani: <b>${pool.universe}</b> sirket
+      (${Fmt.esc(card.sector || 'sektor')} icinde ${pool.sector}).
+      ${small ? 'Havuz kucuk — tarama tamamlaninca puanlar degisebilir.' : ''}</p>`;
+  }
+
   function lowCoverage(block) {
     const d = (card.score_detail || {})[block];
     if (!d || d.coverage === undefined || d.coverage === null) return '';
@@ -293,6 +309,39 @@ window.ViewCompany = (function () {
     </section>`;
   }
 
+  /* Bos hucrenin sebebi HER ZAMAN eksik veri degil.
+     Faaliyet kari negatifse EV/FVOK hesaplanabilir ama ANLAMSIZDIR; kasitli
+     olarak bos birakilir. "SEC dosyasinda kalem bulunamadi" demek yanlis
+     teshis koyar: okuyan kisi veri hatasi sanir, oysa sirket zarar ediyor. */
+  const NEGATIVE_DENOMINATOR = {
+    ev_ebit: ['ebit_musd', 'Faaliyet kari (EBIT)'],
+    ev_ebitda: ['ebitda_musd', 'FAVOK'],
+    ev_gross_profit: ['gross_profit_musd', 'Brut kar'],
+    pe: ['net_income_musd', 'Net kar'],
+    peg: ['net_income_musd', 'Net kar'],
+    implied_growth: ['fcf_musd', 'Serbest nakit akisi'],
+    implied_vs_actual_growth: ['fcf_musd', 'Serbest nakit akisi'],
+  };
+
+  function missingReason(key) {
+    const rule = NEGATIVE_DENOMINATOR[key];
+    if (rule) {
+      const v = (card.ttm || {})[rule[0]];
+      if (Fmt.isNum(v) && v <= 0) {
+        return `${rule[1]} negatif (${Fmt.money(v, { musd: true })}) — bu carpan `
+          + `matematiksel olarak hesaplanir ama ANLAMSIZ olur, kasitli olarak bos birakildi. `
+          + `Zarar eden sirkette EV/Hasilat ve EV/Brut kar carpanlarina bak.`;
+      }
+    }
+    if (key === 'peg') {
+      const g = ((card.metrics || {}).rev_growth_ttm || {}).value;
+      if (Fmt.isNum(g) && g <= 0) {
+        return 'Satislar buyumuyor — buyumeye bolunen bir carpan negatif tabanda anlamsiz.';
+      }
+    }
+    return 'Bu sirket icin hesaplanamadi — SEC dosyasinda ilgili kalem bulunamadi.';
+  }
+
   function metricRow(key) {
     const cell = (card.metrics || {})[key] || {};
     const spec = Fmt.spec(key) || {};
@@ -301,7 +350,7 @@ window.ViewCompany = (function () {
 
     const meaning = Fmt.isNum(v)
       ? Fmt.sentence(key, v)
-      : '<span class="dim">Bu sirket icin hesaplanamadi — SEC dosyasinda ilgili kalem bulunamadi.</span>';
+      : `<span class="dim">${Fmt.esc(missingReason(key))}</span>`;
 
     const sektorNerede = Fmt.percentileSentence(key, cell.sector_pct, cell.pct_basis);
     const own = Fmt.ownHistorySentence(key, cell.own_5y_pct);
@@ -315,6 +364,7 @@ window.ViewCompany = (function () {
           ${Fmt.esc(spec.plain || '')}</div>
       </td>
       <td>${Fmt.cell(key, cell)}
+        ${Fmt.cappedBadge(key, card.capped_for_scoring)}
         ${Fmt.isNum(v) ? `<div class="tiny dim">${Fmt.esc(Fmt.colorMeaning(color))}</div>` : ''}</td>
       <td style="text-align:left;white-space:normal;line-height:1.45">${meaning}</td>
       <td style="text-align:left;white-space:normal">
@@ -398,8 +448,9 @@ window.ViewCompany = (function () {
     return `<section id="dcf"><h2>Ters DCF</h2>
       <div class="card">
         <p style="font-size:15px;margin-top:0">Bu fiyat
-          <b class="c-${verdict[0]}">%${Fmt.num(implied, 1)}</b> yillik FCF buyumesi varsayiyor;
-          sirket son 3 yilda <b>%${Fmt.num(actual, 1)}</b>
+          <b class="c-${verdict[0]}">${Fmt.pctText(Math.abs(implied || 0), 1)}</b> yillik FCF
+          ${Fmt.isNum(implied) && implied < 0 ? 'KUCULMESI' : 'buyumesi'} varsayiyor;
+          sirket son 3 yilda <b>${Fmt.pctText(Math.abs(actual || 0), 1)}</b>
           ${Fmt.isNum(actual) && actual < 0 ? 'KUCULDU' : 'buyudu'}.</p>
         ${verdict[1] ? `<p class="small c-${verdict[0]}">${Fmt.esc(verdict[1])}</p>` : ''}
 
@@ -602,6 +653,19 @@ window.ViewCompany = (function () {
   function wire() {
     // icindekiler vurgusu
     const links = [...document.querySelectorAll('#toc a')];
+
+    // Icindekiler tiklamasi: hash'i DEGISTIRMEDEN kaydir. href yerinde
+    // duruyor ki klavye ve orta tik calissin, ama varsayilan davranis
+    // location.hash'i '#metrikler' yapip yonlendiriciyi tetikliyordu.
+    links.forEach((a) => {
+      a.addEventListener('click', (ev) => {
+        const el = document.getElementById(a.dataset.sec);
+        if (!el) return;
+        ev.preventDefault();
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        links.forEach((l) => l.classList.toggle('active', l === a));
+      });
+    });
     const obs = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (!e.isIntersecting) return;

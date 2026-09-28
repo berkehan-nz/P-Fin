@@ -117,3 +117,129 @@ npm run dev                        # http://localhost:8788/mcp
 3. `submit_for_review` tek PR acar.
 4. Sen PR'i okursun, birlestirirsin.
 5. **Merge** is akisi kartlari gunceller, GitHub Pages yayinlar (~1 dk).
+
+
+## Jeton, yetki ve okuma yolu
+
+**Okumalar jeton istemez.** Depo public; `list_candidates`, `get_card` gibi
+araclar `raw.githubusercontent.com` uzerinden okur. Bunun sebebi somut: GitHub
+bir OAuth uygulamasi icin kullanici basina jeton sayisi asilinca **en eskisini
+iptal eder**. Baglayici birden fazla oturum actiginda eski jeton olur ve
+eskiden TUM araclar (okumalar dahil) 401 veriyordu. Artik jeton yalnizca
+YAZMA icin gerekli.
+
+Calisma dalindan yapilan okumalar API'den gider: raw CDN birkac dakika
+onbelleklidir ve bayat icerik, ajanin kendi yazdigini ezmesine yol acar.
+
+**`whoami` gercek dogrulama yapar.** `GET /user` + depo izin kontrolu calistirir.
+Onceki surum hicbir cagri yapmadan "yazma yetkin var" diyordu; jeton iptal
+edilmisken bile. Simdi jeton olmusse acikca soyler ve ne yapilacagini yazar.
+
+**Jeton gecersizse:** claude.ai > Settings > Connectors > P-Fin baglayicisini
+kaldirip yeniden bagla.
+
+## Dagitim — otomatik
+
+`mcp/` altinda bir degisiklik main'e girince **MCP dagitimi** is akisi
+(`.github/workflows/mcp-deploy.yml`) sunucuyu kendiliginden gunceller.
+Tip hatasi olan kod canliya gitmez.
+
+Eskiden sunucu yalnizca bir bilgisayardan terminalle (`npm run deploy`)
+dagitilabiliyordu. Kod depoda guncellense bile canlidaki surum eski
+kaliyordu ve bunu kimse fark etmiyordu.
+
+### Tek seferlik kurulum (3 adim, ~5 dakika)
+
+**1. Cloudflare'den anahtar al**
+
+- https://dash.cloudflare.com adresine gir
+- Sag ustte profil simgesi > **My Profile**
+- Sol menude **API Tokens** > **Create Token**
+- **Edit Cloudflare Workers** satirinda **Use template**
+- *Account Resources*: kendi hesabini sec. *Zone Resources*: **All zones**
+- **Continue to summary** > **Create Token**
+- Cikan uzun metni KOPYALA. **Bir daha gosterilmez.**
+
+**2. GitHub'a kaydet**
+
+- Depo > **Settings** > **Secrets and variables** > **Actions**
+- **New repository secret**
+- Name: `CLOUDFLARE_API_TOKEN`
+- Secret: kopyaladigin metni yapistir > **Add secret**
+
+(SEC_USER_AGENT, FINNHUB_API_KEY ve FRED_API_KEY'i de ayni yerden
+eklemistin.)
+
+**3. Ilk dagitimi baslat**
+
+- Depo > **Actions** > sol listede **MCP dagitimi** > **Run workflow**
+- 1-2 dakika icinde yesil tik gormelisin
+
+**Dogrulama:** Claude sohbetinde "whoami calistir" de. Cikti
+`Jeton: GECERLI (dogrulandi)` ile baslamali.
+
+Kirmizi carpi cikarsa ve hata "CLOUDFLARE_ACCOUNT_ID" diyorsa, birden
+fazla Cloudflare hesabin var demektir: Cloudflare ana sayfasinda sag
+taraftaki **Account ID**'yi kopyalayip ayni yoldan `CLOUDFLARE_ACCOUNT_ID`
+adiyla ikinci bir secret olarak ekle.
+
+### Elle dagitim (gelistirici icin)
+
+```bash
+cd mcp && npm ci && npm run type-check && npm run deploy
+```
+
+
+## Araclar
+
+### Okuma (jeton gerektirmez)
+
+| Arac | Ne cevaplar |
+|---|---|
+| `list_candidates` | Puana gore siralanmis adaylar |
+| `get_card` | Tek sirketin tam karti |
+| `list_cards(filter)` | Kirici tetiklenmis / not bekleyen / dusuk kapsamali / veri sorunlu / karar yok |
+| `get_portfolio` | Deger, K/Z, dilim agirliklari ve sapmalari, uyarilar, TL basa bas |
+| `get_weekly_review` | Cuma raporu — kac madde eylem gerektiriyor |
+| `get_funnel_status` | Tarama nerede, ELENDI / VERI_YOK ayrimi, yeniden deneme kuyrugu |
+| `get_pulse` | Endeksler, VIX, risk notu, yaklasan kritik tarihler |
+| `list_pending_changes` | Birlestirilmemis degisiklikler + bayat dal uyarisi |
+| `whoami` | GERCEK dogrulama (GET /user + depo izni) |
+
+Her arac YALNIZCA kendi sorusunun cevabini dondurur. Ham dosyalar 100 KB'i
+asiyor ve cogu alan sorulan seyle ilgisiz; ajanin indirip ayiklamasi
+gereksiz.
+
+### Yazma (PR akisi)
+
+| Arac | Not |
+|---|---|
+| `write_analysis` | Analiz metni. SAYISAL ALAN YAZAMAZ |
+| `set_decision` | AL / BEKLE / ELE + gerekce |
+| `set_catalyst_score` | Katalizor puani (elle girilen tek puan) |
+| `add_to_watchlist` | Izleme listesi |
+| `record_position` | STOCK / ETF / **TL_DEPOSIT**, dilim, kademeli alim |
+| `close_position` | **Gerekce zorunlu**: tez_kirici / hedef_fiyat / yeniden_dengeleme / nakit_ihtiyaci / tez_degisti |
+| `set_thesis_breakers` | **Yapilandirilmis** kirici (metric/op/value/consecutive_quarters) |
+| `set_target_price` | Hedef + gerekce (zorunlu) |
+| `report_data_issue` | HAM donem verisi duzeltmesi, kaynak zorunlu |
+| `submit_for_review` | Tek PR acar |
+| `trigger_bootstrap` | Tek sembol icin karti yeniden uretir — **PR akisi disinda** |
+
+Iki tasarim notu:
+
+**Sayisal alan yasagi metriklere ve puanlara aittir**, pozisyon verisine
+degil. Bir kiricinin esik degeri bir TERCIHTIR, olculen bir buyukluk
+degil; hisse adedi ve mevduat anaparasi da oyle. Yasagin amaci, hesaplanan
+bir sayinin elle ezilip girdiyle ciktinin celismesini onlemek.
+
+**`set_thesis_breakers` yapilandirilmis bicim ister** cunku serbest metin
+bir kirici ("rakip pazar payi alirsa") makine tarafindan degerlendirilemez
+ve o yuzden hicbir zaman tetiklenmez. Yapilandirilmis bicimde gunluk kosu
+kart verisine bakip kendiliginden karar verir. Seri yoksa TETIKLEMEZ ve
+"veri_yok" der — yari bilgiyle alarm calmak, bir sure sonra tum alarmlarin
+gormezden gelinmesini ogretir.
+
+**`trigger_bootstrap` PR akisinin disindadir** ve bunu ciktisinda acikca
+soyler: is akisi biter bitmez kart main'e yazilir. Veri duzeltmesi
+birlestirildikten sonra ya da bilanco sonrasi kullanilir.

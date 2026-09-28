@@ -1,22 +1,27 @@
 {
   "analyst": {
     "analyst_count": 9,
-    "as_of": "2026-09-09",
     "buy": 10,
     "hold": 0,
-    "recommendation": "none",
+    "recommendation": "strong_buy",
     "sell": 0,
     "source": "yfinance",
     "target_high": 36.0,
     "target_low": 29.0,
     "target_median": 32.0,
-    "upside_to_median": 45.9188326493388
+    "upside_to_median": 49.81272980157145
   },
-  "as_of": "2026-09-11",
+  "as_of": "2026-09-26",
   "calendar": {
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-11-04"
   },
-  "change_1d_pct": -8.89,
+  "capped_for_scoring": {
+    "cash_conversion": {
+      "raw": 5.9783,
+      "used": 5.0
+    }
+  },
   "data_quality": {
     "issue_count": 1,
     "issues": [
@@ -42,7 +47,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 3968.8,
+  "enterprise_value_musd": 3848.2,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -66,24 +71,26 @@
     ],
     "warnings": [
       "Net kar EBIT'e gore asiri yuksek veya vergi orani negatif — F/K tek seferlik kalemle sismis olabilir.",
+      "BORC EKSIK OLABILIR: 10.3 mn $ faiz, 3.0 mn $ borca %339 faiz orani ima ediyor. Bir borc kalemi okunamamis olabilir.",
       "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (operating_income, net_income). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
     ],
     "would_fail_at": 1,
-    "z_unreliable": false
+    "z_unreliable": false,
+    "z_unreliable_reason": null
   },
-  "generated_at": "2026-09-10T12:54:37+00:00",
+  "generated_at": "2026-09-26T23:02:26+00:00",
   "insider": {
     "form4_count": 52,
-    "last_form4": "2026-09-04",
+    "last_form4": "2026-09-10",
     "window_days": 180
   },
-  "market_cap_musd": 4642.2,
+  "market_cap_musd": 4521.6,
   "metrics": {
     "altman_z": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 87.9,
+      "pct_basis": "sector",
+      "sector_pct": 72.7,
       "value": 9.53
     },
     "beneish_m": {
@@ -96,23 +103,23 @@
     "cash_conversion": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 98.3,
+      "pct_basis": "sector",
+      "sector_pct": 100.0,
       "value": 5.98
     },
     "current_ratio": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 87.5,
+      "pct_basis": "sector",
+      "sector_pct": 91.7,
       "value": 3.18
     },
     "earnings_yield": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 24.3,
-      "value": 1.953
+      "pct_basis": "sector",
+      "sector_pct": 16.7,
+      "value": 2.01
     },
     "ebitda_margin": {
       "color": "gray",
@@ -124,16 +131,16 @@
     "ev_ebit": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 85.5,
-      "value": 51.211
+      "pct_basis": "sector",
+      "sector_pct": 83.3,
+      "value": 49.67
     },
     "ev_ebitda": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 82.3,
-      "value": 38.42
+      "pct_basis": "sector",
+      "sector_pct": 91.7,
+      "value": 37.26
     },
     "ev_gross_profit": {
       "color": "gray",
@@ -144,16 +151,16 @@
     },
     "ev_sales": {
       "color": "green",
-      "own_5y_pct": 58.3,
-      "pct_basis": "universe",
-      "sector_pct": 23.6,
-      "value": 2.193
+      "own_5y_pct": 25.0,
+      "pct_basis": "sector",
+      "sector_pct": 0.0,
+      "value": 2.13
     },
     "fcf_margin": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 50.0,
+      "pct_basis": "sector",
+      "sector_pct": 75.0,
       "value": 21.44
     },
     "fcf_margin_change_3y": {
@@ -165,17 +172,17 @@
     },
     "fcf_yield_ev": {
       "color": "green",
-      "own_5y_pct": 40.0,
-      "pct_basis": "universe",
-      "sector_pct": 72.9,
-      "value": 9.776
+      "own_5y_pct": 60.0,
+      "pct_basis": "sector",
+      "sector_pct": 91.7,
+      "value": 10.08
     },
     "fcf_yield_mcap": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 78.6,
-      "value": 8.358
+      "pct_basis": "sector",
+      "sector_pct": 91.7,
+      "value": 8.58
     },
     "gross_margin": {
       "color": "gray",
@@ -203,7 +210,7 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -0.5
+      "value": -2.43
     },
     "implied_vs_actual_growth": {
       "color": "gray",
@@ -213,11 +220,11 @@
       "value": null
     },
     "interest_coverage": {
-      "color": "gray",
+      "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "none",
-      "sector_pct": null,
-      "value": null
+      "pct_basis": "sector",
+      "sector_pct": 25.0,
+      "value": 7.56
     },
     "maturity_wall_2y": {
       "color": "gray",
@@ -236,15 +243,15 @@
     "net_debt_to_ebitda": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 12.9,
+      "pct_basis": "sector",
+      "sector_pct": 0.0,
       "value": -6.52
     },
     "operating_margin": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 21.4,
+      "pct_basis": "sector",
+      "sector_pct": 8.3,
       "value": 4.28
     },
     "operating_margin_change_3y": {
@@ -257,85 +264,85 @@
     "pct_off_52w_high": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 26.4,
-      "value": 20.194
+      "pct_basis": "sector",
+      "sector_pct": 66.7,
+      "value": 22.27
     },
     "pe": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 88.7,
-      "value": 68.369
+      "pct_basis": "sector",
+      "sector_pct": 83.3,
+      "value": 66.56
     },
     "peg": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 3.15
+      "value": 2.8
     },
     "piotroski_f": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 34.7,
+      "pct_basis": "sector",
+      "sector_pct": 8.3,
       "value": 5.0
     },
     "rel_strength_12m": {
-      "color": "yellow",
+      "color": "green",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -13.784
+      "value": 6.23
     },
     "rel_strength_6m": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 73.6,
-      "value": 12.532
+      "pct_basis": "sector",
+      "sector_pct": 66.7,
+      "value": 3.83
     },
     "return_12m": {
-      "color": "yellow",
+      "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 68.1,
-      "value": 8.296
+      "pct_basis": "sector",
+      "sector_pct": 91.7,
+      "value": 31.12
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 73.6,
-      "value": 29.152
+      "pct_basis": "sector",
+      "sector_pct": 66.7,
+      "value": 33.58
     },
     "rev_cagr_3y": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 92.9,
+      "pct_basis": "sector",
+      "sector_pct": 83.3,
       "value": 35.76
     },
     "rev_growth_ttm": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 62.5,
+      "pct_basis": "sector",
+      "sector_pct": 83.3,
       "value": 23.79
     },
     "roic": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 37.9,
+      "pct_basis": "sector",
+      "sector_pct": 33.3,
       "value": 13.15
     },
     "rule_of_40": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 61.4,
+      "pct_basis": "sector",
+      "sector_pct": 83.3,
       "value": 45.23
     },
     "rule_of_40_ebitda": {
@@ -355,91 +362,97 @@
     "sbc_to_fcf": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 50.0,
+      "pct_basis": "sector",
+      "sector_pct": 66.7,
       "value": 0.37
     },
     "sbc_to_revenue": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 51.4,
+      "pct_basis": "sector",
+      "sector_pct": 75.0,
       "value": 7.92
     },
     "share_count_change_1y": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 90.0,
+      "pct_basis": "sector",
+      "sector_pct": 100.0,
       "value": 11.78
     },
     "sloan_accruals": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 15.7,
+      "pct_basis": "sector",
+      "sector_pct": 0.0,
       "value": -0.18
     }
   },
   "name": "Remitly Global, Inc.",
-  "net_debt_musd": -673.4,
+  "net_debt_musd": -673.37,
   "news": [
     {
-      "date": "2026-09-10",
-      "headline": "Remitly Global, Inc. (RELY) Presents at Goldman Sachs Communacopia + Technology Conference 2026 Transcript",
-      "source": "SeekingAlpha",
-      "url": "https://finnhub.io/api/news?id=71182539b88a687abed70b245965823f1842ca200a2ddb9f2b559ab8820fe503"
+      "date": "2026-09-26",
+      "headline": "Remitly Global Doesn't Pay a Dividend and Constantly Dilutes Shareholders. Here's Why I'd Still Buy and Hold It Forever.",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=35c589438cca76a20a09151846eced9737fec0284f813241f76c383caa8f47ed"
     },
     {
-      "date": "2026-09-09",
-      "headline": "Remitly Chief Business Officer Sells 21,000 Shares for $554,000",
+      "date": "2026-09-25",
+      "headline": "FIS Modernizes Retirement Recordkeeping With Cloud-Native Platform",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=8cbbdecb2ea41300fe3440d6e0dc5b065d9911638e981df8ec50da2074d7be84"
+      "url": "https://finnhub.io/api/news?id=00ed452c6c1c3ed62527194c16bf57e0f07223b9ea42dee216d9a0ccbdb970e4"
     },
     {
-      "date": "2026-09-09",
-      "headline": "Remitly partners with Etsy to give sellers more choice in how they get paid globally",
+      "date": "2026-09-24",
+      "headline": "Remitly Stock Is Down From Its Highs, Can It Deliver Better Returns By 2028?",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=64684e2cf4644d97fcaea2bfe86cd7bb7fd485d9f727e0232b8292fbb005d5fe"
+      "url": "https://finnhub.io/api/news?id=036788626cb0dc1f23081198a754d70eb52590d581269d0c1fc359cb88bab290"
     },
     {
-      "date": "2026-09-04",
-      "headline": "Consumer Pressure Rises, but So Does Demand for Affirm's Services",
+      "date": "2026-09-24",
+      "headline": "2 Volatile Stocks for Long-Term Investors and 1 Facing Challenges",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=4c8cddc64fec5f5f3938e334c534fa3dfd8798ff8bdd5d9c6a47b1f41c56e0dd"
+      "url": "https://finnhub.io/api/news?id=d0e0dd270cd591f7f93bf3428476388c3beb9084121587e5bf96531167ed2402"
     },
     {
-      "date": "2026-09-04",
-      "headline": "Remitly’s (RELY) Record Growth Meets One-Time Tax Boosts And Take-Rate Questions",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=c15ff793f0b47a386566176ce751f321e007909ee715545d4fddc8b78bd9efda"
+      "date": "2026-09-23",
+      "headline": "Shares of fintech and financial services companies are trading lower amid elevated bond yields and Fed interest rate expectations, which may dampen enthusiasm for the growth-oriented sector.",
+      "source": "Benzinga",
+      "url": "https://finnhub.io/api/news?id=5a2d147c8ac559e9409f3856d7b5b28407ebce679bd1c9666cd85c0f1c43f167"
     },
     {
-      "date": "2026-09-04",
-      "headline": "2 Cash-Producing Stocks to Target This Week and 1 We Ignore",
+      "date": "2026-09-23",
+      "headline": "Buy 3 Mobile Payment Stocks to Tap Solid Short-Term Upside Potential",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=673e9395b38ea023144c870e9e59eeb795cc202c6aaf8d0a2cd35a6e7a6a19cf"
+      "url": "https://finnhub.io/api/news?id=3c216626f8fed68d827970a5d5ddbd3882fe99d750867acbb93ca779b27cc366"
     },
     {
-      "date": "2026-09-04",
-      "headline": "New Strong Buy Stocks for September 4th",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=e3cf598313f7a275d78eeda24a7593a62e591c8b7e3fb95e67bcc958cbed1553"
+      "date": "2026-09-22",
+      "headline": "Remitly Global Inc (NASDAQ:RELY) Screens for High Growth as Earnings Revisions and Cash Flow Strengthen",
+      "source": "ChartMill",
+      "url": "https://finnhub.io/api/news?id=57b3c4ab9d9cea70385cfe6ab65b5724e15347730bed55e8a3a54e179cf1c409"
     },
     {
-      "date": "2026-09-03",
-      "headline": "Remitly (RELY) Stock May Be Overvalued With Little Room For Error",
+      "date": "2026-09-21",
+      "headline": "1 of Wall Street’s Favorite Stocks to Own for Decades and 2 We Ignore",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=025c14f132b7c5500d713be1fac79b3adcbe1405e81ec62123705dd43081997e"
+      "url": "https://finnhub.io/api/news?id=43e47f8f3be2eea492ac5716671ae053cf4069f86bcd7f3a8e2659fd42c65e64"
     }
   ],
-  "price": 21.93,
+  "overrides": [],
+  "percentile_pool": {
+    "sector": 12,
+    "universe": 354
+  },
+  "price": 21.36,
+  "price_as_of": "2026-09-25",
   "reverse_dcf": {
     "actual_growth_pct": 35.76,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 3968.8,
+    "enterprise_value_musd": 3848.2,
     "fcf_ttm_musd": 388.0,
-    "implied_growth_pct": -0.5,
+    "implied_growth_pct": -2.43,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -451,18 +464,18 @@
           "percentile": null
         },
         "cash_conversion": {
-          "percentile": 98.3,
-          "scaled": 98.3,
+          "percentile": 100.0,
+          "scaled": 100.0,
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 34.7,
-          "scaled": 34.7,
+          "percentile": 8.3,
+          "scaled": 8.3,
           "weight": 0.25
         },
         "sloan_accruals": {
-          "percentile": 15.7,
-          "scaled": 84.3,
+          "percentile": 0.0,
+          "scaled": 100.0,
           "weight": 0.25
         }
       },
@@ -472,13 +485,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 68.1,
-          "scaled": 68.1,
+          "percentile": 25.0,
+          "scaled": 25.0,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 73.6,
-          "scaled": 73.6,
+          "percentile": 66.7,
+          "scaled": 66.7,
           "weight": 0.4
         }
       },
@@ -488,8 +501,8 @@
     "quality": {
       "components": {
         "fcf_margin": {
-          "percentile": 50.0,
-          "scaled": 50.0,
+          "percentile": 75.0,
+          "scaled": 75.0,
           "weight": 0.15
         },
         "gross_margin": {
@@ -501,13 +514,13 @@
           "percentile": null
         },
         "roic": {
-          "percentile": 37.9,
-          "scaled": 37.9,
+          "percentile": 33.3,
+          "scaled": 33.3,
           "weight": 0.3
         },
         "rule_of_40": {
-          "percentile": 61.4,
-          "scaled": 61.4,
+          "percentile": 83.3,
+          "scaled": 83.3,
           "weight": 0.15
         }
       },
@@ -517,38 +530,39 @@
     "safety": {
       "components": {
         "altman_z": {
-          "percentile": 87.9,
-          "scaled": 87.9,
+          "percentile": 72.7,
+          "scaled": 72.7,
           "weight": 0.3
         },
         "current_ratio": {
-          "percentile": 87.5,
-          "scaled": 87.5,
+          "percentile": 91.7,
+          "scaled": 91.7,
           "weight": 0.2
         },
         "interest_coverage": {
-          "contribution": null,
-          "percentile": null
+          "percentile": 25.0,
+          "scaled": 25.0,
+          "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 12.9,
-          "scaled": 87.1,
+          "percentile": 0.0,
+          "scaled": 100.0,
           "weight": 0.3
         }
       },
-      "coverage": 0.8,
+      "coverage": 1.0,
       "low_coverage": false
     },
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 24.3,
-          "scaled": 24.3,
+          "percentile": 16.7,
+          "scaled": 16.7,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 85.5,
-          "scaled": 14.5,
+          "percentile": 83.3,
+          "scaled": 16.7,
           "weight": 0.3
         },
         "ev_gross_profit": {
@@ -556,13 +570,13 @@
           "percentile": null
         },
         "ev_sales": {
-          "percentile": 23.6,
-          "scaled": 76.4,
+          "percentile": 0.0,
+          "scaled": 100.0,
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 72.9,
-          "scaled": 72.9,
+          "percentile": 91.7,
+          "scaled": 91.7,
           "weight": 0.25
         }
       },
@@ -612,16 +626,16 @@
       "earnings_quality": 0.8,
       "momentum": 1.0,
       "quality": 0.6,
-      "safety": 0.8,
+      "safety": 1.0,
       "value": 0.8
     },
-    "earnings_quality": 74.0,
-    "momentum": 70.3,
-    "quality": 46.8,
-    "safety": 87.5,
-    "total": 54.5,
-    "value": 45.6,
-    "weight_coverage": 0.82
+    "earnings_quality": 71.4,
+    "momentum": 41.7,
+    "quality": 56.2,
+    "safety": 75.2,
+    "total": 55.2,
+    "value": 55.7,
+    "weight_coverage": 0.85
   },
   "sector": "Diger is hizmetleri",
   "series": {
@@ -669,66 +683,66 @@
       "2026-06-30"
     ],
     "price_sparkline": [
-      15.53,
-      15.255,
-      15.53,
-      15.35,
-      16.16,
-      15.99,
-      15.32,
-      15.75,
-      16.21,
-      16.67,
-      17.31,
-      18.86,
-      20.01,
-      20.8,
-      20.46,
-      21.26,
+      15.01,
+      15.67,
+      16.02,
+      16.02,
+      17.1,
+      17.92,
+      19.63,
+      20.64,
+      20.94,
+      21.08,
+      21.61,
       21.89,
+      23.78,
       22.79,
-      23.74,
-      22.79,
-      23.86,
-      23.31,
-      21.44,
-      21.58,
-      21.58,
-      20.12,
-      20.02,
-      20.07,
+      24.28,
+      23.75,
+      22.59,
+      20.87,
+      21.57,
+      20.39,
+      20.0,
+      21.03,
       19.81,
       18.45,
-      18.79,
-      19.63,
-      20.43,
-      20.66,
-      21.45,
-      22.37,
+      18.04,
+      19.08,
+      20.36,
+      21.1,
+      20.4,
+      21.74,
       22.41,
       23.75,
       24.13,
       23.56,
-      23.52,
-      25.23,
-      23.86,
-      23.11,
+      23.68,
+      24.96,
+      24.13,
+      23.83,
       22.53,
       23.33,
       23.45,
       23.98,
       24.07,
       24.42,
-      24.23,
+      23.61,
+      25.62,
       26.3,
-      25.44,
       24.71,
       26.59,
       25.75,
       26.55,
       25.71,
       26.92,
-      24.83
+      24.83,
+      21.93,
+      21.83,
+      21.73,
+      21.59,
+      20.19,
+      21.36
     ],
     "quarters": [
       "2023-09",
@@ -814,7 +828,7 @@
     "why_cheap_diagnosis": "RE-RATED (kâr dönüşü oynandı)",
     "why_cheap_rationale": "Trailing F/K 150x+'tan ~18,5x'e (kâr inflection); 52h zirvesine yakın, ATH'den %46 aşağı. %1 havale vergisi (1 Oca 2026) yalnızca nakit fonlu transferlere — Remitly dijital modeli MUAF, net pozitif (rekor müşteri kazanımı)."
   },
-  "story_age_days": 18,
+  "story_age_days": 16,
   "ticker": "RELY",
   "track": "both",
   "ttm": {

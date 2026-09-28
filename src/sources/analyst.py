@@ -23,7 +23,14 @@ EMPTY = {
 
 
 def consensus(ticker: str, price: float | None = None, *,
-              max_age_hours: int = 72) -> dict:
+              max_age_hours: int = 72) -> dict | None:
+    """Analist konsensusu. Kaynak cevap vermezse None doner (bos sozluk DEGIL).
+
+    Bu ayrim onemli: cagiran taraf ``if analyst:`` ile koruyor ama bos bir
+    sozluk truthy oldugu icin o korumadan geciyordu. Sonuc, gecici bir
+    yfinance kesintisinde kartlardaki analist hedeflerinin sessizce
+    silinmesiydi.
+    """
     path = CACHE_DIR / f"{ticker.upper()}.json"
     if path.exists():
         age = datetime.now() - datetime.fromtimestamp(path.stat().st_mtime)
@@ -36,8 +43,12 @@ def consensus(ticker: str, price: float | None = None, *,
         import yfinance as yf
         info = yf.Ticker(ticker).info or {}
     except Exception as exc:  # noqa: BLE001
+        # BOS SOZLUK DEGIL None. Bos sozluk truthy oldugu icin cagirandaki
+        # "if analyst:" korumasini gecip kartta YAZILI OLAN analist
+        # verisini null'larla eziyordu. Kaynak cokunce elimizdekini
+        # silmek, veriyi kaybetmenin en sessiz yolu.
         print(f"  [uyari] analist {ticker}: {exc}")
-        return dict(EMPTY)
+        return None
 
     out = {
         # al/tut/sat dagilimi asagida ayri tablodan gelir; burada bos birakilir

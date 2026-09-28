@@ -1,0 +1,821 @@
+{
+  "analyst": {
+    "analyst_count": 14,
+    "buy": 13,
+    "hold": 2,
+    "recommendation": "strong_buy",
+    "sell": 0,
+    "source": "yfinance",
+    "target_high": 120.0,
+    "target_low": 90.0,
+    "target_median": 110.5,
+    "upside_to_median": 27.289482778481734
+  },
+  "as_of": "2026-09-25",
+  "calendar": {
+    "estimated": true,
+    "next_earnings": "2026-10-29"
+  },
+  "change_1d_pct": 0.34,
+  "data_quality": {
+    "issue_count": 0,
+    "issues": [],
+    "status": "iyi"
+  },
+  "data_sources": {
+    "analyst": "yfinance",
+    "fundamentals": "sec_companyfacts",
+    "news": "finnhub",
+    "period_end": "2026-06-28",
+    "price": "yfinance",
+    "shares": "kapak_sayfasi"
+  },
+  "decision": {
+    "action": "",
+    "author": "berke",
+    "date": "",
+    "rationale": ""
+  },
+  "enterprise_value_musd": 14901.8,
+  "exchange": "Nasdaq",
+  "flags": {
+    "annual_fallback_fields": [
+      "cfo",
+      "capex",
+      "cfi",
+      "shares_diluted",
+      "shares_basic"
+    ],
+    "data_basis": "mixed",
+    "is_manual": false,
+    "kill_reason": null,
+    "one_off_earnings": false,
+    "passed_stages": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "rev_growth_organic_suspect": false,
+    "roic_method": "a",
+    "stage1_missing": [],
+    "warnings": [
+      "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
+    ],
+    "would_fail_at": null,
+    "z_unreliable": false,
+    "z_unreliable_reason": null
+  },
+  "generated_at": "2026-09-17T13:51:07+00:00",
+  "insider": {
+    "form4_count": 29,
+    "last_form4": "2026-09-03",
+    "window_days": 180
+  },
+  "market_cap_musd": 12244.1,
+  "metrics": {
+    "altman_z": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 47.7,
+      "value": 6.84
+    },
+    "beneish_m": {
+      "color": "gray",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": null
+    },
+    "cash_conversion": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 15.5,
+      "value": 1.12
+    },
+    "current_ratio": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 45.8,
+      "value": 1.66
+    },
+    "earnings_yield": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 79.9,
+      "value": 7.79
+    },
+    "ebitda_margin": {
+      "color": "gray",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": 25.91
+    },
+    "ev_ebit": {
+      "color": "yellow",
+      "own_5y_pct": 20.0,
+      "pct_basis": "universe",
+      "sector_pct": 21.8,
+      "value": 12.83
+    },
+    "ev_ebitda": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 28.6,
+      "value": 11.57
+    },
+    "ev_gross_profit": {
+      "color": "green",
+      "own_5y_pct": 75.0,
+      "pct_basis": "universe",
+      "sector_pct": 30.8,
+      "value": 4.14
+    },
+    "ev_sales": {
+      "color": "green",
+      "own_5y_pct": 75.0,
+      "pct_basis": "universe",
+      "sector_pct": 49.4,
+      "value": 3.0
+    },
+    "fcf_margin": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 53.2,
+      "value": 16.69
+    },
+    "fcf_margin_change_3y": {
+      "color": "gray",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": 12.51
+    },
+    "fcf_yield_ev": {
+      "color": "yellow",
+      "own_5y_pct": 25.0,
+      "pct_basis": "universe",
+      "sector_pct": 56.0,
+      "value": 5.57
+    },
+    "fcf_yield_mcap": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 66.8,
+      "value": 6.78
+    },
+    "gross_margin": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 73.0,
+      "value": 72.35
+    },
+    "gross_margin_change_3y": {
+      "color": "gray",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": 5.0
+    },
+    "gross_profitability": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 81.8,
+      "value": 0.6
+    },
+    "implied_growth": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": 5.7
+    },
+    "implied_vs_actual_growth": {
+      "color": "gray",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": null
+    },
+    "interest_coverage": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 25.0,
+      "value": 6.85
+    },
+    "maturity_wall_2y": {
+      "color": "gray",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": null
+    },
+    "net_debt": {
+      "color": "gray",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": 2657.7
+    },
+    "net_debt_to_ebitda": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 87.2,
+      "value": 2.06
+    },
+    "operating_margin": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 80.7,
+      "value": 23.35
+    },
+    "operating_margin_change_3y": {
+      "color": "gray",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": 16.39
+    },
+    "pct_off_52w_high": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 38.8,
+      "value": 18.85
+    },
+    "pe": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 19.5,
+      "value": 15.42
+    },
+    "peg": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": 0.91
+    },
+    "piotroski_f": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 72.6,
+      "value": 7.0
+    },
+    "rel_strength_12m": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": -7.69
+    },
+    "rel_strength_6m": {
+      "color": "red",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 26.3,
+      "value": -32.33
+    },
+    "return_12m": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 61.3,
+      "value": 16.2
+    },
+    "return_6m": {
+      "color": "red",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 28.4,
+      "value": -6.25
+    },
+    "rev_cagr_3y": {
+      "color": "red",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 6.2,
+      "value": -7.06
+    },
+    "rev_growth_ttm": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 68.6,
+      "value": 16.99
+    },
+    "roic": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 71.6,
+      "value": 26.58
+    },
+    "rule_of_40": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 58.1,
+      "value": 33.68
+    },
+    "rule_of_40_ebitda": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": 42.9
+    },
+    "rule_of_40_gap": {
+      "color": "gray",
+      "own_5y_pct": null,
+      "pct_basis": "none",
+      "sector_pct": null,
+      "value": 9.22
+    },
+    "sbc_to_fcf": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 40.0,
+      "value": 0.12
+    },
+    "sbc_to_revenue": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 47.9,
+      "value": 1.92
+    },
+    "share_count_change_1y": {
+      "color": "green",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 59.7,
+      "value": -0.07
+    },
+    "sloan_accruals": {
+      "color": "yellow",
+      "own_5y_pct": null,
+      "pct_basis": "universe",
+      "sector_pct": 75.6,
+      "value": 0.03
+    }
+  },
+  "name": "HASBRO, INC.",
+  "net_debt_musd": 2657.7,
+  "news": [
+    {
+      "date": "2026-09-23",
+      "headline": "Losing to Win: A VC Lens Will Find the Next Nvidia",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=033d5030e561ba69a6c8780a7a0f2737d6fa25de0b9cfb1e719061a616b357c1"
+    },
+    {
+      "date": "2026-09-23",
+      "headline": "Hasbro (HAS) Partners To Develop Playocity In Jeddah",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=bdce0916b5d83c2c911977d38aec1c801d94902f76cc327c85753a12514542bf"
+    },
+    {
+      "date": "2026-09-23",
+      "headline": "McDonald's Takes a Chance by Bringing Back Monopoly: Can It Change Its Fortunes Passing Go or Is the Stock Going to Remain in Jail?",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=5100712975dcc698302e2bc6272467ebec78d85dc0b500bd3dd545d0ffbcc37f"
+    },
+    {
+      "date": "2026-09-18",
+      "headline": "Littlest Pet Shop and LIKE NASTYA, Global YouTube Sensation, Launch First-Ever Collab Collection at Global Retailers and Announce Special Event at Five Below in New York City",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=1c98ba8e2561cc12ce512240126a9a94f53e921caec26a8e7472c69a1151d27e"
+    },
+    {
+      "date": "2026-09-17",
+      "headline": "1 of Wall Street’s Favorite Stocks with Exciting Potential and 2 Facing Headwinds",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=5cc03bb78cec0f444e5f5d380ef5d51ea5a45f7bdc74add4666561e96951169b"
+    },
+    {
+      "date": "2026-09-16",
+      "headline": "Hasbro (HAS) Registers a Bigger Fall Than the Market: Important Facts to Note",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=a5f783e466b705b9629c80ce5fc2eea267d632ea0b04c70a131de788bc7ad939"
+    },
+    {
+      "date": "2026-09-16",
+      "headline": "Billionaire Ray Dalio’s Bridgewater’s 2 Non-AI Stock Picks",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=e2589e0d901daa9c25b03e71d26c66c42cc5ef4204af49d8d521f8f9b5e32235"
+    },
+    {
+      "date": "2026-09-15",
+      "headline": "3-Year-Old With Rare Condition Crowned Toddler of the Year; Campaign Raises $4.5M to Support Toys for Tots®",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=842aeec79041722d21e25a28bf916dceb72743c3b48b6d91d5e48a44853ebff8"
+    }
+  ],
+  "overrides": [],
+  "percentile_pool": {
+    "sector": 3,
+    "universe": 277
+  },
+  "price": 86.81,
+  "price_as_of": "2026-09-24",
+  "reverse_dcf": {
+    "actual_growth_pct": -7.06,
+    "discount_rate": 0.1,
+    "enterprise_value_musd": 14901.8,
+    "fcf_ttm_musd": 829.9,
+    "implied_growth_pct": 5.697783475605055,
+    "projection_years": 10,
+    "terminal_growth": 0.03
+  },
+  "score_detail": {
+    "earnings_quality": {
+      "components": {
+        "beneish_m": {
+          "contribution": null,
+          "percentile": null
+        },
+        "cash_conversion": {
+          "percentile": 15.5,
+          "scaled": 15.5,
+          "weight": 0.3
+        },
+        "piotroski_f": {
+          "percentile": 72.6,
+          "scaled": 72.6,
+          "weight": 0.25
+        },
+        "sloan_accruals": {
+          "percentile": 75.6,
+          "scaled": 24.4,
+          "weight": 0.25
+        }
+      },
+      "coverage": 0.8,
+      "low_coverage": false
+    },
+    "momentum": {
+      "components": {
+        "rel_strength_3m": {
+          "percentile": 48.2,
+          "scaled": 48.2,
+          "weight": 0.6
+        },
+        "rel_strength_6m": {
+          "percentile": 26.3,
+          "scaled": 26.3,
+          "weight": 0.4
+        }
+      },
+      "coverage": 1.0,
+      "low_coverage": false
+    },
+    "quality": {
+      "components": {
+        "fcf_margin": {
+          "percentile": 53.2,
+          "scaled": 53.2,
+          "weight": 0.15
+        },
+        "gross_margin": {
+          "percentile": 73.0,
+          "scaled": 73.0,
+          "weight": 0.2
+        },
+        "gross_profitability": {
+          "percentile": 81.8,
+          "scaled": 81.8,
+          "weight": 0.2
+        },
+        "roic": {
+          "percentile": 71.6,
+          "scaled": 71.6,
+          "weight": 0.3
+        },
+        "rule_of_40": {
+          "percentile": 58.1,
+          "scaled": 58.1,
+          "weight": 0.15
+        }
+      },
+      "coverage": 1.0,
+      "low_coverage": false
+    },
+    "safety": {
+      "components": {
+        "altman_z": {
+          "percentile": 47.7,
+          "scaled": 47.7,
+          "weight": 0.3
+        },
+        "current_ratio": {
+          "percentile": 45.8,
+          "scaled": 45.8,
+          "weight": 0.2
+        },
+        "interest_coverage": {
+          "percentile": 25.0,
+          "scaled": 25.0,
+          "weight": 0.2
+        },
+        "net_debt_to_ebitda": {
+          "percentile": 87.2,
+          "scaled": 12.8,
+          "weight": 0.3
+        }
+      },
+      "coverage": 1.0,
+      "low_coverage": false
+    },
+    "value": {
+      "components": {
+        "earnings_yield": {
+          "percentile": 79.9,
+          "scaled": 79.9,
+          "weight": 0.1
+        },
+        "ev_ebit": {
+          "percentile": 21.8,
+          "scaled": 78.2,
+          "weight": 0.3
+        },
+        "ev_gross_profit": {
+          "percentile": 30.8,
+          "scaled": 69.2,
+          "weight": 0.2
+        },
+        "ev_sales": {
+          "percentile": 49.4,
+          "scaled": 50.6,
+          "weight": 0.15
+        },
+        "fcf_yield_ev": {
+          "percentile": 56.0,
+          "scaled": 56.0,
+          "weight": 0.25
+        }
+      },
+      "coverage": 1.0,
+      "low_coverage": false
+    }
+  },
+  "score_internals": {
+    "altman": {
+      "components": {
+        "A": 0.18788511230371696,
+        "B": 0.2837242430265686,
+        "C": 0.19237394818790168,
+        "D": 0.13761329589779345
+      },
+      "reason": null,
+      "unreliable": false,
+      "z": 6.84471426149438
+    },
+    "beneish": {
+      "m": null,
+      "missing": [
+        "AQI",
+        "DEPI"
+      ]
+    },
+    "piotroski": {
+      "max_possible": 9,
+      "score": 7,
+      "tests": {
+        "accruals": true,
+        "cfo_positive": true,
+        "leverage_down": true,
+        "liquidity_up": false,
+        "margin_up": false,
+        "no_dilution": true,
+        "roa_improving": true,
+        "roa_positive": true,
+        "turnover_up": true
+      }
+    },
+    "solvency_fallback": null
+  },
+  "scores": {
+    "catalyst": null,
+    "coverage_factors": {
+      "earnings_quality": 0.8,
+      "momentum": 1.0,
+      "quality": 1.0,
+      "safety": 1.0,
+      "value": 1.0
+    },
+    "earnings_quality": 36.1,
+    "momentum": 39.4,
+    "quality": 69.1,
+    "safety": 32.3,
+    "total": 55.1,
+    "value": 66.9,
+    "weight_coverage": 0.73
+  },
+  "sector": "Cesitli imalat",
+  "series": {
+    "basis": "quarterly",
+    "fcf": [
+      null,
+      365.8,
+      155.70000000000002,
+      159.9,
+      204.1,
+      240.5,
+      124.3,
+      55.199999999999996,
+      null,
+      389.5,
+      315.5,
+      247.7
+    ],
+    "gross_margin": [
+      67.11,
+      55.47,
+      73.04,
+      76.12,
+      70.43,
+      67.44,
+      76.95,
+      77.03,
+      70.14,
+      68.73,
+      76.39,
+      76.1
+    ],
+    "period_ends": [
+      "2023-10-01",
+      "2023-12-31",
+      "2024-03-31",
+      "2024-06-30",
+      "2024-09-29",
+      "2024-12-29",
+      "2025-03-30",
+      "2025-06-29",
+      "2025-09-28",
+      "2025-12-28",
+      "2026-03-29",
+      "2026-06-28"
+    ],
+    "price_sparkline": [
+      92.19,
+      88.59,
+      93.6,
+      90.16,
+      89.4,
+      91.73,
+      92.75,
+      93.35,
+      95.38,
+      90.61,
+      95.08,
+      95.54,
+      95.84,
+      94.76,
+      97.39,
+      95.19,
+      94.01,
+      95.25,
+      97.18,
+      90.08,
+      87.99,
+      86.38,
+      83.88,
+      84.47,
+      83.54,
+      82.29,
+      83.9,
+      84.96,
+      84.74,
+      82.87,
+      85.33,
+      82.59,
+      80.15,
+      76.73,
+      77.39,
+      79.53,
+      80.51,
+      81.55,
+      89.04,
+      88.79,
+      96.34,
+      94.53,
+      91.47,
+      91.16,
+      93.52,
+      97.04,
+      96.7,
+      93.99,
+      93.56,
+      95.41,
+      96.29,
+      94.23,
+      93.2,
+      93.0,
+      90.31,
+      91.54,
+      90.21,
+      88.76,
+      87.72,
+      86.81
+    ],
+    "quarters": [
+      "2023-10",
+      "2023-12",
+      "2024-03",
+      "2024-06",
+      "2024-09",
+      "2024-12",
+      "2025-03",
+      "2025-06",
+      "2025-09",
+      "2025-12",
+      "2026-03",
+      "2026-06"
+    ],
+    "revenue": [
+      1503.4,
+      1288.9,
+      757.3,
+      995.3,
+      1281.3,
+      1101.6,
+      887.1,
+      980.8,
+      1387.5,
+      1445.9,
+      1000.2,
+      1139.6
+    ],
+    "share_count": [
+      138.8,
+      null,
+      139.3,
+      140.0,
+      140.5,
+      null,
+      141.0,
+      140.3,
+      142.2,
+      null,
+      143.2,
+      143.1
+    ]
+  },
+  "shares_outstanding_m": 141.0445,
+  "short_interest": {
+    "avg_daily_volume": null,
+    "date": null,
+    "days_to_cover": null,
+    "short_interest": null
+  },
+  "sic": 3944,
+  "source": "funnel",
+  "story": {
+    "analyst_narrative": "",
+    "author": "claude",
+    "bear_case": [],
+    "bull_case": [],
+    "business_model": "",
+    "catalyst": {
+      "confidence": "",
+      "expected_date": "",
+      "type": ""
+    },
+    "claude_verdict": "",
+    "moat": "",
+    "news_summary": "",
+    "thesis_breakers": [],
+    "updated_at": "",
+    "why_cheap_diagnosis": "",
+    "why_cheap_rationale": ""
+  },
+  "story_age_days": null,
+  "ticker": "HAS",
+  "track": "A",
+  "ttm": {
+    "ebit_musd": 1161.4,
+    "ebitda_musd": 1288.5,
+    "fcf_musd": 829.9,
+    "gross_profit_musd": 3598.3,
+    "net_income_musd": 794.1,
+    "period_end": "2026-06-28",
+    "revenue_musd": 4973.2
+  }
+}

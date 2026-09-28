@@ -1,22 +1,23 @@
 {
   "analyst": {
     "analyst_count": 20,
-    "as_of": "2026-09-09",
+    "as_of": "2026-09-24",
     "buy": 21,
     "hold": 0,
-    "recommendation": "strong_buy",
+    "recommendation": "none",
     "sell": 0,
     "source": "yfinance",
     "target_high": 50.0,
-    "target_low": 27.0,
-    "target_median": 35.5,
-    "upside_to_median": 46.331409727947225
+    "target_low": 30.0,
+    "target_median": 36.0,
+    "upside_to_median": 47.72260467896005
   },
-  "as_of": "2026-09-11",
+  "as_of": "2026-09-26",
   "calendar": {
+    "estimated": false,
     "next_earnings": "2026-12-07"
   },
-  "change_1d_pct": 2.28,
+  "capped_for_scoring": {},
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -36,7 +37,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 2589.3,
+  "enterprise_value_musd": 2601.3,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -61,31 +62,33 @@
       "8 Eylul 2026'da %11 dustu. Taze sok; son kazanc raporu ve haber akisi one cikarilmali.",
       "Net kar EBIT'e gore asiri yuksek veya vergi orani negatif — F/K tek seferlik kalemle sismis olabilir.",
       "Buyume satin alma kaynakli olabilir; serefiye artisi ve 8-K devralma duyurulari kontrol edilmeli.",
+      "Ertelenmis gelir kisa vadeli yukumlulugun buyuk kismi ve sirket net nakit pozisyonunda — Z'' abonelik modelinde yaniltici. Faiz karsilama ve FCF/borc ile degerlendir.",
       "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
     ],
     "would_fail_at": 1,
-    "z_unreliable": false
+    "z_unreliable": true,
+    "z_unreliable_reason": "Ertelenmis gelir kisa vadeli yukumlulugun buyuk kismi ve sirket net nakit pozisyonunda — Z'' abonelik modelinde yaniltici. Faiz karsilama ve FCF/borc ile degerlendir."
   },
-  "generated_at": "2026-09-10T12:54:07+00:00",
+  "generated_at": "2026-09-26T23:01:21+00:00",
   "insider": {
-    "form4_count": 40,
+    "form4_count": 33,
     "last_form4": "2026-08-28",
     "window_days": 180
   },
-  "market_cap_musd": 2756.1,
+  "market_cap_musd": 2768.1,
   "metrics": {
     "altman_z": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 20.8,
+      "sector_pct": 13.2,
       "value": 2.27
     },
     "beneish_m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 29.2,
+      "sector_pct": 22.0,
       "value": -3.05
     },
     "cash_conversion": {
@@ -99,15 +102,15 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 43.3,
+      "sector_pct": 40.4,
       "value": 1.27
     },
     "earnings_yield": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 3.6,
-      "value": -4.302
+      "sector_pct": 3.5,
+      "value": -4.28
     },
     "ebitda_margin": {
       "color": "gray",
@@ -134,21 +137,21 @@
       "color": "green",
       "own_5y_pct": 16.7,
       "pct_basis": "sector",
-      "sector_pct": 32.1,
-      "value": 4.681
+      "sector_pct": 33.9,
+      "value": 4.7
     },
     "ev_sales": {
       "color": "green",
-      "own_5y_pct": 8.3,
+      "own_5y_pct": 16.7,
       "pct_basis": "sector",
-      "sector_pct": 23.3,
-      "value": 3.104
+      "sector_pct": 28.1,
+      "value": 3.12
     },
     "fcf_margin": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 10.0,
+      "sector_pct": 0.0,
       "value": 7.41
     },
     "fcf_margin_change_3y": {
@@ -162,21 +165,21 @@
       "color": "red",
       "own_5y_pct": 100.0,
       "pct_basis": "sector",
-      "sector_pct": 16.7,
-      "value": 2.391
+      "sector_pct": 3.5,
+      "value": 2.38
     },
     "fcf_yield_mcap": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 16.7,
-      "value": 2.246
+      "sector_pct": 3.5,
+      "value": 2.23
     },
     "gross_margin": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 25.0,
+      "sector_pct": 33.9,
       "value": 66.3
     },
     "gross_margin_change_3y": {
@@ -190,7 +193,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 39.3,
+      "sector_pct": 62.5,
       "value": 0.49
     },
     "implied_growth": {
@@ -198,20 +201,20 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 16.78
+      "value": 17.17
     },
     "implied_vs_actual_growth": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 0.61
+      "value": 0.62
     },
     "interest_coverage": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 65.4,
+      "sector_pct": 81.8,
       "value": 100.0
     },
     "maturity_wall_2y": {
@@ -232,14 +235,14 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 82.1,
+      "sector_pct": 67.9,
       "value": 0.0
     },
     "operating_margin": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 3.6,
+      "sector_pct": 3.5,
       "value": -13.36
     },
     "operating_margin_change_3y": {
@@ -253,8 +256,8 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 76.7,
-      "value": 34.993
+      "sector_pct": 64.9,
+      "value": 34.71
     },
     "pe": {
       "color": "gray",
@@ -274,7 +277,7 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 16.7,
+      "sector_pct": 10.5,
       "value": 4.0
     },
     "rel_strength_12m": {
@@ -282,55 +285,55 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -44.581
+      "value": -49.05
     },
     "rel_strength_6m": {
-      "color": "green",
+      "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 56.7,
-      "value": 12.175
+      "sector_pct": 26.8,
+      "value": -25.2
     },
     "return_12m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 23.3,
-      "value": -22.501
+      "sector_pct": 33.9,
+      "value": -24.15
     },
     "return_6m": {
-      "color": "green",
+      "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 56.7,
-      "value": 28.795
+      "sector_pct": 26.8,
+      "value": 4.55
     },
     "rev_cagr_3y": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 70.0,
+      "sector_pct": 94.6,
       "value": 27.59
     },
     "rev_growth_ttm": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 70.0,
+      "sector_pct": 94.6,
       "value": 27.44
     },
     "roic": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 3.8,
+      "sector_pct": 7.5,
       "value": -19.79
     },
     "rule_of_40": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 16.7,
+      "sector_pct": 26.8,
       "value": 34.85
     },
     "rule_of_40_ebitda": {
@@ -351,90 +354,96 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 83.3,
+      "sector_pct": 100.0,
       "value": 2.38
     },
     "sbc_to_revenue": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 76.7,
+      "sector_pct": 91.2,
       "value": 17.63
     },
     "share_count_change_1y": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 46.4,
+      "sector_pct": 94.4,
       "value": 5.59
     },
     "sloan_accruals": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 23.3,
+      "sector_pct": 21.8,
       "value": -0.19
     }
   },
   "name": "Braze, Inc.",
-  "net_debt_musd": -166.8,
+  "net_debt_musd": -166.77,
   "news": [
     {
-      "date": "2026-09-10",
-      "headline": "Braze, Inc. (BRZE) Presents at Citi's 2026 Global TMT Conference Transcript",
-      "source": "SeekingAlpha",
-      "url": "https://finnhub.io/api/news?id=e321c176375e90543f73732a95da2eb936899c0fd89fe80a464159551212ec35"
-    },
-    {
-      "date": "2026-09-09",
-      "headline": "Braze (BRZE) Q2 2027 Earnings Call Transcript",
+      "date": "2026-09-25",
+      "headline": "Braze (BRZE) Following OfferFit Deal Talk And A Fair Value Gap",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=ab860f8fd6747785871c0657027b540a3c924677a0799bfb1bbe4fb0e301c376"
+      "url": "https://finnhub.io/api/news?id=0ce2a50159a89e42c817e01aaf27aff6df28f7dbeeec907098450b7e8a20860a"
     },
     {
-      "date": "2026-09-09",
-      "headline": "Braze (BRZE) Posted a Strong Q2. Are Investors Still Cautious?",
+      "date": "2026-09-24",
+      "headline": "Braze Named a Leader in 2026 Gartner® Magic Quadrant™ for Multichannel Marketing Hubs for Fourth Consecutive Year",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=27d9e758dd8c3aa7a41b3c3ea9e30a10148b8393d724777d2ee4298cdb8fd8d1"
+      "url": "https://finnhub.io/api/news?id=e0e03b8b35c0ab5ad86c46083edf8e3d7e0464c2f29f535eedf38be2231c47f8"
     },
     {
-      "date": "2026-09-09",
-      "headline": "Braze, Inc. 2027 Q2 - Results - Earnings Call Presentation",
-      "source": "SeekingAlpha",
-      "url": "https://finnhub.io/api/news?id=1fdd2e0bc58cddd7cb2880d8e8e9c74f870039267f924273715bf0bbb58dec95"
-    },
-    {
-      "date": "2026-09-09",
-      "headline": "Braze (BRZE) Posts Strong Q2, But Why Is the Stock Falling?",
+      "date": "2026-09-24",
+      "headline": "Can Super-Scaled Customer Growth Sustain ZETA's Momentum?",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=819b3774247ca2c959ac4d4d43f02300605811979d2baecb9e2a9eaf07788244"
+      "url": "https://finnhub.io/api/news?id=df5d4d9fff71cf3f221f79484f0f85cc35fd62cce0981ed2854f74de6dfe8519"
     },
     {
-      "date": "2026-09-09",
-      "headline": "Update: Braze Shares Fall After Fiscal Q2 Results",
+      "date": "2026-09-18",
+      "headline": "Braze Beat Expectations—Now 2 SaaS Peers Are in Focus",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=ac9a73199c6aa408f53dd253430bd72a63ae72375591cec0c399bc541b4a2187"
+      "url": "https://finnhub.io/api/news?id=69f794d4bacd36e2b43c9eb2a59b88bf21b8e85a45aaf212e8765ffe0274126e"
     },
     {
-      "date": "2026-09-09",
-      "headline": "Wall Street Sounds Positive On BRZE Stock Despite Post-Earnings Decline – These Analysts See Buying Opportunity",
+      "date": "2026-09-15",
+      "headline": "SmarterSends Launches Two-Way SMS and One-Click Retargeting on Braze, Heads to FORGE 2026 in Las Vegas",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=c770d3ca6dc432fc8ab15e324a81aaa099ad787672811e7d1f005ea375902c79"
+      "url": "https://finnhub.io/api/news?id=aab7dbdf56519bd15fe9381075c002afa48dea41c7c08287f2eae64467139005"
     },
     {
-      "date": "2026-09-09",
-      "headline": "Braze (BRZE) Stock Trades Down, Here Is Why",
+      "date": "2026-09-14",
+      "headline": "Braze Sets the Stage for Forge 2026 with ‘Made for This’ Theme, Bold Agenda and Standout Speaker Lineup",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=f35bfd1c1fa9a2a4d8105fde0cb45b5ccadf91e31056fd3f39f1cc5dc6342c1e"
+      "url": "https://finnhub.io/api/news?id=fb2aa46939a06950fdf4ff25104c5a58887df33c73881d624395f856e676b0c6"
+    },
+    {
+      "date": "2026-09-14",
+      "headline": "Bending Spoons shares are trading higher following its IPO debut.",
+      "source": "Benzinga",
+      "url": "https://finnhub.io/api/news?id=7ce30aa188ed456dafbbec8829007be898230d87cf11ec011e54be50f716f432"
+    },
+    {
+      "date": "2026-09-12",
+      "headline": "Why Braze Stock Plummeted This Week",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=82a620e782832b433451e7ec9b7e71a9d2c9eef00dd55d0bbfd649ca7833894b"
     }
   ],
-  "price": 24.26,
+  "overrides": [],
+  "percentile_pool": {
+    "sector": 57,
+    "universe": 354
+  },
+  "price": 24.37,
+  "price_as_of": "2026-09-25",
   "reverse_dcf": {
     "actual_growth_pct": 27.59,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 2589.3,
+    "enterprise_value_musd": 2601.3,
     "fcf_ttm_musd": 61.9,
-    "implied_growth_pct": 16.78,
+    "implied_growth_pct": 17.17,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -442,8 +451,8 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "percentile": 29.2,
-          "scaled": 70.8,
+          "percentile": 22.0,
+          "scaled": 78.0,
           "weight": 0.2
         },
         "cash_conversion": {
@@ -451,13 +460,13 @@
           "percentile": null
         },
         "piotroski_f": {
-          "percentile": 16.7,
-          "scaled": 16.7,
+          "percentile": 10.5,
+          "scaled": 10.5,
           "weight": 0.25
         },
         "sloan_accruals": {
-          "percentile": 23.3,
-          "scaled": 76.7,
+          "percentile": 21.8,
+          "scaled": 78.2,
           "weight": 0.25
         }
       },
@@ -467,13 +476,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 10.0,
-          "scaled": 10.0,
+          "percentile": 36.8,
+          "scaled": 36.8,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 56.7,
-          "scaled": 56.7,
+          "percentile": 26.8,
+          "scaled": 26.8,
           "weight": 0.4
         }
       },
@@ -483,28 +492,28 @@
     "quality": {
       "components": {
         "fcf_margin": {
-          "percentile": 10.0,
-          "scaled": 10.0,
+          "percentile": 0.0,
+          "scaled": 0.0,
           "weight": 0.15
         },
         "gross_margin": {
-          "percentile": 25.0,
-          "scaled": 25.0,
+          "percentile": 33.9,
+          "scaled": 33.9,
           "weight": 0.2
         },
         "gross_profitability": {
-          "percentile": 39.3,
-          "scaled": 39.3,
+          "percentile": 62.5,
+          "scaled": 62.5,
           "weight": 0.2
         },
         "roic": {
-          "percentile": 3.8,
-          "scaled": 3.8,
+          "percentile": 7.5,
+          "scaled": 7.5,
           "weight": 0.3
         },
         "rule_of_40": {
-          "percentile": 16.7,
-          "scaled": 16.7,
+          "percentile": 26.8,
+          "scaled": 26.8,
           "weight": 0.15
         }
       },
@@ -514,23 +523,23 @@
     "safety": {
       "components": {
         "altman_z": {
-          "percentile": 20.8,
-          "scaled": 20.8,
+          "percentile": 13.2,
+          "scaled": 13.2,
           "weight": 0.3
         },
         "current_ratio": {
-          "percentile": 43.3,
-          "scaled": 43.3,
+          "percentile": 40.4,
+          "scaled": 40.4,
           "weight": 0.2
         },
         "interest_coverage": {
-          "percentile": 65.4,
-          "scaled": 65.4,
+          "percentile": 81.8,
+          "scaled": 81.8,
           "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 82.1,
-          "scaled": 17.9,
+          "percentile": 67.9,
+          "scaled": 32.1,
           "weight": 0.3
         }
       },
@@ -540,8 +549,8 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 3.6,
-          "scaled": 3.6,
+          "percentile": 3.5,
+          "scaled": 3.5,
           "weight": 0.1
         },
         "ev_ebit": {
@@ -549,18 +558,18 @@
           "percentile": null
         },
         "ev_gross_profit": {
-          "percentile": 32.1,
-          "scaled": 67.9,
+          "percentile": 33.9,
+          "scaled": 66.1,
           "weight": 0.2
         },
         "ev_sales": {
-          "percentile": 23.3,
-          "scaled": 76.7,
+          "percentile": 28.1,
+          "scaled": 71.9,
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 16.7,
-          "scaled": 16.7,
+          "percentile": 3.5,
+          "scaled": 3.5,
           "weight": 0.25
         }
       },
@@ -613,12 +622,12 @@
       "safety": 1.0,
       "value": 0.7
     },
-    "earnings_quality": 53.6,
-    "momentum": 28.7,
-    "quality": 18.0,
-    "safety": 33.4,
-    "total": 39.0,
-    "value": 42.3,
+    "earnings_quality": 54.0,
+    "momentum": 32.8,
+    "quality": 25.6,
+    "safety": 38.0,
+    "total": 40.5,
+    "value": 36.0,
     "weight_coverage": 0.9
   },
   "sector": "Yazilim ve programlama",
@@ -667,66 +676,66 @@
       "2026-07-31"
     ],
     "price_sparkline": [
-      18.58,
-      18.97,
-      18.88,
-      18.33,
-      18.02,
-      23.31,
-      23.49,
-      23.58,
-      23.125,
-      21.47,
-      20.61,
-      22.74,
-      22.66,
-      23.7,
-      22.46,
-      23.25,
-      22.69,
-      23.56,
-      24.33,
+      23.0,
+      23.61,
+      23.68,
+      22.39,
+      20.68,
+      20.51,
+      22.87,
+      23.73,
+      24.05,
+      23.27,
+      22.41,
+      22.03,
+      24.17,
       22.6,
-      19.26,
-      19.87,
-      21.58,
-      22.82,
-      24.35,
-      24.58,
-      25.63,
-      25.69,
+      20.73,
+      19.43,
+      20.87,
+      21.76,
+      23.41,
+      25.45,
+      23.36,
+      28.27,
       23.14,
       23.07,
       21.66,
-      21.73,
-      20.17,
-      19.21,
-      19.48,
-      21.02,
+      21.66,
+      21.18,
+      20.06,
+      19.26,
+      19.57,
       21.69,
       23.81,
       24.4,
       24.84,
-      26.19,
+      26.6,
       26.21,
-      26.19,
-      22.5,
+      26.5,
+      24.28,
       21.76,
       25.11,
       25.06,
       25.69,
       26.22,
       26.54,
-      27.68,
-      28.93,
-      29.12,
+      28.22,
+      29.87,
+      27.95,
       30.71,
       31.44,
       30.81,
       34.53,
       32.78,
       33.25,
-      30.31
+      30.31,
+      24.265,
+      25.42,
+      24.93,
+      25.4,
+      25.87,
+      24.37
     ],
     "quarters": [
       "2023-10",
@@ -812,7 +821,7 @@
     "why_cheap_diagnosis": "GECICI_SOK — marj kılavuzu",
     "why_cheap_rationale": "Q2 FY27'de gelir, kâr ve yıllık öngörü beklentiyi aştı; hisse yalnızca Q3 EPS kılavuzunun konsensüsün %16 altında gelmesiyle bir günde %16 düştü. Bilanço bozulmadı, RPO %27 büyüyor."
   },
-  "story_age_days": 18,
+  "story_age_days": 16,
   "ticker": "BRZE",
   "track": "B",
   "ttm": {

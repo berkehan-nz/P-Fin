@@ -115,7 +115,11 @@ def build(f: Fundamentals, *,
                 "value": _round(value, key),
                 "sector_pct": _round(sector_pcts.get(key), None, 1),
                 "own_5y_pct": _round(own_pcts.get(key), None, 1),
-                "color": color_for(key, value),
+                # Renk GOSTERILEN degerden hesaplanir. Yuvarlanmamis degerden
+                # hesaplanirsa kartta "0,30x" yazip sari boyanabiliyor; oysa
+                # ekrandaki kurala gore 0,30 yesil. Sayi ile rengi ayni girdiye
+                # bagla ki ikisi birbirini yalanlamasin.
+                "color": color_for(key, _round(value, key)),
                 "pct_basis": pct_basis.get(key, "none"),
             }
     # bloklarda gecmeyen ama gerekli olanlar
@@ -129,7 +133,11 @@ def build(f: Fundamentals, *,
                 "value": _round(value, key),
                 "sector_pct": _round(sector_pcts.get(key), None, 1),
                 "own_5y_pct": None,
-                "color": color_for(key, value),
+                # Renk GOSTERILEN degerden hesaplanir. Yuvarlanmamis degerden
+                # hesaplanirsa kartta "0,30x" yazip sari boyanabiliyor; oysa
+                # ekrandaki kurala gore 0,30 yesil. Sayi ile rengi ayni girdiye
+                # bagla ki ikisi birbirini yalanlamasin.
+                "color": color_for(key, _round(value, key)),
                 "pct_basis": pct_basis.get(key, "none"),
             }
 
@@ -156,6 +164,44 @@ def build(f: Fundamentals, *,
             flags.get("z_unreliable_reason")
             or "Altman Z'' guvenilmez. Faiz karsilama ve FCF/toplam borc ile degerlendir."
         )
+    # NET KAR EBIT'E GORE IMKANSIZ KUCUK.
+    # ConEd'de TTM net kar 2,0 mn $ gorunuyordu; hasilat 17,4 mlr, EBIT 3,0 mlr.
+    # Gercek net kar ~2 mlr — yani bin kat yanlis. Sonuc panoda 19.158x F/K.
+    # Vergi ve faiz karin %98'ini yiyemez; boyle bir oran veri hatasidir.
+    _ni = num(meta.get("net_income_ttm_musd"))
+    _ebit = num(meta.get("ebit_ttm_musd"))
+    if _ni is not None and _ebit is not None and _ebit > 50 and 0 < _ni < _ebit * 0.02:
+        warnings.append(
+            f"NET KAR SUPHELI: TTM net kar {_ni:,.1f} mn $ ama EBIT {_ebit:,.0f} mn $. "
+            f"Vergi ve faiz karin %98'ini yiyemez; kalem buyuk olasilikla eksik veya "
+            f"yanlis olcekte alinmis. F/K, PEG ve kazanc kalitesi puani bu sayidan "
+            f"turedigi icin guvenilmez.")
+
+    # FAIZ ILE BORC TUTARLI MI? Borc etiketi kacirilinca sirket "borcsuz"
+    # gorunuyor, faiz karsilama tavan degeri (100) aliyor ve saglamlik puaninda
+    # en guvenli sirket gibi puanlaniyordu (COLL: 1.036 mn $ borc, 76 mn $ faiz,
+    # kartta borc sifir). Odenen faizden ima edilen oran bu ayrismayi yakalar.
+    _last, _cur = f.latest_period(), f.ttm_period()
+    _debt = (num(_last.long_term_debt) or 0.0) + (num(_last.short_term_debt) or 0.0) if _last else 0.0
+    _interest = abs(num(_cur.interest_expense) or 0.0) if _cur else 0.0
+    _ebit = num(_cur.operating_income) if _cur else None
+    if _interest > 0 and _ebit and _interest > abs(_ebit) * 0.02:
+        if _debt <= 0:
+            warnings.append(
+                f"BORC GORUNMUYOR AMA FAIZ ODENIYOR: TTM faiz gideri "
+                f"{_interest:,.1f} mn $, bilancoda finansal borc yok. Borc donem "
+                f"icinde kapanmis olabilir ya da borc etiketi okunamadi; "
+                f"net borc ve isletme degeri eksik olabilir.")
+        elif _interest / _debt > 0.15:
+            warnings.append(
+                f"BORC EKSIK OLABILIR: {_interest:,.1f} mn $ faiz, {_debt:,.1f} mn $ "
+                f"borca %{_interest / _debt * 100:.0f} faiz orani ima ediyor. "
+                f"Bir borc kalemi okunamamis olabilir.")
+
+    not_scored = (score_block or {}).get("not_scored")
+    if not_scored:
+        warnings.append(f"PUANLANAMADI: {not_scored}")
+
     for o in (getattr(f, "overrides_applied", None) or []):
         warnings.append(
             f"ELLE DUZELTME: {o['period_end']} donemi {o['field']} alani "
@@ -189,6 +235,53 @@ def build(f: Fundamentals, *,
 
     # --- seriler (12 ceyrek grafikleri) ---
     series = _build_series(f)
+
+    # CEYREKLIK GRAFIK ILE TTM METRIGI CELISIYOR MU?
+    # Bir kalem yillik tablodan geldiginde grafik ceyrekleri, metrik ise mali
+    # yili gosterir. INOD'da grafik %44 brut marj cizerken metrik %31 diyordu;
+    # ayni sayfada iki farkli gercek. Genel "tutmayabilir" uyarisi hangi
+    # grafigin tutmadigini soylemiyor — farki OLC ve yaz.
+    if series.get("basis") != "annual":
+        for field, label, ttm_value in (
+            ("revenue", "Satislar", num(meta.get("revenue_ttm_musd"))),
+            ("fcf", "Serbest nakit akisi", num(meta.get("fcf_ttm_musd"))),
+        ):
+            q = [num(x) for x in (series.get(field) or [])[-4:]]
+            if len(q) == 4 and all(x is not None for x in q) and ttm_value:
+                diff = abs(sum(q) - ttm_value) / abs(ttm_value)
+                if diff > 0.05:
+                    warnings.append(
+                        f"GRAFIK-METRIK CELISKISI: {label} grafiginin son 4 ceyregi "
+                        f"{sum(q):,.0f} mn $ ediyor ama TTM {ttm_value:,.0f} mn $ "
+                        f"(%{diff * 100:.0f} fark). Bu kalem yillik tablodan gelmis "
+                        f"olabilir; grafik ile metrik ayni donemi anlatmiyor.")
+
+        # TEK CEYREK AYKIRI DEGERI. CRI'de brut marj %43'ten %67'ye sicriyor;
+        # perakendede bir ceyrekte 24 puan marj artisi gercek degil, etiket
+        # kapsami sorunudur (ceyreklik hasilata kumulatif brut kar gibi).
+        # Sayiyi sessizce duzeltmek yanlis olur — isaretle, insan baksin.
+        gm_all = [num(x) for x in (series.get("gross_margin") or []) if num(x) is not None]
+        if len(gm_all) >= 5:
+            ordered = sorted(gm_all[:-1])
+            median = ordered[len(ordered) // 2]
+            last = gm_all[-1]
+            if abs(last - median) > 15:
+                warnings.append(
+                    f"AYKIRI CEYREK: son ceyregin brut marji %{last:.1f}, onceki "
+                    f"ceyreklerin ortancasi %{median:.1f}. {abs(last - median):.0f} "
+                    f"puanlik sicrama muhtemelen XBRL etiket kapsami sorunudur; "
+                    f"bu ceyrek TTM'e de giriyor, dogrulanmadan guvenme.")
+
+        gm_series = [num(x) for x in (series.get("gross_margin") or []) if num(x) is not None]
+        gm_ttm = m.get("gross_margin")
+        if len(gm_series) >= 4 and gm_ttm is not None:
+            recent = sum(gm_series[-4:]) / 4
+            if abs(recent - gm_ttm) > 8:
+                warnings.append(
+                    f"GRAFIK-METRIK CELISKISI: Brut marj grafiginin son 4 ceyrek "
+                    f"ortalamasi %{recent:.1f} ama TTM brut marj %{gm_ttm:.1f}. "
+                    f"Aradaki {abs(recent - gm_ttm):.1f} puanlik fark, kalemlerin "
+                    f"farkli donemlerden geldigini gosterir.")
     series["price_sparkline"] = prices.sparkline(f.price_history)
 
     card = {
@@ -201,13 +294,20 @@ def build(f: Fundamentals, *,
         "source": source,
         "as_of": today_iso(),
         "price": _round(f.price, None, 2),
+        "price_as_of": (f.price_history[-1][0] if f.price_history else None),
+        # Yuzdeliklerin hangi havuza gore hesaplandigi. Tarama bitene kadar
+        # havuz kucuk; 40'lik bir puan 50 sirketlik havuzda baska, 3.000'lik
+        # havuzda baska sey demek.
+        "percentile_pool": _pool_size(sector_table, sector),
         "market_cap_musd": _round(meta["market_cap_musd"], None, 1),
         "enterprise_value_musd": _round(meta["enterprise_value_musd"], None, 1),
         # Gunluk kosu fiyat degisince EV ve carpanlari BUNLARDAN yeniden
         # hesaplar. Eski carpani oranla olceklemek her gun biraz daha sapan
         # bir sayi birakirdi; TTM buyuklukleri gun icinde degismez.
         "shares_outstanding_m": _round(f.shares_outstanding, None, 4),
-        "net_debt_musd": _round(m.get("net_debt"), None, 1),
+        # Metrik hucresiyle AYNI yuvarlama: ayni buyuklugun iki yerde
+        # farkli gorunmesi (5,25 ve 5,3) denetimde celiski sayilir.
+        "net_debt_musd": _round(m.get("net_debt"), "net_debt"),
         "ttm": {
             "revenue_musd": _round(meta.get("revenue_ttm_musd"), None, 1),
             "gross_profit_musd": _round(meta.get("gross_profit_ttm_musd"), None, 1),
@@ -219,11 +319,17 @@ def build(f: Fundamentals, *,
         },
         "scores": score_block,
         "score_detail": score_detail,
+        # SIRALAMA ICIN KIRPILAN metrikler. Kartta ham deger gorunur
+        # (CVLT'nin ROIC'i gercekten %1.263 hesaplaniyor; gizlemek veriyi
+        # saklamak olurdu) ama puana %60 olarak girdigi YAZILI olmali.
+        # Yoksa "bu sirket neden ilk sirada degil" sorusunun cevabi
+        # hicbir yerde yok.
+        "capped_for_scoring": scoring.capped_metrics(m),
         "metrics": cells,
         "series": series,
         "flags": flags,
         "news": news or [],
-        "calendar": {"next_earnings": next_earnings},
+        "calendar": {"next_earnings": next_earnings, "estimated": False},
         "analyst": analyst or {},
         "short_interest": short_interest or {},
         "insider": insider or {},
@@ -448,6 +554,32 @@ def _story_age(card: dict) -> int | None:
         return None
 
 
+def low_coverage_blocks(card: dict) -> dict[str, list[str]]:
+    """Kapsamasi dusuk bloklar ve o bloklarda HESAPLANAMAYAN alt metrikler.
+
+    "Veri yetersiz" rozeti tek basina neyin eksik oldugunu soylemiyor;
+    eksik metrigi bilmek veriyi duzeltmenin ilk adimi.
+    """
+    out: dict[str, list[str]] = {}
+    for block, detail in (card.get("score_detail") or {}).items():
+        if not isinstance(detail, dict) or not detail.get("low_coverage"):
+            continue
+        missing = [k for k, v in (detail.get("components") or {}).items()
+                   if not isinstance(v, dict) or v.get("percentile") is None]
+        out[block] = missing
+    return out
+
+
+def _pool_size(sector_table: dict | None, sector: str | None) -> dict:
+    """Yuzdelik havuzunun buyuklugu: tum evren ve sirketin sektoru."""
+    if not sector_table:
+        return {"universe": 0, "sector": 0}
+    def widest(block):
+        return max((len(v) for v in (block or {}).values()), default=0)
+    return {"universe": widest(sector_table.get("__ALL__")),
+            "sector": widest(sector_table.get(sector))}
+
+
 def summary_row(card: dict) -> dict:
     """``candidates.json`` icin kompakt satir — dashboard izgarasi bunu okur."""
     m = card.get("metrics", {})
@@ -465,6 +597,15 @@ def summary_row(card: dict) -> dict:
         "market_cap_musd": card.get("market_cap_musd"),
         "scores": card.get("scores", {}),
         "headline": {k: m.get(k, {}) for k in headline_keys},
+        # Kol fark etmeksizin HER satirda olan cekirdek metrikler. headline
+        # kola gore degisiyor (Kol A'da buyume yok); karsilastirma ve Chat
+        # ajani icin ortak bir set gerekiyordu.
+        "core": {k: (m.get(k) or {}).get("value") for k in
+                 ("rev_growth_ttm", "gross_margin", "fcf_yield_ev",
+                  "piotroski_f", "roic", "net_debt_to_ebitda")},
+        "price_as_of": card.get("price_as_of"),
+        "percentile_pool": card.get("percentile_pool"),
+        "low_coverage_blocks": low_coverage_blocks(card),
         "why_cheap": (card.get("story") or {}).get("why_cheap_diagnosis", ""),
         "claude_verdict": verdict[:140],
         "story_age_days": card.get("story_age_days"),

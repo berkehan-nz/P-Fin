@@ -1,22 +1,27 @@
 {
   "analyst": {
     "analyst_count": 18,
-    "as_of": "2026-09-09",
-    "buy": 5,
-    "hold": 16,
-    "recommendation": "none",
+    "buy": 4,
+    "hold": 17,
+    "recommendation": "hold",
     "sell": 1,
     "source": "yfinance",
     "target_high": 220.0,
-    "target_low": 95.35,
-    "target_median": 174.0,
-    "upside_to_median": 7.6932598873553415
+    "target_low": 130.0,
+    "target_median": 177.5,
+    "upside_to_median": 2.94032798212307
   },
-  "as_of": "2026-09-11",
+  "as_of": "2026-09-26",
   "calendar": {
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-11-03"
   },
-  "change_1d_pct": -5.05,
+  "capped_for_scoring": {
+    "roic": {
+      "raw": 61.1087,
+      "used": 60.0
+    }
+  },
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -36,7 +41,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 5339.2,
+  "enterprise_value_musd": 5714.9,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -56,52 +61,55 @@
     "rev_growth_organic_suspect": false,
     "roic_method": "a",
     "stage1_missing": [],
-    "warnings": [],
+    "warnings": [
+      "Ertelenmis gelir kisa vadeli yukumlulugun buyuk kismi ve sirket net nakit pozisyonunda — Z'' abonelik modelinde yaniltici. Faiz karsilama ve FCF/borc ile degerlendir."
+    ],
     "would_fail_at": null,
-    "z_unreliable": false
+    "z_unreliable": true,
+    "z_unreliable_reason": "Ertelenmis gelir kisa vadeli yukumlulugun buyuk kismi ve sirket net nakit pozisyonunda — Z'' abonelik modelinde yaniltici. Faiz karsilama ve FCF/borc ile degerlendir."
   },
-  "generated_at": "2026-09-10T12:54:34+00:00",
+  "generated_at": "2026-09-26T23:02:23+00:00",
   "insider": {
-    "form4_count": 37,
-    "last_form4": "2026-09-03",
+    "form4_count": 38,
+    "last_form4": "2026-09-22",
     "window_days": 180
   },
-  "market_cap_musd": 5589.5,
+  "market_cap_musd": 5965.2,
   "metrics": {
     "altman_z": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 79.2,
+      "sector_pct": 61.3,
       "value": 6.39
     },
     "beneish_m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 45.8,
+      "sector_pct": 35.4,
       "value": -2.91
     },
     "cash_conversion": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 35.0,
+      "sector_pct": 32.2,
       "value": 1.55
     },
     "current_ratio": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 50.0,
+      "sector_pct": 44.7,
       "value": 1.38
     },
     "earnings_yield": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 75.0,
-      "value": 4.525
+      "sector_pct": 69.3,
+      "value": 4.23
     },
     "ebitda_margin": {
       "color": "gray",
@@ -112,37 +120,37 @@
     },
     "ev_ebit": {
       "color": "red",
-      "own_5y_pct": 41.7,
+      "own_5y_pct": 50.0,
       "pct_basis": "sector",
-      "sector_pct": 31.8,
-      "value": 22.099
+      "sector_pct": 35.7,
+      "value": 23.66
     },
     "ev_ebitda": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 40.9,
-      "value": 21.021
+      "sector_pct": 43.3,
+      "value": 22.5
     },
     "ev_gross_profit": {
       "color": "yellow",
       "own_5y_pct": 66.7,
       "pct_basis": "sector",
-      "sector_pct": 96.4,
-      "value": 9.114
+      "sector_pct": 77.7,
+      "value": 9.76
     },
     "ev_sales": {
       "color": "red",
       "own_5y_pct": 75.0,
       "pct_basis": "sector",
-      "sector_pct": 96.7,
-      "value": 7.595
+      "sector_pct": 86.8,
+      "value": 8.13
     },
     "fcf_margin": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 90.0,
+      "sector_pct": 92.1,
       "value": 44.66
     },
     "fcf_margin_change_3y": {
@@ -156,21 +164,21 @@
       "color": "yellow",
       "own_5y_pct": 58.3,
       "pct_basis": "sector",
-      "sector_pct": 43.3,
-      "value": 5.881
+      "sector_pct": 43.0,
+      "value": 5.49
     },
     "fcf_yield_mcap": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 56.7,
-      "value": 5.618
+      "sector_pct": 41.2,
+      "value": 5.26
     },
     "gross_margin": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 89.3,
+      "sector_pct": 84.8,
       "value": 83.33
     },
     "gross_margin_change_3y": {
@@ -184,7 +192,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 60.7,
+      "sector_pct": 75.9,
       "value": 0.55
     },
     "implied_growth": {
@@ -192,20 +200,20 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 5.7
+      "value": 5.88
     },
     "implied_vs_actual_growth": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 0.52
+      "value": 0.54
     },
     "interest_coverage": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 65.4,
+      "sector_pct": 81.8,
       "value": 100.0
     },
     "maturity_wall_2y": {
@@ -226,14 +234,14 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 53.6,
+      "sector_pct": 47.3,
       "value": -0.99
     },
     "operating_margin": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.4,
+      "sector_pct": 93.9,
       "value": 34.36
     },
     "operating_margin_change_3y": {
@@ -244,87 +252,87 @@
       "value": 7.71
     },
     "pct_off_52w_high": {
-      "color": "yellow",
+      "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 16.7,
-      "value": 19.832
+      "sector_pct": 28.9,
+      "value": 14.44
     },
     "pe": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 59.1,
-      "value": 27.068
+      "sector_pct": 39.0,
+      "value": 28.88
     },
     "peg": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 2.75
+      "value": 2.79
     },
     "piotroski_f": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.7,
+      "sector_pct": 94.7,
       "value": 8.0
     },
     "rel_strength_12m": {
-      "color": "yellow",
+      "color": "green",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -0.7
+      "value": 1.75
     },
     "rel_strength_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.7,
-      "value": 50.533
+      "sector_pct": 88.4,
+      "value": 59.5
     },
     "return_12m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 83.3,
-      "value": 21.381
+      "sector_pct": 88.4,
+      "value": 26.65
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.7,
-      "value": 67.153
+      "sector_pct": 88.4,
+      "value": 89.25
     },
     "rev_cagr_3y": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 10.0,
+      "sector_pct": 29.5,
       "value": 10.96
     },
     "rev_growth_ttm": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 10.0,
+      "sector_pct": 36.6,
       "value": 10.35
     },
     "roic": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 92.3,
+      "sector_pct": 95.3,
       "value": 61.11
     },
     "rule_of_40": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 76.7,
+      "sector_pct": 86.6,
       "value": 55.02
     },
     "rule_of_40_ebitda": {
@@ -345,90 +353,96 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 10.0,
+      "sector_pct": 27.2,
       "value": 0.25
     },
     "sbc_to_revenue": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 30.0,
+      "sector_pct": 55.3,
       "value": 11.13
     },
     "share_count_change_1y": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 17.9,
+      "sector_pct": 17.6,
       "value": -2.41
     },
     "sloan_accruals": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 63.3,
+      "sector_pct": 40.9,
       "value": -0.07
     }
   },
   "name": "QUALYS, INC.",
-  "net_debt_musd": -250.3,
+  "net_debt_musd": -250.29,
   "news": [
     {
-      "date": "2026-09-10",
-      "headline": "Is FTNT Stock Worth Buying at a Premium P/S or Should Investors Wait?",
+      "date": "2026-09-26",
+      "headline": "Qualys, Okta, Palo Alto Networks, Rapid7, and SentinelOne Shares Plummet, What You Need To Know",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=63734fcb5561f729bdc226d48eef91f7f44d81720030ad940652c8f9d325b4a7"
+      "url": "https://finnhub.io/api/news?id=a4a3209cf72656db90c8cafdbb0199d3af24570c52b742040fd73c7e87a54368"
     },
     {
-      "date": "2026-09-08",
-      "headline": "AI Is Making Cybersecurity Harder to Ignore—These 3 ETFs Offer a Broad Bet",
+      "date": "2026-09-25",
+      "headline": "Qualys (QLYS) Stock May Be 21% Undervalued On Strong Cash Flow",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=ec12463998299e70a005a6c86736faff17439faf639a9032148eda72398bdb4d"
+      "url": "https://finnhub.io/api/news?id=99dce937cb059c11297d82124478e34c1fb428500bfdd210b904fc0928500ecc"
     },
     {
-      "date": "2026-09-08",
-      "headline": "Cloudflare Surges 41% YTD: Should You Buy, Sell or Hold the Stock?",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=82e60c12a15c090ec40930bfd9d45951a31ca57cb8c2a068abf3f7c7ad137092"
+      "date": "2026-09-25",
+      "headline": "Tenable Holdings shares are trading higher after the company reported better-than-expected Q4 financial results and issued Q1 sales guidance above estimates. Also, the company issued FY26 adjusted EPS guidance above estimates.",
+      "source": "Benzinga",
+      "url": "https://finnhub.io/api/news?id=4a5a2e7955807b009164782f96bc8d6c6e57a2309f3ef2b245640d279d1fba5e"
     },
     {
-      "date": "2026-09-07",
-      "headline": "PANW Surges 102% in 6 Months: Should You Buy, Sell or Hold the Stock?",
+      "date": "2026-09-25",
+      "headline": "1 Unpopular Stock That Deserves a Second Chance and 2 That Underwhelm",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=2d0662083dcfb790388a6d13362ab1f341645cebc720284e80645194f4befc54"
+      "url": "https://finnhub.io/api/news?id=9140b57650e2ccd7362c134377c15e1feeafa14b878e534fe6cdc56c68224c80"
     },
     {
-      "date": "2026-09-06",
-      "headline": "Is Qualys (QLYS) Too Expensive On Earnings Or Cheap On Cash Flow?",
+      "date": "2026-09-25",
+      "headline": "Qualys (QLYS) Could Be 6% Overvalued As Its AI Risk Narrative Builds",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=363c8a03ab5509ede841101928898cdec3d0de671a4beec8b6adfb958a9ed4cc"
+      "url": "https://finnhub.io/api/news?id=3927515db8a0757c2675401a7633dba630662d9f5c648341d2dcb70d756d0302"
     },
     {
-      "date": "2026-09-05",
-      "headline": "Is Qualys (QLYS) Below Fair Value Following Its Earnings Beat And Higher Guidance?",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=49dfb56392b19193d96c451b35bcc54bb75664f18eef5f295af33330ece39be4"
+      "date": "2026-09-24",
+      "headline": "If You Invested $1000 In Qualys Stock 10 Years Ago, You Would Have This Much Today",
+      "source": "Benzinga",
+      "url": "https://finnhub.io/api/news?id=07bd8439d3d262f940337abba2b8faacf8c7c7218a21759fa189c90eaff91963"
     },
     {
-      "date": "2026-09-05",
-      "headline": "Qualys (QLYS) Posts Double-Digit Growth And Still Raises The Bar",
+      "date": "2026-09-23",
+      "headline": "3 Small-Cap Stocks We Think Twice About",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=5c11e72a897cd7d1b8fec0bc773b3dd9a02c8a44fa3c7470fdab0c5ccf990e67"
+      "url": "https://finnhub.io/api/news?id=2f22335bf47f5ae09510fd7c8c8f508048f60721c83f4e6513439a7944509bd2"
     },
     {
-      "date": "2026-09-04",
-      "headline": "3 Russell 2000 Stocks with Open Questions",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=e48db0481a939e2c984294dcc66952834d6841a41291edfb81cc6512314937ec"
+      "date": "2026-09-22",
+      "headline": "How Your Taxes Will Be Different Next Year, And Why You'll Have Trump To Thank",
+      "source": "Benzinga",
+      "url": "https://finnhub.io/api/news?id=7c7bc27315adbe5bcfe5ed5e35cd4e6dcc9d016797069c983e56b5235fa1d71d"
     }
   ],
-  "price": 161.57,
+  "overrides": [],
+  "percentile_pool": {
+    "sector": 57,
+    "universe": 354
+  },
+  "price": 172.43,
+  "price_as_of": "2026-09-25",
   "reverse_dcf": {
     "actual_growth_pct": 10.96,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 5339.2,
+    "enterprise_value_musd": 5714.9,
     "fcf_ttm_musd": 314.0,
-    "implied_growth_pct": 5.7,
+    "implied_growth_pct": 5.88,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -436,23 +450,23 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "percentile": 45.8,
-          "scaled": 54.2,
+          "percentile": 35.4,
+          "scaled": 64.6,
           "weight": 0.2
         },
         "cash_conversion": {
-          "percentile": 35.0,
-          "scaled": 35.0,
+          "percentile": 32.2,
+          "scaled": 32.2,
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 96.7,
-          "scaled": 96.7,
+          "percentile": 94.7,
+          "scaled": 94.7,
           "weight": 0.25
         },
         "sloan_accruals": {
-          "percentile": 63.3,
-          "scaled": 36.7,
+          "percentile": 40.9,
+          "scaled": 59.1,
           "weight": 0.25
         }
       },
@@ -462,13 +476,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 90.0,
-          "scaled": 90.0,
+          "percentile": 76.3,
+          "scaled": 76.3,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 96.7,
-          "scaled": 96.7,
+          "percentile": 88.4,
+          "scaled": 88.4,
           "weight": 0.4
         }
       },
@@ -478,28 +492,28 @@
     "quality": {
       "components": {
         "fcf_margin": {
-          "percentile": 90.0,
-          "scaled": 90.0,
+          "percentile": 92.1,
+          "scaled": 92.1,
           "weight": 0.15
         },
         "gross_margin": {
-          "percentile": 89.3,
-          "scaled": 89.3,
+          "percentile": 84.8,
+          "scaled": 84.8,
           "weight": 0.2
         },
         "gross_profitability": {
-          "percentile": 60.7,
-          "scaled": 60.7,
+          "percentile": 75.9,
+          "scaled": 75.9,
           "weight": 0.2
         },
         "roic": {
-          "percentile": 92.3,
-          "scaled": 92.3,
+          "percentile": 95.3,
+          "scaled": 95.3,
           "weight": 0.3
         },
         "rule_of_40": {
-          "percentile": 76.7,
-          "scaled": 76.7,
+          "percentile": 86.6,
+          "scaled": 86.6,
           "weight": 0.15
         }
       },
@@ -509,23 +523,23 @@
     "safety": {
       "components": {
         "altman_z": {
-          "percentile": 79.2,
-          "scaled": 79.2,
+          "percentile": 61.3,
+          "scaled": 61.3,
           "weight": 0.3
         },
         "current_ratio": {
-          "percentile": 50.0,
-          "scaled": 50.0,
+          "percentile": 44.7,
+          "scaled": 44.7,
           "weight": 0.2
         },
         "interest_coverage": {
-          "percentile": 65.4,
-          "scaled": 65.4,
+          "percentile": 81.8,
+          "scaled": 81.8,
           "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 53.6,
-          "scaled": 46.4,
+          "percentile": 47.3,
+          "scaled": 52.7,
           "weight": 0.3
         }
       },
@@ -535,28 +549,28 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 75.0,
-          "scaled": 75.0,
+          "percentile": 69.3,
+          "scaled": 69.3,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 31.8,
-          "scaled": 68.2,
+          "percentile": 35.7,
+          "scaled": 64.3,
           "weight": 0.3
         },
         "ev_gross_profit": {
-          "percentile": 96.4,
-          "scaled": 3.6,
+          "percentile": 77.7,
+          "scaled": 22.3,
           "weight": 0.2
         },
         "ev_sales": {
-          "percentile": 96.7,
-          "scaled": 3.3,
+          "percentile": 86.8,
+          "scaled": 13.2,
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 43.3,
-          "scaled": 43.3,
+          "percentile": 43.0,
+          "scaled": 43.0,
           "weight": 0.25
         }
       },
@@ -577,7 +591,7 @@
       "z": 6.393409756628207
     },
     "beneish": {
-      "m": -2.907577022762709,
+      "m": -2.9074899045796974,
       "missing": []
     },
     "piotroski": {
@@ -609,12 +623,12 @@
       "safety": 1.0,
       "value": 1.0
     },
-    "earnings_quality": 54.7,
-    "momentum": 92.7,
-    "quality": 82.7,
-    "safety": 60.8,
-    "total": 53.3,
-    "value": 40.0,
+    "earnings_quality": 61.1,
+    "momentum": 81.1,
+    "quality": 87.5,
+    "safety": 59.5,
+    "total": 54.9,
+    "value": 43.4,
     "weight_coverage": 1.0
   },
   "sector": "Yazilim ve programlama",
@@ -663,66 +677,66 @@
       "2026-06-30"
     ],
     "price_sparkline": [
-      96.99,
-      94.99,
-      96.64,
-      96.44,
-      92.29,
-      91.11,
-      87.92,
-      86.21,
-      90.32,
-      87.36,
-      81.4,
-      85.17,
-      83.17,
-      86.28,
-      84.04,
-      85.16,
-      89.6,
-      88.53,
-      92.14,
+      85.63,
+      87.85,
+      88.36,
+      88.24,
+      76.68,
+      83.22,
+      84.09,
+      82.0,
+      88.71,
+      84.34,
+      85.7,
+      86.93,
+      92.49,
       94.97,
-      90.12,
-      86.73,
-      97.98,
-      100.55,
-      102.37,
-      98.32,
-      109.29,
-      113.42,
+      91.53,
+      86.5,
+      90.02,
+      100.09,
+      100.85,
+      102.31,
+      100.37,
+      114.02,
       111.53,
       110.31,
-      110.83,
-      114.65,
-      112.18,
-      108.51,
-      115.34,
-      123.27,
+      110.2,
+      111.24,
+      113.67,
+      111.3,
+      112.33,
+      116.19,
       137.49,
       148.12,
       157.55,
       159.39,
-      164.12,
-      157.56,
-      156.37,
-      140.23,
+      151.54,
+      159.32,
+      159.43,
+      143.78,
       137.48,
       135.75,
       141.71,
       154.89,
       183.25,
       183.48,
-      187.15,
-      186.05,
-      187.98,
+      188.31,
+      195.88,
+      183.31,
       182.21,
       178.46,
       176.67,
       187.05,
       177.01,
       174.35,
-      170.32
+      170.32,
+      161.57,
+      185.37,
+      178.08,
+      181.03,
+      184.79,
+      172.43
     ],
     "quarters": [
       "2023-09",
@@ -808,7 +822,7 @@
     "why_cheap_diagnosis": "PAHALI_DEGIL — kaliteli ama yavaş",
     "why_cheap_rationale": "EV/Sales ~9x ile mutlak ucuz değil; %10-11 büyüme yavaş görülüyor. 40 Kuralı ~57 ve %46 FAVÖK marjı kalite primini hak ediyor. Re-rating alanı sınırlı; getiri kâr+geri alımdan gelir."
   },
-  "story_age_days": 18,
+  "story_age_days": 16,
   "ticker": "QLYS",
   "track": "A",
   "ttm": {

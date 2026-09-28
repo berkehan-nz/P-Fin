@@ -13,6 +13,10 @@ def isolated(tmp_path, monkeypatch):
     """Gercek data/ klasorune dokunmadan calis."""
     monkeypatch.setattr(scan, "STATE_PATH", tmp_path / "scan_state.json")
     monkeypatch.setattr(scan, "SURVIVOR_DIR", tmp_path / "survivors")
+    # interim() huni gunlugunu ve aday dosyasini DATA_DIR'e yazar; yamalanmazsa
+    # testler gercek data/funnel_log.json'u kirletir.
+    from src import pipeline
+    monkeypatch.setattr(pipeline, "DATA_DIR", tmp_path)
     (tmp_path / "survivors").mkdir()
     return tmp_path
 
@@ -45,8 +49,10 @@ class TestState:
         s = scan.empty_state()
         s.update({"queue": ["A"] * 200, "cursor": 50, "survivor_count": 7, "cycle": 2})
         p = scan.progress(s)
-        assert p == {"cycle": 2, "done": 50, "total": 200, "pct": 25.0,
-                     "remaining": 150, "survivors": 7}
+        assert {k: p[k] for k in ("cycle", "done", "total", "pct",
+                                  "remaining", "survivors")} == {
+            "cycle": 2, "done": 50, "total": 200, "pct": 25.0,
+            "remaining": 150, "survivors": 7}
 
     def test_progress_handles_empty_queue(self):
         assert scan.progress(scan.empty_state())["pct"] == 0.0
@@ -267,3 +273,481 @@ class TestDurability:
         assert out["queue"] == ["AAA", "BBB"]
         assert out["cycle"] == 2, "tur sayaci ilerlemeliydi"
         assert out["cursor"] == 1, "bir sirket islenmeliydi"
+
+
+class TestCycleProtection:
+    """Haftalik kosu her pazar --new-cycle cagiriyordu. Bir tur 5-10 gun
+    surdugu icin (GitHub zamanlanmis kosulari saatte bir degil, gunde 6-7
+    kez tetikliyor) tur her seferinde sifirlaniyor ve SONUC HIC URETILMIYORDU.
+    """
+
+    def test_cycle_in_progress_detection(self):
+        s = scan.empty_state()
+        assert scan.cycle_in_progress(s) is False          # kuyruk yok
+        s.update({"queue": ["A", "B", "C"], "cursor": 1})
+        assert scan.cycle_in_progress(s) is True
+        s["cursor"] = 3
+        assert scan.cycle_in_progress(s) is False          # bitmis
+
+    def test_new_cycle_refused_while_in_progress(self, isolated, monkeypatch):
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "load_company", lambda t, **kw: None)
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {"QQQ": []})
+
+        state = scan.empty_state()
+        state.update({"cycle": 1, "queue": ["A"] * 100, "cursor": 40,
+                      "batch_size": 10})
+        scan.save_state(state)
+
+        out = scan.run(new_cycle=True, build_cards=False)
+        assert out["cycle"] == 1, "yarim tur cope atilmamaliydi"
+        assert out["cursor"] >= 40, "imlec geri sarmamaliydi"
+
+    def test_force_allows_reset(self, isolated, monkeypatch):
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "load_company", lambda t, **kw: None)
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {"QQQ": []})
+
+        state = scan.empty_state()
+        state.update({"cycle": 1, "queue": ["A"] * 100, "cursor": 40})
+        scan.save_state(state)
+
+        out = scan.run(new_cycle=True, force=True, tickers=["X", "Y"],
+                       batch_size=1, build_cards=False)
+        assert out["cycle"] == 2
+
+    def test_one_off_batch_does_not_persist(self, isolated, monkeypatch):
+        """weekly --batch 60 kalici olarak parti boyutunu yariya
+        indiriyordu ve sonraki tum kosular yavasliyordu."""
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "load_company", lambda t, **kw: None)
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {"QQQ": []})
+
+        state = scan.empty_state()
+        state.update({"cycle": 1, "queue": ["A"] * 500, "cursor": 0,
+                      "batch_size": 120})
+        scan.save_state(state)
+
+        out = scan.run(batch_size=20, build_cards=False)
+        assert out["batch_size"] == 120, "kayitli parti boyutu degismemeliydi"
+        assert out["cursor"] == 20, "bu kosuda 20 islenmeliydi"
+
+
+class TestInterimResults:
+    """Tur 5-10 gun surerken kullanici hicbir yeni sirket gormemeliydi.
+    Biriken hayatta kalanlar uzerinden gecici siralama uretilir."""
+
+    def _seed_survivors(self, n):
+        import json
+        rows = []
+        for i in range(n):
+            r = row_for("KVYO")
+            r["ticker"] = f"T{i:03d}"
+            r["metrics"] = dict(r["metrics"])
+            r["metrics"]["ev_gross_profit"] = 3.0 + i * 0.1
+            r["own_pct"] = {}
+            snap = scan.to_snapshot(r)
+            snap["ticker"] = r["ticker"]
+            scan.survivor_path(r["ticker"]).write_text(
+                json.dumps(snap), encoding="utf-8")
+            rows.append(r)
+        return rows
+
+    def test_below_threshold_produces_nothing(self, isolated):
+        self._seed_survivors(5)
+        state = scan.empty_state()
+        state.update({"queue": ["A"] * 100, "cursor": 10})
+        assert scan.interim(state, build_cards=False) is None
+
+    def test_above_threshold_ranks_survivors(self, isolated, monkeypatch):
+        from src import pipeline
+        captured = {}
+        monkeypatch.setattr(pipeline, "refresh_candidates_from_disk",
+                            lambda partial=None: captured.update(partial or {}))
+        self._seed_survivors(20)
+        state = scan.empty_state()
+        state.update({"cycle": 1, "queue": ["A"] * 100, "cursor": 25})
+
+        out = scan.interim(state, build_cards=False)
+        assert out is not None
+        assert captured["is_partial"] is True
+        assert captured["scanned"] == 25
+        assert captured["survivors"] == 20
+
+    def test_partial_flag_reaches_candidates_file(self, tmp_path, monkeypatch):
+        """Pano 'bu liste gecici' diyebilmek icin bayragi gormeli."""
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "CARDS_DIR", tmp_path / "cards")
+        (tmp_path / "cards").mkdir()
+        monkeypatch.setattr(pipeline, "DATA_DIR", tmp_path)
+        written = {}
+        monkeypatch.setattr(pipeline, "write_json",
+                            lambda path, payload, **kw: written.update(payload) or True)
+        pipeline.write_candidates([], [], [], partial={"is_partial": True, "pct": 12.5})
+        assert written["partial"]["is_partial"] is True
+
+
+class TestHangProtection:
+    """22 Eylul 2026 kilitlenmesi — tek sirket tum partiyi durdurmasin.
+
+    Borsadan cikmis bir sembolde yfinance sonsuza kadar asildi. Parti
+    50 dakikalik is akisi sinirina carpti, "Commit" adimi atlandi ve
+    imlec 1920'de dondu; her saat ayni yere takildi. Uc savunma:
+    sirket basina zaman siniri, parti sure butcesi, tekrar eden
+    sembolu atlama. Ucu de ILERLEME ASLA DURMAZ ilkesine hizmet eder.
+    """
+
+    def test_hanging_company_does_not_stall_batch(self, isolated, monkeypatch):
+        import time as _t
+
+        from src import config, pipeline
+
+        monkeypatch.setattr(config, "COMPANY_TIMEOUT_SEC", 1)
+
+        def maybe_hang(ticker, **kw):
+            if ticker == "HANG":
+                _t.sleep(30)          # bekci devreye girmezse test kilitlenir
+            f = fixtures.ALL["DBX"]()
+            f.avg_dollar_volume_30d = 50e6
+            return f
+
+        monkeypatch.setattr(pipeline, "load_company", maybe_hang)
+
+        state = scan.start_cycle(scan.empty_state(),
+                                 tickers=["DBX", "HANG", "LSCC"])
+        started = _t.monotonic()
+        state = scan.run_batch(state, size=3)
+
+        assert _t.monotonic() - started < 10      # 30 sn beklemedi
+        assert state["cursor"] == 3               # kuyruk sonuna kadar ilerledi
+        assert state["timeouts"]["HANG"] == 1
+        assert "HANG" in state["failed"]
+
+    def test_repeated_timeouts_skip_the_symbol(self, isolated, monkeypatch):
+        from src import config, pipeline
+
+        calls = []
+
+        def counted(ticker, **kw):
+            calls.append(ticker)
+            raise AssertionError("bu sembol hic denenmemeliydi")
+
+        monkeypatch.setattr(pipeline, "load_company", counted)
+        monkeypatch.setattr(config, "COMPANY_TIMEOUT_SKIP_AFTER", 2)
+
+        state = scan.start_cycle(scan.empty_state(), tickers=["BAD"])
+        state["timeouts"] = {"BAD": 2}
+        state = scan.run_batch(state, size=1)
+
+        assert calls == []                # hic denenmedi
+        assert state["cursor"] == 1       # yine de ilerledi
+
+    def test_deadline_ends_batch_cleanly(self, isolated, monkeypatch):
+        import time as _t
+
+        from src import pipeline
+
+        def quick(ticker, **kw):
+            f = fixtures.ALL["DBX"]()
+            f.avg_dollar_volume_30d = 50e6
+            return f
+
+        monkeypatch.setattr(pipeline, "load_company", quick)
+
+        state = scan.start_cycle(scan.empty_state(),
+                                 tickers=[f"T{i}" for i in range(20)])
+        # Butce ZATEN dolmus: tek sirket bile islenmeden duzgun donmeli
+        state = scan.run_batch(state, size=20, deadline=_t.monotonic() - 1)
+
+        assert state["cursor"] == 0
+        assert state["processed"] == 0
+
+    def test_cursor_is_saved_after_every_company(self, isolated, monkeypatch):
+        """Surec parti ortasinda olurse diskteki imlec o ana kadar ilerlemis olmali."""
+        from src import config, pipeline
+
+        monkeypatch.setattr(config, "STATE_FLUSH_EVERY", 1)
+
+        seen = []
+
+        def quick(ticker, **kw):
+            # Her sirketten sonra diskteki duruma bak
+            on_disk = json.loads(scan.STATE_PATH.read_text()) \
+                if scan.STATE_PATH.exists() else {"cursor": 0}
+            seen.append(on_disk.get("cursor", 0))
+            f = fixtures.ALL["DBX"]()
+            f.avg_dollar_volume_30d = 50e6
+            return f
+
+        monkeypatch.setattr(pipeline, "load_company", quick)
+
+        state = scan.start_cycle(scan.empty_state(), tickers=["A", "B", "C"])
+        scan.run_batch(state, size=3)
+
+        # 1. sirkette disk bos (0), 2.'de 1, 3.'te 2 olmali
+        assert seen == [0, 1, 2]
+        assert json.loads(scan.STATE_PATH.read_text())["cursor"] == 3
+
+
+class TestStallDetection:
+    """Duraklama GORUNUR olmali.
+
+    22 Eylul 2026'da tarama iki gun boyunca ayni sirkette takildi ve
+    hicbir yerde "en son ne zaman ilerledi" yazmadigi icin fark edilmedi.
+    """
+
+    def _state(self, hours_ago, *, cursor=10, total=100):
+        from datetime import datetime, timedelta, timezone
+
+        st = scan.empty_state()
+        st["queue"] = [f"T{i}" for i in range(total)]
+        st["cursor"] = cursor
+        if hours_ago is not None:
+            stamp = datetime.now(timezone.utc) - timedelta(hours=hours_ago)
+            st["last_batch_at"] = stamp.isoformat()
+        return st
+
+    def test_fresh_batch_is_not_stalled(self):
+        p = scan.progress(self._state(0.5))
+        assert p["stalled"] is False
+        assert p["idle_hours"] < 1
+
+    def test_old_batch_is_stalled(self):
+        p = scan.progress(self._state(33))
+        assert p["stalled"] is True
+        assert p["idle_hours"] > 32
+
+    def test_finished_cycle_is_never_stalled(self):
+        """Kuyruk bittiyse beklemek normaldir; alarm verme."""
+        p = scan.progress(self._state(48, cursor=100, total=100))
+        assert p["stalled"] is False
+
+    def test_missing_timestamp_is_not_an_alarm(self):
+        p = scan.progress(self._state(None))
+        assert p["idle_hours"] is None
+        assert p["stalled"] is False
+
+    def test_naive_timestamp_is_treated_as_utc(self):
+        from datetime import datetime, timedelta, timezone
+
+        st = self._state(1)
+        naive = (datetime.now(timezone.utc) - timedelta(hours=5)).replace(tzinfo=None)
+        st["last_batch_at"] = naive.isoformat()
+        p = scan.progress(st)
+        assert 4.5 < p["idle_hours"] < 5.5
+
+
+class TestCorruptState:
+    """Bozuk durum dosyasi SESSIZCE turu sifirlamamali."""
+
+    def test_missing_file_is_a_fresh_start(self, isolated):
+        assert scan.load_state()["cursor"] == 0
+
+    def test_corrupt_file_raises_instead_of_resetting(self, isolated):
+        # 1920 sirketlik ilerlemeyi sessizce cope atmak yerine dur.
+        scan.STATE_PATH.write_text('{"cursor": 1920, "queue": ["A", "B"', encoding="utf-8")
+        with pytest.raises(scan.CorruptStateError):
+            scan.load_state()
+
+    def test_valid_file_loads_normally(self, isolated):
+        state = scan.empty_state()
+        state.update({"cursor": 5, "queue": ["A"] * 10})
+        scan.save_state(state)
+        assert scan.load_state()["cursor"] == 5
+
+
+class TestBatchSizeCeiling:
+    """Parti boyutu bir TAVAN; gercek sinirlayici sure butcesi.
+
+    GitHub saatlik cron'u bu repoda 3-5 saatte bir tetikliyor. Durum
+    dosyasinda kalmis eski 120 degeri, kosu basina isi gereksiz kisitliyordu.
+    """
+
+    def test_legacy_stored_value_does_not_throttle(self, isolated, monkeypatch):
+        seen = {}
+
+        def spy(state, *, size=None, **kw):
+            seen["size"] = size
+            state["cursor"] = len(state["queue"])
+            return state
+
+        monkeypatch.setattr(scan, "run_batch", spy)
+        monkeypatch.setattr(scan, "interim", lambda *a, **k: None)
+        monkeypatch.setattr(scan, "write_survivors_index", lambda: False)
+        monkeypatch.setattr(scan, "finalize", lambda st, **k: st)
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {})
+        # context() FINRA/Finnhub'a gider; testte ag beklemesin.
+        monkeypatch.setattr(pipeline, "context", lambda *a, **k: {})
+        monkeypatch.setattr(scan, "start_cycle",
+                            lambda st, **k: dict(st, queue=["A"], cursor=0))
+
+        state = scan.empty_state()
+        state.update({"queue": ["A"] * 50, "batch_size": scan.LEGACY_BATCH_SIZE})
+        scan.save_state(state)
+        scan.run(build_cards=False)
+
+        assert seen["size"] == scan.DEFAULT_BATCH_SIZE
+
+    def test_explicit_batch_still_wins(self, isolated, monkeypatch):
+        seen = {}
+
+        def spy(state, *, size=None, **kw):
+            seen["size"] = size
+            state["cursor"] = len(state["queue"])
+            return state
+
+        monkeypatch.setattr(scan, "run_batch", spy)
+        monkeypatch.setattr(scan, "interim", lambda *a, **k: None)
+        monkeypatch.setattr(scan, "write_survivors_index", lambda: False)
+        monkeypatch.setattr(scan, "finalize", lambda st, **k: st)
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {})
+        # context() FINRA/Finnhub'a gider; testte ag beklemesin.
+        monkeypatch.setattr(pipeline, "context", lambda *a, **k: {})
+        monkeypatch.setattr(scan, "start_cycle",
+                            lambda st, **k: dict(st, queue=["A"], cursor=0))
+
+        state = scan.empty_state()
+        state.update({"queue": ["A"] * 50})
+        scan.save_state(state)
+        scan.run(batch_size=25, build_cards=False)
+
+        assert seen["size"] == 25      # kullanici acikca istedi, saygi goster
+
+    def test_deliberate_stored_value_is_respected(self, isolated, monkeypatch):
+        """Goc YALNIZCA eski varsayilani (120) yukseltir.
+
+        Bilincli konmus bir deger (ornegin --batch 10 --new-cycle ile
+        kaydedilmis) aynen korunmali; yoksa kullanicinin karari sessizce
+        eziliyor demektir.
+        """
+        seen = {}
+
+        def spy(state, *, size=None, **kw):
+            seen["size"] = size
+            return state
+
+        monkeypatch.setattr(scan, "run_batch", spy)
+        monkeypatch.setattr(scan, "interim", lambda *a, **k: None)
+        monkeypatch.setattr(scan, "write_survivors_index", lambda: False)
+        from src import pipeline
+        monkeypatch.setattr(pipeline, "benchmarks", lambda: {})
+        monkeypatch.setattr(pipeline, "context", lambda *a, **k: {})
+
+        state = scan.empty_state()
+        state.update({"queue": ["A"] * 500, "cursor": 0, "batch_size": 10})
+        scan.save_state(state)
+        scan.run(build_cards=False)
+
+        assert seen["size"] == 10
+
+
+class TestFunnelLogKeepsFinishedRounds:
+    """Biten turun kaydi, ayni gun baslayan yeni turun ara kaydiyla SILINMEMELI.
+
+    Gercek olay: tur 3 24 Eylul'de bitti ve tam kaydini yazdi; ayni gun tur
+    4'un ilk ara kaydi "ayni tarihli kaydi degistir" kuraliyla onu sildi.
+    Tur 2'nin (19 Eylul) kaydi da ayni sekilde kaybolmustu. Ikisi git
+    gecmisinden kurtarildi.
+    """
+
+    def _runs(self, isolated):
+        import json
+        return json.loads((isolated / "funnel_log.json").read_text())["runs"]
+
+    def test_partial_does_not_erase_same_day_full_record(self, isolated):
+        from src import pipeline
+
+        pipeline.append_funnel_log({"stages": [{"stage": 4, "output": 50}]},
+                                   partial=False, cycle=3)
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=4)
+
+        runs = self._runs(isolated)
+        tam = [r for r in runs if not r["partial"]]
+        assert len(tam) == 1 and tam[0]["cycle"] == 3
+        assert any(r["partial"] and r["cycle"] == 4 for r in runs)
+
+    def test_same_day_partial_of_same_cycle_is_replaced(self, isolated):
+        from src import pipeline
+
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=5, scanned=300)
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=5, scanned=600)
+        runs = self._runs(isolated)
+        assert len(runs) == 1 and runs[0]["scanned"] == 600
+
+    def test_finished_rounds_survive_the_cap(self, isolated):
+        """60 ara kayit, tamamlanmis turlari kotadan itmemeli."""
+        from src import pipeline
+        from src.util import write_json
+
+        eski = [{"date": f"2026-08-{i:02d}", "partial": True, "cycle": 1}
+                for i in range(1, 29)]
+        eski.append({"date": "2026-07-01", "partial": False, "cycle": 1})
+        eski += [{"date": f"2026-09-{i:02d}", "partial": True, "cycle": 2}
+                 for i in range(1, 29)]
+        write_json(isolated / "funnel_log.json", {"runs": eski})
+
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=3)
+        runs = self._runs(isolated)
+        assert any(not r["partial"] and r["cycle"] == 1 for r in runs)
+
+    def test_finished_round_comes_before_next_rounds_partial(self, isolated):
+        """Ayni gun: once biten turun kaydi, sonra yeni turun ara kaydi.
+        Pano son kaydi 'guncel' saydigi icin sira onemli."""
+        from src import pipeline
+
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=4)
+        pipeline.append_funnel_log({"stages": []}, partial=False, cycle=3)
+        runs = self._runs(isolated)
+        assert (runs[-1]["cycle"], runs[-1]["partial"]) == (4, True)
+
+
+class TestRoundEta:
+    """'Bu tur ne zaman biter' sorusu olcumle cevaplanmali, tahminle degil."""
+
+    def _state(self, batches, cursor=2100, total=3826):
+        st = scan.empty_state()
+        st.update({"queue": ["X"] * total, "cursor": cursor,
+                   "universe_size_at_cycle_start": total,
+                   "recent_batches": batches})
+        return st
+
+    def test_no_estimate_with_too_few_batches(self):
+        """Iki noktadan cizilen cizgi guven vermez; yanlis tarih, hic
+        tarih olmamasindan kotudur."""
+        st = self._state([{"at": "2026-09-27T01:00:00+00:00", "n": 300},
+                          {"at": "2026-09-27T05:00:00+00:00", "n": 300}])
+        assert scan.eta(st)["eta_at"] is None
+
+    def test_estimate_uses_measured_pace(self):
+        # 3 parti, 12 saatte; ilkinin baslangici bilinmedigi icin sayilmaz:
+        # 600 sirket / 12 saat = 50/saat -> gunde 1.200
+        st = self._state([{"at": "2026-09-27T00:00:00+00:00", "n": 300},
+                          {"at": "2026-09-27T06:00:00+00:00", "n": 300},
+                          {"at": "2026-09-27T12:00:00+00:00", "n": 300}],
+                         cursor=3226, total=3826)
+        out = scan.eta(st)
+        assert out["per_day"] == 1200
+        assert out["eta_hours"] == 12.0          # 600 kalan / 50 saatte
+        assert out["eta_at"].startswith("2026-09-28T00:00")
+
+    def test_finished_round_has_no_eta(self):
+        st = self._state([{"at": "2026-09-27T00:00:00+00:00", "n": 300}] * 3,
+                         cursor=3826, total=3826)
+        out = scan.eta(st)
+        assert out["remaining"] == 0 and out["eta_at"] is None
+
+    def test_batch_records_pace_and_effective_size(self, isolated, monkeypatch):
+        from src import pipeline
+
+        def quick(ticker, **kw):
+            f = fixtures.ALL["DBX"]()
+            f.avg_dollar_volume_30d = 50e6
+            return f
+
+        monkeypatch.setattr(pipeline, "load_company", quick)
+        st = scan.start_cycle(scan.empty_state(), tickers=["A", "B", "C"])
+        st = scan.run_batch(st, size=2)
+        assert st["recent_batches"][-1]["n"] == 2
+        assert "eta" in st

@@ -11,7 +11,8 @@ from . import overrides
 from .util import read_json, today_iso, try_fetch, write_json
 
 
-def load_company(ticker: str, *, with_price: bool = True) -> Fundamentals | None:
+def load_company(ticker: str, *, with_price: bool = True,
+                 fresh: bool = False) -> Fundamentals | None:
     """EDGAR temel verisi + fiyat serisi + elle veri duzeltmeleri.
 
     Duzeltmeler BURADA uygulanir cunku her kosu yolu (tohum, tarama, gunluk)
@@ -19,7 +20,7 @@ def load_company(ticker: str, *, with_price: bool = True) -> Fundamentals | None
     yerde uygulansaydi bir kosuda duzeltilmis, digerinde duzeltilmemis veri
     ile calisilirdi.
     """
-    f = try_fetch(edgar_api.load, ticker, label=f"edgar {ticker}")
+    f = try_fetch(edgar_api.load, ticker, label=f"edgar {ticker}", fresh=fresh)
     if f is None:
         return None
 
@@ -34,7 +35,32 @@ def load_company(ticker: str, *, with_price: bool = True) -> Fundamentals | None
         quote = try_fetch(prices.quote, ticker, label=f"fiyat {ticker}")
         if quote:
             prices.attach(f, quote)
+
+    reconcile_shares(f)
     return f
+
+
+def reconcile_shares(f: Fundamentals) -> None:
+    """EDGAR hisse sayisini dogrulayamadiysa ikinci kaynakla kontrol et.
+
+    Yalnizca SUPHELI durumlarda cagrilir (hisse yok ya da kapak sayfasi
+    seyreltilmis sayiyla karsilastirilamadi) — her sirket icin ek istek
+    atilmaz. Ikinci kaynak belirgin buyukse o kullanilir: kucuk hisse sayisi
+    tek sinif demektir ve piyasa degerini kati kati kucuk gosterir.
+    """
+    source = f.sources.get("shares") or ""
+    if f.shares_outstanding is not None and source != "kapak_sayfasi_dogrulanmamis":
+        return
+    alt = try_fetch(prices.implied_shares, f.ticker, label=f"hisse {f.ticker}")
+    if alt is None:
+        return
+    edgar = f.shares_outstanding
+    if edgar is None or edgar < alt * config.SHARE_RECONCILE_RATIO:
+        print(f"  [hisse] {f.ticker}: EDGAR {edgar} -> yfinance {alt:.3f} mn "
+              f"(tum siniflar)")
+        f.shares_outstanding = alt
+        f.sources["shares"] = ("yfinance_tum_siniflar" if edgar is None
+                               else "yfinance_tum_siniflar (EDGAR tek sinif)")
 
 
 def benchmarks() -> dict[str, list[tuple[str, float]]]:
@@ -51,6 +77,17 @@ def context(tickers: list[str]) -> dict:
                          label="kazanc takvimi") or {}
     shorts = try_fetch(finra_short.load, label="FINRA kisa pozisyon") or {}
     return {"earnings": earnings, "shorts": shorts}
+
+
+def earnings_entry(ticker: str, confirmed: str | None) -> dict:
+    """Bilanco tarihi: Finnhub'da varsa KESIN, yoksa SEC'ten TAHMIN."""
+    if confirmed:
+        return {"next_earnings": confirmed, "estimated": False}
+    from .sources import calendar_src
+    cik = try_fetch(edgar_api.cik_for, ticker, label=f"cik {ticker}")
+    guess = try_fetch(calendar_src.estimate_next_earnings, cik,
+                      label=f"bilanco tahmini {ticker}")
+    return {"next_earnings": guess, "estimated": bool(guess)}
 
 
 def build_cards(rows: list[dict], *, source: str, sector_table: dict,
@@ -90,13 +127,14 @@ def build_cards(rows: list[dict], *, source: str, sector_table: dict,
             is_manual=row.get("is_manual", False),
             both_tracks=ticker in config.SEED_BOTH_TRACKS,
         )
+        card["calendar"] = earnings_entry(ticker, ctx["earnings"].get(ticker))
         cards.save(card)
         built.append(card)
     return built
 
 
 def write_candidates(seed_cards: list[dict], funnel_cards: list[dict],
-                     manual_cards: list[dict]) -> bool:
+                     manual_cards: list[dict], partial: dict | None = None) -> bool:
     """``data/candidates.json`` — dashboard izgarasinin okudugu dosya.
 
     Elle eklenenler AYRI bolumde; siralamaya karismaz.
@@ -119,17 +157,32 @@ def write_candidates(seed_cards: list[dict], funnel_cards: list[dict],
             "manual": len(manual_cards),
         },
         "seed_date": config.SEED_DATE,
+        # Tarama devam ederken yazilan liste GECICIDIR: havuz buyudukce
+        # sektor yuzdelikleri ve dolayisiyla siralama degisir. Pano bunu
+        # acikca soylemeli, yoksa kullanici yarim veriye gore karar verir.
+        "partial": partial,
         "source": "funnel+seed+manual",
     }
     return write_json(DATA_DIR / "candidates.json", payload)
 
 
-def refresh_candidates_from_disk() -> bool:
+def refresh_candidates_from_disk(partial: dict | None = None) -> bool:
     """Kartlari diskten okuyup candidates.json'i yeniden kurar.
 
     Gunluk kosuda tam huni calismaz; kartlarin fiyat/haber alanlari
     guncellenir ve ozet dosyasi bu fonksiyonla tazelenir.
+
+    GECICI LISTE ISARETI KORUNUR. Tarama turu surerken aday listesi
+    "partial" isaretlidir (siralama havuzun tamami bitmeden yapildi).
+    Gunluk, birlestirme ve yeniden hesaplama kosulari bu fonksiyonu
+    parametresiz cagirdigi icin isaret siliniyor, pano gecici listeyi
+    kesinlesmis gibi gosteriyordu. Tur hala suruyorsa mevcut isaret tasinir.
     """
+    if partial is None:
+        state = read_json(DATA_DIR / "scan_state.json", {}) or {}
+        queue = state.get("queue") or []
+        if queue and (state.get("cursor") or 0) < len(queue):
+            partial = (read_json(DATA_DIR / "candidates.json", {}) or {}).get("partial")
     seed, funnel_rows, manual = [], [], []
     for path in sorted(CARDS_DIR.glob("*.json")):
         card = read_json(path)
@@ -141,11 +194,62 @@ def refresh_candidates_from_disk() -> bool:
             seed.append(card)
         else:
             funnel_rows.append(card)
-    return write_candidates(seed, funnel_rows, manual)
+    return write_candidates(seed, funnel_rows, manual, partial=partial)
+
+
+def sector_rows_from_cards(exclude: set[str] | None = None) -> list[dict]:
+    """Diskteki kartlardan yuzdelik havuzu icin satir uretir.
+
+    NEDEN: ``run_seed --tickers FRSH`` gibi ALT KUME kosularinda sektor
+    tablosu yalnizca o kosunun satirlarindan kuruluyordu. Tek sirketle
+    MIN_PEERS_FOR_SECTOR_PERCENTILE asilmiyor, TUM yuzdelikler None doner,
+    tum puan bloklari bosalir ve kart yalnizca elle girilen katalizor
+    puaniyla yayimlanir. FRSH tam olarak boyle 0,25 kapsamali 60,0 puanla
+    siralamaya girdi.
+
+    Havuz, kosuda OLMAYAN sirketlerin son bilinen metrikleriyle
+    tamamlanir; kosudakiler taze degerleriyle zaten ekleniyor.
+    """
+    exclude = {t.upper() for t in (exclude or set())}
+    rows: list[dict] = []
+    for path in sorted(CARDS_DIR.glob("*.json")):
+        card = read_json(path)
+        if not isinstance(card, dict):
+            continue
+        ticker = str(card.get("ticker", "")).upper()
+        if not ticker or ticker in exclude:
+            continue
+        cells = card.get("metrics") or {}
+        metrics = {k: (v or {}).get("value") for k, v in cells.items()
+                   if isinstance(v, dict)}
+        rows.append({"ticker": ticker, "sector": card.get("sector"),
+                     "metrics": metrics})
+    return rows
 
 
 def write_macro() -> bool:
+    """FRED makro anlik goruntusu.
+
+    BOS SONUC IYI VERIYI EZMEZ. Anahtar tanimsizsa veya FRED o an
+    cevap vermiyorsa snapshot bos doner; onu yazmak calisan panoyu
+    "veri yok" haline getirir. Bayat makro, eksik makrodan iyidir —
+    tarih damgasi zaten kartta gorunuyor.
+    """
     snapshot = try_fetch(fred_api.snapshot, label="FRED makro") or {}
+
+    # DOLU MU, GERCEKTEN? Anahtar yokken snapshot bos sozluk DONMEZ: etiketleri
+    # olan ama degerleri None olan bir iskelet doner. "if not snapshot" bunu
+    # kacirip calisan panoyu "veri yok"a cevirdi.
+    has_values = any(
+        isinstance(v, dict) and v.get("value") is not None
+        for v in snapshot.values())
+
+    if not has_values:
+        existing = read_json(DATA_DIR / "macro.json", {}) or {}
+        if any(isinstance(v, dict) and v.get("value") is not None
+               for v in (existing.get("series") or {}).values()):
+            print("  [makro] yeni veri alinamadi; mevcut dosya korundu")
+            return False
     return write_json(DATA_DIR / "macro.json",
                       {"series": snapshot, "source": "fred"})
 
@@ -173,13 +277,21 @@ def _sector_counts(rows: list[dict]) -> dict:
     return dict(sorted(out.items(), key=lambda kv: kv[1], reverse=True))
 
 
-def append_funnel_log(log: dict) -> bool:
-    """Her kosuyu ``funnel_log.json``'a ekler — esik degisimlerinin etkisi izlensin."""
+def append_funnel_log(log: dict, *, partial: bool = False, cycle: int | None = None,
+                      scanned: int | None = None) -> bool:
+    """Her kosuyu ``funnel_log.json``'a ekler — esik degisimlerinin etkisi izlensin.
+
+    ``partial``: tur bitmeden yazilan ara kayit. Asama 3-4 sayilari o anki
+    hayatta kalan havuzuna gore; tur sonunda degisebilir.
+    """
     path = DATA_DIR / "funnel_log.json"
     existing = read_json(path, {"runs": []})
     runs = existing.get("runs", [])
     entry = {
         "date": today_iso(),
+        "partial": partial,
+        "cycle": cycle,
+        "scanned": scanned,
         "stages": log.get("stages", []),
         "kill_reasons": log.get("kill_reasons", {}),
         "sector_distribution": log.get("sector_distribution", {}),
@@ -188,25 +300,68 @@ def append_funnel_log(log: dict) -> bool:
             "stage1": config.STAGE1, "stage2": config.STAGE2, "stage3": config.STAGE3,
         },
     }
-    runs = [r for r in runs if r.get("date") != entry["date"]]
+    # YALNIZCA AYNI TURUN AYNI TURDEN kaydini degistir. Onceki surum
+    # "ayni tarihli her kaydi" siliyordu: tur 3 24 Eylul'de bitti ve TAM
+    # kaydini yazdi, ayni gun tur 4'un ilk ara kaydi onu sildi. Biten bir
+    # turun sonucu — o turun nihai aday listesinin dayandigi sayilar —
+    # iz birakmadan kayboldu.
+    def ayni(r: dict) -> bool:
+        return (r.get("date") == entry["date"]
+                and bool(r.get("partial")) == bool(partial)
+                and r.get("cycle") == cycle)
+
+    runs = [r for r in runs if not ayni(r)]
     runs.append(entry)
-    runs = runs[-60:]     # son 60 kosu yeter
+
+    # Tam tur kayitlari kotada KORUNUR: gunde bir ara kayit yaziliyor ve
+    # tek bir kotada 60 ara kayit, tamamlanmis turlari iterek silerdi.
+    tam = [r for r in runs if not r.get("partial")][-30:]
+    ara = [r for r in runs if r.get("partial")][-30:]
+    runs = sorted(tam + ara, key=lambda r: (r.get("date") or "",
+                                            r.get("cycle") or 0,
+                                            1 if r.get("partial") else 0))
     return write_json(path, {"runs": runs, "source": "funnel"})
 
 
 def write_portfolio_state(quotes: dict, bench: dict, ctx: dict) -> bool:
+    """Portfoy durumunu yazar. POZISYON YOKKEN DE yazar.
+
+    Onceki surumde dosya 10 Eylul'de kalmisti: icerik degismediginden
+    write_json dosyaya dokunmuyordu ve "as_of" 13 gun geride gorunuyordu.
+    Bos bir portfoyun bugun de bos oldugunu BILMEK, dosyanin bayat mi yoksa
+    guncel mi oldugunu bilmemekten iyidir.
+    """
     card_map = {}
     for path in CARDS_DIR.glob("*.json"):
         c = read_json(path)
         if isinstance(c, dict) and c.get("ticker"):
             card_map[c["ticker"]] = c
-    state = portfolio.compute(quotes, bench, ctx["earnings"], card_map)
-    return write_json(DATA_DIR / "portfolio_state.json", state)
+
+    # TL mevduat dilimi kur olmadan degerlenemez.
+    fx = try_fetch(prices.fx_rate, "USDTRY", label="USD/TRY kuru") or {}
+
+    state = portfolio.compute(quotes, bench, ctx["earnings"], card_map, fx=fx)
+    # stamp_matters: icerik ayni olsa bile "as_of" tazelensin.
+    return write_json(DATA_DIR / "portfolio_state.json", state,
+                      stamp_matters=True)
 
 
 def write_overview(ctx: dict, quotes: dict) -> bool:
-    """Genel bakis ekraninin "bugun ne olmus" seridi."""
+    """Genel bakis ekraninin "bugun ne olmus" seridi.
+
+    KAPSAM: yalnizca izleme listesi + portfoy bakiliyordu. Ikisi de bosken
+    genel bakis TAMAMEN bos kaliyordu — 91 kartta haber varken sayfa
+    hicbirini gostermiyordu. Adaylar da dahil: sistemin ilgilendigi kume
+    zaten onlar.
+    """
     watched = set(watchlist.tickers()) | set(portfolio.tickers())
+    cand = read_json(DATA_DIR / "candidates.json", {}) or {}
+    rows = [*(cand.get("seed") or []), *(cand.get("candidates") or []),
+            *(cand.get("manual") or [])]
+    rows.sort(key=lambda r: (r.get("scores") or {}).get("total") or -1, reverse=True)
+    for row in rows[:config.PULSE["top_candidates"]]:
+        if row.get("ticker"):
+            watched.add(str(row["ticker"]).upper())
     movers = []
     for ticker in sorted(watched):
         q = quotes.get(ticker) or {}
@@ -227,8 +382,52 @@ def write_overview(ctx: dict, quotes: dict) -> bool:
         "movers": movers[:20],
         "news": news_items[:25],
         "watched_count": len(watched),
+        # KPI KUTULARI portfolio_state.summary'den besleniyordu; portfoy
+        # bosken hepsi "—" gorunuyor ve genel bakis olu bir sayfa oluyordu.
+        # Oysa sistemin uretttigi is ORTADA: aday sayisi, kac karta uyari
+        # dustu, tarama nerede. Bunlar portfoyden bagimsiz.
+        "kpis": _overview_kpis(rows, cand),
         "source": "prices+finnhub",
     })
+
+
+def _overview_kpis(rows: list[dict], cand: dict) -> dict:
+    """Portfoyden BAGIMSIZ ozet sayilar."""
+    scan = read_json(DATA_DIR / "scan_state.json", {}) or {}
+    total = (scan.get("universe_size_at_cycle_start")
+             or len(scan.get("queue") or []) or 0)
+    done = min(scan.get("cursor", 0), total) if total else 0
+
+    uyarili = 0
+    for path in CARDS_DIR.glob("*.json"):
+        c = read_json(path)
+        if not isinstance(c, dict):
+            continue
+        flags = c.get("flags") or {}
+        dq = c.get("data_quality") or {}
+        if (flags.get("warnings") or dq.get("issue_count")):
+            uyarili += 1
+
+    # candidates.json satirlarinda "decision" duz metin (kartta sozluk).
+    # Iki bicimi de kabul et; birini varsaymak sessizce sifir sayar.
+    def _has_decision(r: dict) -> bool:
+        d = r.get("decision")
+        if isinstance(d, dict):
+            return bool(d.get("action"))
+        return bool(d)
+
+    kararli = sum(1 for r in rows if _has_decision(r))
+    return {
+        "candidate_count": len(cand.get("candidates") or []),
+        "seed_count": len(cand.get("seed") or []),
+        "decided_count": kararli,
+        "cards_with_warnings": uyarili,
+        "scan_done": done,
+        "scan_total": total,
+        "scan_pct": round(done / total * 100, 1) if total else 0.0,
+        "scan_survivors": scan.get("survivor_count", 0),
+        "data_missing": (scan.get("kill_kinds") or {}).get("VERI_YOK", 0),
+    }
 
 
 def universe_tickers(limit: int | None = None, *, auto_sync: bool = True) -> list[str]:

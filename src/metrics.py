@@ -313,6 +313,13 @@ def _one_off_earnings(p: Period) -> bool:
     if ebit is not None and ni is not None and ebit > 0:
         if ni / ebit > ANOMALY["net_income_to_ebit_ratio_max"]:
             return True
+    # FAALIYET ZARARINDA NET KAR. Oran testi EBIT pozitifken calisiyordu;
+    # LYFT'te EBIT -188 mn, net kar +2.844 mn (ertelenmis vergi varligi kaydi)
+    # iken bayrak kalkmiyordu. Isletme zarar ederken buyuk net kar ancak
+    # faaliyet disi tek seferlik bir kalemden gelebilir.
+    if (ebit is not None and ni is not None and ebit <= 0 and ni > 0
+            and ni > abs(ebit) * ANOMALY["net_income_to_ebit_ratio_max"]):
+        return True
     if ANOMALY["negative_tax_rate_flag"]:
         rate = p.effective_tax_rate
         if rate is not None and rate < 0:

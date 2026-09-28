@@ -21,6 +21,9 @@ jobs:
       - name: Inbox ve veri duzeltmesi sozlesmesi
         run: python -m src.run_merge --check
 
+      - name: Kart tutarliligi (sayilar kendi icinde tutuyor mu)
+        run: python scripts/audit_cards.py
+
       - name: JSON semalari gecerli mi
         run: |
           python - <<'PY'

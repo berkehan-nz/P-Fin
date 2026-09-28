@@ -12,7 +12,8 @@ from __future__ import annotations
 import argparse
 import sys
 
-from . import cards, config, pipeline, portfolio, validate, watchlist
+from . import (cards, config, pipeline, portfolio, validate, watchlist,
+               weekly)
 from .config import CARDS_DIR
 from .sources import analyst as analyst_src, finnhub_api, prices
 from .util import read_json, try_fetch
@@ -21,6 +22,8 @@ from .util import read_json, try_fetch
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Gunluk guncelleme")
     parser.add_argument("--no-news", action="store_true")
+    parser.add_argument("--weekly", action="store_true",
+                        help="Cuma raporunu gun bakmadan yaz (data/weekly.json)")
     args = parser.parse_args(argv)
 
     portfolio.ensure_file()
@@ -53,6 +56,9 @@ def main(argv: list[str] | None = None) -> int:
         # --- fiyata bagli alanlari tazele ---
         if quote and quote.get("price"):
             card["price"] = round(quote["price"], 2)
+            # Fiyat HANGI KAPANISA ait? as_of kartin yazildigi gun; fiyat
+            # genelde bir onceki islem gununun kapanisidir.
+            card["price_as_of"] = quote.get("as_of")
             card["change_1d_pct"] = (round(quote["change_1d_pct"], 2)
                                      if quote.get("change_1d_pct") is not None else None)
             card["series"]["price_sparkline"] = prices.sparkline(quote["history"])
@@ -64,11 +70,21 @@ def main(argv: list[str] | None = None) -> int:
             news = try_fetch(finnhub_api.news, ticker, label=f"haber {ticker}")
             if news:
                 card["news"] = news
-        card["calendar"] = {"next_earnings": ctx["earnings"].get(ticker)}
+        # BILANCO TARIHI: yeni sorgu bos dondurduyse kartta YAZILI olani
+        # koru. Onceki surum kosulsuz yaziyordu; Finnhub ve SEC tahmini
+        # ayni anda cevap vermedigi anda bilinen bir tarih siliniyor ve
+        # yerine {"next_earnings": null, "estimated": false} gibi kendi
+        # icinde tutarsiz bir kayit geliyordu.
+        yeni_takvim = pipeline.earnings_entry(ticker, ctx["earnings"].get(ticker))
+        if yeni_takvim.get("next_earnings") or not (card.get("calendar") or {}).get("next_earnings"):
+            card["calendar"] = yeni_takvim
 
         analyst = try_fetch(analyst_src.consensus, ticker, card.get("price"),
                             label=f"analist {ticker}")
-        if analyst:
+        # ICI BOS sozluk de yazmamali: kaynak "cevap verdim ama elimde bir
+        # sey yok" dediginde kartta duran hedefleri silmek dogru degil.
+        if analyst and any(v is not None for k, v in analyst.items()
+                           if k not in ("source", "recommendation")):
             card["analyst"] = analyst
 
         # Fiyat degisince carpanlar yeniden hesaplandi; denetimi tekrarla
@@ -83,6 +99,12 @@ def main(argv: list[str] | None = None) -> int:
     pipeline.write_portfolio_state(quotes, bench_map, ctx)
     pipeline.write_overview(ctx, quotes)
     pipeline.write_macro()
+
+    # CUMA RAPORU. Yalnizca cuma yazilir: "gecen rapordan bu yana yeni
+    # aday" hesabi raporun haftalik olmasina dayanir. Her gun yazilsa
+    # pencere bir gune duser ve bolum anlamini kaybeder.
+    if weekly.write(force=args.weekly):
+        print("[gunluk] Cuma raporu yazildi (data/weekly.json)")
 
     print(f"[gunluk] {changed} kart degisti, {len(quotes)} fiyat guncellendi")
     return 0
@@ -133,8 +155,28 @@ def _refresh_price_derived(card: dict, quote: dict, benchmark: list) -> None:
         _set(cells, "fcf_yield_mcap",
              (fcf / mcap * 100) if (fcf is not None and mcap > 0) else None)
 
+        # PEG, pe'den turer; pe her gun yenilenirken peg birakiliyordu ve
+        # ikisi gunler icinde birbirinden kopuyordu (%13'e varan sapma).
+        growth = num((cells.get("rev_growth_ttm") or {}).get("value"))
+        _set(cells, "peg",
+             div(num((cells.get("pe") or {}).get("value")), growth)
+             if (growth or 0) > 0 else None)
+
+        # IMA EDILEN BUYUME EV'YE BAGLI. Asagida EV guncelleniyordu ama ima
+        # edilen buyume eski EV'den kalma olarak duruyordu: ters DCF bolumu
+        # bugunun isletme degerini dunun varsayimiyla birlikte gosteriyordu.
+        from .scores import implied_growth as _implied_growth
+        ig = _implied_growth(fcf, ev)
+        _set(cells, "implied_growth", ig)
+        actual = num((cells.get("rev_cagr_3y") or {}).get("value"))
+        _set(cells, "implied_vs_actual_growth",
+             (ig / actual) if (ig is not None and ig > 0
+                               and actual is not None and actual > 0) else None)
+
         card["reverse_dcf"] = {**(card.get("reverse_dcf") or {}),
-                               "enterprise_value_musd": round(ev, 1)}
+                               "enterprise_value_musd": round(ev, 1),
+                               "implied_growth_pct": ig,
+                               "actual_growth_pct": actual}
 
     # --- momentum ---
     history = quote.get("history") or []
@@ -157,13 +199,19 @@ def _refresh_price_derived(card: dict, quote: dict, benchmark: list) -> None:
 
 
 def _set(cells: dict, key: str, value) -> None:
-    """Bir metrik hucresini gunceller; yuzdelikler haftalik kosuda yenilenir."""
+    """Bir metrik hucresini gunceller; yuzdelikler haftalik kosuda yenilenir.
+
+    Yuvarlama ve renk TAM YENIDEN URETIMLE AYNI kurali kullanmali: burada
+    sabit 3 haneye yuvarlanirsa ayni metrik, kartin en son hangi kosu
+    tarafindan yazildigina gore farkli hassasiyette gorunur.
+    """
+    from .cards import _round
     from .config import color_for
     from .util import num
-    v = num(value)
+    v = _round(num(value), key)
     cell = cells.setdefault(key, {"sector_pct": None, "own_5y_pct": None,
                                   "pct_basis": "none"})
-    cell["value"] = round(v, 3) if v is not None else None
+    cell["value"] = v
     cell["color"] = color_for(key, v)
 
 

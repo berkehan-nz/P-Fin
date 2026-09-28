@@ -52,7 +52,16 @@ def main(argv: list[str] | None = None) -> int:
 
     # Sektor tablosu tohum evreni uzerinden kurulur. 36 sirketlik havuz
     # kucuk; pct_basis alani hangi referansin kullanildigini kaydeder.
-    sector_table = percentiles.build_sector_table(rows)
+    #
+    # ALT KUME KOSUSU: --tickers ile tek sirket calistirildiginda havuz tek
+    # satira duser ve butun yuzdelikler None olur. Kosuda olmayan sirketler
+    # diskteki kartlardan tamamlanir.
+    pool = rows + pipeline.sector_rows_from_cards(
+        exclude={r["ticker"] for r in rows})
+    if len(pool) > len(rows):
+        print(f"[tohum] yuzdelik havuzu {len(rows)} taze + "
+              f"{len(pool) - len(rows)} mevcut kart = {len(pool)} sirket")
+    sector_table = percentiles.build_sector_table(pool)
 
     built = pipeline.build_cards(rows, source=SEED_SOURCE_TAG,
                                  sector_table=sector_table, ctx=ctx, bench=bench,

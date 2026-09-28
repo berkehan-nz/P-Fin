@@ -1,29 +1,34 @@
 {
   "analyst": {
     "analyst_count": 6,
-    "as_of": "2026-09-09",
     "buy": 4,
     "hold": 1,
-    "recommendation": "none",
+    "recommendation": "buy",
     "sell": 1,
     "source": "yfinance",
     "target_high": 75.0,
     "target_low": 45.0,
     "target_median": 61.5,
-    "upside_to_median": 43.893308376228354
+    "upside_to_median": 55.303036287212805
   },
-  "as_of": "2026-09-11",
+  "as_of": "2026-09-26",
   "calendar": {
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-11-04"
   },
-  "change_1d_pct": -1.0,
+  "capped_for_scoring": {},
   "data_quality": {
-    "issue_count": 1,
+    "issue_count": 2,
     "issues": [
       {
         "code": "brut_kar_yok",
         "level": "medium",
         "message": "Brut kar hesaplanamadi (satis maliyeti etiketi yok). Brut marj Asama 1'de sert filtredir — bu sirket haksiz yere elenebilir."
+      },
+      {
+        "code": "hisse_sayisi_tahmini",
+        "level": "low",
+        "message": "Hisse sayisi kapak sayfasindan degil, yfinance_tum_siniflar uzerinden bulundu."
       }
     ],
     "status": "sinirli"
@@ -34,7 +39,7 @@
     "news": "finnhub",
     "period_end": "2026-06-30",
     "price": "yfinance",
-    "shares": "kapak_sayfasi"
+    "shares": "yfinance_tum_siniflar"
   },
   "decision": {
     "action": "",
@@ -42,14 +47,13 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 2791.6,
+  "enterprise_value_musd": 4417.9,
   "exchange": "NYSE",
   "flags": {
     "annual_fallback_fields": [
-      "net_income",
       "cfi"
     ],
-    "data_basis": "mixed",
+    "data_basis": "quarterly_ttm",
     "is_manual": false,
     "kill_reason": null,
     "one_off_earnings": false,
@@ -65,24 +69,25 @@
       "gross_margin"
     ],
     "warnings": [
-      "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (net_income). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
+      "Ertelenmis gelir kisa vadeli yukumlulugun buyuk kismi ve sirket net nakit pozisyonunda — Z'' abonelik modelinde yaniltici. Faiz karsilama ve FCF/borc ile degerlendir."
     ],
     "would_fail_at": null,
-    "z_unreliable": false
+    "z_unreliable": true,
+    "z_unreliable_reason": "Ertelenmis gelir kisa vadeli yukumlulugun buyuk kismi ve sirket net nakit pozisyonunda — Z'' abonelik modelinde yaniltici. Faiz karsilama ve FCF/borc ile degerlendir."
   },
-  "generated_at": "2026-09-10T12:54:40+00:00",
+  "generated_at": "2026-09-26T23:02:36+00:00",
   "insider": {
-    "form4_count": 44,
+    "form4_count": 42,
     "last_form4": "2026-09-03",
     "window_days": 180
   },
-  "market_cap_musd": 3750.9,
+  "market_cap_musd": 5377.2,
   "metrics": {
     "altman_z": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 54.2,
+      "sector_pct": 40.6,
       "value": 4.97
     },
     "beneish_m": {
@@ -96,22 +101,22 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 85.0,
-      "value": 3.23
+      "sector_pct": 81.1,
+      "value": 3.67
     },
     "current_ratio": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 16.7,
+      "sector_pct": 27.2,
       "value": 1.04
     },
     "earnings_yield": {
-      "color": "green",
+      "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.4,
-      "value": 9.009
+      "sector_pct": 83.3,
+      "value": 5.69
     },
     "ebitda_margin": {
       "color": "gray",
@@ -121,18 +126,18 @@
       "value": 28.61
     },
     "ev_ebit": {
-      "color": "green",
+      "color": "yellow",
       "own_5y_pct": 0.0,
       "pct_basis": "sector",
-      "sector_pct": 4.5,
-      "value": 11.1
+      "sector_pct": 19.4,
+      "value": 17.57
     },
     "ev_ebitda": {
-      "color": "yellow",
+      "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 4.5,
-      "value": 9.751
+      "sector_pct": 24.0,
+      "value": 15.43
     },
     "ev_gross_profit": {
       "color": "gray",
@@ -142,17 +147,17 @@
       "value": null
     },
     "ev_sales": {
-      "color": "green",
-      "own_5y_pct": 75.0,
+      "color": "yellow",
+      "own_5y_pct": 58.3,
       "pct_basis": "sector",
-      "sector_pct": 3.3,
-      "value": 2.79
+      "sector_pct": 50.0,
+      "value": 4.41
     },
     "fcf_margin": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.7,
+      "sector_pct": 97.4,
       "value": 50.8
     },
     "fcf_margin_change_3y": {
@@ -164,17 +169,17 @@
     },
     "fcf_yield_ev": {
       "color": "green",
-      "own_5y_pct": 83.3,
+      "own_5y_pct": 100.0,
       "pct_basis": "sector",
-      "sector_pct": 96.7,
-      "value": 18.212
+      "sector_pct": 90.4,
+      "value": 11.51
     },
     "fcf_yield_mcap": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.7,
-      "value": 13.554
+      "sector_pct": 83.3,
+      "value": 9.45
     },
     "gross_margin": {
       "color": "gray",
@@ -202,7 +207,7 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -10.81
+      "value": -4.29
     },
     "implied_vs_actual_growth": {
       "color": "gray",
@@ -215,7 +220,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 65.4,
+      "sector_pct": 81.8,
       "value": 100.0
     },
     "maturity_wall_2y": {
@@ -236,14 +241,14 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 32.1,
+      "sector_pct": 25.9,
       "value": -3.35
     },
     "operating_margin": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 82.1,
+      "sector_pct": 81.6,
       "value": 25.13
     },
     "operating_margin_change_3y": {
@@ -257,28 +262,28 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 83.3,
-      "value": 38.121
+      "sector_pct": 81.6,
+      "value": 42.67
     },
     "pe": {
-      "color": "yellow",
+      "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 22.7,
-      "value": 22.313
+      "sector_pct": 43.0,
+      "value": 36.36
     },
     "peg": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 1.14
+      "value": 1.84
     },
     "piotroski_f": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 16.7,
+      "sector_pct": 10.5,
       "value": 4.0
     },
     "rel_strength_12m": {
@@ -286,41 +291,41 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -5.528
+      "value": -17.14
     },
     "rel_strength_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 10.0,
-      "value": -21.197
+      "sector_pct": 2.7,
+      "value": -55.59
     },
     "return_12m": {
-      "color": "green",
+      "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 76.7,
-      "value": 16.553
+      "sector_pct": 81.2,
+      "value": 7.76
     },
     "return_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 10.0,
-      "value": -4.577
+      "sector_pct": 2.7,
+      "value": -25.84
     },
     "rev_cagr_3y": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 63.3,
+      "sector_pct": 93.8,
       "value": 27.22
     },
     "rev_growth_ttm": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 50.0,
+      "sector_pct": 77.7,
       "value": 19.77
     },
     "roic": {
@@ -334,7 +339,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.7,
+      "sector_pct": 97.3,
       "value": 70.57
     },
     "rule_of_40_ebitda": {
@@ -355,14 +360,14 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 3.3,
+      "sector_pct": 6.1,
       "value": 0.09
     },
     "sbc_to_revenue": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 3.3,
+      "sector_pct": 18.4,
       "value": 4.32
     },
     "share_count_change_1y": {
@@ -376,69 +381,75 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 36.7,
-      "value": -0.18
+      "sector_pct": 20.9,
+      "value": -0.19
     }
   },
   "name": "Clear Secure, Inc.",
-  "net_debt_musd": -959.3,
+  "net_debt_musd": -959.27,
   "news": [
     {
-      "date": "2026-09-05",
-      "headline": "Clear Secure’s (YOU) Profits Are Soaring While Growth Signals Cool",
+      "date": "2026-09-25",
+      "headline": "Clear Secure (YOU) Rises Higher Than Market: Key Facts",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=6ff5703bcdb1e71cb1b650bbe1d3aec574f4ffdef3f4c7194c13d4e36e6b25e2"
+      "url": "https://finnhub.io/api/news?id=ba76aaa855d270b80b905ccbe978715f2aff7af9d9d9a9e131003afd2c2752d0"
     },
     {
-      "date": "2026-09-04",
-      "headline": "A Clear Secure Vice President Sells Over 9,000 Company Shares After a 24% One-Year Return",
+      "date": "2026-09-24",
+      "headline": "CLEAR Secure, Inc. (YOU) Is a Trending Stock: Facts to Know Before Betting on It",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=1c971e41a8de92d51a4c1f1d6df1c4d4d4b96cfb2b19ef7d44374f7add170e27"
+      "url": "https://finnhub.io/api/news?id=cba490efd44a8d159a07334114a77693c5784a2c785946e4ae6324a053585ac4"
     },
     {
-      "date": "2026-09-02",
-      "headline": "Clear Secure: Beginning To Flex Its Pricing Power",
-      "source": "SeekingAlpha",
-      "url": "https://finnhub.io/api/news?id=aa551f0216ff4335c6286d49eee0157c4cd2de88100fe574afee02c162c2f09e"
-    },
-    {
-      "date": "2026-08-31",
-      "headline": "CrowdStrike Brings CLEAR's Verified Human Identity into the Falcon Platform",
+      "date": "2026-09-24",
+      "headline": "3 Cybersecurity Software Stocks In Focus After The Medicare AI Breach",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=40425db7e658db4ff024a5d0963ca0e6c5ebd5453c55c2c2066addaca9577354"
+      "url": "https://finnhub.io/api/news?id=bfc447be2e9968390c2d487d14dcfe7d1c9323bc2e2d0d76f404b1f828d062dd"
     },
     {
-      "date": "2026-08-31",
-      "headline": "CrowdStrike Adds CLEAR Identity Checks To Help Companies Fight Security Threats",
+      "date": "2026-09-17",
+      "headline": "Clear Secure (YOU) Stock Sinks As Market Gains: What You Should Know",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=21b2c5bdcd45bb0b0b15a7b39ea60d4b96f3548c7f835c011d6e80997fcdc316"
+    },
+    {
+      "date": "2026-09-16",
+      "headline": "Clear Secure President Michael Barkin To Transition To Advisory Role And Resign From Board Effective October 15",
       "source": "Benzinga",
-      "url": "https://finnhub.io/api/news?id=146421bd9899801c5866016daf5c02d12b67d3ad24279acc07cdafc19548ab89"
+      "url": "https://finnhub.io/api/news?id=1d53fc97883b27c4ef1121e8d3e0b27757d0d85e9c33429bafe4ed714bf7ce64"
     },
     {
-      "date": "2026-08-29",
-      "headline": "Clear Secure (YOU) Stock Looks Like A Bargain At Current Prices",
+      "date": "2026-09-14",
+      "headline": "Clear Secure Chief Accounting Officer Sells 6,059 Shares",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=2eed594f473900a29f5f91998e2f6ebb45ba80b01f1a4dfdca029e57c7a0edcb"
+      "url": "https://finnhub.io/api/news?id=cac426523c7fca4c897dfc51ce8d607063511bc373fb9e335741fd03bb079ccb"
     },
     {
-      "date": "2026-08-29",
-      "headline": "Clear Secure (YOU) Selloff Puts Its Undervalued Narrative Back In Focus",
+      "date": "2026-09-11",
+      "headline": "Clear Secure (YOU) Stock Slides as Market Rises: Facts to Know Before You Trade",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=87beb0377072dbce9b11f35712ea58cb39ef0e385661a4e1015e819aae5d30b7"
+      "url": "https://finnhub.io/api/news?id=817faddc73b2b135aef1bece9e3245a4e3f53e0b047bd34d29e55e67f2b407ea"
     },
     {
-      "date": "2026-08-28",
-      "headline": "1 Small-Cap Stock to Own for Decades and 2 Facing Headwinds",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=cd0a4eee0480a44d6c235696d4c02de32952ccd86715c2680a1b076e83efb874"
+      "date": "2026-09-11",
+      "headline": "DA Davidson Maintains Neutral on Clear Secure, Lowers Price Target to $45",
+      "source": "Benzinga",
+      "url": "https://finnhub.io/api/news?id=c412bd123527995e8cac0c43edfeb79325d24adb3baf45337978fad66ffd3218"
     }
   ],
-  "price": 42.74,
+  "overrides": [],
+  "percentile_pool": {
+    "sector": 57,
+    "universe": 354
+  },
+  "price": 39.6,
+  "price_as_of": "2026-09-25",
   "reverse_dcf": {
     "actual_growth_pct": 27.22,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 2791.6,
+    "enterprise_value_musd": 4417.9,
     "fcf_ttm_musd": 508.4,
-    "implied_growth_pct": -10.81,
+    "implied_growth_pct": -4.29,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -450,18 +461,18 @@
           "percentile": null
         },
         "cash_conversion": {
-          "percentile": 85.0,
-          "scaled": 85.0,
+          "percentile": 81.1,
+          "scaled": 81.1,
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 16.7,
-          "scaled": 16.7,
+          "percentile": 10.5,
+          "scaled": 10.5,
           "weight": 0.25
         },
         "sloan_accruals": {
-          "percentile": 36.7,
-          "scaled": 63.3,
+          "percentile": 20.9,
+          "scaled": 79.1,
           "weight": 0.25
         }
       },
@@ -471,13 +482,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 3.3,
-          "scaled": 3.3,
+          "percentile": 2.6,
+          "scaled": 2.6,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 10.0,
-          "scaled": 10.0,
+          "percentile": 2.7,
+          "scaled": 2.7,
           "weight": 0.4
         }
       },
@@ -487,8 +498,8 @@
     "quality": {
       "components": {
         "fcf_margin": {
-          "percentile": 96.7,
-          "scaled": 96.7,
+          "percentile": 97.4,
+          "scaled": 97.4,
           "weight": 0.15
         },
         "gross_margin": {
@@ -504,8 +515,8 @@
           "percentile": null
         },
         "rule_of_40": {
-          "percentile": 96.7,
-          "scaled": 96.7,
+          "percentile": 97.3,
+          "scaled": 97.3,
           "weight": 0.15
         }
       },
@@ -515,23 +526,23 @@
     "safety": {
       "components": {
         "altman_z": {
-          "percentile": 54.2,
-          "scaled": 54.2,
+          "percentile": 40.6,
+          "scaled": 40.6,
           "weight": 0.3
         },
         "current_ratio": {
-          "percentile": 16.7,
-          "scaled": 16.7,
+          "percentile": 27.2,
+          "scaled": 27.2,
           "weight": 0.2
         },
         "interest_coverage": {
-          "percentile": 65.4,
-          "scaled": 65.4,
+          "percentile": 81.8,
+          "scaled": 81.8,
           "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 32.1,
-          "scaled": 67.9,
+          "percentile": 25.9,
+          "scaled": 74.1,
           "weight": 0.3
         }
       },
@@ -541,13 +552,13 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 96.4,
-          "scaled": 96.4,
+          "percentile": 83.3,
+          "scaled": 83.3,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 4.5,
-          "scaled": 95.5,
+          "percentile": 19.4,
+          "scaled": 80.6,
           "weight": 0.3
         },
         "ev_gross_profit": {
@@ -555,13 +566,13 @@
           "percentile": null
         },
         "ev_sales": {
-          "percentile": 3.3,
-          "scaled": 96.7,
+          "percentile": 50.0,
+          "scaled": 50.0,
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 96.7,
-          "scaled": 96.7,
+          "percentile": 90.4,
+          "scaled": 90.4,
           "weight": 0.25
         }
       },
@@ -616,12 +627,12 @@
       "safety": 1.0,
       "value": 0.8
     },
-    "earnings_quality": 56.9,
-    "momentum": 6.0,
-    "quality": 96.7,
-    "safety": 53.0,
-    "total": 62.6,
-    "value": 96.2,
+    "earnings_quality": 58.4,
+    "momentum": 2.7,
+    "quality": 97.3,
+    "safety": 56.2,
+    "total": 58.7,
+    "value": 78.3,
     "weight_coverage": 0.8
   },
   "sector": "Yazilim ve programlama",
@@ -670,66 +681,66 @@
       "2026-06-30"
     ],
     "price_sparkline": [
-      44.81,
-      46.75,
-      48.54,
-      48.12,
-      53.53,
-      53.4,
-      49.05,
-      49.09,
-      51.77,
-      50.41,
-      48.52,
-      51.1,
-      53.03,
-      58.39,
-      53.75,
-      54.74,
-      53.33,
-      54.98,
-      58.77,
+      47.44,
+      48.41,
+      51.36,
+      52.62,
+      48.99,
+      48.39,
+      52.05,
+      56.83,
+      56.99,
+      54.81,
+      53.77,
+      53.39,
+      56.23,
       58.17,
-      57.64,
-      57.21,
-      59.18,
-      62.01,
-      60.06,
-      56.54,
-      55.45,
-      56.78,
+      56.89,
+      55.54,
+      58.89,
+      60.14,
+      61.1,
+      62.36,
+      56.72,
+      57.43,
       54.48,
       54.98,
-      51.0,
-      51.66,
-      50.77,
-      51.96,
-      52.95,
-      55.17,
+      51.97,
+      50.25,
+      52.76,
+      51.45,
+      52.73,
+      53.18,
       55.73,
       53.79,
       55.91,
       56.12,
-      53.54,
-      54.43,
-      57.18,
-      52.3,
+      53.08,
+      54.65,
+      56.03,
+      56.9,
       52.24,
       53.84,
       56.1,
       55.15,
       56.46,
       51.29,
-      46.16,
-      45.45,
-      44.61,
+      48.28,
+      45.67,
+      43.84,
       42.9,
       44.7,
       44.25,
       43.43,
       42.97,
       44.59,
-      43.6
+      43.6,
+      42.74,
+      41.58,
+      40.11,
+      39.26,
+      38.9,
+      39.6
     ],
     "quarters": [
       "2023-09",
@@ -774,7 +785,7 @@
       null
     ]
   },
-  "shares_outstanding_m": 87.7608,
+  "shares_outstanding_m": 135.7881,
   "short_interest": {
     "avg_daily_volume": null,
     "date": null,
@@ -815,7 +826,7 @@
     "why_cheap_diagnosis": "TSA YÜZ TANIMA KORKUSU (Ağu 2026 zirvesinden -%36)",
     "why_cheap_rationale": "ATH 69,07 $ (5 Ağu 2026) sonrası 44 $'a düşüş; short ~%12. Kendi tarihine göre orta-yüksek çarpan (EV/FAVÖK ~18-19x, P/FCF ~12x)."
   },
-  "story_age_days": 18,
+  "story_age_days": 16,
   "ticker": "YOU",
   "track": "both",
   "ttm": {
@@ -823,7 +834,7 @@
     "ebitda_musd": 286.3,
     "fcf_musd": 508.4,
     "gross_profit_musd": null,
-    "net_income_musd": 168.1,
+    "net_income_musd": 147.9,
     "period_end": "2026-06-30",
     "revenue_musd": 1000.7
   }

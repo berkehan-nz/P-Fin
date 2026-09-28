@@ -11,7 +11,7 @@ window.App = (function () {
     '/candidates': { screen: 'candidates', view: () => ViewCandidates.render() },
     '/portfolio':  { screen: 'portfolio',  view: () => ViewPortfolio.render() },
     '/funnel':     { screen: 'funnel',     view: () => ViewFunnel.render() },
-    '/rehber':     { screen: 'rehber',     view: () => ViewGuide.render() },
+    '/weekly':     { screen: 'weekly',     view: () => ViewWeekly.render() },
   };
 
   const api = { thresholds: {} };
@@ -41,6 +41,12 @@ window.App = (function () {
 
   async function route() {
     const hash = location.hash.replace(/^#/, '') || '/overview';
+
+    // SAYFA ICI CAPA. Rotalar '/' ile baslar; '#metrikler' gibi bir capa
+    // rota DEGILDIR. Eskiden buraya dusuyor, bilinmeyen rota sayilip
+    // genel bakisa yonlendiriyordu — sirket sayfasindaki icindekiler
+    // menusu bu yuzden kullaniciyi disari atiyordu.
+    if (hash && hash[0] !== '/') return;
 
     const company = hash.match(/^\/company\/([A-Za-z0-9.\-]+)$/);
     if (company) {

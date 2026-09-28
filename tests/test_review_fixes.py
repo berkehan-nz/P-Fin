@@ -408,3 +408,478 @@ class TestOverrides:
     def test_unknown_period_is_skipped_not_crashed(self):
         f = fixtures.frsh()
         assert overrides.apply(f, [self._entry(ticker="FRSH", period_end="1999-01-01")]) == []
+
+
+# ----------------------------------------------- puan yayimlama tabani
+class TestScoreFloor:
+    """FRSH: tum otomatik bloklar bos, yalnizca elle girilen katalizor (60)
+    kaldi; toplam 60,0 cikti ve sirket siralamaya altinci olarak girdi."""
+
+    def test_catalyst_only_is_not_published(self):
+        s = scoring.total_score({k: None for k in
+                                 ("value", "quality", "safety", "momentum", "earnings_quality")},
+                                catalyst=60.0)
+        assert s["total"] is None
+        assert s["weight_coverage"] == 0.25
+        assert "katalizor" in s["not_scored"]
+
+    def test_normal_coverage_still_published(self):
+        s = scoring.total_score({"value": 60.0, "quality": 60.0, "safety": 60.0,
+                                 "momentum": 60.0, "earnings_quality": 60.0}, catalyst=60.0)
+        assert s["total"] == 60.0
+        assert "not_scored" not in s
+
+    def test_nothing_at_all(self):
+        s = scoring.total_score({k: None for k in
+                                 ("value", "quality", "safety", "momentum", "earnings_quality")})
+        assert s["total"] is None and s["not_scored"]
+
+
+# ------------------------------------------- alt kume kosusu yuzdelik havuzu
+class TestSubsetPercentilePool:
+    def test_single_row_pool_yields_no_percentiles(self):
+        """Hatanin kendisi: tek satirlik havuzda yuzdelik cikmaz."""
+        from src import percentiles
+        r = funnel.evaluate(fixtures.frsh())
+        table = percentiles.build_sector_table([r])
+        p, basis = percentiles.sector_percentile(table, r["sector"], "gross_margin",
+                                                 r["metrics"]["gross_margin"])
+        assert p is None and basis == "none"
+
+    def test_pool_from_cards_restores_percentiles(self, tmp_path, monkeypatch):
+        import json
+        from src import percentiles, pipeline
+        r = funnel.evaluate(fixtures.frsh())
+        for i in range(10):
+            (tmp_path / f"P{i}.json").write_text(json.dumps({
+                "ticker": f"P{i}", "sector": r["sector"],
+                "metrics": {"gross_margin": {"value": 50.0 + i * 4}}}))
+        monkeypatch.setattr(pipeline, "CARDS_DIR", tmp_path)
+        pool = [r] + pipeline.sector_rows_from_cards(exclude={"FRSH"})
+        table = percentiles.build_sector_table(pool)
+        p, basis = percentiles.sector_percentile(table, r["sector"], "gross_margin",
+                                                 r["metrics"]["gross_margin"])
+        assert p is not None and basis == "sector"
+
+    def test_run_tickers_excluded_from_card_pool(self, tmp_path, monkeypatch):
+        import json
+        from src import pipeline
+        (tmp_path / "FRSH.json").write_text(json.dumps({"ticker": "FRSH", "sector": "x", "metrics": {}}))
+        monkeypatch.setattr(pipeline, "CARDS_DIR", tmp_path)
+        assert pipeline.sector_rows_from_cards(exclude={"FRSH"}) == []
+
+
+# --------------------------------------------- pano veri dogrulugu denetimi
+class TestDisplayCorrectness:
+    """Sirket sayfasindaki sayilarin ve isaretlerin dogrulugu."""
+
+    def test_negative_sentences_exist_for_sign_flipping_metrics(self):
+        """Negatifte anlami donen her metrigin ayri bir cumlesi olmali."""
+        from src import config
+        for key in ("implied_growth", "fcf_margin", "operating_margin", "roic",
+                    "rev_cagr_3y", "earnings_yield", "fcf_yield_ev",
+                    "fcf_yield_mcap", "return_12m", "rel_strength_12m"):
+            assert config.THRESHOLDS[key].get("sentence_neg"), key
+
+    def test_negative_sentence_reverses_meaning(self):
+        from src import config
+        assert "KUCULME" in config.THRESHOLDS["implied_growth"]["sentence_neg"]
+        assert "YAKILIYOR" in config.THRESHOLDS["fcf_margin"]["sentence_neg"]
+        assert "buyume" not in config.THRESHOLDS["implied_growth"]["sentence_neg"]
+
+    def test_thresholds_payload_carries_negative_sentences(self):
+        """Pano bunu thresholds.json'dan okuyor; payload'a girmezse ise yaramaz."""
+        from src import config
+        payload = config.thresholds_payload()
+        assert payload["thresholds"]["implied_growth"].get("sentence_neg")
+
+    def test_sparkline_ends_on_latest_price(self):
+        from src.sources.prices import sparkline
+        rows = [(f"2026-{(i // 28) + 1:02d}-{(i % 28) + 1:02d}", 100.0 + i)
+                for i in range(200)]
+        sp = sparkline(rows)
+        assert sp[-1] == rows[-1][1]
+        assert sp[0] == rows[-126][1]
+
+    def test_color_matches_displayed_value(self):
+        """Kartta yazan sayi ile rengi ayni girdiden gelmeli."""
+        from src import cards
+        from src.config import color_for
+        for key, raw in (("sbc_to_fcf", 0.2996), ("current_ratio", 1.9996)):
+            shown = cards._round(raw, key)
+            assert color_for(key, shown) == color_for(key, cards._round(raw, key))
+
+    def test_daily_refresh_updates_peg_and_implied_growth(self):
+        from src import run_daily
+        from tests.test_daily_refresh import base_card
+        c = base_card()
+        c["metrics"]["rev_growth_ttm"] = {"value": 10.0, "sector_pct": None,
+                                          "own_5y_pct": None, "pct_basis": "none"}
+        run_daily._refresh_price_derived(
+            c, {"price": 28.67, "history": [], "high_52w": 32.0}, [])
+        pe = c["metrics"]["pe"]["value"]
+        assert c["metrics"]["peg"]["value"] == pytest.approx(pe / 10.0, abs=0.01)
+        # ters DCF alani da EV ile birlikte tazelenmeli
+        assert "implied_growth_pct" in c["reverse_dcf"]
+
+    def test_peg_follows_price(self):
+        """Fiyat degisince peg de degismeli — pe ile birlikte."""
+        from src import run_daily
+        from tests.test_daily_refresh import base_card
+        out = []
+        for price in (28.67, 14.34):
+            c = base_card()
+            c["metrics"]["rev_growth_ttm"] = {"value": 10.0, "sector_pct": None,
+                                              "own_5y_pct": None, "pct_basis": "none"}
+            run_daily._refresh_price_derived(
+                c, {"price": price, "history": [], "high_52w": 32.0}, [])
+            out.append(c["metrics"]["peg"]["value"])
+        assert out[1] < out[0]
+
+    def test_chart_metric_contradiction_is_flagged(self):
+        """Ceyreklik grafik ile TTM metrigi celisirse kart bunu yazmali."""
+        from src import cards
+        f = fixtures.frsh()
+        c = cards.build(f, source="test")
+        # tutarli fixture'da uyari CIKMAMALI
+        assert not any("GRAFIK-METRIK" in w for w in c["flags"]["warnings"])
+
+
+class TestSurvivorsIndex:
+    """Huni sayfasi 157 ayri dosyayi cekemez; kompakt indeks okur."""
+
+    def test_index_follows_isolated_dir(self, tmp_path, monkeypatch):
+        """Indeks SURVIVOR_DIR'in yanina yazilmali.
+
+        DATA_DIR'e sabitlenseydi test kosusu gercek data/survivors.json'i
+        sifirlardi — bir kez oldu.
+        """
+        import json
+        from src import scan
+        surv = tmp_path / "survivors"
+        surv.mkdir()
+        (surv / "AAA.json").write_text(json.dumps({
+            "ticker": "AAA", "name": "A Inc", "sector": "Yazilim", "track": "A",
+            "metrics": {"rev_growth_ttm": 12.0}, "meta": {"market_cap_musd": 900.0}}))
+        monkeypatch.setattr(scan, "SURVIVOR_DIR", surv)
+        scan.write_survivors_index()
+
+        out = json.loads((tmp_path / "survivors.json").read_text())
+        assert out["count"] == 1
+        assert out["survivors"][0]["ticker"] == "AAA"
+        assert out["survivors"][0]["market_cap_musd"] == 900.0
+        # gercek veri klasorune dokunulmadi
+        assert not (tmp_path / "data").exists()
+
+
+class TestAuditTolerance:
+    """Denetim, yuvarlamayi hatadan ayirmali — ama gercek sapmayi kacirmamali."""
+
+    def _audit(self):
+        import importlib.util
+        import pathlib
+        spec = importlib.util.spec_from_file_location(
+            "audit_cards", pathlib.Path("scripts/audit_cards.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    def test_rounding_is_not_an_error(self):
+        """ConEd: net kar 2,0 saklanmis, gercegi 2,02 — F/K farki hata degil."""
+        m = self._audit()
+        a = m.Audit()
+        a.check({"ticker": "ED"}, "pe", 19158.8, 38758.3 / 2.0, den=2.0)
+        assert not a.errors
+
+    def test_real_drift_is_still_caught(self):
+        """QLYS'de peg %13 kaymisti; tolerans bunu yutmamali."""
+        m = self._audit()
+        a = m.Audit()
+        a.check({"ticker": "QLYS"}, "peg", 2.75, 25.176 / 10.35, den=10.35)
+        assert a.errors
+
+    def test_tolerance_scales_with_denominator_precision(self):
+        m = self._audit()
+        a = m.Audit()
+        # Buyuk paydada yuvarlama onemsiz; ayni goreli sapma HATA olmali
+        a.check({"ticker": "X"}, "oran", 10.0, 10.5, den=5000.0)
+        assert a.errors
+
+
+# ------------------------------------------------------ canli genel bakis
+class TestMarketSnapshot:
+    def test_risk_note_reads_vix(self):
+        from src.sources import market
+        assert "gergin" in market.risk_note([{"symbol": "^VIX", "value": 31.0}])
+        assert "rehavet" in market.risk_note([{"symbol": "^VIX", "value": 11.0}])
+        assert "normal" in market.risk_note([{"symbol": "^VIX", "value": 18.0}])
+        assert market.risk_note([]) is None
+
+    def test_one_broken_symbol_does_not_kill_the_strip(self, monkeypatch):
+        """Tek endeks cekilemezse butun serit bos kalmamali."""
+        import pandas as pd
+        from src.sources import market
+
+        def fake(symbol, days=40):
+            if symbol == "BAD":
+                raise RuntimeError("yok")
+            return pd.DataFrame({"Close": [100.0, 102.0, 101.0, 105.0, 110.0, 108.0]},
+                                index=pd.to_datetime(
+                                    ["2026-09-08", "2026-09-09", "2026-09-10",
+                                     "2026-09-11", "2026-09-12", "2026-09-15"]))
+        monkeypatch.setattr(market, "_history", fake)
+        rows = market.snapshot([("BAD", "Bozuk", "Hisse", "puan"),
+                                ("OK", "Calisan", "Hisse", "puan")])
+        assert [r["symbol"] for r in rows] == ["OK"]
+        assert rows[0]["change_1d_pct"] == pytest.approx(-1.82, abs=0.01)
+        assert rows[0]["change_5d_pct"] == pytest.approx(8.0, abs=0.01)
+
+
+class TestCriticalDates:
+    def _subs(self, forms, dates):
+        return {"filings": {"recent": {
+            "form": forms, "filingDate": dates,
+            "accessionNumber": ["0001-24-000001"] * len(forms),
+            "primaryDocument": ["a.htm"] * len(forms)}}}
+
+    def test_form4_noise_is_excluded(self, monkeypatch):
+        """Form 4 gunde onlarca geliyor ve yon tasimiyor; takvimi bogar."""
+        from src.sources import calendar_src, edgar_api
+        from src.util import today_iso
+        today = today_iso()
+        monkeypatch.setattr(edgar_api, "submissions",
+                            lambda cik: self._subs(["4", "8-K", "4"], [today] * 3))
+        out = calendar_src.sec_events({"AAA": 123})
+        assert len(out) == 1
+        assert out[0]["title"] == "AAA · 8-K"
+        assert out[0]["detail"] == "Onemli olay bildirimi"
+
+    def test_old_filings_are_not_listed(self, monkeypatch):
+        from src.sources import calendar_src, edgar_api
+        monkeypatch.setattr(edgar_api, "submissions",
+                            lambda cik: self._subs(["8-K"], ["2020-01-01"]))
+        assert calendar_src.sec_events({"AAA": 123}) == []
+
+    def test_earnings_only_for_tracked_tickers(self):
+        from datetime import date, timedelta
+        from src.sources import calendar_src
+        soon = (date.today() + timedelta(days=5)).isoformat()
+        far = (date.today() + timedelta(days=400)).isoformat()
+        out = calendar_src.earnings_events(
+            {"AAA": soon, "BBB": soon, "CCC": far}, {"AAA", "CCC"})
+        assert [e["ticker"] for e in out] == ["AAA"]   # BBB takipsiz, CCC cok uzak
+
+    def test_build_splits_past_and_future(self, monkeypatch):
+        from datetime import date, timedelta
+        from src.sources import calendar_src
+        monkeypatch.setattr(calendar_src, "macro_releases", lambda **kw: [
+            {"date": (date.today() + timedelta(days=3)).isoformat(), "kind": "makro",
+             "title": "TUFE", "detail": "enflasyon", "ticker": None},
+            {"date": (date.today() - timedelta(days=3)).isoformat(), "kind": "makro",
+             "title": "Eski", "detail": "x", "ticker": None}])
+        monkeypatch.setattr(calendar_src, "sec_events", lambda *a, **k: [])
+        out = calendar_src.build(earnings={}, tickers=set(), cik_by_ticker={})
+        assert [e["title"] for e in out["upcoming"]] == ["TUFE"]
+        assert [e["title"] for e in out["recent"]] == ["Eski"]
+
+
+class TestMacroNotClobbered:
+    def test_empty_fetch_keeps_existing_file(self, tmp_path, monkeypatch):
+        """FRED cevap vermeyince calisan pano 'veri yok'a dusmemeli."""
+        import json
+        from src import pipeline
+        from src.sources import fred_api
+        path = tmp_path / "macro.json"
+        path.write_text(json.dumps({"series": {"cpi_yoy": {"value": 3.3}}}))
+        monkeypatch.setattr(pipeline, "DATA_DIR", tmp_path)
+        # Anahtar yokken FRED bos sozluk degil, DEGERLERI None olan iskelet doner.
+        monkeypatch.setattr(fred_api, "snapshot", lambda: {
+            "cpi_yoy": {"label": "TUFE (yillik)", "value": None, "series": []}})
+        pipeline.write_macro()
+        assert json.loads(path.read_text())["series"]["cpi_yoy"]["value"] == 3.3
+
+
+# ------------------------------------------------ SEC etiket secimi (guncellik)
+def _facts(**tags):
+    """{etiket: [(end, val, start|None, form)]} -> companyfacts bicimi."""
+    gaap = {}
+    for tag, rows in tags.items():
+        gaap[tag] = {"units": {"USD": [
+            {"end": end, "val": val, "start": start, "form": form,
+             "filed": end, "accn": f"a-{end}", "fp": "Q2" if start else "Q2"}
+            for end, val, start, form in rows]}}
+    return {"facts": {"us-gaap": gaap}}
+
+
+class TestFreshTagSelection:
+    """Corpay 2014'te birakilan LongTermDebtNoncurrent ile 2013'te birakilan
+    InterestExpense yuzunden 10,6 mlr $ borcu ve faiz giderini kaybediyordu:
+    listedeki ilk etiketin GECMISI vardi, o yuzden guncel etiket hic okunmadi."""
+
+    def test_stale_first_tag_does_not_hide_current_stock(self):
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            LongTermDebtNoncurrent=[("2014-03-31", 460e6, None, "10-Q")],
+            LongTermDebt=[("2026-03-31", 10_360e6, None, "10-Q"),
+                          ("2026-06-30", 10_623e6, None, "10-Q")])
+        out = ea._collect_stock(facts, ["LongTermDebtNoncurrent", "LongTermDebt"])
+        assert out["2026-06-30"] == 10_623e6
+        assert out["2014-03-31"] == 460e6            # eski gecmis kaybolmadi
+
+    def test_list_order_kept_among_current_tags(self):
+        """Iki etiket de guncelse liste sirasi kazanir (alt kalem ana etiketi ezmesin)."""
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            A=[("2026-03-31", 100.0, None, "10-Q")],
+            B=[("2026-06-30", 5.0, None, "10-Q")])
+        assert ea._freshness_order([("A", "2026-03-31"), ("B", "2026-06-30")])[0] == "A"
+
+    def test_abandoned_tag_loses_even_if_first(self):
+        from src.sources import edgar_api as ea
+        order = ea._freshness_order([("InterestExpense", "2013-09-30"),
+                                     ("InterestExpenseNonoperating", "2026-06-30")])
+        assert order[0] == "InterestExpenseNonoperating"
+
+
+class TestDebtComponents:
+    def test_components_summed_when_no_total_tag(self):
+        """Collegium: vadeli kredi + konvertibl, toplam etiketi yok."""
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            Revenues=[("2026-06-30", 180e6, "2026-04-01", "10-Q"),
+                      ("2025-12-31", 700e6, "2025-01-01", "10-K")],
+            LongTermLoansPayable=[("2026-06-30", 797.8e6, None, "10-Q")],
+            ConvertibleLongTermNotesPayable=[("2026-06-30", 238.7e6, None, "10-Q")],
+            LongTermDebt=[("2019-12-31", 11.5e6, None, "10-K")])
+        f = ea.fundamentals_from_facts(facts, "COLL")
+        p = next(q for q in f.quarters if q.period_end == "2026-06-30")
+        assert p.long_term_debt == pytest.approx(1036.5, abs=0.1)
+
+    def test_total_tag_wins_over_components(self):
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            Revenues=[("2026-06-30", 180e6, "2026-04-01", "10-Q"),
+                      ("2025-12-31", 700e6, "2025-01-01", "10-K")],
+            LongTermDebtNoncurrent=[("2026-06-30", 900e6, None, "10-Q")],
+            LongTermLoansPayable=[("2026-06-30", 700e6, None, "10-Q")],
+            ConvertibleLongTermNotesPayable=[("2026-06-30", 200e6, None, "10-Q")])
+        f = ea.fundamentals_from_facts(facts, "X")
+        p = next(q for q in f.quarters if q.period_end == "2026-06-30")
+        assert p.long_term_debt == pytest.approx(900.0)   # toplanip 1800 olmadi
+
+    def test_current_portion_not_double_counted(self):
+        """LongTermDebt cari kismi icerir; LongTermDebtCurrent ile birlikte cift sayilmamali."""
+        from src.sources import edgar_api as ea
+        facts = _facts(
+            Revenues=[("2026-06-30", 180e6, "2026-04-01", "10-Q"),
+                      ("2025-12-31", 700e6, "2025-01-01", "10-K")],
+            LongTermDebt=[("2026-06-30", 10_623.5e6, None, "10-Q")],
+            LongTermDebtCurrent=[("2026-06-30", 4_525.4e6, None, "10-Q")])
+        f = ea.fundamentals_from_facts(facts, "CPAY")
+        p = next(q for q in f.quarters if q.period_end == "2026-06-30")
+        assert p.long_term_debt + p.short_term_debt == pytest.approx(10_623.5, abs=0.1)
+
+
+class TestStaleCoverShares:
+    def test_cover_page_from_2011_is_rejected(self):
+        """Bel Fuse: tek kapak kaydi 2011'den; 7 kat kucuk piyasa degeri."""
+        from src.sources import edgar_api as ea
+        facts = {"facts": {"dei": {"EntityCommonStockSharesOutstanding": {"units": {"shares": [
+            {"end": "2011-08-01", "val": 2_174_912, "accn": "x", "filed": "2011-08-09"}]}}}}}
+        shares, source = ea._shares_outstanding(facts)
+        assert shares is None and source == "yok"
+
+    def test_unverifiable_cover_is_marked(self):
+        from datetime import date
+        from src.sources import edgar_api as ea
+        today = date.today().isoformat()
+        facts = {"facts": {"dei": {"EntityCommonStockSharesOutstanding": {"units": {"shares": [
+            {"end": today, "val": 30_000_000, "accn": "x", "filed": today}]}}}}}
+        shares, source = ea._shares_outstanding(facts)
+        assert shares == 30.0 and source == "kapak_sayfasi_dogrulanmamis"
+
+    def test_reconcile_uses_all_class_count(self, monkeypatch):
+        from src import pipeline
+        from src.sources import prices
+        f = fixtures.frsh()
+        f.shares_outstanding = None
+        f.sources["shares"] = "yok"
+        monkeypatch.setattr(prices, "implied_shares", lambda t: 14.44)
+        pipeline.reconcile_shares(f)
+        assert f.shares_outstanding == 14.44
+        assert f.sources["shares"] == "yfinance_tum_siniflar"
+
+    def test_reconcile_skips_verified_counts(self, monkeypatch):
+        """Dogrulanmis EDGAR sayisi icin ek istek ATILMAMALI."""
+        from src import pipeline
+        from src.sources import prices
+        f = fixtures.frsh()
+        f.sources["shares"] = "kapak_sayfasi"
+        called = []
+        monkeypatch.setattr(prices, "implied_shares", lambda t: called.append(t) or 99.0)
+        pipeline.reconcile_shares(f)
+        assert called == []
+
+
+class TestStage1Refinements:
+    def test_growth_exemption_needs_known_margin_and_sane_growth(self):
+        """ABUS: %1078 buyume, brut marj bilinmiyor, FCF negatif -> gecmemeli."""
+        r = funnel.evaluate(fixtures.frsh())
+        r["meta"]["fcf_ttm_musd"] = -40.0
+        r["metrics"].update({"rev_growth_ttm": 1078.0, "rule_of_40": 1057.0,
+                             "gross_margin": None, "net_debt_to_ebitda": 0.0,
+                             "share_count_change_1y": 0.0, "sbc_to_fcf": None})
+        reason = funnel.stage1(r)
+        assert reason and "makul sinirin" in reason and "brut marj bilinmiyor" in reason
+
+    def test_normal_high_growth_still_exempt(self):
+        r = funnel.evaluate(fixtures.frsh())
+        r["meta"]["fcf_ttm_musd"] = -40.0
+        r["metrics"].update({"rev_growth_ttm": 45.0, "rule_of_40": 48.0,
+                             "gross_margin": 75.0, "net_debt_to_ebitda": 0.0,
+                             "share_count_change_1y": 0.0, "sbc_to_fcf": None})
+        assert funnel.stage1(r) is None
+
+    def test_share_decline_window_skips_missing_quarter(self):
+        """MNTN: Aralik ceyregi eksik; eksik atilmadan pencere 2 degere dusuyordu."""
+        from src.fundamentals import Period
+        r = funnel.evaluate(fixtures.frsh())
+        f = r["fundamentals"]
+        f.quarters = [Period(period_end=e, period_type="Q", shares_diluted=v)
+                      for e, v in (("2025-09-30", 80.7), ("2025-12-31", None),
+                                   ("2026-03-31", 78.9), ("2026-06-30", 78.6))]
+        assert funnel._share_count_declining(r) is True
+
+
+class TestOneOffWithOperatingLoss:
+    def test_lyft_style_tax_asset_gain_flagged(self):
+        """EBIT -188, net kar +2.844: oran testi EBIT>0 sartiyla atlaniyordu."""
+        from src.fundamentals import Period
+        from src.metrics import _one_off_earnings
+        assert _one_off_earnings(Period(period_end="2026-06-30", operating_income=-188.0,
+                                        net_income=2844.0)) is True
+
+    def test_small_profit_on_small_loss_not_flagged(self):
+        from src.fundamentals import Period
+        from src.metrics import _one_off_earnings
+        assert _one_off_earnings(Period(period_end="2026-06-30", operating_income=-50.0,
+                                        net_income=20.0)) is False
+
+
+class TestProxyStatementExcluded:
+    def test_def14a_pay_vs_performance_does_not_override_10k(self):
+        """LOPE: 10-K 216.170.000, sonradan dosyalanan DEF 14A 216.170 (binlik)."""
+        from src.sources import edgar_api as ea
+        facts = {"facts": {"us-gaap": {"NetIncomeLoss": {"units": {"USD": [
+            {"start": "2025-01-01", "end": "2025-12-31", "val": 216_170_000,
+             "form": "10-K", "fp": "FY", "filed": "2026-02-18", "accn": "a"},
+            {"start": "2025-01-01", "end": "2025-12-31", "val": 216_170,
+             "form": "DEF 14A", "fp": None, "filed": "2026-04-23", "accn": "b"},
+        ]}}}}}
+        annual, _q, _tag = ea._collect_field(facts, ["NetIncomeLoss"])
+        assert annual["2025-12-31"] == 216_170_000
+
+    def test_proxy_form_detection(self):
+        from src.sources.edgar_api import _is_proxy_form
+        assert _is_proxy_form("DEF 14A") and _is_proxy_form("DEFA14A") and _is_proxy_form("PRE 14A")
+        assert not _is_proxy_form("10-K") and not _is_proxy_form("10-Q") and not _is_proxy_form(None)

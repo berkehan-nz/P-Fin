@@ -1,22 +1,22 @@
 {
   "analyst": {
-    "analyst_count": 16,
-    "as_of": "2026-09-09",
-    "buy": 11,
+    "analyst_count": 15,
+    "buy": 10,
     "hold": 6,
     "recommendation": "buy",
     "sell": 0,
     "source": "yfinance",
     "target_high": 455.0,
     "target_low": 350.0,
-    "target_median": 414.0,
-    "upside_to_median": 20.345338798290747
+    "target_median": 420.0,
+    "upside_to_median": 13.501240487895272
   },
-  "as_of": "2026-09-11",
+  "as_of": "2026-09-26",
   "calendar": {
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-11-03"
   },
-  "change_1d_pct": -0.24,
+  "capped_for_scoring": {},
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -36,10 +36,11 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 18886.4,
+  "enterprise_value_musd": 20117.8,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
+      "interest_expense",
       "cfi",
       "shares_diluted",
       "shares_basic"
@@ -61,50 +62,51 @@
       "Buyume satin alma kaynakli olabilir; serefiye artisi ve 8-K devralma duyurulari kontrol edilmeli."
     ],
     "would_fail_at": null,
-    "z_unreliable": false
+    "z_unreliable": false,
+    "z_unreliable_reason": null
   },
-  "generated_at": "2026-09-10T12:54:41+00:00",
+  "generated_at": "2026-09-26T23:02:38+00:00",
   "insider": {
-    "form4_count": 28,
+    "form4_count": 26,
     "last_form4": "2026-08-11",
     "window_days": 180
   },
-  "market_cap_musd": 16275.4,
+  "market_cap_musd": 17506.8,
   "metrics": {
     "altman_z": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 39.7,
+      "pct_basis": "sector",
+      "sector_pct": 14.7,
       "value": 5.27
     },
     "beneish_m": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 77.1,
+      "pct_basis": "sector",
+      "sector_pct": 90.0,
       "value": -2.27
     },
     "cash_conversion": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 60.3,
+      "pct_basis": "sector",
+      "sector_pct": 75.0,
       "value": 1.82
     },
     "current_ratio": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 1.4,
+      "pct_basis": "sector",
+      "sector_pct": 1.9,
       "value": 0.52
     },
     "earnings_yield": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 58.6,
-      "value": 4.543
+      "pct_basis": "sector",
+      "sector_pct": 42.6,
+      "value": 4.26
     },
     "ebitda_margin": {
       "color": "gray",
@@ -116,36 +118,36 @@
     "ev_ebit": {
       "color": "red",
       "own_5y_pct": 58.3,
-      "pct_basis": "universe",
-      "sector_pct": 46.8,
-      "value": 22.012
+      "pct_basis": "sector",
+      "sector_pct": 57.4,
+      "value": 23.45
     },
     "ev_ebitda": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 40.3,
-      "value": 17.618
+      "pct_basis": "sector",
+      "sector_pct": 50.0,
+      "value": 18.77
     },
     "ev_gross_profit": {
       "color": "green",
       "own_5y_pct": 58.3,
-      "pct_basis": "universe",
-      "sector_pct": 55.0,
-      "value": 6.515
+      "pct_basis": "sector",
+      "sector_pct": 34.0,
+      "value": 6.94
     },
     "ev_sales": {
       "color": "green",
-      "own_5y_pct": 58.3,
-      "pct_basis": "universe",
-      "sector_pct": 45.8,
-      "value": 3.23
+      "own_5y_pct": 66.7,
+      "pct_basis": "sector",
+      "sector_pct": 42.6,
+      "value": 3.44
     },
     "fcf_margin": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 32.9,
+      "pct_basis": "sector",
+      "sector_pct": 61.1,
       "value": 15.46
     },
     "fcf_margin_change_3y": {
@@ -158,22 +160,22 @@
     "fcf_yield_ev": {
       "color": "yellow",
       "own_5y_pct": 12.5,
-      "pct_basis": "universe",
-      "sector_pct": 32.9,
-      "value": 4.787
+      "pct_basis": "sector",
+      "sector_pct": 72.2,
+      "value": 4.49
     },
     "fcf_yield_mcap": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 50.0,
-      "value": 5.554
+      "pct_basis": "sector",
+      "sector_pct": 72.2,
+      "value": 5.16
     },
     "gross_margin": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 21.7,
+      "pct_basis": "sector",
+      "sector_pct": 78.0,
       "value": 49.58
     },
     "gross_margin_change_3y": {
@@ -186,16 +188,16 @@
     "gross_profitability": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 25.0,
+      "pct_basis": "sector",
+      "sector_pct": 70.0,
       "value": 0.34
     },
     "implied_growth": {
-      "color": "green",
+      "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 7.77
+      "value": 8.59
     },
     "implied_vs_actual_growth": {
       "color": "gray",
@@ -205,11 +207,11 @@
       "value": null
     },
     "interest_coverage": {
-      "color": "gray",
+      "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "none",
-      "sector_pct": null,
-      "value": null
+      "pct_basis": "sector",
+      "sector_pct": 35.4,
+      "value": 6.65
     },
     "maturity_wall_2y": {
       "color": "red",
@@ -228,15 +230,15 @@
     "net_debt_to_ebitda": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 98.6,
+      "pct_basis": "sector",
+      "sector_pct": 87.0,
       "value": 2.44
     },
     "operating_margin": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 58.6,
+      "pct_basis": "sector",
+      "sector_pct": 16.7,
       "value": 14.67
     },
     "operating_margin_change_3y": {
@@ -249,29 +251,29 @@
     "pct_off_52w_high": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 20.8,
-      "value": 10.931
+      "pct_basis": "sector",
+      "sector_pct": 13.0,
+      "value": 4.19
     },
     "pe": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 62.9,
-      "value": 30.195
+      "pct_basis": "sector",
+      "sector_pct": 51.9,
+      "value": 32.48
     },
     "peg": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 2.39
+      "value": 2.57
     },
     "piotroski_f": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 77.8,
+      "pct_basis": "sector",
+      "sector_pct": 53.7,
       "value": 7.0
     },
     "rel_strength_12m": {
@@ -279,55 +281,55 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -11.881
+      "value": -4.94
     },
     "rel_strength_6m": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 87.5,
-      "value": 44.38
+      "pct_basis": "sector",
+      "sector_pct": 94.4,
+      "value": 51.27
     },
     "return_12m": {
-      "color": "yellow",
+      "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 56.9,
-      "value": 10.2
+      "pct_basis": "sector",
+      "sector_pct": 51.9,
+      "value": 19.96
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 87.5,
-      "value": 61.001
+      "pct_basis": "sector",
+      "sector_pct": 94.4,
+      "value": 81.02
     },
     "rev_cagr_3y": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 4.3,
+      "pct_basis": "sector",
+      "sector_pct": 13.0,
       "value": -2.27
     },
     "rev_growth_ttm": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 31.9,
+      "pct_basis": "sector",
+      "sector_pct": 79.6,
       "value": 12.66
     },
     "roic": {
       "color": "yellow",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 31.8,
+      "pct_basis": "sector",
+      "sector_pct": 31.5,
       "value": 10.79
     },
     "rule_of_40": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 18.6,
+      "pct_basis": "sector",
+      "sector_pct": 64.8,
       "value": 28.12
     },
     "rule_of_40_ebitda": {
@@ -347,29 +349,29 @@
     "sbc_to_fcf": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 18.6,
+      "pct_basis": "sector",
+      "sector_pct": 75.0,
       "value": 0.19
     },
     "sbc_to_revenue": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 9.7,
+      "pct_basis": "sector",
+      "sector_pct": 75.0,
       "value": 2.98
     },
     "share_count_change_1y": {
       "color": "green",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 30.0,
+      "pct_basis": "sector",
+      "sector_pct": 46.3,
       "value": -1.29
     },
     "sloan_accruals": {
       "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "universe",
-      "sector_pct": 95.7,
+      "pct_basis": "sector",
+      "sector_pct": 90.4,
       "value": 0.12
     }
   },
@@ -377,61 +379,67 @@
   "net_debt_musd": 2611.0,
   "news": [
     {
-      "date": "2026-09-09",
-      "headline": "5 Stocks to Buy as U.S. Manufacturing Stays on Growth Track",
+      "date": "2026-09-25",
+      "headline": "This Physical AI Stock Finds Support, Eyes New Entry As Earnings Gallop 76% Higher",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=bd765e2219ebb505a8effc1ed712dea3e766ffc852c9ac124d67b0da57c1b818"
+      "url": "https://finnhub.io/api/news?id=56206f5b181aff4fbaf1644f3a7273dd48d760760edc1a190ffb0f41973a4eb9"
     },
     {
-      "date": "2026-09-09",
-      "headline": "Zebra Technologies Corporation (ZBRA) Presents at Citi's 2026 Global TMT Conference Transcript",
-      "source": "SeekingAlpha",
-      "url": "https://finnhub.io/api/news?id=ae122f55aa5e7a1c999d0a9ab6427bf9fb2dc439fcd62c1bbf95b641ffa304b6"
+      "date": "2026-09-23",
+      "headline": "These S&P500 stocks are moving in today's session",
+      "source": "ChartMill",
+      "url": "https://finnhub.io/api/news?id=08b8181a534560cc6ffd8f2e5a97e2a046c76202a3cde624208fdef926de7df0"
     },
     {
-      "date": "2026-09-03",
-      "headline": "Governments Are Encouraging Industrial Robotic Growth",
-      "source": "SeekingAlpha",
-      "url": "https://finnhub.io/api/news?id=9e6f67cd69e3910cb1691c496d4c347449f0dd785cad524e06b19447426a8eec"
+      "date": "2026-09-23",
+      "headline": "What's going on in today's session: S&P500 movers",
+      "source": "ChartMill",
+      "url": "https://finnhub.io/api/news?id=605977504757e7e3e80d88506dbb7320e228bde5306828633fe3b5b1a8169658"
     },
     {
-      "date": "2026-09-03",
-      "headline": "Why Is Zebra (ZBRA) Down 4.9% Since Last Earnings Report?",
+      "date": "2026-09-23",
+      "headline": "Zebra CTO Tom Bianculli to Keynote 6th United Nations General Assembly Digital Health Symposium on Powering Healthcare Transformation",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=2f14a879f488f2f3aa75f43c2ab28c3bb09156b08b4eb0357d4a06f6c13707ed"
+      "url": "https://finnhub.io/api/news?id=ac26f34604d1b5fc125929312e5103760f2ac665fb65120dc3a1452044fc1ec4"
     },
     {
-      "date": "2026-09-03",
-      "headline": "New Strong Buy Stocks for September 3rd",
+      "date": "2026-09-22",
+      "headline": "Is Zebra Technologies Stock Underperforming the Dow?",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=849b1b7fe1318f8b0ead59e1369d4300981db169c41fb7653db0a3bf95d1ca47"
+      "url": "https://finnhub.io/api/news?id=58f58817d83d40eed2ab1f379b36537bf2323cb9f1f843b8d21cec8a3c3dfad3"
     },
     {
-      "date": "2026-09-02",
-      "headline": "Reasons Why Zebra Technologies Stock Should Be in Your Portfolio",
+      "date": "2026-09-21",
+      "headline": "Top Stock Picks for Week of September 21, 2026",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=153fc3b3a0642789888ceeffeada0b02961aec8254f6da530bd61c1811341691"
+      "url": "https://finnhub.io/api/news?id=1c85a21af311c9eed9c2518e6164a6a5ebbef4ad6dae3f9a6be9d65b2d4c51a5"
     },
     {
-      "date": "2026-09-02",
-      "headline": "Zebra Technologies to Present at Citi's 2026 Global Technology, Media & Telecom Conference",
+      "date": "2026-09-18",
+      "headline": "What Are You Really Buying When You Buy Samsara?",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=401e71ccc035af7737f1d28dd9de6f90264899e244793a6288e1653453746e76"
+      "url": "https://finnhub.io/api/news?id=5df30e175ece2c36a1414daf9630249bbc4b42a9f5a623db3e5abfa27ad7bf2d"
     },
     {
-      "date": "2026-09-02",
-      "headline": "University Health Deploys Zebra Mobile Devices to Reduce Callback Times and Modernize Workflows",
+      "date": "2026-09-17",
+      "headline": "Zebra Technologies Introduces KC401 Kiosk to Drive Smarter Self-Service Across Industries",
       "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=6b96e4d6579b78602031b7023a947197ad2e44424aedf5bb87317e6599dc4a2a"
+      "url": "https://finnhub.io/api/news?id=ddb13f9b63d11302201c0dfa98471984ca922ee00d3b41b628cb05ddd8547a3f"
     }
   ],
-  "price": 344.01,
+  "overrides": [],
+  "percentile_pool": {
+    "sector": 27,
+    "universe": 354
+  },
+  "price": 370.04,
+  "price_as_of": "2026-09-25",
   "reverse_dcf": {
     "actual_growth_pct": -2.27,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 18886.4,
+    "enterprise_value_musd": 20117.8,
     "fcf_ttm_musd": 904.0,
-    "implied_growth_pct": 7.77,
+    "implied_growth_pct": 8.59,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -439,23 +447,23 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "percentile": 77.1,
-          "scaled": 22.9,
+          "percentile": 90.0,
+          "scaled": 10.0,
           "weight": 0.2
         },
         "cash_conversion": {
-          "percentile": 60.3,
-          "scaled": 60.3,
+          "percentile": 75.0,
+          "scaled": 75.0,
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 77.8,
-          "scaled": 77.8,
+          "percentile": 53.7,
+          "scaled": 53.7,
           "weight": 0.25
         },
         "sloan_accruals": {
-          "percentile": 95.7,
-          "scaled": 4.3,
+          "percentile": 90.4,
+          "scaled": 9.6,
           "weight": 0.25
         }
       },
@@ -465,13 +473,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 90.3,
-          "scaled": 90.3,
+          "percentile": 98.1,
+          "scaled": 98.1,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 87.5,
-          "scaled": 87.5,
+          "percentile": 94.4,
+          "scaled": 94.4,
           "weight": 0.4
         }
       },
@@ -481,28 +489,28 @@
     "quality": {
       "components": {
         "fcf_margin": {
-          "percentile": 32.9,
-          "scaled": 32.9,
+          "percentile": 61.1,
+          "scaled": 61.1,
           "weight": 0.15
         },
         "gross_margin": {
-          "percentile": 21.7,
-          "scaled": 21.7,
+          "percentile": 78.0,
+          "scaled": 78.0,
           "weight": 0.2
         },
         "gross_profitability": {
-          "percentile": 25.0,
-          "scaled": 25.0,
+          "percentile": 70.0,
+          "scaled": 70.0,
           "weight": 0.2
         },
         "roic": {
-          "percentile": 31.8,
-          "scaled": 31.8,
+          "percentile": 31.5,
+          "scaled": 31.5,
           "weight": 0.3
         },
         "rule_of_40": {
-          "percentile": 18.6,
-          "scaled": 18.6,
+          "percentile": 64.8,
+          "scaled": 64.8,
           "weight": 0.15
         }
       },
@@ -512,53 +520,54 @@
     "safety": {
       "components": {
         "altman_z": {
-          "percentile": 39.7,
-          "scaled": 39.7,
+          "percentile": 14.7,
+          "scaled": 14.7,
           "weight": 0.3
         },
         "current_ratio": {
-          "percentile": 1.4,
-          "scaled": 1.4,
+          "percentile": 1.9,
+          "scaled": 1.9,
           "weight": 0.2
         },
         "interest_coverage": {
-          "contribution": null,
-          "percentile": null
+          "percentile": 35.4,
+          "scaled": 35.4,
+          "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 98.6,
-          "scaled": 1.4,
+          "percentile": 87.0,
+          "scaled": 13.0,
           "weight": 0.3
         }
       },
-      "coverage": 0.8,
+      "coverage": 1.0,
       "low_coverage": false
     },
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 58.6,
-          "scaled": 58.6,
+          "percentile": 42.6,
+          "scaled": 42.6,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 46.8,
-          "scaled": 53.2,
+          "percentile": 57.4,
+          "scaled": 42.6,
           "weight": 0.3
         },
         "ev_gross_profit": {
-          "percentile": 55.0,
-          "scaled": 45.0,
+          "percentile": 34.0,
+          "scaled": 66.0,
           "weight": 0.2
         },
         "ev_sales": {
-          "percentile": 45.8,
-          "scaled": 54.2,
+          "percentile": 42.6,
+          "scaled": 57.4,
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 32.9,
-          "scaled": 32.9,
+          "percentile": 72.2,
+          "scaled": 72.2,
           "weight": 0.25
         }
       },
@@ -605,16 +614,16 @@
       "earnings_quality": 1.0,
       "momentum": 1.0,
       "quality": 1.0,
-      "safety": 0.8,
+      "safety": 1.0,
       "value": 1.0
     },
-    "earnings_quality": 43.2,
-    "momentum": 89.2,
-    "quality": 26.6,
+    "earnings_quality": 40.3,
+    "momentum": 96.7,
+    "quality": 57.9,
     "safety": 15.8,
-    "total": 33.8,
-    "value": 47.2,
-    "weight_coverage": 0.97
+    "total": 42.0,
+    "value": 56.9,
+    "weight_coverage": 1.0
   },
   "sector": "Makine ve bilgisayar donanimi",
   "series": {
@@ -662,66 +671,66 @@
       "2026-07-04"
     ],
     "price_sparkline": [
-      204.05,
-      203.97,
-      207.51,
-      203.62,
-      207.49,
-      204.42,
-      199.3,
-      207.28,
-      211.12,
-      221.14,
-      226.09,
-      229.64,
-      234.43,
-      236.67,
-      226.87,
-      221.0,
-      215.54,
-      227.08,
-      228.39,
+      202.64,
+      209.08,
+      202.84,
+      212.51,
+      223.07,
+      226.7,
+      233.04,
+      237.3,
+      231.1,
+      227.71,
+      219.24,
+      226.26,
+      223.73,
       228.62,
-      241.79,
-      258.1,
-      260.06,
-      243.47,
-      255.55,
-      252.51,
-      243.63,
-      254.44,
+      216.96,
+      246.76,
+      259.35,
+      247.15,
+      242.26,
+      252.44,
+      247.9,
+      249.96,
       245.48,
       233.04,
-      222.44,
-      240.05,
-      232.98,
-      245.69,
-      247.78,
-      251.53,
+      216.79,
+      228.42,
+      237.39,
+      235.98,
+      237.72,
+      243.39,
       263.26,
       267.18,
       264.65,
       272.65,
-      260.11,
-      265.04,
-      264.69,
-      262.75,
+      266.71,
+      255.17,
+      267.4,
+      262.4,
       259.92,
       284.4,
       288.57,
       291.64,
       368.99,
       376.49,
-      378.37,
-      376.03,
-      366.42,
+      383.06,
+      379.63,
+      371.26,
       360.52,
       363.3,
       359.84,
       356.45,
       343.7,
       357.5,
-      352.54
+      352.54,
+      344.01,
+      342.73,
+      347.81,
+      350.84,
+      371.02,
+      370.04
     ],
     "quarters": [
       "2023-09",
@@ -807,7 +816,7 @@
     "why_cheap_diagnosis": "TARİFE/DÖNGÜSEL DİP (tamamlandı) → ZİRVE KÂR RİSKİ",
     "why_cheap_rationale": "2025 tarife/talep korkusu hisseyi 199 $'a indirdi; Q2 2026 büyük beat ile 363 $. Ama Q2 FAVÖK marjının +710bp'sinin çoğu 73 mn $ tek seferlik IEEPA tarife geri kazanımından; tarife hariç genişleme ~2 puan. Trailing F/K ~32x."
   },
-  "story_age_days": 18,
+  "story_age_days": 16,
   "ticker": "ZBRA",
   "track": "A",
   "ttm": {

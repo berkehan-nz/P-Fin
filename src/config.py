@@ -40,6 +40,33 @@ HTTP_MAX_RETRIES = 5
 HTTP_BACKOFF_BASE_SEC = 2.0  # 2, 4, 8, 16, 32
 
 # --------------------------------------------------------------------------
+# ZAMAN BUTCELERI — bir sirket tum partiyi kilitlemesin
+# --------------------------------------------------------------------------
+# Is akisinin sert siniri 50 dk. O sinira carpilirsa adim IPTAL edilir ve
+# "Commit" adimi ATLANIR; yani parti bosa gider ve imlec hic ilerlemez.
+# Bu yuzden kendi butcemiz her zaman is akisinin sinirindan once dolmali.
+COMPANY_TIMEOUT_SEC = 90       # tek sirket icin yumusak sinir (SIGALRM)
+YF_TIMEOUT_SEC = 40            # yfinance cagrisi — en sik asilan yer
+BATCH_BUDGET_SEC = 26 * 60     # parti bu sureden sonra duzgun biter
+RUN_BUDGET_SEC = 40 * 60       # kart uretimi dahil tum kosu
+WATCHDOG_LIMIT_SEC = 6 * 60    # hic hayat belirtisi yoksa sureci sonlandir
+STATE_FLUSH_EVERY = 10         # kac sirkette bir durum diske yazilsin
+COMPANY_TIMEOUT_SKIP_AFTER = 2  # bu kadar kez asan sembol artik denenmez
+
+# FIYAT KAYNAKLARI SABIRSIZ OLMALI. SEC'in 5 denemeli/ustel geri cekilmeli
+# politikasi tek dogru kaynak oldugu icin dogru; Stooq ve yfinance ise
+# ISTEGE BAGLI zenginlestirmedir — fiyat gelmezse kart yine uretilir.
+# Eski ayarla (5 deneme x 30 sn + 62 sn bekleme) erisilemeyen Stooq hisse
+# basina 212 saniyeye kadar yakabiliyordu; 22 Eylul kilitlenmesinin sebebi
+# buydu: 48 dakika boyunca birkac hisse.
+PRICE_TIMEOUT_SEC = 12
+PRICE_MAX_RETRIES = 2
+# Bir kaynak ust uste bu kadar kez COKERSE o kosu boyunca bir daha aranmaz.
+# Kaynak tamamen kapaliyken 120 sirketin her birinde zaman asimi beklemenin
+# anlami yok; bir kez ogren, gerisini atla.
+SOURCE_BREAKER_THRESHOLD = 8
+
+# --------------------------------------------------------------------------
 # TOHUM LISTESI — 9 Eylul 2026 Finviz on taramasi
 # --------------------------------------------------------------------------
 SEED_DATE = "2026-09-09"
@@ -148,6 +175,8 @@ STAGE1 = {
     # FCF > 0  VEYA  (buyume > X VE Rule of 40 >= Y)
     "high_growth_exemption_growth_pct": 25.0,
     "high_growth_exemption_rule40_min": 40.0,
+    # Bunun ustundeki buyume istisnaya dayanak olamaz (tek seferlik gelir izi).
+    "high_growth_exemption_growth_max_pct": 150.0,
     "net_debt_to_ebitda_max": 3.0,
     "share_count_growth_max_pct": 5.0,
     # Yillik hisse artisi tek seferlik olaylarla sisebilir: IPO'da imtiyazli
@@ -227,6 +256,13 @@ SCORE_WEIGHTS = {
 COVERAGE = {
     "min_weight_factor": 0.35,   # kapsama 0 olsa bile blok tamamen susmasin
     "low_coverage_flag": 0.60,   # bunun altinda kartta "veri yetersiz" rozeti
+    # PUAN YAYIMLAMA TABANI. Otomatik bloklarin hicbiri hesaplanamadiginda
+    # geriye yalnizca ELLE girilen katalizor puani kalir; toplam o tek sayiya
+    # esit olur ve sirket siralamaya gercek bir olcum gibi girer. FRSH tam
+    # boyle 60,0 ile altinci siraya yerlesmisti (kapsama 0,25). Bu tabanin
+    # altinda toplam puan URETILMEZ: "veri yok" ile "puan dusuk" ayni sey
+    # degildir ve siralamada ayni yeri tutamaz.
+    "min_total_weight": 0.40,
 }
 
 # Puanlamada uc degerlerin yuzdelik siralamasini bozmasini engelleyen tavanlar.
@@ -236,6 +272,11 @@ COVERAGE = {
 # anlamina gelmez, paydanin kucuk oldugu anlamina gelir.
 SCORE_CAPS = {
     "roic": (None, 60.0),
+    # 40 Kurali = buyume% + marj%. Saglikli bir sirkette 40-80 arasidir.
+    # ABUS'ta 1057 cikmisti: paya giren %1079 "buyume", tek seferlik bir
+    # lisans/tazminat gelirinin izi. Kirpilmazsa tek sirket tum sektorun
+    # yuzdelik dagilimini kendine cekiyor.
+    "rule_of_40": (None, 100.0),
     "cash_conversion": (None, 5.0),
     "interest_coverage": (None, 100.0),
     "gross_profitability": (None, 2.0),
@@ -282,7 +323,12 @@ SCORE_COMPONENTS = {
     ],
 }
 
-MAX_PER_SECTOR = 12       # Asama 4 ciktisinda sektor basina en fazla
+# Asama 4 ciktisinda sektor basina en fazla kac aday.
+# 12'den 15'e cikarildi: SIC 7300'ler alt gruplara bolunduğunden (yazilim,
+# veri isleme, bilgi hizmetleri ayri ayri) "sektor" artik cok daha dar bir
+# kume. Dar bir grupta 12 tavani, gercekten iyi sirketleri kotaya takiliyor
+# diye eliyordu — su an yalniz "Yazilim ve programlama"da 18 aday var.
+MAX_PER_SECTOR = 15
 FINAL_CANDIDATE_COUNT = 50
 
 # --------------------------------------------------------------------------
@@ -676,8 +722,76 @@ PORTFOLIO = {
     "earnings_warning_days": 7,
     "tax_year_warning_days": 30,        # 1 yil dolmasina kalan gun
     "review_overdue_grace_days": 0,
-    "benchmarks": {"nasdaq100": "QQQ", "sp500": "SPY"},
+    # Dilim bazli kiyas: motor dilimini QQQ ile olcmek yaniltici. Motor
+    # kucuk/deger egilimli tek hisselerden olusuyor; dogru kiyas AVUV.
+    "benchmarks": {"nasdaq100": "QQQ", "sp500": "SPY", "kucuk_deger": "AVUV"},
+    "slice_benchmarks": {"motor": "kucuk_deger", "cekirdek": "nasdaq100"},
     "default_broker": "Midas",
+
+    # ----------------------------------------------------------------
+    # DILIMLER — hedef agirliklar
+    # ----------------------------------------------------------------
+    # DIKKAT: bu oranlar VARSAYILANDIR, Berke'nin onayindan gecmedi.
+    # Sapma uyarilari bunlara gore uretildigi icin ilk kullanimdan once
+    # gozden gecirilmeli. Degistirmek icin yalnizca burasi yeter.
+    "slices": {
+        "motor":    {"label": "Motor (tek hisse)", "target_pct": 40.0},
+        "cekirdek": {"label": "Cekirdek ETF",      "target_pct": 30.0},
+        "nakit":    {"label": "Nakit capasi",      "target_pct": 20.0},
+        "tl":       {"label": "TL mevduat",        "target_pct": 10.0},
+    },
+    # Hedeften bu kadar YUZDE PUAN sapinca uyari uretilir.
+    "slice_drift_warn_pp": 5.0,
+
+    # Varlik sinifindan dilime varsayilan esleme. Pozisyon kendi "slice"
+    # alanini yazarsa o kazanir: SGOV bir ETF'tir ama nakit capasidir.
+    "asset_class_slice": {
+        "STOCK": "motor",
+        "ETF": "cekirdek",
+        "TL_DEPOSIT": "tl",
+    },
+}
+
+# --------------------------------------------------------------------------
+# TEZ KIRICILAR — uc katman
+# --------------------------------------------------------------------------
+# Onceki surumde kiricilar yalnizca ELLE `triggered: true` yapilinca
+# raporlaniyordu; hicbir sey kendiliginden tetiklenmiyordu. Yani "tez
+# kirilirsa cik" kurali kagit uzerinde kaliyordu.
+#
+# Katmanlar bilerek farkli siddette:
+#   thesis      — yapisal bozulma. Tezin dayandigi sayi bozulduysa cikilir.
+#   catastrophic— fiyat cokusu. OTOMATIK SATIS DEGIL: zorunlu yeniden
+#                 degerlendirme. Fiyat duserken satmak, tezin yanlis
+#                 oldugunu degil paniklendigimizi gosterir.
+#   take_profit — hedefe ulasildi. Yarisini sat, kalanini birak.
+BREAKERS = {
+    "catastrophic_price_pct": -30.0,      # girise gore
+    "portfolio_drawdown_pct": -20.0,      # zirveden
+    "take_profit_sell_fraction": 0.5,
+    # Yapisal kirici kac CEYREK ust uste saglanirsa tetiklenir (varsayilan).
+    "default_consecutive_quarters": 2,
+    "levels": {
+        "thesis": {"level": "high",
+                   "action": "SAT, SGOV'a al"},
+        "catastrophic_price": {"level": "high",
+                               "action": "ZORUNLU yeniden degerlendirme "
+                                         "(otomatik satis degil)"},
+        "take_profit": {"level": "medium",
+                        "action": "Yarisini sat"},
+        "portfolio_drawdown": {"level": "high",
+                               "action": "Motor dilimine ekleme durdur"},
+    },
+}
+
+# Yapilandirilmis kiricinin kullanabilecegi karsilastirmalar.
+BREAKER_OPS = {"<", "<=", ">", ">=" }
+
+# TL mevduat hesabi icin gun sayimi. Turkiye'de mevduat faizi basit faizle
+# ve 365 gun uzerinden isler.
+TL_DEPOSIT = {
+    "day_count": 365,
+    "default_withholding_pct": 15.0,   # stopaj; vadeye gore degisir
 }
 
 # --------------------------------------------------------------------------
@@ -695,6 +809,9 @@ FRED_SERIES = {
 # Fiyat kaynaklari
 # --------------------------------------------------------------------------
 STOOQ_URL = "https://stooq.com/q/d/l/?s={symbol}.us&i=d"
+# Doviz sembolleri ".us" soneki ALMAZ; hisse URL'siyle cekilirse Stooq
+# "usdtry.us" diye bir sembol arar ve bos doner.
+STOOQ_FX_URL = "https://stooq.com/q/d/l/?s={symbol}&i=d"
 BENCHMARK_TICKERS = ["QQQ", "SPY"]
 PRICE_HISTORY_DAYS = 800          # ~3 yil; 52 hafta ve 12 aylik getiri icin yeterli
 AVG_VOLUME_WINDOW_DAYS = 30
@@ -723,9 +840,114 @@ FRED_URL = "https://api.stlouisfed.org/fred/series/observations"
 # --------------------------------------------------------------------------
 # Dashboard'a servis edilecek esik dosyasi
 # --------------------------------------------------------------------------
+# Piyasa risk okumasi. VIX bir SAYI olarak kimseye bir sey anlatmaz;
+# esikler burada durur ki pano sayinin yanina ne demek oldugunu yazabilsin.
+MARKET_RISK = {
+    "vix_high": 25.0,   # ustunde piyasa gergin
+    "vix_low": 14.0,    # altinda rehavet
+}
+
+# EDGAR hisse sayisi ikinci kaynagin bu oranindan kucukse tek sinif sayilir.
+SHARE_RECONCILE_RATIO = 0.8
+
+# Genel bakis "nabiz" kosusunun kapsami. Tum adaylarin haberini her saat
+# cekmek Finnhub kotasini bosuna yakar; en yuksek puanlilar + portfoy +
+# izleme listesi zaten ilgilendigimiz kume.
+PULSE = {
+    "top_candidates": 25,      # puan sirasindan kac aday
+    "news_days": 3,            # kac gun geriye haber
+    "news_per_ticker": 3,
+    "max_news": 40,
+}
+
+# Huni asamalarinin adi ve ne yaptigi. funnel.py bunu okur; pano da ayni
+# metni thresholds.json uzerinden alir ki iki yerde farkli isim olmasin.
+STAGE_INFO = {
+    0: ("Evren", "ABD borsalarinda islem goren, yeterince buyuk ve likit "
+                 "adi hisseler. Finans, gayrimenkul ve hasilatsiz biyoteknoloji harictir."),
+    1: ("Sert filtreler", "Is modeli calisiyor mu? Brut marj, buyume, nakit "
+                          "uretimi, borc ve seyrelme esikleri."),
+    2: ("Tuzak eleme", "Ucuz gorunup aslinda bozuk olanlari ayikla: muhasebe "
+                       "oynamasi, iflas riski, karin nakde donmemesi."),
+    3: ("Goreli ucuzluk", "Sektor emsallerine ve kendi gecmisine gore gercekten "
+                          "ucuz mu? Havuzun tamami bitmeden hesaplanamaz."),
+    4: ("Puanlama", "Kalanlari puanla, sektor basina kota uygula, ilk 50'yi sec."),
+}
+
+# ELEME SEBEPLERININ SINIFLANDIRMASI.
+#
+# Huni her elemeyi serbest metin olarak yaziyor ve esik degerleri metne
+# gomuluyor ("Brut marj %20.3 <= %30"). Bu yuzden 1500 sirketlik bir turda
+# 345 FARKLI sebep metni olusuyor; oylece listelenince hicbir sey anlatmiyor.
+# Kalipla gruplanir; gruplama kuralini ON YUZE KOPYALAMAK yerine burada
+# tutup thresholds.json ile gonderiyoruz — kural bilgisi tek yerde kalsin.
+#
+# (desen, asama, kisa grup adi, sade aciklama)
+KILL_REASON_GROUPS = [
+    (r"^SIC .*haric", 0, "Finans / gayrimenkul",
+     "Banka, sigorta ve gayrimenkul sirketleri farkli okunur; evren disi."),
+    (r"^Hasilatsiz biyoteknoloji", 0, "Hasilatsiz biyoteknoloji",
+     "Satisi olmayan ilac sirketi degerleme carpanlariyla olculemez."),
+    (r"^Borsa disi", 0, "Borsa disi kotasyon",
+     "OTC ve benzeri kotasyonlar; likidite ve raporlama standardi dusuk."),
+    (r"^Piyasa degeri hesaplanamadi", 0, "Piyasa degeri yok",
+     "Fiyat veya hisse sayisi alinamadi."),
+    (r"^Piyasa degeri <", 0, "Cok kucuk",
+     "Alt sinirin altinda; likidite ve veri kalitesi sorunlu olur."),
+    (r"^Piyasa degeri >", 0, "Cok buyuk",
+     "Ust sinirin ustunde; bu boyutta yeniden fiyatlanma nadir."),
+    (r"^Fiyat alinamadi", 0, "Fiyat yok", "Fiyat kaynagi bu sembolu tasimiyor."),
+    (r"^Fiyat <", 0, "Fiyat esigi", "Cok dusuk fiyatli hisseler haric."),
+    (r"ortalama dolar hacmi <", 0, "Islem hacmi dusuk",
+     "Girip cikmasi zor; fiyat tek islemle oynar."),
+
+    (r"^Brut marj hesaplanamadi", 1, "Brut marj yok",
+     "SEC dosyasinda satis maliyeti veya brut kar bulunamadi."),
+    (r"^Brut marj %", 1, "Brut marj dusuk",
+     "Fiyatlama gucu zayif; marj esigin altinda."),
+    (r"^Hasilat buyumesi hesaplanamadi", 1, "Buyume verisi yok",
+     "Onceki donem hasilati yok, buyume olculemedi."),
+    (r"^Hasilat buyumesi %", 1, "Buyume yetersiz",
+     "Satislar esigin altinda buyuyor veya kuculuyor."),
+    (r"^FCF negatif", 1, "Nakit uretmiyor",
+     "Serbest nakit akisi negatif ve yuksek buyume istisnasini da saglamiyor."),
+    (r"^Net borc/FAVOK", 1, "Borc yuksek",
+     "Net borc, yillik FAVOK'un esik kati uzerinde."),
+    (r"^Hisse sayisi artisi", 1, "Seyrelme",
+     "Hisse sayisi hizli artiyor; ortaklik payin eriyor."),
+    (r"^SBC/FCF", 1, "Hisse bazli odeme agir",
+     "Calisana verilen hisse, uretilen nakdin buyuk kismini yiyor."),
+
+    (r"^Beneish M", 2, "Manipulasyon suphesi",
+     "Muhasebe oynamasi olasiligi esigin ustunde."),
+    (r"^Altman Z", 2, "Iflas riski",
+     "Z'' skoru sikinti bolgesinde (abonelik istisnasi uygulanmadiysa)."),
+    (r"^Piotroski F", 2, "Temel saglik zayif",
+     "9 maddelik saglik testinin yeterlisini gecemiyor (yalnizca Kol A)."),
+    (r"^Nakit donusumu", 2, "Kar nakde donmuyor",
+     "Kagit uzerindeki kar ust uste birkac yil nakde donmemis."),
+    (r"^Hasilat VE brut marj", 2, "Is kotulesiyor",
+     "Hem satislar hem marj birlikte geriliyor."),
+    (r"^Vade duvari", 2, "Vade duvari",
+     "Yakin vadeli borc nakde gore buyuk ve FCF negatif."),
+    (r"^Halka arz", 2, "Yeni halka arz",
+     "Kilit suresi bitmemis olabilir; arz baskisi riski."),
+
+    (r"sektor yuzdeligi hesaplanamadi", 3, "Karsilastirma yok",
+     "Sektorde yeterli emsal olmadigi icin goreli ucuzluk olculemedi."),
+    (r"^Sektor kotasi", 4, "Sektor kotasi doldu",
+     "Ayni sektorden en fazla belirli sayida sirket listeye girebilir."),
+]
+
+
 def thresholds_payload() -> dict:
     """``data/thresholds.json`` icerigi. Dashboard renkleri buradan okur."""
     return {
+        "kill_reason_groups": [
+            {"pattern": pat, "stage": stage, "label": label, "plain": plain}
+            for pat, stage, label, plain in KILL_REASON_GROUPS
+        ],
+        "stage_info": {str(k): {"name": n, "plain": d} for k, (n, d) in STAGE_INFO.items()},
         "thresholds": THRESHOLDS,
         "score_plain": SCORE_PLAIN,
         "metric_blocks": METRIC_BLOCKS,
@@ -924,12 +1146,59 @@ METRIC_PLAIN = {
                              "Nakit marji 3 yilda {v} puan degisti"),
 }
 
+# NEGATIF DEGERDE ANLAMI TERSINE DONEN CUMLELER.
+#
+# Pano "Ne anlama geliyor" sutununda sayiyi MUTLAK degerle yaziyordu; boylece
+# nakit YAKAN bir sirket "Her 100 dolarlik satistan 8,2 dolar serbest nakit
+# kaliyor" diye okunuyordu ve fiyatin KUCULME varsaydigi bir hisse "yilda %2,9
+# buyume varsayiyor" diye gorunuyordu. Tam tersi. Bu sutun finans bilmeyen
+# birinin okumasi icin var; yanlis yonde bir cumle, ham sayidan daha zararli.
+#
+# Buradaki sablonlar MUTLAK deger alir (isaret zaten cumlede tasiniyor).
+# Bir metrik burada yoksa isaret sayinin onunde korunur (orn. "-%8,2"),
+# hicbir kosulda sessizce dusurulmez.
+METRIC_SENTENCE_NEG = {
+    "fcf_yield_ev": "Sirket nakit uretmiyor; isletme degerinin yilda %{v} kadarini yakiyor",
+    "fcf_yield_mcap": "Sirket nakit uretmiyor; piyasa degerinin yilda %{v} kadarini yakiyor",
+    "earnings_yield": "Faaliyet kari NEGATIF; tamamini alsan yilda %{v} zarar demek",
+    "rev_growth_ttm": "Satislar bir yilda %{v} AZALDI",
+    "rev_cagr_3y": "3 yildir yilda ortalama %{v} KUCULUYOR",
+    "gross_margin": "Her 100 dolarlik satis {v} dolar ZARARLA yapiliyor "
+                    "(satis maliyeti hasilattan buyuk)",
+    "operating_margin": "Her 100 dolarlik satista {v} dolar faaliyet ZARARI var",
+    "fcf_margin": "Her 100 dolarlik satista {v} dolar nakit YAKILIYOR",
+    "ebitda_margin": "Her 100 dolarlik satista {v} dolar FAVOK ZARARI var",
+    "roic": "Yatirilan sermaye yilda %{v} ZARAR uretiyor",
+    "share_count_change_1y": "Hisse sayisi bir yilda %{v} AZALDI — geri alim var, "
+                             "ortaklik payin artiyor",
+    "implied_growth": "Bu fiyat, nakit akisinin yilda %{v} KUCULMESINI varsayiyor",
+    "return_3m": "3 ayda %{v} KAYBETTIRDI",
+    "return_6m": "6 ayda %{v} KAYBETTIRDI",
+    "return_12m": "12 ayda %{v} KAYBETTIRDI",
+    "rel_strength_3m": "3 ayda Nasdaq 100'un %{v} GERISINDE kaldi",
+    "rel_strength_6m": "6 ayda Nasdaq 100'un %{v} GERISINDE kaldi",
+    "rel_strength_12m": "12 ayda Nasdaq 100'un %{v} GERISINDE kaldi",
+    "pct_off_52w_high": "1 yilin zirvesinin %{v} USTUNDE",
+    "gross_margin_change_3y": "Brut marj 3 yilda {v} puan GERILEDI",
+    "operating_margin_change_3y": "Faaliyet marji 3 yilda {v} puan GERILEDI",
+    "fcf_margin_change_3y": "Nakit marji 3 yilda {v} puan GERILEDI",
+    "net_debt_to_ebitda": "Sirket NET NAKIT pozisyonunda; borcu nakdinden az",
+    "sbc_to_revenue": "Satislarin %{v} kadari calisana hisse olarak veriliyor",
+}
+
+# "farkli" yon bilgisi tasimiyordu; pozitif taraf da acik yazilmali.
+for _k, _n in (("rel_strength_3m", 3), ("rel_strength_6m", 6), ("rel_strength_12m", 12)):
+    METRIC_PLAIN[_k] = (METRIC_PLAIN[_k][0], METRIC_PLAIN[_k][1],
+                        f"{_n} ayda Nasdaq 100'un %{{v}} ONUNDE")
+
 # Aciklamalari esik tanimlarina yedir
 for _key, (_plain, _unit, _sentence) in METRIC_PLAIN.items():
     if _key in THRESHOLDS:
         THRESHOLDS[_key]["plain"] = _plain
         THRESHOLDS[_key]["unit_name"] = _unit
         THRESHOLDS[_key]["sentence"] = _sentence
+        if _key in METRIC_SENTENCE_NEG:
+            THRESHOLDS[_key]["sentence_neg"] = METRIC_SENTENCE_NEG[_key]
 
 # Puan bloklarinin sade aciklamalari
 SCORE_PLAIN = {
