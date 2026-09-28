@@ -118,7 +118,7 @@ class TestSliceDrift:
     def test_on_target_slices_are_omitted(self):
         state = {"summary": {"slices": [
             {"slice": "motor", "off_target": True},
-            {"slice": "nakit", "off_target": False},
+            {"slice": "sgov", "off_target": False},
         ]}}
         assert [s["slice"] for s in weekly.slice_drift(state)] == ["motor"]
 

@@ -1,7 +1,90 @@
 {
-  "as_of": "2026-09-09",
-  "cash_usd": 1000.0,
+  "as_of": "2026-09-28",
+  "cash_flows": [],
+  "cash_usd": 149.04,
   "closed": [],
-  "positions": [],
+  "planned_tranches": [
+    {
+      "amount_usd": 149.0,
+      "date": "2026-10-30",
+      "done": false,
+      "note": "ikinci parca",
+      "ticker": "QQQM"
+    }
+  ],
+  "positions": [
+    {
+      "annual_rate_pct": 36.0,
+      "asset_class": "TL_DEPOSIT",
+      "bank": "İş Bankası",
+      "broker": "İş Bankası",
+      "entry_date": "2026-09-29",
+      "entry_price": 0.0,
+      "fees_usd": 0.0,
+      "maturity_date": "2026-12-30",
+      "notes": "Berke'nin tezi: kur tutuluyor, faiz inmiyor. USD->TRY cevrimi Midas'ta 50,3 kurundan. Stopaj orani teyit edilecek.",
+      "principal_try": 60000.0,
+      "review_date": "2026-12-30",
+      "shares": 0.0,
+      "slice": "tl",
+      "start_date": "2026-09-29",
+      "status": "OPEN",
+      "target_price": 0.0,
+      "thesis_breakers": [],
+      "ticker": "TL-ISBANK",
+      "type": "GERCEK",
+      "usdtry_at_entry": 50.3,
+      "withholding_confirmed": false,
+      "withholding_pct": 15.0
+    },
+    {
+      "asset_class": "ETF",
+      "broker": "Midas",
+      "entry_date": "2026-09-29",
+      "entry_price": 100.96,
+      "fees_usd": 1.5,
+      "notes": "Nakit capasi. Kasim ortasi (Faz 1) hisse alimlarinin kaynagi.",
+      "review_date": "2026-11-16",
+      "shares": 5.0,
+      "slice": "sgov",
+      "status": "OPEN",
+      "target_price": 0.0,
+      "thesis_breakers": [],
+      "ticker": "SGOV",
+      "type": "GERCEK"
+    },
+    {
+      "asset_class": "ETF",
+      "broker": "Midas",
+      "entry_date": "2026-09-29",
+      "entry_price": 304.94,
+      "fees_usd": 1.5,
+      "notes": "Cekirdek ETF, ilk parca. Ikinci parca 30 Ekim.",
+      "review_date": "",
+      "shares": 1.0,
+      "slice": "cekirdek_etf",
+      "status": "OPEN",
+      "target_price": 0.0,
+      "thesis_breakers": [],
+      "ticker": "QQQM",
+      "type": "GERCEK"
+    },
+    {
+      "asset_class": "ETF",
+      "broker": "Midas",
+      "entry_date": "2026-09-29",
+      "entry_price": 709.79,
+      "fees_usd": 1.5,
+      "notes": "Cekirdek ETF (kesirli).",
+      "review_date": "",
+      "shares": 0.33,
+      "slice": "cekirdek_etf",
+      "status": "OPEN",
+      "target_price": 0.0,
+      "thesis_breakers": [],
+      "ticker": "VOO",
+      "type": "GERCEK"
+    }
+  ],
   "source": "manual"
 }

@@ -324,26 +324,50 @@ def append_funnel_log(log: dict, *, partial: bool = False, cycle: int | None = N
 
 
 def write_portfolio_state(quotes: dict, bench: dict, ctx: dict) -> bool:
-    """Portfoy durumunu yazar. POZISYON YOKKEN DE yazar.
+    """Portfoy durumu + tarihce. POZISYON YOKKEN DE yazar.
 
-    Onceki surumde dosya 10 Eylul'de kalmisti: icerik degismediginden
-    write_json dosyaya dokunmuyordu ve "as_of" 13 gun geride gorunuyordu.
-    Bos bir portfoyun bugun de bos oldugunu BILMEK, dosyanin bayat mi yoksa
-    guncel mi oldugunu bilmemekten iyidir.
+    Sira onemli: once tarihce (zirve degeri ve gunluk degisim oradan gelir),
+    sonra durum. Ikisi AYNI fiyat, kur ve dagitim verisini kullanir; aksi
+    halde genel bakistaki "toplam" ile grafigin son noktasi ayrisirdi.
     """
+    from . import history
+
     card_map = {}
     for path in CARDS_DIR.glob("*.json"):
         c = read_json(path)
         if isinstance(c, dict) and c.get("ticker"):
             card_map[c["ticker"]] = c
 
+    data = portfolio.load()
+    held = portfolio.tickers()
+    needed = sorted(set(held) | {history.BENCH_SGOV, history.BENCH_QQQ})
+
     # TL mevduat dilimi kur olmadan degerlenemez.
     fx = try_fetch(prices.fx_rate, "USDTRY", label="USD/TRY kuru") or {}
 
-    state = portfolio.compute(quotes, bench, ctx["earnings"], card_map, fx=fx)
+    price_series = {}
+    for t in needed:
+        rows = try_fetch(prices.history, t, label=f"fiyat serisi {t}") or []
+        price_series[t] = [(r["date"], r["close"]) for r in rows]
+    divs = {t: try_fetch(prices.dividends, t, label=f"dagitim {t}") for t in needed}
+
+    macro = read_json(DATA_DIR / "macro.json", {}) or {}
+    tbill_cell = (macro.get("series") or {}).get("us3m") or {}
+    tbill = tbill_cell.get("value") if isinstance(tbill_cell, dict) else tbill_cell
+
+    rows = history.rebuild(data, price_series=price_series, dividends=divs,
+                           fx_series=fx.get("series") or [])
+    merged = history.merge(history.load(), rows)
+    history.write(merged)
+    perf = history.performance(merged, data)
+
+    state = portfolio.compute(quotes, bench, ctx["earnings"], card_map, fx=fx,
+                              dividends={t: v or [] for t, v in divs.items()},
+                              tbill_pct=tbill, peak_value=perf.get("peak_value_usd"))
+    state["performance"] = perf
+    state["dividends_unknown"] = sorted(t for t in held if divs.get(t) is None)
     # stamp_matters: icerik ayni olsa bile "as_of" tazelensin.
-    return write_json(DATA_DIR / "portfolio_state.json", state,
-                      stamp_matters=True)
+    return write_json(DATA_DIR / "portfolio_state.json", state, stamp_matters=True)
 
 
 def write_overview(ctx: dict, quotes: dict) -> bool:

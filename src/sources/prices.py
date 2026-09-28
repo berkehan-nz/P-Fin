@@ -290,4 +290,52 @@ def fx_rate(pair: str = "USDTRY", *, max_age_hours: int = 12) -> dict:
         "as_of": last["date"],
         "change_1w_pct": round(change, 2) if change is not None else None,
         "source": "stooq/yfinance",
+        # Son ~1,5 yil: ceyreklik tempo ve portfoy tarihcesi icin. Durum
+        # dosyasina YAZILMAZ (pipeline ayiklar); yalnizca hesapta kullanilir.
+        "series": [(r["date"], r["close"]) for r in rows[-400:]],
     }
+
+
+# --------------------------------------------------------------------------
+# Dagitimlar (temettu)
+# --------------------------------------------------------------------------
+# SGOV her ay dagitim yapar ve fiyat odeme-disi gunu dagitim kadar duser.
+# Yalnizca fiyata bakmak SGOV'u her ay "para kaybediyor" gosterir; TL
+# mevduatin tahakkuk eden faizini sayip SGOV'unkini saymamak iki dilimi
+# haksiz yere kiyaslamak olur. Stooq dagitim vermez; yfinance verir.
+DIV_CACHE_DIR = CACHE_DIR.parent / "dividends"
+DIV_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def dividends(ticker: str, *, max_age_hours: int = 24) -> list[tuple[str, float]] | None:
+    """[(odeme-disi tarih, hisse basina tutar)]. Kaynak cevap vermezse None.
+
+    None ile [] AYRI seylerdir: [] "bu ETF dagitim yapmiyor", None "bilmiyoruz".
+    Cagiran taraf None gorunce eski onbellege duser ve bunu isaretler.
+    """
+    path = DIV_CACHE_DIR / f"{ticker.upper()}.json"
+    if _fresh(path, max_age_hours):
+        cached = read_json(path, {})
+        if "rows" in cached:
+            return [tuple(r) for r in cached["rows"]]
+
+    rows = None
+    if YF_BREAKER.ok():
+        try:
+            import yfinance as yf
+            with time_limit(config.YF_TIMEOUT_SEC, f"yfinance dagitim {ticker}"):
+                series = yf.Ticker(ticker).dividends
+            rows = [(idx.date().isoformat(), float(v)) for idx, v in series.items()
+                    if num(v)]
+        except TimeoutHit as exc:
+            YF_BREAKER.miss()
+            print(f"  [uyari] dagitim {ticker}: {exc}", flush=True)
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [uyari] dagitim {ticker}: {str(exc)[:100]}")
+
+    if rows is None:
+        cached = read_json(path, {})
+        return [tuple(r) for r in cached["rows"]] if "rows" in cached else None
+
+    write_json(path, {"ticker": ticker.upper(), "rows": rows[-60:]})
+    return rows[-60:]

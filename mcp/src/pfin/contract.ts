@@ -95,11 +95,11 @@ export const assetClassSchema = z
 	.default("STOCK");
 
 export const sliceSchema = z
-	.enum(["motor", "cekirdek", "nakit", "tl"])
+	.enum(["motor", "cekirdek_etf", "sgov", "tl"])
 	.optional()
 	.describe(
 		"Hangi dilime yazilsin. Bos birakilirsa varlik sinifindan turetilir; " +
-			"SGOV gibi bir ETF nakit capasi ise acikca 'nakit' yaz.",
+			"SGOV kendiliginden 'sgov' dilimine gider.",
 	);
 
 /** TL vadeli mevduat — hisse gibi 'adet x fiyat' ile degerlenmez. */

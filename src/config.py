@@ -725,32 +725,71 @@ PORTFOLIO = {
     # Dilim bazli kiyas: motor dilimini QQQ ile olcmek yaniltici. Motor
     # kucuk/deger egilimli tek hisselerden olusuyor; dogru kiyas AVUV.
     "benchmarks": {"nasdaq100": "QQQ", "sp500": "SPY", "kucuk_deger": "AVUV"},
-    "slice_benchmarks": {"motor": "kucuk_deger", "cekirdek": "nasdaq100"},
+    "slice_benchmarks": {"motor": "kucuk_deger", "cekirdek_etf": "nasdaq100"},
     "default_broker": "Midas",
 
     # ----------------------------------------------------------------
-    # DILIMLER — hedef agirliklar
+    # DILIMLER VE FAZLAR
     # ----------------------------------------------------------------
-    # DIKKAT: bu oranlar VARSAYILANDIR, Berke'nin onayindan gecmedi.
-    # Sapma uyarilari bunlara gore uretildigi icin ilk kullanimdan once
-    # gozden gecirilmeli. Degistirmek icin yalnizca burasi yeter.
+    # Dilimler kasitli olarak dort: nakit capasi SGOV kendi dilimidir, cunku
+    # "Kasim ortasinda hisse alimi" icin bekleyen parayi temsil ediyor ve
+    # hedef agirligi fazdan faza en cok degisen kalem.
     "slices": {
-        "motor":    {"label": "Motor (tek hisse)", "target_pct": 40.0},
-        "cekirdek": {"label": "Cekirdek ETF",      "target_pct": 30.0},
-        "nakit":    {"label": "Nakit capasi",      "target_pct": 20.0},
-        "tl":       {"label": "TL mevduat",        "target_pct": 10.0},
+        "motor":        {"label": "Motor (tek hisse)"},
+        "cekirdek_etf": {"label": "Cekirdek ETF"},
+        "sgov":         {"label": "SGOV (nakit capasi)"},
+        "tl":           {"label": "TL mevduat"},
     },
+    # Hedef agirliklar FAZA gore degisir. Aktif faz bugunun tarihine gore
+    # secilir; "active_phase" doldurulursa tarih yok sayilip o faz kullanilir
+    # (ornegin Faz 1 alimlari gecikirse faz0'da kalmak icin).
+    # Kaynak: Berke'nin 29 Eylul 2026 plani.
+    "phases": [
+        {"key": "faz0", "label": "Faz 0 — hazirlik",
+         "start": "2026-09-01", "end": "2026-11-16",
+         "targets": {"motor": 0, "cekirdek_etf": 27, "sgov": 23, "tl": 50}},
+        {"key": "faz1", "label": "Faz 1 — ilk hisseler",
+         "start": "2026-11-16", "end": "2027-03-01",
+         "targets": {"motor": 25, "cekirdek_etf": 30, "sgov": 10, "tl": 35}},
+        {"key": "faz2", "label": "Faz 2 — tam motor",
+         "start": "2027-03-01", "end": None,
+         "targets": {"motor": 40, "cekirdek_etf": 30, "sgov": 10, "tl": 20}},
+    ],
+    "active_phase": None,
     # Hedeften bu kadar YUZDE PUAN sapinca uyari uretilir.
     "slice_drift_warn_pp": 5.0,
 
-    # Varlik sinifindan dilime varsayilan esleme. Pozisyon kendi "slice"
-    # alanini yazarsa o kazanir: SGOV bir ETF'tir ama nakit capasidir.
+    # Varlik sinifindan dilime varsayilan esleme. Sembol eslemesi once
+    # gelir (SGOV bir ETF'tir ama cekirdek degil nakit capasidir); pozisyon
+    # kendi "slice" alanini yazarsa o hepsinden once gelir.
     "asset_class_slice": {
         "STOCK": "motor",
-        "ETF": "cekirdek",
+        "ETF": "cekirdek_etf",
         "TL_DEPOSIT": "tl",
     },
+    "ticker_slice": {"SGOV": "sgov"},
 }
+
+# USD/TRY tempo esikleri — CEYREKLIK (son 91 gun) degisim, %.
+# TL mevduat tezi "kur tutuluyor" varsayimina dayaniyor; tempo bu tezin
+# nabzidir. Yesil < 4, sari 4-7, kirmizi > 7.
+FX_PACE = {"window_days": 91, "green_max_pct": 4.0, "yellow_max_pct": 7.0}
+
+# TL mevduat vade sonu YENILEME olcutleri. Uc olcutun ucu de yesilse tez
+# ayakta demektir. Politika faizi, enflasyon ve erken secim bilgisi ELLE
+# girilir (data/tr_macro.json) — ucretsiz ve guvenilir bir otomatik kaynak
+# yok; tahmini bir sayi yazmaktansa "veri girilmedi" demek daha dogru.
+TL_RENEWAL = {
+    "fx_pace_max_pct": 7.0,
+    "stale_after_days": 45,     # elle girilen makro verisi bu kadar eskiyse gri
+}
+
+# Kalici makro takvim. TCMB toplantilari data/tr_macro.json'dan gelir.
+MACRO_EVENTS = [
+    {"date": "2026-10-27", "end": "2026-10-28", "title": "FOMC toplantisi", "kind": "fed"},
+    {"date": "2026-11-03", "title": "ABD ara secimi", "kind": "politika"},
+    {"date": "2026-12-08", "end": "2026-12-09", "title": "FOMC toplantisi", "kind": "fed"},
+]
 
 # --------------------------------------------------------------------------
 # TEZ KIRICILAR — uc katman
@@ -803,6 +842,9 @@ FRED_SERIES = {
     "unemployment": {"id": "UNRATE", "label": "Issizlik", "unit": "%"},
     "ism_proxy": {"id": "INDPRO", "label": "Sanayi uretimi (yillik)", "unit": "%", "transform": "yoy_pct"},
     "fed_funds": {"id": "DFF", "label": "Fed politika faizi", "unit": "%"},
+    # SGOV'un getirisi 0-3 aylik hazine bonosunu izler. TL mevduatin
+    # "SGOV'a gore basa bas kuru" bu oranla hesaplanir.
+    "us3m": {"id": "DTB3", "label": "ABD 3 aylik hazine bonosu", "unit": "%"},
 }
 
 # --------------------------------------------------------------------------

@@ -1,12 +1,306 @@
 {
-  "as_of": "2026-09-27",
+  "actions": [
+    {
+      "date": "2026-10-30",
+      "days": 32,
+      "kind": "alim",
+      "note": "ikinci parca",
+      "title": "QQQM parcasi — 149.0 $"
+    },
+    {
+      "date": "2026-11-16",
+      "days": 49,
+      "kind": "faz",
+      "note": "hedef: Motor (tek hisse) %25, Cekirdek ETF %30, SGOV (nakit capasi) %10, TL mevduat %35",
+      "title": "Faz 1 — ilk hisseler basliyor"
+    },
+    {
+      "criteria": [
+        {
+          "detail": "politika faizi ve enflasyon girilmedi",
+          "key": "reel_faiz",
+          "label": "Politika faizi enflasyonun ustunde",
+          "status": "gray"
+        },
+        {
+          "detail": "kur serisi alinamadi",
+          "key": "kur_temposu",
+          "label": "Kur temposu ceyrekte %7'nin altinda",
+          "status": "gray"
+        },
+        {
+          "detail": "bilgi girilmedi",
+          "key": "erken_secim",
+          "label": "Erken secim tarihi kesinlesmemis",
+          "status": "gray"
+        }
+      ],
+      "date": "2026-12-30",
+      "days": 93,
+      "kind": "vade",
+      "note": "yenileme karari",
+      "title": "TL mevduat vadesi (İş Bankası)"
+    },
+    {
+      "date": "2027-03-01",
+      "days": 154,
+      "kind": "faz",
+      "note": "hedef: Motor (tek hisse) %40, Cekirdek ETF %30, SGOV (nakit capasi) %10, TL mevduat %20",
+      "title": "Faz 2 — tam motor basliyor"
+    }
+  ],
+  "as_of": "2026-09-28",
+  "calendar": [
+    {
+      "date": "2026-10-27",
+      "days": 29,
+      "end": "2026-10-28",
+      "kind": "fed",
+      "title": "FOMC toplantisi"
+    },
+    {
+      "date": "2026-11-03",
+      "days": 36,
+      "kind": "politika",
+      "title": "ABD ara secimi"
+    },
+    {
+      "date": "2026-12-08",
+      "days": 71,
+      "end": "2026-12-09",
+      "kind": "fed",
+      "title": "FOMC toplantisi"
+    }
+  ],
   "closed": [],
-  "positions": [],
+  "dividends_unknown": [],
+  "performance": {
+    "days_to_start": 1,
+    "inception": "2026-09-29",
+    "invested_usd": 2390.35,
+    "note": "Ilk kapanistan sonra dolar.",
+    "status": "baslamadi"
+  },
+  "positions": [
+    {
+      "annual_rate_pct": 36.0,
+      "asset_class": "TL_DEPOSIT",
+      "bank": "İş Bankası",
+      "broker": "İş Bankası",
+      "change_1d_pct": null,
+      "cost_usd": 1192.84,
+      "days_to_review": 93,
+      "dividends_usd": 0.0,
+      "entry_date": "2026-09-29",
+      "entry_price": 0.0,
+      "fees_usd": 0.0,
+      "holding_days": 0,
+      "maturity_date": "2026-12-30",
+      "next_earnings": null,
+      "notes": "Berke'nin tezi: kur tutuluyor, faiz inmiyor. USD->TRY cevrimi Midas'ta 50,3 kurundan. Stopaj orani teyit edilecek.",
+      "pnl_pct": null,
+      "pnl_usd": null,
+      "price": null,
+      "price_as_of": null,
+      "principal_try": 60000.0,
+      "review_date": "2026-12-30",
+      "sector": "",
+      "shares": 0.0,
+      "slice": "tl",
+      "start_date": "2026-09-29",
+      "started": false,
+      "status": "OPEN",
+      "target_price": 0.0,
+      "thesis_breakers": [],
+      "ticker": "TL-ISBANK",
+      "tl_deposit": {
+        "annual_rate_pct": 36.0,
+        "bank": "İş Bankası",
+        "breakeven_headroom_pct": 7.71,
+        "daily_net_interest_try": 50.3,
+        "days_to_maturity": 92,
+        "elapsed_days": 0,
+        "gross_interest_try": 0.0,
+        "matured": false,
+        "maturity_date": "2026-12-30",
+        "net_interest_try": 0.0,
+        "net_interest_usd": 0.0,
+        "principal_try": 60000.0,
+        "start_date": "2026-09-29",
+        "term_days": 92,
+        "usdtry_at_entry": 50.3,
+        "usdtry_breakeven": 54.1796,
+        "usdtry_now": 48.960201263427734,
+        "usdtry_used_pct": -34.5,
+        "value_try": 60000.0,
+        "value_try_at_maturity": 64627.73,
+        "value_usd": 1225.49,
+        "withholding_pct": 15.0,
+        "withholding_try": 0.0
+      },
+      "type": "GERCEK",
+      "upside_to_target_pct": null,
+      "usdtry_at_entry": 50.3,
+      "value_usd": 1192.84,
+      "vs_benchmark": {
+        "kucuk_deger": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        },
+        "nasdaq100": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        },
+        "sp500": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        }
+      },
+      "weight_pct": 50.0,
+      "withholding_confirmed": false,
+      "withholding_pct": 15.0
+    },
+    {
+      "asset_class": "ETF",
+      "broker": "Midas",
+      "change_1d_pct": null,
+      "cost_usd": 506.3,
+      "days_to_review": 49,
+      "dividends_usd": 0.0,
+      "entry_date": "2026-09-29",
+      "entry_price": 100.96,
+      "fees_usd": 1.5,
+      "holding_days": 0,
+      "next_earnings": null,
+      "notes": "Nakit capasi. Kasim ortasi (Faz 1) hisse alimlarinin kaynagi.",
+      "pnl_pct": null,
+      "pnl_usd": null,
+      "price": null,
+      "price_as_of": null,
+      "review_date": "2026-11-16",
+      "sector": "",
+      "shares": 5.0,
+      "slice": "sgov",
+      "started": false,
+      "status": "OPEN",
+      "target_price": 0.0,
+      "thesis_breakers": [],
+      "ticker": "SGOV",
+      "type": "GERCEK",
+      "upside_to_target_pct": null,
+      "value_usd": 504.8,
+      "vs_benchmark": {
+        "kucuk_deger": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        },
+        "nasdaq100": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        },
+        "sp500": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        }
+      },
+      "weight_pct": 21.16
+    },
+    {
+      "asset_class": "ETF",
+      "broker": "Midas",
+      "change_1d_pct": null,
+      "cost_usd": 306.44,
+      "days_to_review": null,
+      "dividends_usd": 0.0,
+      "entry_date": "2026-09-29",
+      "entry_price": 304.94,
+      "fees_usd": 1.5,
+      "holding_days": 0,
+      "next_earnings": null,
+      "notes": "Cekirdek ETF, ilk parca. Ikinci parca 30 Ekim.",
+      "pnl_pct": null,
+      "pnl_usd": null,
+      "price": null,
+      "price_as_of": null,
+      "review_date": "",
+      "sector": "",
+      "shares": 1.0,
+      "slice": "cekirdek_etf",
+      "started": false,
+      "status": "OPEN",
+      "target_price": 0.0,
+      "thesis_breakers": [],
+      "ticker": "QQQM",
+      "type": "GERCEK",
+      "upside_to_target_pct": null,
+      "value_usd": 304.94,
+      "vs_benchmark": {
+        "kucuk_deger": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        },
+        "nasdaq100": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        },
+        "sp500": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        }
+      },
+      "weight_pct": 12.78
+    },
+    {
+      "asset_class": "ETF",
+      "broker": "Midas",
+      "change_1d_pct": null,
+      "cost_usd": 235.73,
+      "days_to_review": null,
+      "dividends_usd": 0.0,
+      "entry_date": "2026-09-29",
+      "entry_price": 709.79,
+      "fees_usd": 1.5,
+      "holding_days": 0,
+      "next_earnings": null,
+      "notes": "Cekirdek ETF (kesirli).",
+      "pnl_pct": null,
+      "pnl_usd": null,
+      "price": null,
+      "price_as_of": null,
+      "review_date": "",
+      "sector": "",
+      "shares": 0.33,
+      "slice": "cekirdek_etf",
+      "started": false,
+      "status": "OPEN",
+      "target_price": 0.0,
+      "thesis_breakers": [],
+      "ticker": "VOO",
+      "type": "GERCEK",
+      "upside_to_target_pct": null,
+      "value_usd": 234.23,
+      "vs_benchmark": {
+        "kucuk_deger": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        },
+        "nasdaq100": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        },
+        "sp500": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        }
+      },
+      "weight_pct": 9.82
+    }
+  ],
   "source": "manual+prices",
   "summary": {
-    "cash_usd": 1000.0,
-    "cost_usd": 0.0,
-    "equity_value_usd": 0.0,
+    "cash_usd": 149.04,
+    "cost_usd": 2241.31,
+    "equity_value_usd": 2236.81,
     "fx": {
       "as_of": "2026-09-25",
       "change_1w_pct": 0.38,
@@ -14,56 +308,106 @@
       "rate": 48.960201263427734,
       "source": "stooq/yfinance"
     },
+    "fx_pace": {
+      "as_of": "2026-09-25",
+      "change_quarter_pct": null,
+      "change_since_entry_pct": -2.66,
+      "color": "gray",
+      "rate": 48.960201263427734,
+      "window_days": 91
+    },
     "largest_position_pct": null,
-    "peak_value_usd": 1000.0,
-    "pnl_pct": null,
-    "pnl_usd": 0.0,
-    "portfolio_value_usd": 1000.0,
-    "position_count": 0,
+    "peak_value_usd": 2385.85,
+    "phase": {
+      "end": "2026-11-16",
+      "key": "faz0",
+      "label": "Faz 0 — hazirlik",
+      "start": "2026-09-01"
+    },
+    "pnl_pct": -0.2,
+    "pnl_usd": -4.5,
+    "portfolio_value_try": 116811.87,
+    "portfolio_value_usd": 2385.85,
+    "position_count": 4,
     "sector_mix_pct": {},
     "slices": [
       {
         "actual_pct": 0.0,
-        "drift_pp": -40.0,
+        "drift_pp": 0.0,
         "label": "Motor (tek hisse)",
         "off_target": false,
         "slice": "motor",
-        "target_pct": 40.0,
+        "target_pct": 0.0,
         "value_usd": 0.0
       },
       {
-        "actual_pct": 0.0,
-        "drift_pp": -30.0,
+        "actual_pct": 22.6,
+        "drift_pp": -4.4,
         "label": "Cekirdek ETF",
         "off_target": false,
-        "slice": "cekirdek",
-        "target_pct": 30.0,
-        "value_usd": 0.0
+        "slice": "cekirdek_etf",
+        "target_pct": 27.0,
+        "value_usd": 539.17
       },
       {
-        "actual_pct": 100.0,
-        "drift_pp": 80.0,
-        "label": "Nakit capasi",
+        "actual_pct": 21.16,
+        "drift_pp": -1.84,
+        "label": "SGOV (nakit capasi)",
         "off_target": false,
-        "slice": "nakit",
-        "target_pct": 20.0,
-        "value_usd": 1000.0
+        "slice": "sgov",
+        "target_pct": 23.0,
+        "value_usd": 504.8
       },
       {
-        "actual_pct": 0.0,
-        "drift_pp": -10.0,
+        "actual_pct": 50.0,
+        "drift_pp": -0.0,
         "label": "TL mevduat",
         "off_target": false,
         "slice": "tl",
-        "target_pct": 10.0,
-        "value_usd": 0.0
+        "target_pct": 50.0,
+        "value_usd": 1192.84
+      },
+      {
+        "actual_pct": 6.25,
+        "drift_pp": null,
+        "label": "Nakit (USD)",
+        "note": "planli alimlar icin bekliyor; sapma hesabina girmez",
+        "off_target": false,
+        "slice": "nakit",
+        "target_pct": null,
+        "value_usd": 149.04
       }
     ],
+    "slices_incomplete": [],
+    "tbill_pct": null,
     "vs_benchmark": {
       "kucuk_deger": null,
       "nasdaq100": null,
       "sp500": null
     }
+  },
+  "tl_renewal": {
+    "criteria": [
+      {
+        "detail": "politika faizi ve enflasyon girilmedi",
+        "key": "reel_faiz",
+        "label": "Politika faizi enflasyonun ustunde",
+        "status": "gray"
+      },
+      {
+        "detail": "kur serisi alinamadi",
+        "key": "kur_temposu",
+        "label": "Kur temposu ceyrekte %7'nin altinda",
+        "status": "gray"
+      },
+      {
+        "detail": "bilgi girilmedi",
+        "key": "erken_secim",
+        "label": "Erken secim tarihi kesinlesmemis",
+        "status": "gray"
+      }
+    ],
+    "maturity_date": "2026-12-30"
   },
   "warnings": []
 }
