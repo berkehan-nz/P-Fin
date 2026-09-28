@@ -620,7 +620,7 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 55.0,
     "coverage_factors": {
       "earnings_quality": 1.0,
       "momentum": 1.0,
@@ -632,9 +632,9 @@
     "momentum": 23.3,
     "quality": 85.6,
     "safety": 67.4,
-    "total": 71.8,
+    "total": 67.6,
     "value": 76.6,
-    "weight_coverage": 0.75
+    "weight_coverage": 1.0
   },
   "sector": "Veri isleme ve sistem entegrasyonu",
   "series": {
@@ -796,25 +796,38 @@
   "sic": 7374,
   "source": "funnel",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Moderate Buy, ortalama 40,75 $: Oppenheimer 44 $, BTIG 41 $ Buy; Citi ve DA Davidson Neutral. Ayrışma AI'ın trafiği ne kadar ele geçireceğinde.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "ABD bayi büyümesi yalnızca +%3; pazar doygun, büyüme QARSD (fiyat/ürün) kaynaklı",
+      "Büyüme yavaşlıyor: %15→%13→Q3 kılavuzu ~%9-12",
+      "İçeriden satış (~2,6 mn $ / 90 gün); AI aracısızlaşma sorusu cevapsız"
+    ],
+    "bull_case": [
+      "Aralık 2022'den beri hisselerin %30'undan fazlası geri alındı (~925 mn $); 2026 programının %82'si ilk yarıda kullanıldı",
+      "Q2 FCF 87,7 mn $ (%35 marj, FAVÖK'ün %103'ü); borç yok; adj EPS 0,66 $ vs 0,61 $",
+      "FAVÖK marj kılavuzu iyileştirildi (-0,5/-1,5 puan; AI verimliliği); PriceVantage rezervasyonları çeyrekte +%50"
+    ],
+    "business_model": "ABD'nin en çok ziyaret edilen otomobil pazaryeri. Gelir bayilerden abonelik (listeleme, PriceVantage) + OEM reklamı. Q2 2026: 34.629 ödeme yapan bayi (+%5; ABD 26.151 +%3, uluslararası 8.478 +%11), ABD bayi başına çeyreklik gelir 8.134 $ (+%8). CarOffer (toptan) 2025 sonunda kapatıldı.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "orta",
+      "expected_date": "2026Q4",
+      "type": "Q3 sonuçları + 2027 geri alım programı (Şubat) + Guru AI katmanı"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Kârlı, borçsuz, hisseyi gerçekten küçülten bir pazaryeri; EV/FAVÖK ~9x kendi tarihine göre ucuz. Ana soru AI'ın bayi-tüketici aracılığını eritip eritmeyeceği — bugünkü veri (bayi +%5, QARSD +%8) erimeyi göstermiyor. Kısa liste adayı, BEKLE→AL.",
+    "moat": "Trafik liderliği + tescilli fiyat verisi + bayi ilişkileri; %92 brüt marj, %34 FAVÖK marjı. Uluslararası gelir +%28. Risk: Google/AI aracısızlaşması ve Carvana'nın pay kazanması.",
+    "news_summary": "6 Ağu 2026: Q2 gelir 251 mn $ (+%13), FCF 87,7 mn $; 2026 büyüme kılavuzu %10-13 teyit, marj kılavuzu iyileştirildi; hisse mesai sonrası +%5,3 (~38 $).",
+    "thesis_breakers": [
+      "ABD ödeme yapan bayi sayısı iki çeyrek üst üste çeyreklik düşerse",
+      "ABD QARSD büyümesi %4 altına inerse",
+      "Gelir büyümesi %8 altına düşerse",
+      "Aylık tekil kullanıcı YoY küçülürse"
+    ],
+    "updated_at": "2026-09-28",
+    "why_cheap_diagnosis": "GECICI_SOK + AI korkusu + ilgisizlik",
+    "why_cheap_rationale": "CarOffer başarısızlığı (2025), 2026'nın 'yatırım yılı' ilan edilip FAVÖK marjı kılavuzunun düşürülmesi ve 'AI otomobil aramasını ele geçirir' anlatısı çarpanı sıkıştırdı. Yönetim baskıyı 'yapısal değil' diyor; bayiler FTC fiyat şeffaflığı kuralı ve marj baskısıyla temkinli."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "CARG",
   "track": "A",
   "ttm": {

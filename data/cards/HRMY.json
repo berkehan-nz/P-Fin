@@ -594,7 +594,7 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 45.0,
     "coverage_factors": {
       "earnings_quality": 0.8,
       "momentum": 1.0,
@@ -606,9 +606,9 @@
     "momentum": 83.2,
     "quality": 76.8,
     "safety": 66.0,
-    "total": 74.8,
+    "total": 67.2,
     "value": 86.7,
-    "weight_coverage": 0.73
+    "weight_coverage": 0.98
   },
   "sector": "Kimya ve ilac",
   "series": {
@@ -770,25 +770,38 @@
   "sic": 2834,
   "source": "funnel",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "Gerçekten bölünmüş: Oppenheimer 70 $ / HC Wainwright 55 $ / Mizuho 51 $ boğa; BofA 28 $ Underperform, Truist 29 $, DB 36 $, UBS 36 $ ayı. Konsensüs ~46-47 $, fiyat ~36-39 $.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "Tek ürün, tek lisans; 22 Ekim davası kaybedilirse jenerik tak vimi öne çekilebilir",
+      "BofA Underperform 28 $, Truist Hold 29 $: 2030 sonrası gelir görünürlüğü yok",
+      "CFO değişikliği; kredi sözleşmesi feragati (doğrulanmadı); orexin sınıfında Takeda gibi büyük rakipler"
+    ],
+    "bull_case": [
+      "Q2 EPS 1,28 $ konsensüsü geniş farkla geçti; hasta artışı tarihin 2. en yüksek çeyreği",
+      "Net nakit 870 mn $, EV ~1,4-1,6 mlr $; FCF verimi ~%18",
+      "GR ve HD formülasyonları patent ömrünü 2044'e taşıyabilir; BP-205 best-in-class potansiyeli (Oppenheimer 70 $, Wolfe Outperform)"
+    ],
+    "business_model": "Tek ticari ürün: Wakix (pitolisant, Bioprojet'ten lisanslı), narkolepside EDS ve katapleksi. Q2 2026 net gelir 261 mn $ (+%30), ortalama hasta 8.950 (+450). 2026 kılavuzu 1,0-1,04 mlr $. Boru hattı: pitolisant GR (PDUFA 2027Q1), HD (Faz 3 2027), BP-205 orexin-2 agonisti (MAD verisi 2026Q4).",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2026Q4",
+      "type": "AET davası kapanış argümanları 22 Ekim 2026 (ikili sonuç) + BP-205 MAD verisi + GR PDUFA 2027Q1"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Ucuz ve nakit zengin ama tek ürün + 22 Ekim'de ikili bir dava sonucu var; bizim çerçevede bu 'asimetrik' sınıfı, motor dilimi değil. Dava lehte biterse ve BP-205 verisi temizse küçük pozisyon düşünülebilir. Karar 22 Ekim sonrasına: BEKLE.",
+    "moat": "Yetim ilaç münhasırlığı + patent uzlaşmaları: 7 ANDA başvurucusundan 6'sıyla anlaşıldı, jenerik girişi en erken Eylül 2029 (pediatrik uzatmayla Mart 2030). ~%79 brüt marj, net nakit ~870 mn $. Kalan davacı AET ile bench trial bitti, kapanış argümanları 22 Ekim 2026.",
+    "news_summary": "4 Ağu 2026: Q2 rekor gelir 261 mn $, EPS 1,28 $, BP-205 ilk SAD verisi; hisse +%8,9, 52h zirvesi 42,7 $. 16 Tem: CFO Reicin ayrıldı.",
+    "thesis_breakers": [
+      "AET davasında her iki patentin de kaybedilmesi",
+      "Çeyreklik net hasta artışı iki çeyrek üst üste +200 altında kalırsa",
+      "2026 gelirinin 1,0 mlr $ altında kalması",
+      "BP-205 MAD verisinde doz sınırlayıcı güvenlik sinyali"
+    ],
+    "updated_at": "2026-09-28",
+    "why_cheap_diagnosis": "TAKVİMLİ YAPISAL UÇURUM + geçici hukuki belirsizlik",
+    "why_cheap_rationale": "Şubat 2026'da uzlaşmalar jenerik tarihini 4 ay öne çekince hisse ~%25 düştü (UBS Neutral 36 $); Q1'de kâr lisans peşinatı ve dava giderleriyle geriledi (-%10,8); CFO Temmuz'da ayrıldı. EV/Satış ~1,5x: piyasa 2030 sonrasına neredeyse sıfır değer biçiyor."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "HRMY",
   "track": "A",
   "ttm": {

@@ -631,7 +631,7 @@
     "solvency_fallback": null
   },
   "scores": {
-    "catalyst": null,
+    "catalyst": 25.0,
     "coverage_factors": {
       "earnings_quality": 1.0,
       "momentum": 1.0,
@@ -643,9 +643,9 @@
     "momentum": 16.4,
     "quality": 73.3,
     "safety": 79.4,
-    "total": 71.9,
+    "total": 60.2,
     "value": 98.2,
-    "weight_coverage": 0.75
+    "weight_coverage": 1.0
   },
   "sector": "Yazilim ve programlama",
   "series": {
@@ -807,25 +807,38 @@
   "sic": 7370,
   "source": "funnel",
   "story": {
-    "analyst_narrative": "",
+    "analyst_narrative": "4 analist, Moderate Buy, medyan hedef 26,5 $ (fiyat 17,6 $). Az kapsama = ihmal, ama döngü riski hedeflere yansımıyor.",
     "author": "claude",
-    "bear_case": [],
-    "bull_case": [],
-    "business_model": "",
+    "bear_case": [
+      "FAVÖK marjı şirket tarihinin zirvesinde; döngü döndüğünde kâr yarıya inebilir",
+      "Büyüme %32→%15→%25→Q3 %17: sigorta şirketi harcaması yavaşlıyor",
+      "Google/AI arama lead modelini bozabilir; TCPA davaları; müşteri yoğunlaşması (10-K'da doğrulanmalı)"
+    ],
+    "bull_case": [
+      "Rekor FAVÖK 30 mn $ (%15,4 marj), 2025 OCF 95 mn $; net nakit 192 mn $, borç yok; EV/FAVÖK ~3,6x",
+      "Konut dikeyi +%35; AI araçları verimlilik sağlıyor",
+      "50 mn $ geri alım tamamlandı, yeni yetki yıl içinde değerlendirilecek"
+    ],
+    "business_model": "Online sigorta pazaryeri: tüketiciyi sigorta şirketlerine/acentelere yönlendirir, tıklama/lead/çağrı başına ücret alır. Tamamen işlemsel, sigorta şirketlerinin pazarlama bütçesine bağlı. Q2 2026 gelir 195 mn $ (+%25): otomobil 172 mn $ (%88), konut 23 mn $ (+%35). VMM (değişken pazarlama marjı) %29,2.",
     "catalyst": {
-      "confidence": "",
-      "expected_date": "",
-      "type": ""
+      "confidence": "dusuk",
+      "expected_date": "2026Q4",
+      "type": "Q3 sonuçları + yeni geri alım yetkisi; 2027 sigorta prim döngüsü"
     },
-    "claude_verdict": "",
-    "moat": "",
-    "news_summary": "",
-    "thesis_breakers": [],
-    "updated_at": "",
-    "why_cheap_diagnosis": "",
-    "why_cheap_rationale": ""
+    "claude_verdict": "Sistemin %20 FCF verimi gerçek nakitten geliyor ama döngünün zirvesinden; F/K ise tek seferlik vergi geliriyle yapay düşük. Sigorta şirketi harcaması döndüğünde 'ucuz' görünen şirket bir anda pahalılaşır. Bizim 'zirve kârda ucuz' tuzağına uyuyor. ELE eğilimli; izleme listesinde tut.",
+    "moat": "Zayıf: trafik Google'a, talep sigorta şirketlerinin bütçe döngüsüne bağlı. Smart Campaigns (AI teklif aracı) ilk 10 şirketin 7'sinde — gömme başlangıcı. %98 brüt marj ama düşük geçiş maliyeti.",
+    "news_summary": "4 Ağu 2026: Q2 gelir 195 mn $ (+%25) beat, FAVÖK rekor; Q3 kılavuzu +%17 ve harcama artışı → hisse -%4/-%9. 23 Eyl: -%9,8 (sebep bilinmiyor).",
+    "thesis_breakers": [
+      "Otomobil geliri iki çeyrek üst üste YoY küçülürse",
+      "VMM %27 altına inerse",
+      "Q3 geliri 198 mn $ altında kalırsa",
+      "Büyük bir sigorta şirketi harcamayı belirgin keserse"
+    ],
+    "updated_at": "2026-09-28",
+    "why_cheap_diagnosis": "DÖNGÜ ZİRVESİ + OPTİK UCUZLUK (tek seferlik vergi geliri)",
+    "why_cheap_rationale": "Q4 2025 net kârının 57,8 mn $'ının 38,4 mn $'ı ertelenmiş vergi varlığı değerleme karşılığının serbest bırakılmasından (one_off_earnings bayrağının kaynağı); TTM F/K 8x yapay olarak düşük, gerçek ~10x. Sigorta şirketleri 2022-23'te bütçe kesti, 2024-25'te döndü ve bugün 'hedef birleşik oranın belirgin altında' çalışıyor — döngünün olgun evresi. 4 Ağu: beat'e rağmen Q3 büyüme kılavuzu %17'ye yavaşladı, hisse -%9; 23 Eylül'de -%9,8 daha (17,6 $, zirveden -%39)."
   },
-  "story_age_days": null,
+  "story_age_days": 0,
   "ticker": "EVER",
   "track": "A",
   "ttm": {
