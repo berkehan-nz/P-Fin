@@ -86,6 +86,7 @@ window.DataLayer = (function () {
     weekly:        () => get('weekly.json', {}),
     overview:      () => get('overview.json', { movers: [], news: [] }),
     portfolio:     () => get('portfolio_state.json', { positions: [], summary: {}, warnings: [] }),
+    portfolioHistory: () => get('portfolio_history.json', { rows: [] }),
     watchlist:     () => get('watchlist.json', { entries: [] }),
     card:          (t) => get(`cards/${String(t).toUpperCase()}.json`, null),
     cardRawUrl:    (t) => rawUrl(`data/cards/${String(t).toUpperCase()}.json`),

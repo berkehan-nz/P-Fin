@@ -34,6 +34,11 @@
   --accent:    #58a6e0;
   --accent-bg: #0f2331;
 
+  /* Grafik: vurgu + baglam. Baglam grisi kasitli olarak dusuk doygunlukta
+     (vurgu formu); ikili dataviz dogrulayicisindan gecti (ayrim, kontrast). */
+  --chart-focus:   var(--accent);
+  --chart-context: #5d6875;
+
   --radius:    10px;
   --radius-sm: 6px;
   --gap: 12px;
@@ -75,6 +80,8 @@
 
   --accent:    #16679f;
   --accent-bg: #e2eff9;
+
+  --chart-context: #8c959f;
 
   --shadow:    0 1px 2px rgba(16,26,38,.07);
   --shadow-lg: 0 14px 38px rgba(16,26,38,.16);
@@ -734,3 +741,100 @@ ul.plain > li {
   padding: 7px 0;
 }
 ul.plain > li:first-child { border-top: none; }
+
+/* ======================================================================
+   GENEL BAKIS — portfoy. Telefonda once tek buyuk sayi, sonra degisim.
+   Buyuk sayilar ORANTILI rakamla (tabular yalnizca sutunlarda).
+   ==================================================================== */
+.ov-hero { padding: 16px; }
+.ov-hero-top { display: flex; justify-content: space-between; gap: 16px;
+               flex-wrap: wrap; align-items: flex-end; }
+.ov-label { font-size: 11px; color: var(--text-2); font-weight: 600;
+            letter-spacing: .02em; }
+.ov-big { font-size: clamp(40px, 11vw, 56px); font-weight: 650; line-height: 1.05;
+          letter-spacing: -.025em; margin: 4px 0 2px; font-variant-numeric: normal; }
+.ov-sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.ov-today { text-align: right; }
+.ov-delta { font-size: 24px; font-weight: 650; letter-spacing: -.015em; margin-top: 2px; }
+.ov-tiles { display: grid; gap: 8px; margin-top: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); }
+.ov-tile { background: var(--bg-3); border-radius: var(--radius-sm); padding: 9px 11px; min-width: 0; }
+.ov-tile-v { font-size: 18px; font-weight: 650; margin-top: 2px; letter-spacing: -.01em; }
+.ov-2col { display: grid; gap: 0 var(--gap);
+           grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); }
+.ov-2col > * { min-width: 0; }
+.nw { white-space: nowrap; }
+.ov-tl { margin-top: 8px; }
+.ov-tl ul.plain > li, .ov-crit-row { line-height: 1.45; }
+
+/* Segmentli secici (kiyas) */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--radius-sm);
+       overflow: hidden; }
+.seg button { border: 0; border-radius: 0; background: transparent; padding: 4px 10px;
+              font-size: 12px; min-height: 0; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent-bg); color: var(--accent); }
+
+/* Kiyas grafigi — cizgi 2px, izgara kil payi ve duz, uc noktalarda
+   yuzey renginde 2px halka. Yazilar veri rengini giymez. */
+.cmp-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; margin-bottom: 4px; }
+.cmp-key { display: inline-flex; align-items: center; gap: 6px; }
+.cmp-key b { color: var(--text); font-weight: 650; }
+.k-focus, .k-context { display: inline-block; width: 14px; height: 2px; border-radius: 1px; }
+.k-focus   { background: var(--chart-focus); }
+.k-context { background: var(--chart-context); }
+.cmp-plot { position: relative; width: 100%; }
+.cmp-plot svg { display: block; overflow: visible; touch-action: pan-y; }
+.cmp-plot svg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cmp-grid { stroke: var(--line-soft); stroke-width: 1; }
+.cmp-tick { fill: var(--text-3); font-size: 10.5px; font-variant-numeric: tabular-nums; }
+.cmp-end  { fill: var(--text-2); font-size: 11px; font-weight: 600; }
+.cmp-focus, .cmp-context { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.cmp-focus   { stroke: var(--chart-focus); }
+.cmp-context { stroke: var(--chart-context); }
+.cmp-dot-focus, .cmp-dot-context { stroke: var(--bg-2); stroke-width: 2; }
+.cmp-dot-focus   { fill: var(--chart-focus); }
+.cmp-dot-context { fill: var(--chart-context); }
+.cmp-cross { stroke: var(--text-3); stroke-width: 1; }
+.cmp-tip { position: absolute; z-index: 5; pointer-events: none; min-width: 150px;
+           background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius-sm);
+           padding: 7px 9px; font-size: 12px; box-shadow: var(--shadow-lg); }
+.cmp-tip-date { color: var(--text-2); font-size: 11px; margin-bottom: 3px; }
+.cmp-tip-row { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.cmp-tip-row b { color: var(--text); font-variant-numeric: tabular-nums; }
+.cmp-tip-diff { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--line-soft);
+                color: var(--text-2); }
+
+/* Dilim cubuklari — gercek dolgu + hedef cizgisi */
+.sl-row { margin-bottom: 12px; }
+.sl-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+.sl-name { font-size: 13px; font-weight: 600; margin-right: auto; }
+.sl-track { position: relative; height: 8px; background: var(--bg-3); border-radius: 0 4px 4px 0; }
+.sl-track > i { display: block; height: 100%; background: var(--chart-focus);
+                border-radius: 0 4px 4px 0; max-width: 100%; }
+.sl-track > b { position: absolute; top: -3px; width: 2px; height: 14px;
+                margin-left: -1px; background: var(--text); border-radius: 1px; }
+.sl-key-fill, .sl-key-tick { display: inline-block; vertical-align: middle; }
+.sl-key-fill { width: 12px; height: 6px; background: var(--chart-focus); border-radius: 0 3px 3px 0; }
+.sl-key-tick { width: 2px; height: 10px; background: var(--text); margin-left: 6px; }
+
+/* Siradaki isler */
+.ov-act { display: grid; grid-template-columns: 44px 1fr; gap: 10px; padding: 10px 12px;
+          border-bottom: 1px solid var(--line-soft); align-items: start; }
+.ov-act:last-child { border-bottom: none; }
+.ov-act-when { text-align: center; line-height: 1.1; }
+.ov-act-when b { display: block; font-size: 18px; }
+.ov-act-when b.tiny { font-size: 11px; }
+.ov-act .chip { margin-right: 6px; }
+.ov-crit { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); }
+.ov-crit-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 5px; }
+.ov-crit-row .chip { flex-shrink: 0; min-width: 104px; justify-content: center; }
+
+@media (max-width: 760px) {
+  .ov-hero { padding: 14px; }
+  .ov-today { text-align: left; }
+  .ov-tiles { grid-template-columns: 1fr 1fr; }
+  .ov-tile-v { font-size: 16px; }
+  .ov-crit-row { flex-direction: column; gap: 2px; }
+  .ov-crit-row .chip { min-width: 0; }
+}

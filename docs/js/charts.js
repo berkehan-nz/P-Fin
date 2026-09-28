@@ -171,5 +171,190 @@ window.Charts = (function () {
       <span class="num">${Fmt.money(high, { digits: 2 })}</span></div>`;
   }
 
-  return { sparkline, bars, line, scoreRing, miniBar, ratingBar, targetRange };
+  /* KIYAS CIZGISI — portfoy degeri (vurgulu) + tek bir kiyas (gri).
+
+     Tek eksen (USD). Iki seri ayni sermayeyle ayni gun basladigi icin ilk
+     gunlerde ust uste biner; bu yuzden kiyaslar AYNI ANDA degil, birer
+     birer cizilir (secici grafigin ustunde). Kimlik renge birakilmaz:
+     lejant her zaman var, uc noktada kisa ad + deger yazar.
+
+     Ipucu (tooltip) yalnizca kolaylik: her deger alttaki tabloda da var.
+     Etiketler textContent ile yazilir — seri adlari veriden gelir. */
+  function compare(host, cfg) {
+    const { dates, focus, context } = cfg;
+    const fmt = cfg.fmt || ((v) => String(v));
+    const fmtTick = cfg.fmtTick || fmt;
+    const fmtDate = cfg.fmtDate || ((d) => d);
+    const H = cfg.height || 190;
+    const series = [focus, context].filter(Boolean);
+    const n = dates.length;
+
+    host.innerHTML = '';
+    const make = (tag, cls, text) => {
+      const el = document.createElement(tag);
+      if (cls) el.className = cls;
+      if (text !== undefined) el.textContent = text;
+      return el;
+    };
+    const lastOf = (vals) => {
+      for (let i = vals.length - 1; i >= 0; i--) if (isNum(vals[i])) return i;
+      return -1;
+    };
+
+    // Lejant: cizgi anahtari + ad + son deger (deger vurgulu, ad ikincil).
+    const legend = make('div', 'cmp-legend');
+    series.forEach((s) => {
+      const k = make('span', 'cmp-key');
+      k.append(make('i', s.role === 'focus' ? 'k-focus' : 'k-context'));
+      k.append(make('span', 'muted', s.label));
+      const li = lastOf(s.values);
+      k.append(make('b', null, li >= 0 ? fmt(s.values[li]) : '—'));
+      legend.append(k);
+    });
+    const plot = make('div', 'cmp-plot');
+    const tip = make('div', 'cmp-tip');
+    tip.hidden = true;
+    host.append(legend, plot);
+
+    let lastW = 0;
+    function draw() {
+      const W = Math.max(Math.round(plot.clientWidth), 260);
+      if (W === lastW) return;
+      lastW = W;
+      const padL = 46, padR = 10, padT = 14, padB = 22;
+      const all = series.flatMap((s) => s.values.filter(isNum));
+      let lo = Math.min(...all), hi = Math.max(...all);
+      // Duz seride (ilk gunler) eksen 0,5 dolarlik kipirtiyi ucurum gibi
+      // gostermesin: aralik en az degerin %1'i.
+      const minSpan = Math.max(Math.abs(hi) * 0.01, 1);
+      if (hi - lo < minSpan) { const m = (hi + lo) / 2; lo = m - minSpan / 2; hi = m + minSpan / 2; }
+      const pad = (hi - lo) * 0.15;
+      lo -= pad; hi += pad;
+      const step = niceStep((hi - lo) / 3);
+      const ticks = [];
+      for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) ticks.push(t);
+
+      const x = (i) => padL + (n === 1 ? 0 : i * (W - padL - padR) / (n - 1));
+      const y = (v) => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
+
+      const grid = ticks.map((t) => `<line x1="${padL}" x2="${W - padR}" y1="${y(t).toFixed(1)}"
+          y2="${y(t).toFixed(1)}" class="cmp-grid"/>
+        <text x="${padL - 6}" y="${(y(t) + 3.5).toFixed(1)}" text-anchor="end"
+          class="cmp-tick">${esc(fmtTick(t))}</text>`).join('');
+
+      const path = (vals) => {
+        let d = '', pen = false;
+        vals.forEach((v, i) => {
+          if (!isNum(v)) { pen = false; return; }
+          d += `${pen ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`;
+          pen = true;
+        });
+        return d;
+      };
+
+      // Arkadaki seri once cizilir; vurgulu seri ustte kalir.
+      const lines = [...series].reverse().map((s) => `<path d="${path(s.values)}"
+          class="${s.role === 'focus' ? 'cmp-focus' : 'cmp-context'}"/>`).join('');
+
+      // Uc noktalar + kisa ad. Ustteki serinin etiketi yukari, alttakinin
+      // asagi — yakinsayan serilerde bile carpismazlar.
+      const ends = series.map((s) => ({ s, i: lastOf(s.values) })).filter((e) => e.i >= 0);
+      const topKey = ends.length === 2
+        ? (ends[0].s.values[ends[0].i] >= ends[1].s.values[ends[1].i] ? 0 : 1) : 0;
+      const endMarks = ends.map((e, k) => {
+        const cx = x(e.i), cy = y(e.s.values[e.i]);
+        const above = k === topKey;
+        const ly = Math.max(padT + 2, Math.min(H - padB - 4, above ? cy - 9 : cy + 17));
+        return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4"
+            class="${e.s.role === 'focus' ? 'cmp-dot-focus' : 'cmp-dot-context'}"/>
+          <text x="${(cx - 7).toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="end"
+            class="cmp-end">${esc(e.s.short || e.s.label)}</text>`;
+      }).join('');
+
+      const xl = `<text x="${padL}" y="${H - 5}" class="cmp-tick">${esc(fmtDate(dates[0]))}</text>
+        <text x="${W - padR}" y="${H - 5}" text-anchor="end" class="cmp-tick">${
+          esc(fmtDate(dates[n - 1]))}</text>`;
+
+      plot.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" tabindex="0"
+          role="img" aria-label="${esc(cfg.aria || 'Portfoy degeri grafigi')}">
+        ${grid}${lines}${endMarks}${xl}
+        <g class="cmp-hover" visibility="hidden">
+          <line class="cmp-cross" y1="${padT}" y2="${H - padB}"/>
+          ${series.map((s) => `<circle r="4" class="${s.role === 'focus'
+            ? 'cmp-dot-focus' : 'cmp-dot-context'}"/>`).join('')}
+        </g>
+        <rect x="${padL}" y="0" width="${W - padL - padR}" height="${H}" fill="transparent"
+          class="cmp-hit"/>
+      </svg>`;
+      plot.append(tip);
+
+      const svg = plot.querySelector('svg');
+      const hover = svg.querySelector('.cmp-hover');
+      const cross = hover.querySelector('line');
+      const dots = hover.querySelectorAll('circle');
+      let cur = -1;
+
+      function show(i) {
+        cur = Math.max(0, Math.min(n - 1, i));
+        const cx = x(cur);
+        cross.setAttribute('x1', cx); cross.setAttribute('x2', cx);
+        series.forEach((s, k) => {
+          const v = s.values[cur];
+          dots[k].setAttribute('visibility', isNum(v) ? 'visible' : 'hidden');
+          if (isNum(v)) { dots[k].setAttribute('cx', cx); dots[k].setAttribute('cy', y(v)); }
+        });
+        hover.setAttribute('visibility', 'visible');
+
+        tip.textContent = '';
+        tip.append(make('div', 'cmp-tip-date', fmtDate(dates[cur])));
+        series.forEach((s) => {
+          const row = make('div', 'cmp-tip-row');
+          row.append(make('i', s.role === 'focus' ? 'k-focus' : 'k-context'));
+          row.append(make('b', null, isNum(s.values[cur]) ? fmt(s.values[cur]) : '—'));
+          row.append(make('span', 'dim', s.label));
+          tip.append(row);
+        });
+        if (cfg.diff && series.length === 2) {
+          const txt = cfg.diff(focus.values[cur], context.values[cur]);
+          if (txt) tip.append(make('div', 'cmp-tip-diff', txt));
+        }
+        tip.hidden = false;
+        const tw = tip.offsetWidth;
+        tip.style.left = `${cx + 12 + tw > W ? Math.max(0, cx - 12 - tw) : cx + 12}px`;
+        tip.style.top = `${padT}px`;
+      }
+      function hide() { hover.setAttribute('visibility', 'hidden'); tip.hidden = true; cur = -1; }
+      function at(ev) {
+        const r = svg.getBoundingClientRect();
+        const px = ev.clientX - r.left;
+        return n === 1 ? 0 : Math.round((px - padL) / ((W - padL - padR) / (n - 1)));
+      }
+
+      const hit = svg.querySelector('.cmp-hit');
+      hit.addEventListener('pointermove', (ev) => show(at(ev)));
+      hit.addEventListener('pointerdown', (ev) => show(at(ev)));
+      hit.addEventListener('pointerleave', hide);
+      svg.addEventListener('focus', () => show(cur >= 0 ? cur : n - 1));
+      svg.addEventListener('blur', hide);
+      svg.addEventListener('keydown', (ev) => {
+        if (ev.key === 'ArrowLeft') { show((cur < 0 ? n : cur) - 1); ev.preventDefault(); }
+        else if (ev.key === 'ArrowRight') { show((cur < 0 ? n - 2 : cur) + 1); ev.preventDefault(); }
+        else if (ev.key === 'Escape') hide();
+      });
+    }
+
+    draw();
+    if (window.ResizeObserver) new ResizeObserver(() => draw()).observe(plot);
+  }
+
+  function niceStep(raw) {
+    if (!(raw > 0)) return 1;
+    const p = Math.pow(10, Math.floor(Math.log10(raw)));
+    const f = raw / p;
+    return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p;
+  }
+
+  function esc(s) { return Fmt.esc(s); }
+
+  return { sparkline, bars, line, scoreRing, miniBar, ratingBar, targetRange, compare };
 })();

@@ -163,3 +163,45 @@ class TestPerformance:
         perf = H.performance([], base_data())
         assert perf["status"] == "baslamadi"
         assert perf["days_to_start"] == 1
+
+
+class TestLotsAndDayChange:
+    def _with_second_lot(self):
+        d = base_data()
+        d["positions"].append({"ticker": "SGOV", "asset_class": "ETF",
+                               "entry_date": DAYS[2], "entry_price": 100.0,
+                               "shares": 1.0, "fees_usd": 0.0, "status": "OPEN"})
+        d["cash_usd"] = 0.0                    # ikinci parca nakitten alindi
+        return d
+
+    def test_second_lot_of_same_ticker_is_summed(self):
+        """30 Ekim QQQM parcasi ilk parcayi satirdan silmemeli."""
+        ps, divs, fx = series()
+        rows = H.rebuild(self._with_second_lot(), price_series=ps,
+                         dividends=divs, fx_series=fx)
+        assert rows[2]["positions"]["SGOV"]["shares"] == 6.0
+        assert rows[2]["positions"]["SGOV"]["value_usd"] == pytest.approx(600.0)
+
+    def test_new_lot_day_is_not_counted_as_gain(self):
+        ps, divs, fx = series()
+        d = self._with_second_lot()
+        rows = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
+        day = H.positions_day(rows[1], rows[2])
+        assert day["SGOV"]["usd"] == pytest.approx(0.0)   # fiyat ayni
+
+    def test_cash_injection_is_not_a_gain(self):
+        ps, divs, fx = series()
+        d = base_data()
+        d["cash_flows"] = [{"date": DAYS[-1], "amount_usd": 500.0}]
+        d["cash_usd"] = 600.0
+        rows = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
+        perf = H.performance(rows, d)
+        # Son gun: SGOV 5 x (99,70 + 0,30) degismedi, TL +50 TL = +1 $,
+        # 500 $ giris kazanc sayilmaz.
+        assert perf["day_change_usd"] == pytest.approx(1.0, abs=0.01)
+
+    def test_tl_day_change_is_interest_plus_fx(self):
+        ps, divs, fx = series()
+        rows = H.rebuild(base_data(), price_series=ps, dividends=divs, fx_series=fx)
+        day = H.positions_day(rows[0], rows[1])
+        assert day["TL-X"]["usd"] == pytest.approx(1.0, abs=0.01)  # 50 TL / 50

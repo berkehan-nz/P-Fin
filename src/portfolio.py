@@ -403,8 +403,11 @@ def upcoming_actions(data: dict, tl_rows: list[dict], criteria: list[dict]) -> l
     for tr in data.get("planned_tranches") or []:
         if not isinstance(tr, dict) or tr.get("done"):
             continue
+        tutar = num(tr.get("amount_usd"))
         out.append({"date": tr.get("date"), "kind": "alim",
-                    "title": f"{tr.get('ticker', '')} parcasi — {tr.get('amount_usd', '?')} $".strip(),
+                    "title": f"{tr.get('ticker', '')} parcasi"
+                             + (f" — ${tutar:,.0f}" if tutar is not None else ""),
+                    "amount_usd": tutar, "ticker": tr.get("ticker"),
                     "note": tr.get("note", "")})
     for ph in PORTFOLIO["phases"]:
         if ph["start"] > today:

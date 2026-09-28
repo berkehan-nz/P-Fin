@@ -4,55 +4,21 @@ window.ViewOverview = (function () {
   const $ = (id) => document.getElementById(id);
 
   async function render() {
-    const [cand, port, macro, ov, pulse] = await Promise.all([
+    const [cand, port, macro, ov, pulse, hist] = await Promise.all([
       DataLayer.candidates(), DataLayer.portfolio(),
       DataLayer.macro(), DataLayer.overview(), DataLayer.pulse(),
+      DataLayer.portfolioHistory(),
     ]);
 
-    const s = port.summary || {};
-    const counts = cand.counts || {};
-    const totalCandidates = (counts.funnel || 0) + (counts.seed || 0) + (counts.manual || 0);
-    const warnCount = (port.warnings || []).length
-      + [...(cand.candidates || []), ...(cand.seed || []), ...(cand.manual || [])]
-          .reduce((n, r) => n + (r.warning_count || 0), 0);
-
-    const nasdaq = (s.vs_benchmark || {}).nasdaq100;
-
-    /* Portfoy BOSKEN ilk uc kutu "—" gosteriyordu ve genel bakis olu bir
-       sayfa oluyordu. Oysa sistemin urettigi is ortada: tarama nerede,
-       kac sirket Asama 2'yi gecti, kaca karar verildi. Pozisyon acilinca
-       kutular portfoye doner. */
-    const k = (ov && ov.kpis) || {};
-    const portfoyVar = (s.position_count || 0) > 0;
-
-    const ilkUc = portfoyVar ? [
-      box('Portfoy degeri', Fmt.money(s.portfolio_value_usd, { digits: 0 }),
-          `${s.position_count} pozisyon · nakit ${Fmt.money(s.cash_usd, { digits: 0 })}`),
-      box('Toplam K/Z', Fmt.money(s.pnl_usd, { digits: 0 }),
-          Fmt.isNum(s.pnl_pct) ? Fmt.signedPct(s.pnl_pct) : '—',
-          Fmt.pnlClass(s.pnl_usd)),
-      box('Nasdaq 100\'e gore', Fmt.isNum(nasdaq) ? Fmt.signedPct(nasdaq) : '—',
-          'Giris tarihlerinden itibaren, agirlikli', Fmt.pnlClass(nasdaq)),
-    ] : [
-      box('Evren taramasi', Fmt.isNum(k.scan_pct) ? `%${Fmt.num(k.scan_pct, 1)}` : '—',
-          Fmt.isNum(k.scan_total)
-            ? `${(k.scan_done || 0).toLocaleString('tr-TR')} / ${(k.scan_total || 0).toLocaleString('tr-TR')} sirket`
-            : 'Tarama henuz baslamadi'),
-      box('Sert filtreleri gecen', String(k.scan_survivors || 0),
-          k.data_missing ? `${k.data_missing} sirket veri eksikliginden bekliyor`
-                         : 'Asama 0-1-2 sonrasi'),
-      box('Karar verilen', String(k.decided_count || 0),
-          `${(k.seed_count || 0) + (k.candidate_count || 0)} sirketin icinde`),
-    ];
-
-    $('summaryBoxes').innerHTML = [
-      ...ilkUc,
-      box('Aday sayisi', String(totalCandidates),
-          `${counts.seed || 0} tohum · ${counts.funnel || 0} huni · ${counts.manual || 0} elle`),
-      box('Uyari', String(warnCount),
-          warnCount ? 'Portfoy ve kart uyarilari' : 'Temiz',
-          warnCount ? 'c-yellow' : 'c-green'),
-    ].join('');
+    const perf = port.performance || {};
+    renderHero(port, perf);
+    renderChart(hist.rows || [], perf);
+    renderWarnings(port);
+    renderPositions(port, perf);
+    renderSlices(port.summary || {});
+    renderFx(port);
+    renderActions(port);
+    renderMacroCal(port);
 
     renderFreshness(cand, port, pulse);
     renderMarket(pulse);
@@ -60,6 +26,456 @@ window.ViewOverview = (function () {
     renderNews(pulse, ov);
     renderMacro(macro);
     renderToday(ov, port);
+    renderSystem(cand, ov);
+  }
+
+  /* ======================================================================
+     PORTFOY — "bugun yatirimlarim nasil gitti" 10 saniyede.
+     Sira telefon ekranina gore: once tek buyuk sayi ve bugunku degisim,
+     sonra ne kadar kazandim / kiyaslar, sonra grafik, sonra ayrinti.
+     ==================================================================== */
+  const usd = (v, d = 2) => Fmt.money(v, { digits: d });
+  const tl = (v, d = 0) => (Fmt.isNum(v) ? `${v < 0 ? '-' : ''}₺${Fmt.num(Math.abs(v), d)}` : '—');
+  const signedUsd = (v, d = 2) => (Fmt.isNum(v) ? `${v >= 0 ? '+' : '-'}${usd(Math.abs(v), d)}` : '—');
+  const arrowOf = (v) => (!Fmt.isNum(v) || v === 0 ? '' : v > 0 ? '▲ ' : '▼ ');
+
+  function shortDate(iso) {
+    if (!iso) return '—';
+    const d = new Date(`${String(iso).slice(0, 10)}T12:00:00`);
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+  }
+
+  function daysFromToday(iso) {
+    const d = new Date(`${String(iso).slice(0, 10)}T00:00:00`);
+    if (isNaN(d)) return null;
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return Math.round((d - t) / 86400000);
+  }
+
+  /* Isaretli degisim: renk YON'u, ok da ayni bilgiyi renksiz tasir. */
+  function delta(v, text) {
+    return `<span class="${Fmt.pnlClass(v)} nw">${arrowOf(v)}${text}</span>`;
+  }
+
+  /* ---------------------------------------------------------- a) baslik */
+  function renderHero(port, perf) {
+    const s = port.summary || {};
+    const el = $('ovHero');
+
+    if (perf.status !== 'aktif') {
+      const kalan = perf.days_to_start;
+      el.innerHTML = `<div class="card ov-hero">
+        <div class="ov-label">Portfoy degeri · maliyet uzerinden</div>
+        <div class="ov-big">${usd(s.portfolio_value_usd)}</div>
+        <div class="ov-sub">${tl(s.portfolio_value_try)} karsiligi${
+          Fmt.isNum((s.fx || {}).rate) ? ` · USD/TRY ${Fmt.num(s.fx.rate, 2)}` : ''}</div>
+        <p class="small muted" style="margin:12px 0 0">
+          Pozisyonlar <b>${Fmt.esc(shortDate(perf.inception))}</b> tarihinde basliyor${
+            Fmt.isNum(kalan) && kalan > 0 ? ` (${kalan} gun sonra)` : ''}.
+          Ilk kapanistan sonraki sabah gunluk kosu ilk satiri yazar; "bugun"
+          degisimi ikinci kapanistan itibaren gorunur. Yatirilan sermaye
+          <b>${usd(perf.invested_usd)}</b>, fark komisyon.</p>
+      </div>`;
+      return;
+    }
+
+    const b = perf.benchmarks || {};
+    const eksik = !perf.complete && (perf.missing || []).length
+      ? `<p class="tiny c-yellow" style="margin:8px 0 0">⚠ Bazi girdiler eksik
+          (${Fmt.esc(perf.missing.join(', '))}); sayilar yaklasik.</p>` : '';
+
+    const bugun = Fmt.isNum(perf.day_change_usd)
+      ? `<div class="ov-delta">${delta(perf.day_change_usd, signedUsd(perf.day_change_usd))}</div>
+         <div class="ov-sub">${delta(perf.day_change_pct, Fmt.signedPct(perf.day_change_pct, 2))}
+           · ${Fmt.esc(shortDate(perf.prev_date))} kapanisina gore</div>`
+      : `<div class="ov-delta c-gray">—</div>
+         <div class="ov-sub">ilk gun; kiyaslanacak onceki kapanis yok</div>`;
+
+    const kiyas = (label, v, fark) => `<div class="ov-tile">
+        <div class="ov-label">${label}</div>
+        <div class="ov-tile-v">${usd(v, 0)}</div>
+        <div class="ov-sub">${Fmt.isNum(fark)
+          ? `sen ${delta(fark, `${signedUsd(fark)}`)} ${fark >= 0 ? 'ondesin' : 'geridesin'}`
+          : 'veri yok'}</div></div>`;
+
+    el.innerHTML = `<div class="card ov-hero">
+      <div class="ov-hero-top">
+        <div>
+          <div class="ov-label">Portfoy degeri · ${Fmt.esc(shortDate(perf.as_of))} kapanisi</div>
+          <div class="ov-big">${usd(perf.value_usd)}</div>
+          <div class="ov-sub">${tl(perf.value_try)} · USD/TRY ${Fmt.num(perf.usdtry, 2)}</div>
+        </div>
+        <div class="ov-today">
+          <div class="ov-label">Bugun</div>
+          ${bugun}
+        </div>
+      </div>
+      <div class="ov-tiles">
+        <div class="ov-tile">
+          <div class="ov-label">Baslangictan beri</div>
+          <div class="ov-tile-v">${delta(perf.return_usd, signedUsd(perf.return_usd))}</div>
+          <div class="ov-sub">${delta(perf.return_pct, Fmt.signedPct(perf.return_pct, 2))} dolar
+            · ${delta(perf.return_try_pct, Fmt.signedPct(perf.return_try_pct, 2))} TL bazinda
+            · ${perf.days} gun</div>
+        </div>
+        ${kiyas('Hepsi TL mevduatta olsaydi', b.all_tl_usd, perf.vs_all_tl_usd)}
+        ${kiyas('Hepsi SGOV\'da olsaydi', b.all_sgov_usd, perf.vs_all_sgov_usd)}
+        ${kiyas('Hepsi QQQ\'da olsaydi', b.all_qqq_usd, perf.vs_all_qqq_usd)}
+      </div>
+      ${eksik}
+    </div>`;
+  }
+
+  /* -------------------------------------------------- g) 30 gunluk grafik */
+  const BENCH = {
+    tl:   { key: 'all_tl_usd',   label: 'Hepsi TL mevduatta', short: 'TL' },
+    sgov: { key: 'all_sgov_usd', label: 'Hepsi SGOV\'da',     short: 'SGOV' },
+    qqq:  { key: 'all_qqq_usd',  label: 'Hepsi QQQ\'da',      short: 'QQQ' },
+  };
+
+  function renderChart(rows, perf) {
+    const el = $('ovChart');
+    const son = rows.slice(-30);
+    if (son.length < 2) {
+      el.innerHTML = `<div class="card muted small">Grafik ilk iki kapanistan sonra
+        cizilir. ${perf.status === 'aktif' ? 'Yarin sabahki gunluk kosudan sonra burada.'
+        : `Ilk satir ${Fmt.esc(shortDate(perf.inception))} kapanisindan sonra yazilir.`}</div>`;
+      return;
+    }
+
+    let secili = DataLayer.prefs.get('ovBench', 'tl');
+    if (!BENCH[secili]) secili = 'tl';
+
+    el.innerHTML = `<div class="card">
+      <div class="spread" style="align-items:center;margin-bottom:8px">
+        <div class="ov-label">Son ${son.length} islem gunu · USD</div>
+        <div class="seg" role="group" aria-label="Kiyas secimi">${Object.entries(BENCH).map(
+          ([k, v]) => `<button data-b="${k}" aria-pressed="${k === secili}">${Fmt.esc(v.short)}</button>`).join('')}
+        </div>
+      </div>
+      <div id="ovChartPlot"></div>
+      <details class="tiny" style="margin-top:8px"><summary class="dim">Tablo olarak goster</summary>
+        <div class="table-wrap" style="margin-top:6px" id="ovChartTable"></div></details>
+    </div>`;
+
+    const draw = () => {
+      const bm = BENCH[secili];
+      const dates = son.map((r) => r.date);
+      const focus = { role: 'focus', label: 'Portfoy', short: 'Portfoy',
+                      values: son.map((r) => r.total_usd) };
+      const context = { role: 'context', label: bm.label, short: bm.short,
+                        values: son.map((r) => (r.benchmarks || {})[bm.key]) };
+      Charts.compare($('ovChartPlot'), {
+        dates, focus, context,
+        fmt: (v) => usd(v, 0),
+        fmtTick: (v) => usd(v, 0),
+        fmtDate: shortDate,
+        diff: (a, c) => (Fmt.isNum(a) && Fmt.isNum(c) ? `Fark ${signedUsd(a - c)}` : ''),
+        aria: `Son ${son.length} gunde portfoy degeri ve ${bm.label} kiyasi`,
+      });
+      $('ovChartTable').innerHTML = `<table><thead><tr><th>Tarih</th><th>Portfoy</th>
+        <th>${Fmt.esc(bm.label)}</th><th>Fark</th></tr></thead><tbody>${
+        [...son].reverse().map((r) => {
+          const c = (r.benchmarks || {})[bm.key];
+          return `<tr><td>${Fmt.esc(shortDate(r.date))}</td><td class="num">${usd(r.total_usd)}</td>
+            <td class="num">${usd(c)}</td>
+            <td class="num">${Fmt.isNum(c) ? delta(r.total_usd - c, signedUsd(r.total_usd - c)) : '—'}</td></tr>`;
+        }).join('')}</tbody></table>`;
+    };
+
+    el.querySelectorAll('[data-b]').forEach((btn) => btn.addEventListener('click', () => {
+      secili = btn.dataset.b;
+      DataLayer.prefs.set('ovBench', secili);
+      el.querySelectorAll('[data-b]').forEach((x) =>
+        x.setAttribute('aria-pressed', String(x.dataset.b === secili)));
+      draw();
+    }));
+    draw();
+  }
+
+  /* ------------------------------------------------------------ h) uyarilar */
+  function renderWarnings(port) {
+    const ws = port.warnings || [];
+    $('ovWarnings').innerHTML = ws.length
+      ? `<h2>Uyarilar <span class="chip yellow">${ws.length}</span></h2>` + ws.map((w) =>
+          `<div class="warn ${Fmt.esc(w.level)}"><span aria-hidden="true">${
+            w.level === 'high' ? '⛔' : w.level === 'medium' ? '⚠' : 'ℹ'}</span>
+          <span>${Fmt.esc(w.message)}</span></div>`).join('')
+      : '';
+  }
+
+  /* ---------------------------------------------------------- b) pozisyonlar */
+  /* Ayni sembolun parcalari (30 Ekim QQQM) tek satirda toplanir. */
+  function groupPositions(positions) {
+    const by = new Map();
+    positions.forEach((p) => {
+      const key = p.ticker;
+      const g = by.get(key);
+      if (!g) { by.set(key, { ...p, lots: 1 }); return; }
+      g.lots += 1;
+      g.shares = (g.shares || 0) + (p.shares || 0);
+      g.cost_usd = (g.cost_usd || 0) + (p.cost_usd || 0);
+      g.value_usd = Fmt.isNum(g.value_usd) && Fmt.isNum(p.value_usd) ? g.value_usd + p.value_usd : null;
+      g.pnl_usd = Fmt.isNum(g.pnl_usd) && Fmt.isNum(p.pnl_usd) ? g.pnl_usd + p.pnl_usd : null;
+      g.pnl_pct = Fmt.isNum(g.pnl_usd) && g.cost_usd ? (g.pnl_usd / g.cost_usd) * 100 : null;
+      g.started = g.started || p.started;
+    });
+    return [...by.values()].sort((a, b) => (b.value_usd || 0) - (a.value_usd || 0));
+  }
+
+  function renderPositions(port, perf) {
+    const el = $('ovPositions');
+    const pos = groupPositions((port.positions || []).filter((p) => p.status !== 'CLOSED'));
+    const s = port.summary || {};
+    if (!pos.length) {
+      el.innerHTML = `<div class="card muted small">Acik pozisyon yok.</div>`;
+      return;
+    }
+    const gunluk = perf.positions_day || {};
+    const sliceLabel = {};
+    (s.slices || []).forEach((x) => { sliceLabel[x.slice] = x.label; });
+
+    const bugun = (p) => {
+      const g = gunluk[p.ticker];
+      if (g && Fmt.isNum(g.usd)) {
+        return `${delta(g.usd, signedUsd(g.usd))}<div class="tiny">${delta(g.pct, Fmt.signedPct(g.pct, 2))}</div>`;
+      }
+      if (p.started && Fmt.isNum(p.change_1d_pct) && Fmt.isNum(p.value_usd)) {
+        const d = p.value_usd * p.change_1d_pct / (100 + p.change_1d_pct);
+        return `${delta(d, signedUsd(d))}<div class="tiny">${delta(p.change_1d_pct, Fmt.signedPct(p.change_1d_pct, 2))}</div>`;
+      }
+      return '<span class="dim">—</span>';
+    };
+    const kz = (p) => (!p.started ? '<span class="dim tiny">baslamadi</span>'
+      : Fmt.isNum(p.pnl_usd)
+        ? `${delta(p.pnl_usd, signedUsd(p.pnl_usd))}<div class="tiny">${delta(p.pnl_pct, Fmt.signedPct(p.pnl_pct, 2))}</div>`
+        : '<span class="dim">—</span>');
+
+    const rows = pos.map((p) => {
+      const t = p.tl_deposit;
+      if (t) {
+        return `<tr>
+          <td><b>TL mevduat</b><div class="tiny dim">${Fmt.esc(t.bank || p.bank || '')}</div></td>
+          <td class="num">${usd(p.value_usd)}<div class="tiny dim">${tl(t.value_try)}</div></td>
+          <td class="num">${bugun(p)}</td>
+          <td class="num">${kz(p)}</td>
+          <td class="num">${tl(t.principal_try)}<div class="tiny dim">anapara</div></td>
+          <td class="num">${usd(p.cost_usd)}<div class="tiny dim">@${Fmt.num(t.usdtry_at_entry, 2)}</div></td>
+          <td class="num">kur ${Fmt.num(t.usdtry_now, 2)}</td>
+          <td>${Fmt.esc(sliceLabel[p.slice] || p.slice || '')}</td></tr>`;
+      }
+      return `<tr>
+        <td><b>${Fmt.esc(p.ticker)}</b>${p.lots > 1 ? `<div class="tiny dim">${p.lots} parca</div>` : ''}</td>
+        <td class="num">${usd(p.value_usd)}</td>
+        <td class="num">${bugun(p)}</td>
+        <td class="num">${kz(p)}</td>
+        <td class="num">${Fmt.num(p.shares, p.shares % 1 ? 2 : 0)}</td>
+        <td class="num">${usd(p.cost_usd)}<div class="tiny dim">@${Fmt.num(p.entry_price, 2)}</div></td>
+        <td class="num">${Fmt.isNum(p.price) ? usd(p.price) : '<span class="dim">—</span>'}</td>
+        <td>${Fmt.esc(sliceLabel[p.slice] || p.slice || '')}</td></tr>`;
+    }).join('');
+
+    const nakit = Fmt.isNum(s.cash_usd) ? `<tr>
+        <td><b>Nakit</b><div class="tiny dim">USD</div></td>
+        <td class="num">${usd(s.cash_usd)}</td><td></td><td></td><td></td><td></td><td></td>
+        <td class="dim">planli alimlar</td></tr>` : '';
+
+    el.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Varlik</th><th>Deger</th><th>Bugun</th><th>Toplam K/Z</th>
+        <th>Adet</th><th>Maliyet</th><th>Fiyat</th><th style="text-align:left">Dilim</th></tr></thead>
+      <tbody>${rows}${nakit}</tbody></table></div>
+      ${pos.filter((p) => p.tl_deposit).map(tlDetail).join('')}`;
+  }
+
+  /* TL mevduat: anapara, biriken faiz, vade, basa bas kurlari. Mevduatta
+     sorulacak soru "faiz ne kadar" degil, "kur nereye kadar giderse bu
+     faiz hala SGOV'u yener". */
+  function tlDetail(p) {
+    const t = p.tl_deposit;
+    const kalan = t.matured ? 'vadesi doldu'
+      : `vadeye <b>${t.days_to_maturity} gun</b> (${Fmt.esc(shortDate(t.maturity_date))})`;
+    const vsSgov = Fmt.isNum(t.usdtry_breakeven_vs_sgov)
+      ? `<li>SGOV'a gore basa bas kur <b class="num">${Fmt.num(t.usdtry_breakeven_vs_sgov, 2)}</b>
+           — vadede USD/TRY bunun ustundeyse mevduat SGOV'dan kotu.</li>`
+      : `<li class="dim">SGOV'a gore basa bas kur: 3 aylik T-bill faizi (FRED) gelince hesaplanir.</li>`;
+    const stopaj = p.withholding_confirmed === false ? ' <span class="chip gray">teyit bekliyor</span>' : '';
+    return `<div class="card ov-tl">
+      <div class="ov-label">TL mevduat · ${Fmt.esc(t.bank || '')}</div>
+      <ul class="plain small">
+        <li>Anapara <b class="num">${tl(t.principal_try)}</b> · brut %${Fmt.num(t.annual_rate_pct, 1)},
+          stopaj %${Fmt.num(t.withholding_pct, 0)}${stopaj}</li>
+        <li>Biriken net faiz <b class="num">${tl(t.net_interest_try, 2)}</b>
+          (${usd(t.net_interest_usd)}) · gunde ${tl(t.daily_net_interest_try, 2)} · ${kalan}</li>
+        <li>Dolar karsiligi <b class="num">${usd(p.value_usd)}</b>${p.started ? ''
+          : ' <span class="dim">(baslamadi; giris kurundan)</span>'} · vadede ${tl(t.value_try_at_maturity)}</li>
+        <li>Basa bas kur <b class="num">${Fmt.num(t.usdtry_breakeven, 2)}</b>
+          — vadede USD/TRY bunun ustundeyse mevduat dolar bazinda zarar${
+          Fmt.isNum(t.breakeven_headroom_pct) ? ` (bugunden %${Fmt.num(t.breakeven_headroom_pct, 1)} uzakta)` : ''}.</li>
+        ${vsSgov}
+      </ul></div>`;
+  }
+
+  /* ----------------------------------------------------------- c) dilimler */
+  function renderSlices(s) {
+    const el = $('ovSlices');
+    const slices = s.slices || [];
+    const ph = s.phase || {};
+    if (!slices.length) { el.innerHTML = '<div class="card muted small">Dilim verisi yok.</div>'; return; }
+
+    const maks = Math.max(...slices.flatMap((x) => [x.actual_pct || 0, x.target_pct || 0]));
+    const olcek = Math.min(100, Math.ceil((maks + 5) / 10) * 10);
+    const eksik = (s.slices_incomplete || []).length
+      ? `<p class="tiny c-yellow" style="margin:0 0 8px">⚠ Eksik fiyat/kur:
+          ${Fmt.esc(s.slices_incomplete.join(', '))} — sapma uyarisi kapali.</p>` : '';
+
+    const rozet = (x) => {
+      if (!Fmt.isNum(x.target_pct)) return '<span class="chip gray">hedef yok</span>';
+      if (!Fmt.isNum(x.drift_pp)) return '<span class="chip gray">? veri yok</span>';
+      const d = x.drift_pp;
+      const txt = Math.abs(d) < 0.5 ? 'hedefte' : `${d > 0 ? '+' : '-'}${Fmt.num(Math.abs(d), 1)} puan`;
+      return x.off_target
+        ? `<span class="chip yellow">${d > 0 ? '▲' : '▼'} ${txt}</span>`
+        : `<span class="chip green">✓ ${txt}</span>`;
+    };
+
+    el.innerHTML = `<div class="card">
+      <div class="spread" style="margin-bottom:10px">
+        <span class="ov-label">${Fmt.esc(ph.label || 'Faz')}${ph.end ? ` · bitis ${Fmt.esc(shortDate(ph.end))}` : ''}</span>
+        <span class="tiny dim"><i class="sl-key-fill"></i> gercek <i class="sl-key-tick"></i> hedef · tolerans ±5 puan</span>
+      </div>
+      ${eksik}
+      ${slices.map((x) => `<div class="sl-row">
+        <div class="sl-head">
+          <span class="sl-name">${Fmt.esc(x.label)}</span>
+          <span class="num small">%${Fmt.num(x.actual_pct || 0, 1)}${Fmt.isNum(x.target_pct)
+            ? ` <span class="dim">/ %${Fmt.num(x.target_pct, 0)}</span>` : ''}</span>
+          ${rozet(x)}
+        </div>
+        <div class="sl-track" title="${Fmt.esc(x.label)}: ${usd(x.value_usd, 0)}">
+          <i style="width:${Math.min(100, (x.actual_pct || 0) / olcek * 100).toFixed(1)}%"></i>
+          ${Fmt.isNum(x.target_pct) ? `<b style="left:${(x.target_pct / olcek * 100).toFixed(1)}%"></b>` : ''}
+        </div>
+        ${x.note ? `<div class="tiny dim">${Fmt.esc(x.note)}</div>` : ''}
+      </div>`).join('')}
+      <div class="tiny dim" style="margin-top:4px">Olcek %0–${olcek}</div>
+    </div>`;
+  }
+
+  /* --------------------------------------------------------------- d) kur */
+  const PACE = {
+    green:  ['green',  '●', 'sakin'],
+    yellow: ['yellow', '▲', 'izle'],
+    red:    ['red',    '▲', 'hizli'],
+    gray:   ['gray',   '?', 'veri yok'],
+  };
+
+  function renderFx(port) {
+    const s = port.summary || {};
+    const fx = s.fx || {};
+    const pace = s.fx_pace || {};
+    const t = ((port.positions || []).find((p) => p.tl_deposit) || {}).tl_deposit || {};
+    const el = $('ovFx');
+    if (!Fmt.isNum(fx.rate)) {
+      el.innerHTML = '<div class="card muted small">USD/TRY alinamadi — gunluk kosu kuru cekemedi.</div>';
+      return;
+    }
+    const [cls, ikon, ad] = PACE[pace.color] || PACE.gray;
+    el.innerHTML = `<div class="card">
+      <div class="spread">
+        <div>
+          <div class="ov-label">USD/TRY · ${Fmt.esc(shortDate(fx.as_of))}</div>
+          <div class="ov-tile-v" style="font-size:26px">${Fmt.num(fx.rate, 2)}</div>
+        </div>
+        <span class="chip ${cls}" title="Son ${pace.window_days || 91} gunluk kur degisimi">${ikon} tempo: ${ad}</span>
+      </div>
+      <ul class="plain small" style="margin-top:8px">
+        <li>Giris kuruna gore (${Fmt.num(t.usdtry_at_entry, 2)})
+          <b class="num">${Fmt.signedPct(pace.change_since_entry_pct, 2)}</b></li>
+        <li>Ceyreklik tempo <b class="num">${Fmt.signedPct(pace.change_quarter_pct, 1)}</b>
+          <span class="dim">· yesil &lt;%4, sari %4–7, kirmizi &gt;%7</span></li>
+        <li>1 hafta <b class="num">${Fmt.signedPct(fx.change_1w_pct, 2)}</b></li>
+        ${Fmt.isNum(t.usdtry_breakeven) ? `<li>TL basa bas kur <b class="num">${Fmt.num(t.usdtry_breakeven, 2)}</b>${
+          Fmt.isNum(t.usdtry_breakeven_vs_sgov) ? ` · SGOV'a gore <b class="num">${Fmt.num(t.usdtry_breakeven_vs_sgov, 2)}</b>` : ''}</li>` : ''}
+      </ul></div>`;
+  }
+
+  /* ------------------------------------------------------- e) siradaki isler */
+  const CRIT = {
+    green: ['green', '✓', 'saglaniyor'],
+    red:   ['red',   '✗', 'saglanmiyor'],
+    gray:  ['gray',  '?', 'veri yok'],
+  };
+  const ACTION_KIND = { alim: 'alim', faz: 'faz', vade: 'vade' };
+
+  function renderActions(port) {
+    const el = $('ovActions');
+    const acts = port.actions || [];
+    if (!acts.length) { el.innerHTML = '<div class="card muted small">Planli is yok.</div>'; return; }
+    el.innerHTML = `<div class="card" style="padding:0">${acts.map((a) => {
+      const kriter = (a.criteria || []).length ? `<div class="ov-crit">
+        <div class="tiny dim" style="margin-bottom:4px">Yenileme icin uc kosul:</div>
+        ${a.criteria.map((c) => {
+          const [k, i, t] = CRIT[c.status] || CRIT.gray;
+          return `<div class="ov-crit-row"><span class="chip ${k}">${i} ${t}</span>
+            <span class="small">${Fmt.esc(c.label)}${c.detail
+              ? `<span class="tiny dim"> — ${Fmt.esc(c.detail)}</span>` : ''}</span></div>`;
+        }).join('')}</div>` : '';
+      return `<div class="ov-act">
+        ${when(a.days, 'gun gecti')}
+        <div style="min-width:0">
+          <div><span class="chip gray">${Fmt.esc(ACTION_KIND[a.kind] || a.kind)}</span>
+            <b>${Fmt.esc(a.title)}</b></div>
+          <div class="tiny dim">${Fmt.esc(Fmt.date(a.date))}${a.note ? ` · ${Fmt.esc(a.note)}` : ''}</div>
+          ${kriter}
+        </div></div>`;
+    }).join('')}</div>`;
+  }
+
+  /* Kalan gun sutunu. Gecmis tarih: planli is icin "gecti" (yapilmadi mi?),
+     iki gunluk toplanti icin "suruyor". */
+  function when(days, pastLabel) {
+    if (!Fmt.isNum(days)) return '<div class="ov-act-when"><b>—</b></div>';
+    if (days === 0) return '<div class="ov-act-when"><b>BUGUN</b></div>';
+    if (days < 0) {
+      return pastLabel === 'suruyor'
+        ? '<div class="ov-act-when"><b class="tiny">suruyor</b></div>'
+        : `<div class="ov-act-when c-yellow"><b class="num">${Math.abs(days)}</b>
+             <span class="tiny">${pastLabel}</span></div>`;
+    }
+    return `<div class="ov-act-when"><b class="num">${days}</b><span class="tiny dim">gun</span></div>`;
+  }
+
+  /* ------------------------------------------------------ f) makro takvim */
+  const MACRO_KIND = { fed: 'Fed', politika: 'politika', tcmb: 'TCMB' };
+
+  function renderMacroCal(port) {
+    const el = $('ovMacroCal');
+    const cal = port.calendar || [];
+    if (!cal.length) { el.innerHTML = '<div class="card muted small">Yaklasan makro olay yok.</div>'; return; }
+    el.innerHTML = `<div class="card" style="padding:0">${cal.map((e) => {
+      const gun = Fmt.isNum(e.days) ? e.days : daysFromToday(e.date);
+      return `<div class="ov-act">
+        ${when(gun, 'suruyor')}
+        <div style="min-width:0">
+          <div><span class="chip gray">${Fmt.esc(MACRO_KIND[e.kind] || e.kind)}</span>
+            <b>${Fmt.esc(e.title)}</b></div>
+          <div class="tiny dim">${Fmt.esc(shortDate(e.date))}${e.end && e.end !== e.date
+            ? `–${Fmt.esc(shortDate(e.end))}` : ''}${e.note ? ` · ${Fmt.esc(e.note)}` : ''}</div>
+        </div></div>`;
+    }).join('')}</div>`;
+  }
+
+  /* ------------------------------------------------- tarama ve adaylar (kisa) */
+  function renderSystem(cand, ov) {
+    const k = (ov && ov.kpis) || {};
+    const counts = cand.counts || {};
+    const toplam = (counts.funnel || 0) + (counts.seed || 0) + (counts.manual || 0);
+    $('ovSystem').innerHTML = `<div class="card small muted">
+      Huni taramasi ${Fmt.isNum(k.scan_pct) ? `<b>%${Fmt.num(k.scan_pct, 1)}</b>` : '—'}
+      · ${k.scan_survivors || 0} sirket sert filtreleri gecti
+      · ${toplam} aday · ${k.decided_count || 0} karar
+      · <a href="#/funnel">Huni</a> · <a href="#/candidates">Adaylar</a></div>`;
   }
 
   /* ------------------------------------------------------- kuresel piyasa */

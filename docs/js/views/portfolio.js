@@ -72,15 +72,16 @@ window.ViewPortfolio = (function () {
         <td style="text-align:right"><b>${Fmt.pct(sl.actual_pct)}</b></td>
         <td style="text-align:right" class="muted">${Fmt.pct(sl.target_pct)}</td>
         <td style="text-align:right" class="${sapma}">
-          ${sl.drift_pp === 0 ? 'hedefte'
-            : `${Math.abs(sl.drift_pp).toFixed(1)} puan ${yon}`}</td>
+          ${!Fmt.isNum(sl.drift_pp) ? '<span class="dim">hedef yok</span>'
+            : Math.abs(sl.drift_pp) < 0.05 ? 'hedefte'
+            : `${Fmt.num(Math.abs(sl.drift_pp), 1)} puan ${yon}`}</td>
       </tr>`;
     }).join('');
 
     el.innerHTML = `<h2>Dilimler</h2>
-      <p class="muted small" style="margin:-4px 0 8px">Hedef oranlar
-        <code>config.PORTFOLIO.slices</code> icinde; sapma ${'±'}5 puani
-        gecince uyari uretilir. ${kur}</p>
+      <p class="muted small" style="margin:-4px 0 8px">Hedefler aktif
+        fazdan gelir (<code>config.PORTFOLIO.phases</code>); sapma ${'±'}5
+        puani gecince uyari uretilir. Nakit hedefe dahil degildir. ${kur}</p>
       <div class="table-wrap"><table>
         <thead><tr><th>Dilim</th><th style="text-align:right">Deger</th>
           <th style="text-align:right">Gercek</th><th style="text-align:right">Hedef</th>

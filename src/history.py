@@ -123,6 +123,21 @@ def injections(data: dict) -> list[tuple[str, float]]:
 # --------------------------------------------------------------------------
 # Tek gunluk degerleme
 # --------------------------------------------------------------------------
+_SUMMED = ("shares", "value_usd", "dividends_usd", "value_try",
+           "accrued_net_try", "accrued_net_usd", "principal_try")
+
+
+def _add_lot(positions: dict, ticker: str, row: dict) -> None:
+    cur = positions.get(ticker)
+    if cur is None:
+        positions[ticker] = row
+        return
+    for k in _SUMMED:
+        if k in row or k in cur:
+            a, b = num(cur.get(k)), num(row.get(k))
+            cur[k] = None if (a is None and b is None) else round((a or 0) + (b or 0), 4)
+
+
 def value_on(data: dict, day: str, *, price_series: dict, dividends: dict,
              fx_series: list) -> dict:
     """``day`` kapanisinda portfoy. Eksik girdi varsa ``complete=False``."""
@@ -150,11 +165,12 @@ def value_on(data: dict, day: str, *, price_series: dict, dividends: dict,
             if v is None:
                 missing.append(ticker)
                 continue
-            positions[ticker] = {
+            row = {
                 "value_usd": round(v, 2),
                 "value_try": tl.get("value_try"),
                 "accrued_net_try": tl.get("net_interest_try"),
                 "accrued_net_usd": tl.get("net_interest_usd"),
+                "principal_try": num(p.get("principal_try")),
             }
         else:
             close = _on_or_before(price_series.get(ticker), day)
@@ -170,11 +186,15 @@ def value_on(data: dict, day: str, *, price_series: dict, dividends: dict,
             shares = num(p.get("shares")) or 0.0
             div_usd = shares * pf.dividends_since(divs or [], entry, day)
             v = shares * close + div_usd
-            positions[ticker] = {"price": round(close, 4), "value_usd": round(v, 2),
-                                 "dividends_usd": round(div_usd, 2)}
+            row = {"price": round(close, 4), "shares": shares,
+                   "value_usd": round(v, 2), "dividends_usd": round(div_usd, 2)}
 
-        total += positions[ticker]["value_usd"]
-        slices[sl] = round(slices.get(sl, 0.0) + positions[ticker]["value_usd"], 2)
+        # AYNI SEMBOLDE IKINCI PARCA (30 Ekim QQQM) ayri bir kayit olarak
+        # gelir. Sozluge yeniden yazmak ilk parcayi satirdan silerdi; toplam
+        # dogru kalir ama pozisyon satiri yarim gorunurdu. Parcalar toplanir.
+        _add_lot(positions, ticker, row)
+        total += row["value_usd"]
+        slices[sl] = round(slices.get(sl, 0.0) + row["value_usd"], 2)
 
     cash = cash_on(data, day)
     total += cash
@@ -307,7 +327,11 @@ def performance(rows: list[dict], data: dict) -> dict:
     prev = rows[-2] if len(rows) >= 2 else None
     total = last["total_usd"]
 
-    day_chg = (total - prev["total_usd"]) if prev else None
+    # Dis nakit girisi (maas, havale) portfoyu "kazandirmaz": gunluk
+    # degisimden dusulur. Alim-satim nakdi pozisyona tasir, toplami
+    # degistirmez (komisyon haric — o gercek bir maliyet).
+    added = sum(a for d, a in inc[1:] if prev and prev["date"] < d <= last["date"])
+    day_chg = (total - prev["total_usd"] - added) if prev else None
     rate, _w, entry_fx = _tl_terms(data)
     invested_try = sum(a * (entry_fx if (i == 0 and entry_fx) else (last.get("usdtry") or 0))
                        for i, (_d, a) in enumerate(inc))
@@ -330,6 +354,7 @@ def performance(rows: list[dict], data: dict) -> dict:
         "day_change_pct": round(day_chg / prev["total_usd"] * 100, 2)
         if (day_chg is not None and prev["total_usd"]) else None,
         "prev_date": prev["date"] if prev else None,
+        "positions_day": positions_day(prev, last),
         "return_usd": round(total - invested, 2),
         "return_pct": round((total / invested - 1) * 100, 2) if invested else None,
         "return_try_pct": round((last["total_try"] / invested_try - 1) * 100, 2)
@@ -342,6 +367,43 @@ def performance(rows: list[dict], data: dict) -> dict:
         "complete": last.get("complete", False),
         "missing": last.get("missing", []),
     }
+
+
+def positions_day(prev: dict | None, last: dict) -> dict:
+    """Pozisyon bazinda gunluk degisim ($ ve %).
+
+    Yeni bir parca alinan gun deger farki "kazanc" degildir: pay sayisi
+    degistiyse degisim fiyat farkindan, bugunku pay sayisiyla hesaplanir.
+    TL mevduatta anapara ayni kaldigi surece fark = faiz + kur etkisi.
+    """
+    out: dict[str, dict] = {}
+    if not prev:
+        return out
+    before = prev.get("positions") or {}
+    for ticker, now in (last.get("positions") or {}).items():
+        was = before.get(ticker)
+        if not was:
+            continue
+        v_now, v_was = num(now.get("value_usd")), num(was.get("value_usd"))
+        if v_now is None or v_was is None:
+            continue
+        if "price" in now:
+            same = num(now.get("shares")) == num(was.get("shares"))
+            p_now, p_was = num(now.get("price")), num(was.get("price"))
+            if same:
+                chg = v_now - v_was
+            elif p_now is not None and p_was is not None:
+                chg = (num(now.get("shares")) or 0.0) * (p_now - p_was)
+            else:
+                continue
+            base = v_now - chg
+        else:
+            if num(now.get("principal_try")) != num(was.get("principal_try")):
+                continue
+            chg, base = v_now - v_was, v_was
+        out[ticker] = {"usd": round(chg, 2),
+                       "pct": round(chg / base * 100, 2) if base else None}
+    return out
 
 
 def load() -> list[dict]:
