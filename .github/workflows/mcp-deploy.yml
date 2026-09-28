@@ -33,13 +33,17 @@ jobs:
       run:
         working-directory: mcp
     steps:
+      # Bu adim checkout'tan ONCE calisir; mcp/ klasoru henuz yok. Varsayilan
+      # calisma klasoru (mcp) burada kullanilirsa adim anlamli hata yerine
+      # "No such file or directory" ile cokuyordu.
       - name: Anahtar tanimli mi?
+        working-directory: .
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
             echo "::error::CLOUDFLARE_API_TOKEN secret'i tanimli degil. MCP sunucusu dagitilamadi."
-            echo "::error::Cozum: README > 'MCP sunucusunu otomatik dagitma' bolumundeki 3 adimi izle."
+            echo "::error::Cozum: mcp/README.md > 'Dagitim — otomatik' > 'Tek seferlik kurulum' (3 adim)."
             exit 1
           fi
 
@@ -74,6 +78,8 @@ jobs:
             echo ""
             echo "Commit: \`${GITHUB_SHA::7}\`"
             echo ""
-            echo "Dogrulamak icin Claude sohbetinde: **whoami** aracini cagir."
-            echo "Artik gercek bir GitHub kontrolu yapar ve sonucu acikca soyler."
+            echo "**Simdi:** claude.ai > Settings > Connectors > P-Fin > Disconnect > Connect,"
+            echo "sonra YENI bir sohbet ac (eski sohbet yeni araclari gormez)."
+            echo ""
+            echo "Dogrulamak icin yeni sohbette: **whoami** aracini cagir."
           } >> "$GITHUB_STEP_SUMMARY"
