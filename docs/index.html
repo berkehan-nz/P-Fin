@@ -6,6 +6,8 @@
 <title>Berkehan Finansal Takip Sistemi</title>
 <meta name="description" content="Berkehan Finansal Takip Sistemi — yatirim tarama, analiz ve portfoy takibi">
 <link rel="stylesheet" href="css/style.css">
+<!-- Parola ekrani: <head>'de, icerik cizilmeden once kilitler. -->
+<script src="js/auth.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
 </head>
 <body>
@@ -22,6 +24,7 @@
     </nav>
     <div class="row" style="gap:6px">
       <span class="tiny dim" id="asOf"></span>
+      <button id="lockBtn" class="ghost" title="Kilitle" aria-label="Kilitle" hidden>🔒</button>
       <button id="themeToggle" class="ghost" title="Tema degistir" aria-label="Tema degistir">◐</button>
     </div>
   </div>

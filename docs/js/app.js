@@ -117,6 +117,13 @@ window.App = (function () {
   /* ------------------------------------------------------------ baslat */
   async function start() {
     initTheme();
+    // Parola dogrulanmadan data/ klasorune tek istek atilmaz.
+    await Auth.gate();
+    if (Auth.configured()) {
+      const lock = document.getElementById('lockBtn');
+      lock.hidden = false;
+      lock.addEventListener('click', () => Auth.lock());
+    }
     try {
       const th = await DataLayer.thresholds();
       api.thresholds = th;

@@ -838,3 +838,15 @@ ul.plain > li:first-child { border-top: none; }
   .ov-crit-row { flex-direction: column; gap: 2px; }
   .ov-crit-row .chip { min-width: 0; }
 }
+
+/* ------------------------------------------------------------ parola */
+/* Kilitliyken sayfanin hicbir parcasi cizilmez; yalnizca parola kutusu. */
+html.locked body > *:not(#authGate) { display: none !important; }
+#authGate { position: fixed; inset: 0; z-index: 300; background: var(--bg);
+            display: grid; place-items: center; padding: 16px; }
+.auth-box { width: min(360px, 100%); background: var(--bg-2); border: 1px solid var(--line);
+            border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-lg); }
+.auth-box form { display: flex; flex-direction: column; gap: 8px; }
+.auth-box input, .auth-box textarea { width: 100%; font-size: 16px; }
+.auth-box textarea { margin-top: 10px; font-size: 12px; }
+.auth-box button { min-height: 42px; }

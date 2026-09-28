@@ -467,7 +467,40 @@ Adres: `https://berkehan-nz.github.io/P-Fin/docs/`
 
 ---
 
+## Parola (panoyu gizleme)
+
+> **Bu parola yalnizca ARAYUZU gizler.** Repo herkese acik oldugu icin
+> `data/` altindaki JSON dosyalari (portfoy dahil)
+> `raw.githubusercontent.com/berkehan-nz/P-Fin/main/data/...` uzerinden
+> parolasiz okunabilir. Ekran, panoyu gelip gecen birinin gozunden saklar;
+> veriyi korumaz.
+
+- **Parola kodda yok.** `docs/js/auth.js` yalnizca tuz + PBKDF2-SHA-256 ozeti
+  (600.000 tur) tasir. Ozet de acik oldugu icin kisa ya da tahmin edilebilir
+  bir parola cevrimdisi kirilabilir: **en az 12 karakter, baska yerde
+  kullanilmayan** bir parola sec.
+- **Parola belirleme / degistirme:** siteyi `?parola-olustur` ile ac
+  (`https://berkehan-nz.github.io/P-Fin/docs/?parola-olustur`), parolayi iki
+  kez yaz, cikan `P-Fin parola ozeti: salt=... hash=...` satirini Claude'a
+  gonder. Parola tarayicida ozetlenir, cihazdan cikmaz; koda yalnizca ozet
+  yazilir.
+- **Oturum:** dogru parola sekme acik kaldikca gecerli (sessionStorage).
+  Sekme kapaninca yeniden sorulur. Ust cubuktaki 🔒 hemen kilitler. Parola
+  degisince acik oturumlar da duser.
+- Parola dogrulanmadan pano `data/` klasorune tek istek atmaz.
+- **Kapatmak:** `auth.js` icindeki `salt` ve `hash` bosaltilirsa ekran kalkar.
+
+**Veri de korunsun istenirse (Secenek B, sonra):** repo ozel yapilir, pano
+GitHub Pages yerine bir Cloudflare Worker'dan servis edilir ve onune
+Cloudflare Access (e-posta ile tek kullanimlik kod) konur. O zaman
+`raw.githubusercontent.com` herkese kapanir; Claude veriyi MCP uzerinden
+(GitHub jetonuyla) okur — MCP'nin okuma yolu `readRaw`'dan API'ye cevrilir.
+
+---
+
 ## Bilinen sinirlar
+
+- **Parola ekrani veriyi korumaz** — yukaridaki "Parola" bolumu.
 
 - **Midas API'si yok** — islemler `data/portfolio.json` icine elle girilir.
   Dashboard'daki form JSON parcasi uretir.
