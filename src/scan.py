@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import shutil
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from . import config, funnel, pipeline, validate, watchlist
 from .config import DATA_DIR, SEED_TICKERS, sector_for_sic
@@ -142,6 +142,43 @@ def stalled_hours(state: dict) -> float | None:
     return round(delta.total_seconds() / 3600, 1)
 
 
+def eta(state: dict) -> dict:
+    """Bu turun olculmus hizla tahmini bitisi.
+
+    Hiz, son partilerin gercek zaman damgalarindan hesaplanir (ilk parti
+    haric: onun baslangic ani bilinmiyor). En az 3 parti yoksa tahmin
+    YAPILMAZ — iki noktadan cizilen cizgi guven vermez, yanlis bir tarih
+    ise hic tarih olmamasindan kotudur.
+    """
+    total = (state.get("universe_size_at_cycle_start")
+             or len(state.get("queue") or []))
+    kalan = max(total - min(state.get("cursor", 0), total), 0)
+    gecmis = state.get("recent_batches") or []
+    out = {"remaining": kalan, "per_day": None, "eta_at": None, "eta_hours": None}
+    if kalan == 0 or len(gecmis) < 3:
+        return out
+    try:
+        t0 = datetime.fromisoformat(gecmis[0]["at"])
+        t1 = datetime.fromisoformat(gecmis[-1]["at"])
+    except (KeyError, ValueError):
+        return out
+    saat = (t1 - t0).total_seconds() / 3600
+    if saat <= 0:
+        return out
+    hiz = sum(b.get("n", 0) for b in gecmis[1:]) / saat      # sirket/saat
+    if hiz <= 0:
+        return out
+    kalan_saat = kalan / hiz
+    if t1.tzinfo is None:
+        t1 = t1.replace(tzinfo=timezone.utc)
+    out.update({
+        "per_day": round(hiz * 24),
+        "eta_hours": round(kalan_saat, 1),
+        "eta_at": (t1 + timedelta(hours=kalan_saat)).isoformat(timespec="minutes"),
+    })
+    return out
+
+
 def progress(state: dict) -> dict:
     total = len(state.get("queue") or [])
     done = min(state.get("cursor", 0), total)
@@ -160,6 +197,7 @@ def progress(state: dict) -> dict:
         "eliminated": kinds.get(funnel.ELENDI, 0),
         "data_missing": kinds.get(funnel.VERI_YOK, 0),
         "retry_queue": len(state.get("retry_queue") or []),
+        "eta": eta(state),
         "stalled": bool(idle is not None and idle >= STALL_HOURS
                         and done < total),
     }
@@ -435,6 +473,20 @@ def run_batch(state: dict, *, size: int | None = None,
 
     state["survivor_count"] = len(list(SURVIVOR_DIR.glob("*.json")))
     state["last_batch_at"] = utc_now_iso()
+
+    # HIZ KAYDI. Kullanici "bu tur ne zaman biter" diye sordugunda cevap
+    # tahminle degil olcumle verilmeli. GitHub zamanlanmis kosulari saatte
+    # bir degil 3-5 saatte bir tetikledigi icin "300 sirket/saat" gibi
+    # sabit bir varsayim yaniltici olurdu.
+    islenen = state["cursor"] - start
+    if islenen > 0:
+        gecmis = state.setdefault("recent_batches", [])
+        gecmis.append({"at": state["last_batch_at"], "n": islenen})
+        state["recent_batches"] = gecmis[-24:]
+    # Pano bu hesabi KENDISI tekrarlamasin: ayni kural iki yerde durursa
+    # biri degisince digeri sessizce eskir.
+    state["eta"] = eta(state)
+
     save_state(state)
     return state
 
@@ -687,7 +739,10 @@ def finalize(state: dict, *, ctx: dict | None = None,
 
     pipeline.write_thresholds()
     pipeline.write_universe(rows, log)
-    pipeline.append_funnel_log(log)
+    # Tur numarasi YAZILMALI: onceki surumde tam kayitlar "tur: None"
+    # ile duruyordu ve hangi turun sonucu oldugu anlasilmiyordu.
+    pipeline.append_funnel_log(log, cycle=state.get("cycle"),
+                               scanned=progress(state)["done"])
     pipeline.refresh_candidates_from_disk()
 
     state["last_finalized"] = today_iso()
@@ -725,6 +780,10 @@ def run(*, batch_size: int | None = None, new_cycle: bool = False,
         # --batch 60 --new-cycle) aynen korunur.
         stored = DEFAULT_BATCH_SIZE
     run_batch_size = batch_size or stored
+    # Panonun gostermesi gereken GERCEK parti boyu. Dosyada kalan eski
+    # "batch_size: 120" gosteriliyordu; oysa goc sonrasi her parti 300
+    # sirket. "Kalan parti" sayisi bu yuzden 2,5 kat fazla gorunuyordu.
+    state["effective_batch_size"] = run_batch_size
 
     # ZAMAN BUTCESI. Is akisinin sert siniri (50 dk) partiyi IPTAL eder ve
     # "Commit" adimini atlar; o noktaya gelinirse kosu bosa gider. Kendi

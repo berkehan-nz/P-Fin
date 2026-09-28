@@ -641,3 +641,113 @@ class TestBatchSizeCeiling:
         scan.run(build_cards=False)
 
         assert seen["size"] == 10
+
+
+class TestFunnelLogKeepsFinishedRounds:
+    """Biten turun kaydi, ayni gun baslayan yeni turun ara kaydiyla SILINMEMELI.
+
+    Gercek olay: tur 3 24 Eylul'de bitti ve tam kaydini yazdi; ayni gun tur
+    4'un ilk ara kaydi "ayni tarihli kaydi degistir" kuraliyla onu sildi.
+    Tur 2'nin (19 Eylul) kaydi da ayni sekilde kaybolmustu. Ikisi git
+    gecmisinden kurtarildi.
+    """
+
+    def _runs(self, isolated):
+        import json
+        return json.loads((isolated / "funnel_log.json").read_text())["runs"]
+
+    def test_partial_does_not_erase_same_day_full_record(self, isolated):
+        from src import pipeline
+
+        pipeline.append_funnel_log({"stages": [{"stage": 4, "output": 50}]},
+                                   partial=False, cycle=3)
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=4)
+
+        runs = self._runs(isolated)
+        tam = [r for r in runs if not r["partial"]]
+        assert len(tam) == 1 and tam[0]["cycle"] == 3
+        assert any(r["partial"] and r["cycle"] == 4 for r in runs)
+
+    def test_same_day_partial_of_same_cycle_is_replaced(self, isolated):
+        from src import pipeline
+
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=5, scanned=300)
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=5, scanned=600)
+        runs = self._runs(isolated)
+        assert len(runs) == 1 and runs[0]["scanned"] == 600
+
+    def test_finished_rounds_survive_the_cap(self, isolated):
+        """60 ara kayit, tamamlanmis turlari kotadan itmemeli."""
+        from src import pipeline
+        from src.util import write_json
+
+        eski = [{"date": f"2026-08-{i:02d}", "partial": True, "cycle": 1}
+                for i in range(1, 29)]
+        eski.append({"date": "2026-07-01", "partial": False, "cycle": 1})
+        eski += [{"date": f"2026-09-{i:02d}", "partial": True, "cycle": 2}
+                 for i in range(1, 29)]
+        write_json(isolated / "funnel_log.json", {"runs": eski})
+
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=3)
+        runs = self._runs(isolated)
+        assert any(not r["partial"] and r["cycle"] == 1 for r in runs)
+
+    def test_finished_round_comes_before_next_rounds_partial(self, isolated):
+        """Ayni gun: once biten turun kaydi, sonra yeni turun ara kaydi.
+        Pano son kaydi 'guncel' saydigi icin sira onemli."""
+        from src import pipeline
+
+        pipeline.append_funnel_log({"stages": []}, partial=True, cycle=4)
+        pipeline.append_funnel_log({"stages": []}, partial=False, cycle=3)
+        runs = self._runs(isolated)
+        assert (runs[-1]["cycle"], runs[-1]["partial"]) == (4, True)
+
+
+class TestRoundEta:
+    """'Bu tur ne zaman biter' sorusu olcumle cevaplanmali, tahminle degil."""
+
+    def _state(self, batches, cursor=2100, total=3826):
+        st = scan.empty_state()
+        st.update({"queue": ["X"] * total, "cursor": cursor,
+                   "universe_size_at_cycle_start": total,
+                   "recent_batches": batches})
+        return st
+
+    def test_no_estimate_with_too_few_batches(self):
+        """Iki noktadan cizilen cizgi guven vermez; yanlis tarih, hic
+        tarih olmamasindan kotudur."""
+        st = self._state([{"at": "2026-09-27T01:00:00+00:00", "n": 300},
+                          {"at": "2026-09-27T05:00:00+00:00", "n": 300}])
+        assert scan.eta(st)["eta_at"] is None
+
+    def test_estimate_uses_measured_pace(self):
+        # 3 parti, 12 saatte; ilkinin baslangici bilinmedigi icin sayilmaz:
+        # 600 sirket / 12 saat = 50/saat -> gunde 1.200
+        st = self._state([{"at": "2026-09-27T00:00:00+00:00", "n": 300},
+                          {"at": "2026-09-27T06:00:00+00:00", "n": 300},
+                          {"at": "2026-09-27T12:00:00+00:00", "n": 300}],
+                         cursor=3226, total=3826)
+        out = scan.eta(st)
+        assert out["per_day"] == 1200
+        assert out["eta_hours"] == 12.0          # 600 kalan / 50 saatte
+        assert out["eta_at"].startswith("2026-09-28T00:00")
+
+    def test_finished_round_has_no_eta(self):
+        st = self._state([{"at": "2026-09-27T00:00:00+00:00", "n": 300}] * 3,
+                         cursor=3826, total=3826)
+        out = scan.eta(st)
+        assert out["remaining"] == 0 and out["eta_at"] is None
+
+    def test_batch_records_pace_and_effective_size(self, isolated, monkeypatch):
+        from src import pipeline
+
+        def quick(ticker, **kw):
+            f = fixtures.ALL["DBX"]()
+            f.avg_dollar_volume_30d = 50e6
+            return f
+
+        monkeypatch.setattr(pipeline, "load_company", quick)
+        st = scan.start_cycle(scan.empty_state(), tickers=["A", "B", "C"])
+        st = scan.run_batch(st, size=2)
+        assert st["recent_batches"][-1]["n"] == 2
+        assert "eta" in st

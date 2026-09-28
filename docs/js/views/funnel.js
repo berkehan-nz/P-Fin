@@ -35,7 +35,7 @@ window.ViewFunnel = (function () {
 
     $('funnelSubtitle').innerHTML = subtitle(scan, fromFullRun, latest, uni);
 
-    renderScan(scan);
+    renderScan(scan, runs);
     renderPipeline(stages, kills, scan, cand);
     renderKindSplit(fromFullRun ? latest : scan);
     renderKills(kills);
@@ -87,7 +87,7 @@ window.ViewFunnel = (function () {
   }
 
   /* Kademeli tarama: evren bir kuyruktur, her parti bir dilim isler. */
-  function renderScan(scan) {
+  function renderScan(scan, runs) {
     const el = $('scanProgress');
     if (!scan || !scan.queue || !scan.queue.length) {
       el.innerHTML = `<div class="card muted small">Tarama turu henuz baslamadi.
@@ -97,32 +97,79 @@ window.ViewFunnel = (function () {
     const total = scanTotal(scan);
     const done = Math.min(scan.cursor || 0, total);
     const pct = total ? (done / total) * 100 : 0;
-    const perBatch = scan.batch_size || 120;
+    // GERCEK parti boyu. Dosyadaki "batch_size" eski bir deger (120)
+    // tasiyabiliyor; her parti aslinda 300 sirket.
+    const perBatch = scan.effective_batch_size || scan.batch_size || 300;
+    const eta = scan.eta || {};
+
+    const bitis = eta.eta_at
+      ? `${tarihSaat(eta.eta_at)} civari`
+      : 'hesaplaniyor';
+    const bitisAlt = eta.per_day
+      ? `olculen hiz gunde ~${Number(eta.per_day).toLocaleString('tr-TR')} sirket`
+      : 'birkac parti sonra hesaplanir';
+
+    /* Tamamlanan turlar: "Tur 5" tek basina bir sey anlatmiyor. Onceki
+       turlarin ne zaman bittigini ve kac aday cikardigini gormek, "tur"un
+       ne oldugunu kendiliginden aciklar. */
+    const bitenler = (runs || []).filter((r) => !r.partial && r.cycle)
+      .slice(-6).reverse().map((r) => {
+        const s4 = (r.stages || []).find((x) => x.stage === 4);
+        const s0 = (r.stages || []).find((x) => x.stage === 0);
+        return `<li>Tur ${r.cycle} · ${Fmt.date(r.date)} bitti ·
+          ${s0 ? Number(s0.input).toLocaleString('tr-TR') : '?'} sirket tarandi
+          &rarr; <b>${s4 ? s4.output : '?'}</b> aday</li>`;
+      }).join('');
 
     el.innerHTML = `<div class="card">
       <div class="spread">
         <span><b>Tur ${scan.cycle}</b>
           <span class="tiny dim">${scan.cycle_started ? Fmt.date(scan.cycle_started) + ' tarihinde basladi' : ''}</span></span>
-        <span class="num">${done} / ${total} <span class="dim">(%${Fmt.num(pct, 1)})</span></span>
+        <span class="num">${done.toLocaleString('tr-TR')} / ${total.toLocaleString('tr-TR')}
+          <span class="dim">(%${Fmt.num(pct, 1)})</span></span>
       </div>
       <span class="bar green" style="display:block;height:8px;margin:10px 0">
         <i style="width:${pct}%"></i></span>
       <div class="grid g-summary" style="margin-top:12px">
         ${miniStat("ASAMA 2'YI GECEN", scan.survivor_count || 0)}
-        ${miniStat('KALAN', total - done)}
-        ${miniStat('PARTI BOYU', perBatch)}
-        ${miniStat('KALAN PARTI', Math.ceil((total - done) / perBatch))}
+        ${miniStat('KALAN', (total - done).toLocaleString('tr-TR'))}
+        ${miniStat('KALAN PARTI', `${Math.ceil((total - done) / perBatch)} (x${perBatch})`)}
+        ${miniStat('BU TUR BITER', bitis)}
       </div>
+      <div class="tiny dim" style="margin-top:6px">${Fmt.esc(bitisAlt)}</div>
+
+      <div class="card" style="margin-top:12px;background:var(--bg-3)">
+        <b>Turlar bitmez — bu bir dongu.</b>
+        <p class="small" style="margin:6px 0 0">Bir tur, ABD'deki ~${total.toLocaleString('tr-TR')}
+          sirketin <b>tamaminin bir kez</b> taranmasidir. Tur bitince Asama 3-4
+          calisir, nihai aday listesi cikar ve <b>hemen yeni tur baslar</b> —
+          cunku sirketler her ceyrek yeni bilanco aciklar, fiyatlar degisir;
+          dunku liste yarin bayatlar. "Tur ${scan.cycle}", sistem kuruldugundan
+          beri yapilan ${scan.cycle}. tam tarama demektir; "5 turdan 5.'si"
+          degil. Bir tur su an yaklasik 2 gun suruyor.</p>
+        ${bitenler ? `<p class="small" style="margin:10px 0 4px"><b>Tamamlanan turlar</b></p>
+          <ul class="plain small">${bitenler}</ul>` : ''}
+      </div>
+
       <div class="tiny dim" style="margin-top:10px">
-        Son parti: ${scan.last_batch_at ? Fmt.date(scan.last_batch_at) : '—'} ·
+        Son parti: ${scan.last_batch_at ? tarihSaat(scan.last_batch_at) : '—'} ·
         Son tur sonu: ${scan.last_finalized ? Fmt.date(scan.last_finalized) : 'henuz yok'}
         ${(scan.failed || []).length ? ` · yuklenemeyen ${scan.failed.length}` : ''}
       </div>
       ${done < total ? `<p class="tiny dim" style="margin:8px 0 0">
-        Parti sayisi saate esit DEGILDIR: is akisi saatlik kurulu ama GitHub
-        zamanlanmis kosulari yogunlukta atliyor; pratikte birkac saatte bir
-        calisiyor.</p>` : ''}
+        Is akisi saatlik kurulu ama GitHub zamanlanmis kosulari yogunlukta
+        atliyor; pratikte 3-5 saatte bir calisiyor. Tahmini bitis bu yuzden
+        sabit bir varsayimla degil, olculen hizla hesaplanir.</p>` : ''}
     </div>`;
+  }
+
+  /* "28 Eyl 22:15" — tur bitisinde gun yetmez, saat de lazim. */
+  function tarihSaat(iso) {
+    try {
+      return new Date(iso).toLocaleString('tr-TR', {
+        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+      });
+    } catch (_) { return iso; }
   }
 
   function miniStat(label, value) {

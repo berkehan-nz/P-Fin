@@ -300,9 +300,26 @@ def append_funnel_log(log: dict, *, partial: bool = False, cycle: int | None = N
             "stage1": config.STAGE1, "stage2": config.STAGE2, "stage3": config.STAGE3,
         },
     }
-    runs = [r for r in runs if r.get("date") != entry["date"]]
+    # YALNIZCA AYNI TURUN AYNI TURDEN kaydini degistir. Onceki surum
+    # "ayni tarihli her kaydi" siliyordu: tur 3 24 Eylul'de bitti ve TAM
+    # kaydini yazdi, ayni gun tur 4'un ilk ara kaydi onu sildi. Biten bir
+    # turun sonucu — o turun nihai aday listesinin dayandigi sayilar —
+    # iz birakmadan kayboldu.
+    def ayni(r: dict) -> bool:
+        return (r.get("date") == entry["date"]
+                and bool(r.get("partial")) == bool(partial)
+                and r.get("cycle") == cycle)
+
+    runs = [r for r in runs if not ayni(r)]
     runs.append(entry)
-    runs = runs[-60:]     # son 60 kosu yeter
+
+    # Tam tur kayitlari kotada KORUNUR: gunde bir ara kayit yaziliyor ve
+    # tek bir kotada 60 ara kayit, tamamlanmis turlari iterek silerdi.
+    tam = [r for r in runs if not r.get("partial")][-30:]
+    ara = [r for r in runs if r.get("partial")][-30:]
+    runs = sorted(tam + ara, key=lambda r: (r.get("date") or "",
+                                            r.get("cycle") or 0,
+                                            1 if r.get("partial") else 0))
     return write_json(path, {"runs": runs, "source": "funnel"})
 
 
