@@ -1,7 +1,6 @@
 {
   "analyst": {
     "analyst_count": 10,
-    "as_of": "2026-09-24",
     "buy": 5,
     "hold": 6,
     "recommendation": "buy",
@@ -10,14 +9,15 @@
     "target_high": 37.0,
     "target_low": 22.0,
     "target_median": 27.5,
-    "upside_to_median": 10.176286092524144
+    "upside_to_median": 10.176282051282048
   },
-  "as_of": "2026-09-26",
+  "as_of": "2026-09-28",
   "calendar": {
     "estimated": true,
     "next_earnings": "2026-11-04"
   },
   "capped_for_scoring": {},
+  "change_1d_pct": -6.45,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -34,8 +34,8 @@
   "decision": {
     "action": "ELE",
     "author": "claude",
-    "date": "2026-09-11",
-    "rationale": "Toparlanma gerçek (NRR %100→%117, rekor marj) ama hisse 52 haftada 7→21 $ ile bunu fiyatladı; kendi tarihine göre artık ucuz değil, sistem puanı 22 ile en düşük. Müşteri yoğunlaşması (ilk 10 = %26-34) ve kullanım bazlı gelir oynaklığı sürüyor. İzleme listesinde kalsın; NRR %120 ve GAAP kâr gelirse yeniden bakılır."
+    "date": "2026-09-28",
+    "rationale": "Toparlanma gerçek (NRR %100→%117, rekor marj) ama hisse 52 haftada 7→21 $ ile bunu fiyatladı; kendi tarihine göre artık ucuz değil, sistem puanı en düşükler arasında. Müşteri yoğunlaşması (ilk 10 = %26-34) ve kullanım bazlı gelir oynaklığı sürüyor. İzleme listesinde kalsın; NRR %120 ve GAAP kâr gelirse yeniden bakılır."
   },
   "enterprise_value_musd": 3962.6,
   "exchange": "Nasdaq",
@@ -165,7 +165,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 3.5,
-      "value": 1.27
+      "value": 1.28
     },
     "gross_margin": {
       "color": "green",
@@ -193,7 +193,7 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 25.69
+      "value": 25.68
     },
     "implied_vs_actual_growth": {
       "color": "red",
@@ -375,6 +375,12 @@
   "net_debt_musd": -13.54,
   "news": [
     {
+      "date": "2026-09-26",
+      "headline": "Fastly (FSLY) Is Getting More Interesting. Meta’s Muse Is Part of the Reason",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=2824dfdb25ba36fdbcad26f5de10686535c715bc7e6534c2ca5e05af027c7e0f"
+    },
+    {
       "date": "2026-09-25",
       "headline": "Zscaler Sinks 9% on Chief Revenue Officer Exit, Fastly Drops 6% as Citi Questions AI Traffic Payoff",
       "source": "Yahoo",
@@ -415,12 +421,6 @@
       "headline": "Most Active Options Report: FSLY, GDDY, STM",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=fa755de83e3b6dbde4cff3e363358b99c1eb8c15640092f43aacb7e00987c859"
-    },
-    {
-      "date": "2026-09-24",
-      "headline": "Fastly (FSLY) Moves 13.7% Higher: Will This Strength Last?",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=3b3f774937bde98e752bd051160dd0f4bd422b0ea99f218da45cb0d549f8a1b9"
     }
   ],
   "overrides": [],
@@ -435,7 +435,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 3962.6,
     "fcf_ttm_musd": 50.7,
-    "implied_growth_pct": 25.69,
+    "implied_growth_pct": 25.681556435561564,
     "projection_years": 10,
     "terminal_growth": 0.03
   },

@@ -1,11 +1,13 @@
 {
   "actions": [
     {
+      "amount_usd": 149.0,
       "date": "2026-10-30",
       "days": 32,
       "kind": "alim",
       "note": "ikinci parca",
-      "title": "QQQM parcasi — 149.0 $"
+      "ticker": "QQQM",
+      "title": "QQQM parcasi — $149"
     },
     {
       "date": "2026-11-16",
@@ -23,10 +25,10 @@
           "status": "gray"
         },
         {
-          "detail": "kur serisi alinamadi",
+          "detail": "son 91 gunde %5.1",
           "key": "kur_temposu",
           "label": "Kur temposu ceyrekte %7'nin altinda",
-          "status": "gray"
+          "status": "green"
         },
         {
           "detail": "bilgi girilmedi",
@@ -120,6 +122,8 @@
         "daily_net_interest_try": 50.3,
         "days_to_maturity": 92,
         "elapsed_days": 0,
+        "entry_rate_suspect": true,
+        "entry_vs_market_pct": 2.71,
         "gross_interest_try": 0.0,
         "matured": false,
         "maturity_date": "2026-12-30",
@@ -130,11 +134,12 @@
         "term_days": 92,
         "usdtry_at_entry": 50.3,
         "usdtry_breakeven": 54.1796,
-        "usdtry_now": 48.960201263427734,
-        "usdtry_used_pct": -34.5,
+        "usdtry_market_at_start": 48.9729,
+        "usdtry_now": 48.972938537597656,
+        "usdtry_used_pct": -34.2,
         "value_try": 60000.0,
         "value_try_at_maturity": 64627.73,
-        "value_usd": 1225.49,
+        "value_usd": 1225.17,
         "withholding_pct": 15.0,
         "withholding_try": 0.0
       },
@@ -148,11 +153,11 @@
           "excess_pct": null
         },
         "nasdaq100": {
-          "benchmark_return_pct": null,
+          "benchmark_return_pct": 0.0,
           "excess_pct": null
         },
         "sp500": {
-          "benchmark_return_pct": null,
+          "benchmark_return_pct": 0.0,
           "excess_pct": null
         }
       },
@@ -175,8 +180,8 @@
       "notes": "Nakit capasi. Kasim ortasi (Faz 1) hisse alimlarinin kaynagi.",
       "pnl_pct": null,
       "pnl_usd": null,
-      "price": null,
-      "price_as_of": null,
+      "price": 100.66000366210938,
+      "price_as_of": "2026-09-25",
       "review_date": "2026-11-16",
       "sector": "",
       "shares": 5.0,
@@ -195,11 +200,11 @@
           "excess_pct": null
         },
         "nasdaq100": {
-          "benchmark_return_pct": null,
+          "benchmark_return_pct": 0.0,
           "excess_pct": null
         },
         "sp500": {
-          "benchmark_return_pct": null,
+          "benchmark_return_pct": 0.0,
           "excess_pct": null
         }
       },
@@ -220,8 +225,8 @@
       "notes": "Cekirdek ETF, ilk parca. Ikinci parca 30 Ekim.",
       "pnl_pct": null,
       "pnl_usd": null,
-      "price": null,
-      "price_as_of": null,
+      "price": 306.5400085449219,
+      "price_as_of": "2026-09-25",
       "review_date": "",
       "sector": "",
       "shares": 1.0,
@@ -240,11 +245,11 @@
           "excess_pct": null
         },
         "nasdaq100": {
-          "benchmark_return_pct": null,
+          "benchmark_return_pct": 0.0,
           "excess_pct": null
         },
         "sp500": {
-          "benchmark_return_pct": null,
+          "benchmark_return_pct": 0.0,
           "excess_pct": null
         }
       },
@@ -265,8 +270,8 @@
       "notes": "Cekirdek ETF (kesirli).",
       "pnl_pct": null,
       "pnl_usd": null,
-      "price": null,
-      "price_as_of": null,
+      "price": 710.7899780273438,
+      "price_as_of": "2026-09-25",
       "review_date": "",
       "sector": "",
       "shares": 0.33,
@@ -285,11 +290,11 @@
           "excess_pct": null
         },
         "nasdaq100": {
-          "benchmark_return_pct": null,
+          "benchmark_return_pct": 0.0,
           "excess_pct": null
         },
         "sp500": {
-          "benchmark_return_pct": null,
+          "benchmark_return_pct": 0.0,
           "excess_pct": null
         }
       },
@@ -302,18 +307,18 @@
     "cost_usd": 2241.31,
     "equity_value_usd": 2236.81,
     "fx": {
-      "as_of": "2026-09-25",
-      "change_1w_pct": 0.38,
+      "as_of": "2026-09-28",
+      "change_1w_pct": 0.41,
       "pair": "USDTRY",
-      "rate": 48.960201263427734,
+      "rate": 48.972938537597656,
       "source": "stooq/yfinance"
     },
     "fx_pace": {
-      "as_of": "2026-09-25",
-      "change_quarter_pct": null,
-      "change_since_entry_pct": -2.66,
-      "color": "gray",
-      "rate": 48.960201263427734,
+      "as_of": "2026-09-28",
+      "change_quarter_pct": 5.06,
+      "change_since_entry_pct": -2.64,
+      "color": "yellow",
+      "rate": 48.972938537597656,
       "window_days": 91
     },
     "largest_position_pct": null,
@@ -326,7 +331,7 @@
     },
     "pnl_pct": -0.2,
     "pnl_usd": -4.5,
-    "portfolio_value_try": 116811.87,
+    "portfolio_value_try": 116842.26,
     "portfolio_value_usd": 2385.85,
     "position_count": 4,
     "sector_mix_pct": {},
@@ -395,10 +400,10 @@
         "status": "gray"
       },
       {
-        "detail": "kur serisi alinamadi",
+        "detail": "son 91 gunde %5.1",
         "key": "kur_temposu",
         "label": "Kur temposu ceyrekte %7'nin altinda",
-        "status": "gray"
+        "status": "green"
       },
       {
         "detail": "bilgi girilmedi",
@@ -409,5 +414,12 @@
     ],
     "maturity_date": "2026-12-30"
   },
-  "warnings": []
+  "warnings": [
+    {
+      "level": "medium",
+      "message": "TL-ISBANK giris kuru 50.3, baslangic gunu piyasa kuru 48.9729 (%+2.7). Kayit dogru mu? Fark ilk gun dogrudan kar/zarar olarak gorunur.",
+      "ticker": "TL-ISBANK",
+      "type": "giris_kuru"
+    }
+  ]
 }

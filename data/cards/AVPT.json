@@ -1,19 +1,20 @@
 {
   "analyst": {
-    "analyst_count": null,
-    "buy": null,
-    "hold": null,
-    "sell": null,
-    "source": null,
-    "target_high": null,
-    "target_low": null,
-    "target_median": null,
-    "upside_to_median": null
+    "analyst_count": 13,
+    "buy": 10,
+    "hold": 4,
+    "recommendation": "buy",
+    "sell": 0,
+    "source": "yfinance",
+    "target_high": 26.0,
+    "target_low": 14.0,
+    "target_median": 15.0,
+    "upside_to_median": 15.384615384615374
   },
-  "as_of": "2026-09-27",
+  "as_of": "2026-09-28",
   "calendar": {
-    "estimated": false,
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-11-05"
   },
   "capped_for_scoring": {
     "roic": {
@@ -21,6 +22,7 @@
       "used": 60.0
     }
   },
+  "change_1d_pct": -1.22,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -136,7 +138,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 75.0,
-      "value": 48.0
+      "value": 48.01
     },
     "ev_gross_profit": {
       "color": "green",
@@ -150,7 +152,7 @@
       "own_5y_pct": 25.0,
       "pct_basis": "sector",
       "sector_pct": 63.2,
-      "value": 5.01
+      "value": 5.0
     },
     "fcf_margin": {
       "color": "green",
@@ -269,7 +271,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 78.0,
-      "value": 79.04
+      "value": 79.03
     },
     "peg": {
       "color": "red",
@@ -424,7 +426,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 2333.1,
     "fcf_ttm_musd": 101.0,
-    "implied_growth_pct": 9.09,
+    "implied_growth_pct": 9.091485708783908,
     "projection_years": 10,
     "terminal_growth": 0.03
   },

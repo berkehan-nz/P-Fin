@@ -1,21 +1,22 @@
 {
   "analyst": {
-    "analyst_count": null,
-    "buy": null,
-    "hold": null,
-    "sell": null,
-    "source": null,
-    "target_high": null,
-    "target_low": null,
-    "target_median": null,
-    "upside_to_median": null
+    "analyst_count": 4,
+    "buy": 3,
+    "hold": 1,
+    "recommendation": "none",
+    "sell": 0,
+    "source": "yfinance",
+    "target_high": 21.0,
+    "target_low": 12.0,
+    "target_median": 17.5,
+    "upside_to_median": 86.56716417910447
   },
-  "as_of": "2026-09-27",
+  "as_of": "2026-09-28",
   "calendar": {
-    "estimated": false,
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-11-04"
   },
-  "change_1d_pct": -1.86,
+  "change_1d_pct": -1.47,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -35,7 +36,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 2192.9,
+  "enterprise_value_musd": 2161.5,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -72,7 +73,7 @@
     "last_form4": "2026-07-28",
     "window_days": 180
   },
-  "market_cap_musd": 2132.3,
+  "market_cap_musd": 2101.0,
   "metrics": {
     "altman_z": {
       "color": "green",
@@ -107,7 +108,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 75.0,
-      "value": 10.24
+      "value": 10.39
     },
     "ebitda_margin": {
       "color": "gray",
@@ -121,28 +122,28 @@
       "own_5y_pct": 12.5,
       "pct_basis": "sector",
       "sector_pct": 32.1,
-      "value": 9.77
+      "value": 9.63
     },
     "ev_ebitda": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 32.1,
-      "value": 9.45
+      "value": 9.32
     },
     "ev_gross_profit": {
       "color": "green",
       "own_5y_pct": 8.3,
       "pct_basis": "sector",
       "sector_pct": 53.1,
-      "value": 6.62
+      "value": 6.52
     },
     "ev_sales": {
       "color": "yellow",
       "own_5y_pct": 25.0,
       "pct_basis": "sector",
       "sector_pct": 34.2,
-      "value": 4.28
+      "value": 4.22
     },
     "fcf_margin": {
       "color": "red",
@@ -163,14 +164,14 @@
       "own_5y_pct": 50.0,
       "pct_basis": "sector",
       "sector_pct": 23.7,
-      "value": 1.27
+      "value": 1.29
     },
     "fcf_yield_mcap": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 23.7,
-      "value": 1.3
+      "value": 1.32
     },
     "gross_margin": {
       "color": "green",
@@ -198,14 +199,14 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 25.81
+      "value": 25.61
     },
     "implied_vs_actual_growth": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 0.53
+      "value": 0.52
     },
     "interest_coverage": {
       "color": "green",
@@ -254,21 +255,21 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 97.4,
-      "value": 53.47
+      "value": 54.15
     },
     "pe": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 25.0,
-      "value": 12.62
+      "value": 12.43
     },
     "peg": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 1.57
+      "value": 1.55
     },
     "piotroski_f": {
       "color": "red",
@@ -282,28 +283,28 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -64.5
+      "value": -65.0
     },
     "rel_strength_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 2.6,
-      "value": -42.05
+      "value": -16.6
     },
     "return_12m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 2.6,
-      "value": -40.61
+      "value": -40.1
     },
     "return_6m": {
-      "color": "red",
+      "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 2.6,
-      "value": -15.98
+      "value": 13.15
     },
     "rev_cagr_3y": {
       "color": "green",
@@ -380,6 +381,12 @@
   "net_debt_musd": 60.57,
   "news": [
     {
+      "date": "2026-09-27",
+      "headline": "ADMA Biologics (ADMA), Why Is It Back In The Spotlight?",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=7392b8a66c4691982bf2a8cd43c4fec28916eac5541f788dafe26360a52f17c5"
+    },
+    {
       "date": "2026-09-24",
       "headline": "Why Adma Biologics (ADMA) Dipped More Than Broader Market Today",
       "source": "Yahoo",
@@ -420,12 +427,6 @@
       "headline": "Adma Biologics (ADMA) Down 4.8% Since Last Earnings Report: Can It Rebound?",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=94521699c9a3561c59a84abaecf48bb31f1414e2dcd4be8f418b76fb1eb1e1ea"
-    },
-    {
-      "date": "2026-09-02",
-      "headline": "ADMA Biologics: Maybe The Bears Are Right (Rating Downgrade)",
-      "source": "SeekingAlpha",
-      "url": "https://finnhub.io/api/news?id=e51328284589fbff552dd4535a006ad66675d384d8c0e8892c43e349905b3130"
     }
   ],
   "overrides": [],
@@ -433,14 +434,14 @@
     "sector": 19,
     "universe": 277
   },
-  "price": 9.52,
-  "price_as_of": "2026-09-24",
+  "price": 9.38,
+  "price_as_of": "2026-09-25",
   "reverse_dcf": {
     "actual_growth_pct": 49.05,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 2192.9,
+    "enterprise_value_musd": 2161.5,
     "fcf_ttm_musd": 27.8,
-    "implied_growth_pct": 25.81008357254657,
+    "implied_growth_pct": 25.60932294271528,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -672,12 +673,11 @@
       "2026-06-30"
     ],
     "price_sparkline": [
-      9.63,
       9.25,
       9.01,
       9.19,
       9.26,
-      9.7,
+      9.94,
       10.49,
       10.74,
       10.88,
@@ -685,7 +685,7 @@
       11.26,
       10.9,
       10.25,
-      10.25,
+      10.31,
       8.47,
       7.88,
       8.5,
@@ -694,7 +694,7 @@
       8.46,
       8.15,
       7.93,
-      7.6,
+      7.9,
       7.98,
       8.06,
       8.48,
@@ -702,7 +702,7 @@
       8.58,
       8.31,
       8.69,
-      8.75,
+      8.72,
       8.37,
       8.95,
       9.21,
@@ -710,7 +710,7 @@
       8.97,
       8.68,
       8.71,
-      8.38,
+      8.59,
       8.27,
       8.79,
       8.67,
@@ -719,7 +719,7 @@
       9.9,
       9.905,
       9.41,
-      9.54,
+      9.34,
       9.76,
       9.55,
       9.63,
@@ -727,11 +727,12 @@
       9.33,
       9.58,
       9.54,
-      9.23,
+      9.39,
       8.61,
       8.95,
       9.505,
-      9.52
+      9.7,
+      9.38
     ],
     "quarters": [
       "2023-09",

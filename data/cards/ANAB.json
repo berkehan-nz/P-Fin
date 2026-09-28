@@ -1,19 +1,20 @@
 {
   "analyst": {
-    "analyst_count": null,
-    "buy": null,
-    "hold": null,
-    "sell": null,
-    "source": null,
-    "target_high": null,
-    "target_low": null,
-    "target_median": null,
-    "upside_to_median": null
+    "analyst_count": 8,
+    "buy": 8,
+    "hold": 0,
+    "recommendation": "strong_buy",
+    "sell": 0,
+    "source": "yfinance",
+    "target_high": 140.0,
+    "target_low": 70.0,
+    "target_median": 79.5,
+    "upside_to_median": 55.88235294117647
   },
-  "as_of": "2026-09-27",
+  "as_of": "2026-09-28",
   "calendar": {
-    "estimated": false,
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-11-10"
   },
   "capped_for_scoring": {
     "roic": {
@@ -25,6 +26,7 @@
       "used": 100.0
     }
   },
+  "change_1d_pct": -1.35,
   "data_quality": {
     "issue_count": 3,
     "issues": [
@@ -418,6 +420,12 @@
   "news": [
     {
       "date": "2026-09-26",
+      "headline": "AnaptysBio (ANAB) Is Down 7.6% After Tax-Driven Earnings Surge Masks Underlying Cash Performance",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=161589d0d86ed5f36f41b2c4968e345a8eb31e0c0934ec3bd9996032509c53ac"
+    },
+    {
+      "date": "2026-09-26",
       "headline": "AnaptysBio (ANAB) Reports a Tax-Driven Profit. When Will Royalties Fund Shareholder Returns?",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=2843d0540e753676b36bdc9ca7d6f0259ed913e01cb20bf4b540a1e95453ed98"
@@ -457,12 +465,6 @@
       "headline": "12 Health Care Stocks Moving In Monday's After-Market Session",
       "source": "Benzinga",
       "url": "https://finnhub.io/api/news?id=5c389d182d0729ba00bed5398594278c770ae22bb653f7a50cf68140cd412bc9"
-    },
-    {
-      "date": "2026-09-21",
-      "headline": "AnaptysBio Q2 Adj. EPS $(0.11) Beats $(0.46) Estimate, Sales $27.488M Beat $21.675M Estimate",
-      "source": "Benzinga",
-      "url": "https://finnhub.io/api/news?id=0efacaad49e841b3d2e08b4603b95769c7908860e79cca178c12fb802b021569"
     }
   ],
   "overrides": [],
@@ -477,7 +479,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 1360.5,
     "fcf_ttm_musd": 19.6,
-    "implied_growth_pct": 24.03,
+    "implied_growth_pct": 24.033301777544253,
     "projection_years": 10,
     "terminal_growth": 0.03
   },

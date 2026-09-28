@@ -1,21 +1,22 @@
 {
   "analyst": {
-    "analyst_count": null,
-    "buy": null,
-    "hold": null,
-    "sell": null,
-    "source": null,
-    "target_high": null,
-    "target_low": null,
-    "target_median": null,
-    "upside_to_median": null
+    "analyst_count": 11,
+    "buy": 7,
+    "hold": 3,
+    "recommendation": "buy",
+    "sell": 0,
+    "source": "yfinance",
+    "target_high": 230.0,
+    "target_low": 190.0,
+    "target_median": 212.0,
+    "upside_to_median": 30.213131871506672
   },
-  "as_of": "2026-09-27",
+  "as_of": "2026-09-28",
   "calendar": {
-    "estimated": false,
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-10-27"
   },
-  "change_1d_pct": -1.12,
+  "change_1d_pct": 0.42,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -35,7 +36,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 7265.5,
+  "enterprise_value_musd": 7294.2,
   "exchange": "NYSE",
   "flags": {
     "annual_fallback_fields": [
@@ -71,7 +72,7 @@
     "last_form4": "2026-09-10",
     "window_days": 180
   },
-  "market_cap_musd": 6852.1,
+  "market_cap_musd": 6880.8,
   "metrics": {
     "altman_z": {
       "color": "gray",
@@ -106,7 +107,7 @@
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 67.5,
-      "value": 6.02
+      "value": 5.99
     },
     "ebitda_margin": {
       "color": "gray",
@@ -120,28 +121,28 @@
       "own_5y_pct": 25.0,
       "pct_basis": "universe",
       "sector_pct": 35.1,
-      "value": 16.62
+      "value": 16.68
     },
     "ev_ebitda": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 34.1,
-      "value": 13.03
+      "value": 13.08
     },
     "ev_gross_profit": {
       "color": "yellow",
       "own_5y_pct": 25.0,
       "pct_basis": "universe",
       "sector_pct": 83.7,
-      "value": 10.63
+      "value": 10.67
     },
     "ev_sales": {
       "color": "yellow",
       "own_5y_pct": 25.0,
       "pct_basis": "universe",
       "sector_pct": 66.7,
-      "value": 4.29
+      "value": 4.3
     },
     "fcf_margin": {
       "color": "yellow",
@@ -162,14 +163,14 @@
       "own_5y_pct": 91.7,
       "pct_basis": "universe",
       "sector_pct": 28.1,
-      "value": 3.4
+      "value": 3.38
     },
     "fcf_yield_mcap": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 29.9,
-      "value": 3.6
+      "value": 3.59
     },
     "gross_margin": {
       "color": "yellow",
@@ -197,7 +198,7 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 12.36
+      "value": 12.41
     },
     "implied_vs_actual_growth": {
       "color": "yellow",
@@ -253,21 +254,21 @@
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 55.4,
-      "value": 21.33
+      "value": 21.0
     },
     "pe": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 36.7,
-      "value": 21.73
+      "value": 21.82
     },
     "peg": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 2.54
+      "value": 2.55
     },
     "piotroski_f": {
       "color": "yellow",
@@ -281,28 +282,28 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -41.21
+      "value": -40.52
     },
     "rel_strength_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 21.9,
-      "value": -28.17
+      "value": -31.06
     },
     "return_12m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 19.8,
-      "value": -17.32
+      "value": -15.63
     },
     "return_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 23.7,
-      "value": -2.1
+      "value": -1.31
     },
     "rev_cagr_3y": {
       "color": "yellow",
@@ -419,12 +420,6 @@
       "headline": "2 of Wall Street’s Favorite Stocks with Exciting Potential and 1 We Find Risky",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=2f8e9d6abc142fa87b6d86c52b8b00df4f997e50b892c9a418c20258bb77ef58"
-    },
-    {
-      "date": "2026-08-28",
-      "headline": "Why Is Masco (MAS) Up 0.9% Since Last Earnings Report?",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=b2aca0e8480a8e7d73a5ea77fd697e819506fbda301452340de733800c569ee4"
     }
   ],
   "overrides": [],
@@ -432,14 +427,14 @@
     "sector": 7,
     "universe": 277
   },
-  "price": 162.13,
-  "price_as_of": "2026-09-24",
+  "price": 162.81,
+  "price_as_of": "2026-09-25",
   "reverse_dcf": {
     "actual_growth_pct": 9.54,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 7265.5,
+    "enterprise_value_musd": 7294.2,
     "fcf_ttm_musd": 246.7,
-    "implied_growth_pct": 12.358744699531893,
+    "implied_growth_pct": 12.411888187809481,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -673,12 +668,11 @@
       "2026-06-30"
     ],
     "price_sparkline": [
-      167.18,
       162.17,
       164.8,
       165.03,
       166.58,
-      175.48,
+      174.35,
       179.19,
       173.57,
       180.61,
@@ -686,7 +680,7 @@
       178.27,
       169.84,
       170.39,
-      164.38,
+      163.63,
       165.08,
       159.43,
       158.04,
@@ -695,7 +689,7 @@
       157.15,
       159.7,
       160.34,
-      152.84,
+      155.17,
       152.75,
       152.08,
       152.19,
@@ -703,7 +697,7 @@
       158.0,
       157.88,
       154.97,
-      162.16,
+      161.46,
       160.42,
       158.56,
       155.36,
@@ -711,7 +705,7 @@
       155.69,
       155.9,
       155.97,
-      157.28,
+      151.43,
       160.71,
       178.65,
       174.37,
@@ -720,7 +714,7 @@
       185.52,
       186.7,
       181.68,
-      177.15,
+      179.17,
       178.11,
       178.25,
       177.78,
@@ -728,11 +722,12 @@
       168.94,
       170.84,
       170.41,
-      163.87,
+      162.73,
       160.09,
       159.89,
       161.88,
-      162.13
+      163.97,
+      162.81
     ],
     "quarters": [
       "2023-09",

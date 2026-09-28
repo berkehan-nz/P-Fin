@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-26",
+  "as_of": "2026-09-28",
   "headline_metrics": {
     "A": [
       "ev_ebit",
@@ -213,39 +213,77 @@
     ]
   },
   "portfolio": {
+    "active_phase": null,
     "asset_class_slice": {
-      "ETF": "cekirdek",
+      "ETF": "cekirdek_etf",
       "STOCK": "motor",
       "TL_DEPOSIT": "tl"
     },
     "default_broker": "Midas",
     "earnings_warning_days": 7,
     "max_position_weight_pct": 15.0,
+    "phases": [
+      {
+        "end": "2026-11-16",
+        "key": "faz0",
+        "label": "Faz 0 — hazirlik",
+        "start": "2026-09-01",
+        "targets": {
+          "cekirdek_etf": 27,
+          "motor": 0,
+          "sgov": 23,
+          "tl": 50
+        }
+      },
+      {
+        "end": "2027-03-01",
+        "key": "faz1",
+        "label": "Faz 1 — ilk hisseler",
+        "start": "2026-11-16",
+        "targets": {
+          "cekirdek_etf": 30,
+          "motor": 25,
+          "sgov": 10,
+          "tl": 35
+        }
+      },
+      {
+        "end": null,
+        "key": "faz2",
+        "label": "Faz 2 — tam motor",
+        "start": "2027-03-01",
+        "targets": {
+          "cekirdek_etf": 30,
+          "motor": 40,
+          "sgov": 10,
+          "tl": 20
+        }
+      }
+    ],
     "review_overdue_grace_days": 0,
     "slice_benchmarks": {
-      "cekirdek": "nasdaq100",
+      "cekirdek_etf": "nasdaq100",
       "motor": "kucuk_deger"
     },
     "slice_drift_warn_pp": 5.0,
     "slices": {
-      "cekirdek": {
-        "label": "Cekirdek ETF",
-        "target_pct": 30.0
+      "cekirdek_etf": {
+        "label": "Cekirdek ETF"
       },
       "motor": {
-        "label": "Motor (tek hisse)",
-        "target_pct": 40.0
+        "label": "Motor (tek hisse)"
       },
-      "nakit": {
-        "label": "Nakit capasi",
-        "target_pct": 20.0
+      "sgov": {
+        "label": "SGOV (nakit capasi)"
       },
       "tl": {
-        "label": "TL mevduat",
-        "target_pct": 10.0
+        "label": "TL mevduat"
       }
     },
-    "tax_year_warning_days": 30
+    "tax_year_warning_days": 30,
+    "ticker_slice": {
+      "SGOV": "sgov"
+    }
   },
   "reverse_dcf": {
     "discount_rate": 0.1,

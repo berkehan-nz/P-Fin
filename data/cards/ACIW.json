@@ -1,21 +1,22 @@
 {
   "analyst": {
-    "analyst_count": null,
-    "buy": null,
-    "hold": null,
-    "sell": null,
-    "source": null,
-    "target_high": null,
-    "target_low": null,
-    "target_median": null,
-    "upside_to_median": null
+    "analyst_count": 3,
+    "buy": 3,
+    "hold": 1,
+    "recommendation": "none",
+    "sell": 0,
+    "source": "yfinance",
+    "target_high": 70.0,
+    "target_low": 66.0,
+    "target_median": 66.0,
+    "upside_to_median": 33.30640274691983
   },
-  "as_of": "2026-09-27",
+  "as_of": "2026-09-28",
   "calendar": {
-    "estimated": false,
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-11-05"
   },
-  "change_1d_pct": 0.81,
+  "change_1d_pct": -0.22,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -35,7 +36,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 5664.2,
+  "enterprise_value_musd": 5653.1,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -66,7 +67,7 @@
     "last_form4": "2026-09-09",
     "window_days": 180
   },
-  "market_cap_musd": 5009.4,
+  "market_cap_musd": 4998.3,
   "metrics": {
     "altman_z": {
       "color": "green",
@@ -101,7 +102,7 @@
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 63.9,
-      "value": 5.98
+      "value": 5.99
     },
     "ebitda_margin": {
       "color": "gray",
@@ -115,21 +116,21 @@
       "own_5y_pct": 42.9,
       "pct_basis": "universe",
       "sector_pct": 43.3,
-      "value": 16.72
+      "value": 16.69
     },
     "ev_ebitda": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 40.6,
-      "value": 12.97
+      "value": 12.94
     },
     "ev_gross_profit": {
       "color": "green",
       "own_5y_pct": 58.3,
       "pct_basis": "universe",
       "sector_pct": 44.1,
-      "value": 6.34
+      "value": 6.33
     },
     "ev_sales": {
       "color": "green",
@@ -157,14 +158,14 @@
       "own_5y_pct": 50.0,
       "pct_basis": "universe",
       "sector_pct": 71.1,
-      "value": 5.5
+      "value": 5.51
     },
     "fcf_yield_mcap": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 76.3,
-      "value": 6.22
+      "value": 6.23
     },
     "gross_margin": {
       "color": "yellow",
@@ -192,14 +193,14 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 5.87
+      "value": 5.85
     },
     "implied_vs_actual_growth": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 0.8
+      "value": 0.79
     },
     "interest_coverage": {
       "color": "yellow",
@@ -248,21 +249,21 @@
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 44.7,
-      "value": 18.76
+      "value": 18.94
     },
     "pe": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 28.1,
-      "value": 22.19
+      "value": 22.15
     },
     "peg": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 3.16
+      "value": 3.15
     },
     "piotroski_f": {
       "color": "green",
@@ -276,28 +277,28 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -30.09
+      "value": -30.19
     },
     "rel_strength_6m": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 76.3,
-      "value": -1.59
+      "value": -8.58
     },
     "return_12m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 47.2,
-      "value": -6.2
+      "value": -5.3
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
       "sector_pct": 76.3,
-      "value": 24.49
+      "value": 21.17
     },
     "rev_cagr_3y": {
       "color": "yellow",
@@ -374,6 +375,12 @@
   "net_debt_musd": 654.78,
   "news": [
     {
+      "date": "2026-09-27",
+      "headline": "ACI Worldwide (ACIW) Expands Connetic And Swift Routing, Is The Discount Warranted?",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=cda15f9bda42bbd94d3192e3bb2bd2ec80aec6bd60696a66aa660eb9242313bb"
+    },
+    {
       "date": "2026-09-24",
       "headline": "Solaris Goes Live on ACI Worldwide’s ACI Connetic for SEPA Instant Payments",
       "source": "Yahoo",
@@ -414,12 +421,6 @@
       "headline": "Card companies are on a ‘land grab’ to set the standards for AI shopping, even as consumers aren’t yet comfortable handing over purchases to a bot",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=e4add8347c8334a3f5a2e24afa39282133226976da2a98a3e9bb8e22c52e0360"
-    },
-    {
-      "date": "2026-09-18",
-      "headline": "Nearly 60% of US Adults Can't Cover a $1,000 Emergency Expense, Driving Demand for Greater Control and Flexibility in Bill Payment, Finds ACI Speedpay Pulse Report",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=b08470bda98663f85bbe120c6f4336c12e1305b101374b36041ba7e3163ae002"
     }
   ],
   "overrides": [],
@@ -427,14 +428,14 @@
     "sector": 3,
     "universe": 19
   },
-  "price": 49.62,
-  "price_as_of": "2026-09-24",
+  "price": 49.51,
+  "price_as_of": "2026-09-25",
   "reverse_dcf": {
     "actual_growth_pct": 7.37,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 5664.2,
+    "enterprise_value_musd": 5653.1,
     "fcf_ttm_musd": 311.4,
-    "implied_growth_pct": 5.8720720594663804,
+    "implied_growth_pct": 5.845578119875897,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -666,12 +667,11 @@
       "2026-06-30"
     ],
     "price_sparkline": [
-      40.04,
       39.88,
       41.01,
       41.33,
       40.78,
-      39.89,
+      40.75,
       41.45,
       42.8,
       45.15,
@@ -679,7 +679,7 @@
       43.19,
       43.94,
       43.22,
-      44.16,
+      44.28,
       46.65,
       42.36,
       40.81,
@@ -688,7 +688,7 @@
       42.52,
       42.35,
       42.4,
-      43.71,
+      45.03,
       42.36,
       42.56,
       43.73,
@@ -696,7 +696,7 @@
       45.5,
       44.09,
       45.17,
-      49.26,
+      46.66,
       50.29,
       54.88,
       55.62,
@@ -704,7 +704,7 @@
       56.43,
       57.04,
       58.07,
-      54.71,
+      56.69,
       56.31,
       59.97,
       57.69,
@@ -713,7 +713,7 @@
       53.67,
       52.24,
       53.66,
-      52.17,
+      52.13,
       51.57,
       52.41,
       53.04,
@@ -721,11 +721,12 @@
       51.23,
       52.91,
       51.98,
-      52.09,
+      51.97,
       51.29,
       51.18,
       49.59,
-      49.62
+      49.22,
+      49.51
     ],
     "quarters": [
       "2023-09",

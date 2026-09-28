@@ -1,21 +1,22 @@
 {
   "analyst": {
-    "analyst_count": null,
-    "buy": null,
-    "hold": null,
-    "sell": null,
-    "source": null,
-    "target_high": null,
-    "target_low": null,
-    "target_median": null,
-    "upside_to_median": null
+    "analyst_count": 1,
+    "buy": 1,
+    "hold": 0,
+    "recommendation": "none",
+    "sell": 0,
+    "source": "yfinance",
+    "target_high": 5.390211,
+    "target_low": 5.390211,
+    "target_median": 5.390211,
+    "upside_to_median": 11.13837113402063
   },
-  "as_of": "2026-09-27",
+  "as_of": "2026-09-28",
   "calendar": {
-    "estimated": false,
-    "next_earnings": null
+    "estimated": true,
+    "next_earnings": "2026-11-11"
   },
-  "change_1d_pct": 0.62,
+  "change_1d_pct": -0.61,
   "data_quality": {
     "issue_count": 2,
     "issues": [
@@ -46,7 +47,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 872.9,
+  "enterprise_value_musd": 866.9,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -81,7 +82,7 @@
     "last_form4": "2026-06-10",
     "window_days": 180
   },
-  "market_cap_musd": 965.5,
+  "market_cap_musd": 959.6,
   "metrics": {
     "altman_z": {
       "color": "green",
@@ -116,7 +117,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 91.7,
-      "value": 17.07
+      "value": 17.19
     },
     "ebitda_margin": {
       "color": "gray",
@@ -130,14 +131,14 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 10.7,
-      "value": 5.86
+      "value": 5.82
     },
     "ev_ebitda": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 17.9,
-      "value": 5.86
+      "value": 5.82
     },
     "ev_gross_profit": {
       "color": "gray",
@@ -151,7 +152,7 @@
       "own_5y_pct": 16.7,
       "pct_basis": "sector",
       "sector_pct": 60.5,
-      "value": 4.8
+      "value": 4.77
     },
     "fcf_margin": {
       "color": "red",
@@ -172,14 +173,14 @@
       "own_5y_pct": 83.3,
       "pct_basis": "sector",
       "sector_pct": 2.6,
-      "value": -4.54
+      "value": -4.57
     },
     "fcf_yield_mcap": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 2.6,
-      "value": -4.1
+      "value": -4.13
     },
     "gross_margin": {
       "color": "gray",
@@ -263,14 +264,14 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 18.4,
-      "value": 10.46
+      "value": 11.01
     },
     "pe": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 3.6,
-      "value": 6.31
+      "value": 6.27
     },
     "peg": {
       "color": "green",
@@ -291,28 +292,28 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -13.73
+      "value": -16.88
     },
     "rel_strength_6m": {
-      "color": "yellow",
+      "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 50.0,
-      "value": -12.85
+      "value": -20.76
     },
     "return_12m": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 39.5,
-      "value": 10.16
+      "value": 8.02
     },
     "return_6m": {
-      "color": "green",
+      "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 55.3,
-      "value": 13.23
+      "value": 8.99
     },
     "rev_cagr_3y": {
       "color": "red",
@@ -389,6 +390,12 @@
   "net_debt_musd": -92.62,
   "news": [
     {
+      "date": "2026-09-25",
+      "headline": "10 Health Care Stocks With Whale Alerts In Today’s Session",
+      "source": "Benzinga",
+      "url": "https://finnhub.io/api/news?id=50d878b82a064951cdb9c0d340c1b407a22468c7e52c48167fc1ae5b0f4eb515"
+    },
+    {
       "date": "2026-09-13",
       "headline": "Roivant Sciences: Diverse Exposure To Biotech Niches Through Vants",
       "source": "SeekingAlpha",
@@ -400,12 +407,12 @@
     "sector": 19,
     "universe": 277
   },
-  "price": 4.88,
-  "price_as_of": "2026-09-24",
+  "price": 4.85,
+  "price_as_of": "2026-09-25",
   "reverse_dcf": {
     "actual_growth_pct": -28.8,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 872.9,
+    "enterprise_value_musd": 866.9,
     "fcf_ttm_musd": -39.6,
     "implied_growth_pct": null,
     "projection_years": 10,
@@ -638,12 +645,11 @@
       "2026-06-30"
     ],
     "price_sparkline": [
-      4.53,
       4.29,
       4.5,
       4.48,
       4.46,
-      4.15,
+      4.3,
       4.35,
       4.68,
       4.6,
@@ -651,7 +657,7 @@
       4.2,
       4.15,
       4.2,
-      4.4,
+      4.39,
       4.35,
       4.39,
       4.31,
@@ -660,7 +666,7 @@
       4.44,
       4.64,
       4.6,
-      4.26,
+      4.48,
       4.35,
       4.24,
       4.12,
@@ -668,7 +674,7 @@
       4.39,
       4.55,
       4.45,
-      4.58,
+      4.41,
       4.8,
       4.87,
       5.18,
@@ -676,7 +682,7 @@
       4.67,
       4.56,
       4.56,
-      4.33,
+      4.52,
       4.38,
       4.41,
       4.41,
@@ -685,7 +691,7 @@
       4.63,
       4.67,
       4.58,
-      4.84,
+      4.71,
       4.77,
       5.2,
       5.19,
@@ -697,7 +703,8 @@
       5.06,
       5.07,
       5.0,
-      4.88
+      4.85,
+      4.85
     ],
     "quarters": [
       "2023-09",
