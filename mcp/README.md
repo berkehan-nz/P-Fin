@@ -5,8 +5,8 @@ uzak MCP sunucusu. Cloudflare Workers'ta calisir, GitHub ile kimlik dogrular.
 
 ## Neden bu tasarim
 
-Sunucu **hicbir veri saklamaz.** Okumalar `main` dalindan, yazmalar tek bir
-calisma dalina gider ve oradan **tek bir PR** acilir. Boylece:
+Sunucu **hicbir veri saklamaz.** Okumalar `main` dalindan, yazmalar o
+sohbetin calisma dalina gider ve oradan **tek bir PR** acilir. Boylece:
 
 - Deponun "tum durum dosyada tutulur" ilkesi bozulmaz.
 - Her degisiklik bir commit oldugu icin denetim izi kendiliginden olusur.
@@ -110,6 +110,22 @@ cp .dev.vars.example .dev.vars     # ikinci OAuth App'in degerlerini gir
 npm run dev                        # http://localhost:8788/mcp
 ```
 
+## Calisma dali: her sohbet kendi dalini acar
+
+Dal adi `claude/mcp-<tarih>-<oturum>` (orn. `claude/mcp-2026-09-28-a1b2c3`).
+Sohbetteki ilk yazma, **guncel main'den** yeni bir dal acar; o sohbetin tum
+yazmalari bu dalda birikir ve `submit_for_review` yalnizca bu dali PR yapar.
+
+- Iki sohbet ayni gun calissa bile yazmalari birbirine karismaz.
+- PR birlesince ayni sohbette yeni bir yazma yine guncel main'den baslar.
+- Baska sohbetlerden kalan, gonderilmemis dallar `list_pending_changes`'te
+  ayrica listelenir — kaybolmasinlar diye. Ya PR yapilir ya silinir.
+- MCP yalnizca kullanici niyeti tasiyan dosyalara yazar:
+  `claude_inbox/<T>.json`, `data/portfolio.json`, `data/watchlist.json`,
+  `data/overrides.json`, `data/tr_macro.json`. Otomasyonun yazdigi
+  dosyalara (kartlar, aday listesi) yazmaya kalkarsa REDDEDILIR; bu yuzden
+  PR'lar main'le cakismaz.
+
 ## Gunluk akis
 
 1. Chat'te: *"En dusuk analiz kapsamali uc sirketi incele ve not yaz."*
@@ -178,6 +194,13 @@ eklemistin.)
 **Dogrulama:** Claude sohbetinde "whoami calistir" de. Cikti
 `Jeton: GECERLI (dogrulandi)` ile baslamali.
 
+> **Her dagitimdan sonra: baglayiciyi yeniden bagla + YENI sohbet ac.**
+> claude.ai arac listesini baglanti aninda alir ve onbellekte tutar; eski
+> sohbet yeni araclari (orn. `set_tr_macro`) ya da degisen parametreleri
+> (orn. `record_position.planned_tranches`) gormez. Yol: claude.ai >
+> Settings > Connectors > P-Fin > **Disconnect** > **Connect**, sonra yeni
+> bir sohbet. Kontrol: yeni sohbette "whoami calistir".
+
 Kirmizi carpi cikarsa ve hata "CLOUDFLARE_ACCOUNT_ID" diyorsa, birden
 fazla Cloudflare hesabin var demektir: Cloudflare ana sayfasinda sag
 taraftaki **Account ID**'yi kopyalayip ayni yoldan `CLOUDFLARE_ACCOUNT_ID`
@@ -218,7 +241,8 @@ gereksiz.
 | `set_decision` | AL / BEKLE / ELE + gerekce |
 | `set_catalyst_score` | Katalizor puani (elle girilen tek puan) |
 | `add_to_watchlist` | Izleme listesi |
-| `record_position` | STOCK / ETF / **TL_DEPOSIT**, dilim, kademeli alim |
+| `record_position` | STOCK / ETF / **TL_DEPOSIT** (banka, stopaj teyidi), dilim, `planned_tranches`. Nakit yetmezse yazmaz. Planli bir parcayi (ayni sembol, +-7 gun) kendiliginden "yapildi" isaretler |
+| `set_tr_macro` | TCMB politika faizi, TUFE, erken secim, PPK tarihleri — TL mevduat yenileme kosullari bunlardan hesaplanir. **Kaynak zorunlu** |
 | `close_position` | **Gerekce zorunlu**: tez_kirici / hedef_fiyat / yeniden_dengeleme / nakit_ihtiyaci / tez_degisti |
 | `set_thesis_breakers` | **Yapilandirilmis** kirici (metric/op/value/consecutive_quarters) |
 | `set_target_price` | Hedef + gerekce (zorunlu) |

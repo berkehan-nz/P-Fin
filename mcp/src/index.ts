@@ -29,9 +29,10 @@ import {
 	tickerSchema,
 	tlDepositSchema,
 	trancheSchema,
+	trMacroSchema,
 	today,
 } from "./pfin/contract";
-import { parseRepo, Repo } from "./pfin/repo";
+import { parseRepo, Repo, sessionTag } from "./pfin/repo";
 import type { Props } from "./utils";
 
 const ok = (text: string) => ({ content: [{ text, type: "text" as const }] });
@@ -86,7 +87,22 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 		return new Repo(
 			new Octokit({ auth: this.props!.accessToken }),
 			parseRepo(this.env.GITHUB_REPO ?? "berkehan-nz/P-Fin"),
+			this.branchTag(),
 		);
+	}
+
+	/**
+	 * Bu sohbet oturumunun dal etiketi. Her sohbet kendi dalini acar
+	 * (claude/mcp-<tarih>-<etiket>); iki sohbetin yazmalari birbirine karismaz.
+	 */
+	private branchTag(): string {
+		let id: string;
+		try {
+			id = this.getSessionId();
+		} catch {
+			id = this.ctx.id.toString();
+		}
+		return sessionTag(id);
 	}
 
 	/** Inbox dosyasini calisma dalindan okur; yoksa main'den; yoksa bos. */
@@ -214,20 +230,21 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 				const stale = await repo.staleBranches();
 				const uyari = stale.length
 					? {
-							bayat_dallar: stale.map((b) =>
+							baska_sohbetlerin_dallari: stale.map((b) =>
 								`${b.name} (${b.ahead} commit ileride, ${b.behind} geride)`,
 							),
 							not:
-								"Bu dallar bugunden eski oldugu icin yeni yazmalar ORAYA GITMEZ " +
-								"(calisma dali her gun guncel main'den acilir). Icinde " +
-								"birlestirilmemis is olabilir: PR'ini birlestir ya da dali sil.",
+								"Bu dallar BASKA sohbetlerden kaldi; bu sohbetin yazmalari ORAYA " +
+								"GITMEZ (her sohbet kendi dalini guncel main'den acar). Icinde " +
+								"birlestirilmemis is olabilir: kullaniciya soyle, PR'ini " +
+								"birlestirsin ya da dali silsin.",
 						}
 					: null;
 
 				if (!branch) {
 					return ok(
 						JSON.stringify(
-							{ bekleyen: "yok — calisma dali temiz", ...(uyari ?? {}) },
+							{ bekleyen: "yok — bu sohbetin dali temiz", ...(uyari ?? {}) },
 							null,
 							1,
 						),
@@ -381,6 +398,12 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 				tl_deposit: tlDepositSchema.optional()
 					.describe("asset_class TL_DEPOSIT ise zorunlu"),
 				type: z.enum(["GERCEK", "KAGIT"]).default("KAGIT"),
+				planned_tranches: z.array(trancheSchema).max(12).optional()
+					.describe("Sonraki alim parcalari (orn. 30 Ekim'de 149 $ QQQM). " +
+						"Ayni sembol+tarih varsa guncellenir."),
+				mark_tranche_done: z.boolean().default(true)
+					.describe("Bu alim planli bir parcaysa (ayni sembol, +-7 gun) onu " +
+						"'yapildi' olarak isaretle"),
 			},
 			async (a) => {
 				const repo = this.repo();
@@ -428,22 +451,63 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 					...(a.slice ? { slice: a.slice } : {}),
 					...(isDeposit ? a.tl_deposit : {}),
 				};
+				// KADEMELI ALIM. Bu alim planli bir parcaysa (30 Ekim QQQM) plan
+				// 'yapildi' olur; yoksa genel bakis onu hala "siradaki is" diye
+				// gosterir ve kademeli alim uyarisi susmaz.
+				const tranches: any[] = [...(doc.planned_tranches ?? [])];
+				let fulfilled: any = null;
+				if (a.mark_tranche_done && !isDeposit) {
+					const d0 = Date.parse(a.entry_date);
+					let best = -1;
+					let bestGap = Infinity;
+					tranches.forEach((t, i) => {
+						if (t?.done || String(t?.ticker ?? "").toUpperCase() !== a.ticker) return;
+						const gap = Math.abs(Date.parse(t.date) - d0) / 86_400_000;
+						if (gap <= 7 && gap < bestGap) { best = i; bestGap = gap; }
+					});
+					if (best >= 0) {
+						tranches[best] = { ...tranches[best], done: true, done_date: a.entry_date };
+						fulfilled = tranches[best];
+					}
+				}
+				for (const t of a.planned_tranches ?? []) {
+					const tk = t.ticker ?? a.ticker;
+					const row = { amount_usd: t.amount_usd, date: t.date, done: t.done,
+						note: t.note, ticker: tk };
+					const i = tranches.findIndex((x) => x?.ticker === tk && x?.date === t.date);
+					if (i >= 0) tranches[i] = { ...tranches[i], ...row };
+					else tranches.push(row);
+				}
+				tranches.sort((x, y) => String(x.date).localeCompare(String(y.date)));
+
 				const next = {
 					...doc,
 					as_of: today(),
 					cash_usd: Math.round((cash - cost) * 100) / 100,
+					planned_tranches: tranches,
 					positions: [...(doc.positions ?? []), position],
 				};
-				const b = await repo.writeJson("data/portfolio.json", next,
-					`portfoy: ${a.type} ${a.ticker} ${a.shares} @ ${a.entry_price}`);
 				const ne = isDeposit
 					? `${a.tl_deposit!.principal_try} TL mevduat @ %${a.tl_deposit!.annual_rate_pct} ` +
 						`(kur ${a.tl_deposit!.usdtry_at_entry})`
 					: `${a.shares} adet @ ${a.entry_price} $`;
+				const b = await repo.writeJson("data/portfolio.json", next,
+					`portfoy: ${a.type} ${a.ticker} ${ne}`);
+
+				// Planli parcalarin toplami kalan nakdi asiyorsa soyle (engelleme).
+				const planned = tranches.filter((t) => !t.done)
+					.reduce((n, t) => n + Number(t.amount_usd || 0), 0);
+				const notes = [
+					fulfilled ? `Planli parca ${fulfilled.date} (${fulfilled.amount_usd} $) 'yapildi' olarak isaretlendi.` : "",
+					planned > next.cash_usd + 0.01
+						? `DIKKAT: bekleyen parcalar ${planned.toFixed(2)} $, nakit ${next.cash_usd.toFixed(2)} $ — ` +
+							"parca tarihinde nakit yetmeyecek (SGOV satisi ya da yeni para gerekir)."
+						: "",
+				].filter(Boolean).join(" ");
 				return ok(
 					`${a.type} ${a.ticker} [${a.asset_class}]: ${ne} ` +
 						`(maliyet ${cost.toFixed(2)} $) ${b} dalina yazildi. ` +
-						`Kalan nakit ${next.cash_usd.toFixed(2)} $. ` +
+						`Kalan nakit ${next.cash_usd.toFixed(2)} $. ${notes} ` +
 						`Tum pozisyonlari girdikten sonra submit_for_review ile PR ac.`,
 				);
 			},
@@ -696,6 +760,39 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 					"data/portfolio.json", { ...doc, as_of: today(), positions },
 					`portfoy: ${a.ticker} hedef ${a.target_price}`);
 				return ok(`${a.ticker} hedef fiyati ${a.target_price} $ (${b}).`);
+			},
+		);
+
+		this.tool(
+			"set_tr_macro",
+			"Turkiye makro girdilerini gunceller (data/tr_macro.json): TCMB politika " +
+				"faizi, TUFE yillik, erken secim tarihi kesinlesti mi, PPK toplanti " +
+				"tarihleri. TL mevduat YENILEME KOSULLARI bunlardan hesaplanir; girilmezse " +
+				"genel bakista gri ('veri yok') kalir. KAYNAK ZORUNLU. Yalnizca verilen " +
+				"alanlar degisir; null bir alani bosaltir. 45 gunden eski veri bayat sayilir.",
+			trMacroSchema.shape,
+			async (a) => {
+				const repo = this.repo();
+				const path = "data/tr_macro.json";
+				const branch = await repo.existingBranch();
+				const doc =
+					(branch ? await repo.readJson<any>(path, branch) : null) ??
+					(await repo.readJson<any>(path)) ?? {};
+				const next: Record<string, any> = { ...doc };
+				for (const k of ["policy_rate_pct", "cpi_yoy_pct", "early_election_announced",
+					"tcmb_meetings"] as const) {
+					if (a[k] !== undefined) next[k] = a[k];
+				}
+				if (Array.isArray(next.tcmb_meetings)) {
+					next.tcmb_meetings = [...new Set(next.tcmb_meetings as string[])].sort();
+				}
+				next.source = a.source;
+				next.as_of = today();
+				const b = await repo.writeJson(path, next, `tr_macro: ${a.source}`.slice(0, 120));
+				const reel = typeof next.policy_rate_pct === "number" && typeof next.cpi_yoy_pct === "number"
+					? ` Reel faiz ${(next.policy_rate_pct - next.cpi_yoy_pct).toFixed(1)} puan.` : "";
+				return ok(`Turkiye makro girdileri ${b} dalina yazildi.${reel} ` +
+					"PR birlesip gunluk kosu calisinca yenileme kosullari guncellenir.");
 			},
 		);
 

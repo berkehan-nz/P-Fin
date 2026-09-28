@@ -21,29 +21,38 @@ import { Octokit } from "octokit";
  * acdigi dallara uyar.
  */
 const BRANCH_PREFIX = "claude/mcp-";
-const BRANCH_RE = /^claude\/mcp-(\d{4}-\d{2}-\d{2})$/;
+// Yeni bicim: claude/mcp-<tarih>-<oturum>. Eski bicim (yalnizca tarih)
+// hala taninir ki yarim kalmis eski dallar list_pending_changes'te gorunsun.
+const BRANCH_RE = /^claude\/mcp-(\d{4}-\d{2}-\d{2})(?:-([a-z0-9]{4,12}))?$/;
 
 /**
- * CALISMA DALI HER GUN GUNCEL MAIN'DEN ACILIR.
+ * HER SOHBET OTURUMU KENDI DALINI GUNCEL MAIN'DEN ACAR.
  *
  * Gecmis: ilk surum "main'den ileride olan HERHANGI bir dali" yeniden
  * kullaniyordu ve 11 Eylul'de acilan claude/mcp-2026-09-11, 17 gun boyunca
  * her yazmanin hedefi oldu. Dal main'in 206 commit gerisine dustu; PR #1
- * 47 dosyada cakisti. (Cakismanin dogrudan sebebi Merge is akisinin dalda
- * kart uretmesiydi — o merge.yml'de duzeltildi — ama bayat dal sorunu
- * buyuttu.)
+ * 47 dosyada cakisti. Ikinci surum gunluk dal actı; ayni gun iki sohbet
+ * yine ayni dala yaziyor, birinin gondermedigi degisiklik digerinin PR'ina
+ * karisiyordu.
  *
- * Kural: yalnizca BUGUNUN tarihini tasiyan dal yeniden kullanilir. Dunden
- * kalan, gonderilmemis bir dal varsa yeni yazmalar oraya GITMEZ;
- * list_pending_changes onu ayrica bildirir ki kaybolmasin.
+ * Kural: dal adi oturum kimligini tasir (claude/mcp-2026-09-28-a1b2c3).
+ * Bir oturum YALNIZCA kendi dalina yazar ve yalnizca kendi dalini gonderir.
+ * Baska oturumlardan kalan, gonderilmemis dallar list_pending_changes'te
+ * ayrica bildirilir ki kaybolmasin.
  */
-function branchDate(name: string): string | null {
+function branchSession(name: string): string | null {
 	const m = BRANCH_RE.exec(name);
-	return m ? m[1] : null;
+	return m ? (m[2] ?? null) : null;
 }
 
 function todayUtc(): string {
 	return new Date().toISOString().slice(0, 10);
+}
+
+/** Oturum kimliginden dal etiketi: kucuk harf + rakam, 6 karakter. */
+export function sessionTag(sessionId: string): string {
+	const clean = sessionId.toLowerCase().replace(/[^a-z0-9]/g, "");
+	return (clean.slice(0, 6) || "x").padEnd(4, "0");
 }
 
 /**
@@ -59,13 +68,14 @@ function todayUtc(): string {
  *   data/portfolio.json    pozisyonlar (elle girilen islem kayitlari)
  *   data/watchlist.json    izleme listesi
  *   data/overrides.json    ham veri duzeltmeleri (kaynakli)
+ *   data/tr_macro.json     TCMB faizi, TUFE, erken secim (elle, kaynakli)
  *
  * Yeni bir arac baska bir yola yazmaya calisirsa REDDEDILIR — sorunun
  * sessizce geri gelmesi yerine yuksek sesle basarisiz olur.
  */
 const WRITABLE_PATHS: RegExp[] = [
 	/^claude_inbox\/[A-Z0-9.\-]+\.json$/,
-	/^data\/(portfolio|watchlist|overrides)\.json$/,
+	/^data\/(portfolio|watchlist|overrides|tr_macro)\.json$/,
 ];
 
 export function isWritablePath(path: string): boolean {
@@ -86,7 +96,14 @@ export class Repo {
 	constructor(
 		private octokit: Octokit,
 		private ref: RepoRef,
+		/** Bu sohbet oturumunun dal etiketi (sessionTag). */
+		private session: string,
 	) {}
+
+	/** Bu oturumun dal adi (bugun acilirsa). */
+	private branchName(): string {
+		return `${BRANCH_PREFIX}${todayUtc()}-${this.session}`;
+	}
 
 	/**
 	 * Depo PUBLIC oldugu icin okumalar jeton istemez.
@@ -152,11 +169,10 @@ export class Repo {
 	}
 
 	/**
-	 * Biriken degisikliklerin durdugu dal — YOKSA null, olusturmaz.
+	 * Bu oturumun, henuz birlestirilmemis dali — YOKSA null, olusturmaz.
 	 *
-	 * PR'a DEGIL DALIN KENDISINE bakar. Onceki surum acik PR ariyordu, ama
-	 * yazmalar submit_for_review'dan ONCE oluyor: PR henuz yokken her cagri
-	 * kendine yeni bir dal aciyor, hicbiri birikmiyordu.
+	 * Yalnizca BU OTURUMUN etiketini tasiyan dallar aday. Gece yarisini
+	 * geçen bir sohbet dunku tarihli kendi dalina yazmaya devam eder.
 	 */
 	async existingBranch(): Promise<string | null> {
 		const { data } = await this.octokit.rest.git.listMatchingRefs({
@@ -167,15 +183,13 @@ export class Repo {
 
 		const names = data
 			.map((r) => r.ref.replace("refs/heads/", ""))
-			.filter((n) => BRANCH_RE.test(n))
+			.filter((n) => branchSession(n) === this.session)
 			.sort()
 			.reverse(); // tarih adin icinde; en yenisi basta
 
 		for (const name of names) {
-			// Yalnizca BUGUNUN dali (yukaridaki nota bak).
-			if (branchDate(name) !== todayUtc()) continue;
-			// main'e gore ilerlemis mi? Birlestirilmis eski bir dal yeniden
-			// kullanilmamali, yoksa kapali bir PR'a yazmaya calisiriz.
+			// main'e gore ilerlemis mi? Birlestirilmis dal yeniden
+			// kullanilmaz, yoksa kapali bir PR'a yazmaya calisiriz.
 			const { data: cmp } = await this.octokit.rest.repos.compareCommitsWithBasehead({
 				basehead: `${this.ref.base}...${name}`,
 				owner: this.ref.owner,
@@ -187,7 +201,7 @@ export class Repo {
 	}
 
 	/**
-	 * Yasi gecmis ama hala birlestirilmemis dallar.
+	 * BASKA oturumlardan kalan, birlestirilmemis dallar.
 	 *
 	 * Bunlar sessizce unutulmamali: icinde gercek kararlar olabilir.
 	 * list_pending_changes bunlari ayrica bildirir ki kullanici ya PR acsin
@@ -203,7 +217,7 @@ export class Repo {
 		for (const r of data) {
 			const name = r.ref.replace("refs/heads/", "");
 			if (!BRANCH_RE.test(name)) continue;
-			if (branchDate(name) === todayUtc()) continue;
+			if (branchSession(name) === this.session) continue;
 			const { data: cmp } = await this.octokit.rest.repos.compareCommitsWithBasehead({
 				basehead: `${this.ref.base}...${name}`,
 				owner: this.ref.owner,
@@ -217,15 +231,15 @@ export class Repo {
 	}
 
 	/**
-	 * Calisma dali: varsa mevcut olani, yoksa bugunun dalini acar. Boylece
-	 * oturum boyunca (ve ayni gun icinde) tum yazmalar TEK dalda birikir ve
-	 * tek PR olarak sunulur.
+	 * Calisma dali: bu oturumun acik dali varsa o, yoksa GUNCEL MAIN'den
+	 * yeni bir dal. Oturum boyunca tum yazmalar tek dalda birikir ve tek PR
+	 * olarak sunulur.
 	 */
 	async ensureBranch(): Promise<string> {
 		const existing = await this.existingBranch();
 		if (existing) return existing;
 
-		const name = `${BRANCH_PREFIX}${todayUtc()}`;
+		const name = this.branchName();
 		const { data: baseRef } = await this.octokit.rest.git.getRef({
 			owner: this.ref.owner,
 			ref: `heads/${this.ref.base}`,
@@ -239,9 +253,27 @@ export class Repo {
 				sha: baseRef.object.sha,
 			});
 		} catch (err: any) {
-			// 422 = dal zaten var (bugun acilip birlestirilmis olabilir).
-			// Uzerine yazmak dogru: yeniden ilerlemis hale gelir.
+			// 422 = dal zaten var. Iki durum:
+			//  - Ayni oturumun ES ZAMANLI bir cagrisi az once acti (main'le
+			//    ayni ya da ileride): oldugu gibi kullan, SIFIRLAMA — yoksa
+			//    o cagrinin commit'i silinir.
+			//  - Bu oturumun bugun acip PR'i BIRLESMIS dali (ileride degil,
+			//    main'in gerisinde): icerigi zaten main'de; guncel main'e cek.
 			if (err?.status !== 422) throw err;
+			const { data: cmp } = await this.octokit.rest.repos.compareCommitsWithBasehead({
+				basehead: `${this.ref.base}...${name}`,
+				owner: this.ref.owner,
+				repo: this.ref.repo,
+			});
+			if ((cmp.ahead_by ?? 0) === 0 && (cmp.behind_by ?? 0) > 0) {
+				await this.octokit.rest.git.updateRef({
+					force: true,
+					owner: this.ref.owner,
+					ref: `heads/${name}`,
+					repo: this.ref.repo,
+					sha: baseRef.object.sha,
+				});
+			}
 		}
 		return name;
 	}

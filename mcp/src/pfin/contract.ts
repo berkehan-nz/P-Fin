@@ -105,11 +105,14 @@ export const sliceSchema = z
 /** TL vadeli mevduat — hisse gibi 'adet x fiyat' ile degerlenmez. */
 export const tlDepositSchema = z.object({
 	annual_rate_pct: z.number().positive().max(200),
+	bank: z.string().max(60).optional(),
 	maturity_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 	principal_try: z.number().positive(),
 	start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 	usdtry_at_entry: z.number().positive(),
 	withholding_pct: z.number().min(0).max(50).default(15),
+	withholding_confirmed: z.boolean().default(false)
+		.describe("Stopaj orani bankadan teyit edildi mi"),
 });
 
 /** Kademeli alim plani — tek seferde girmek yerine parcalara bolunmus. */
@@ -117,7 +120,27 @@ export const trancheSchema = z.object({
 	amount_usd: z.number().positive(),
 	date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 	done: z.boolean().default(false),
-	ticker: tickerSchema.optional(),
+	note: z.string().max(200).default(""),
+	ticker: tickerSchema.optional()
+		.describe("Bos birakilirsa kaydedilen pozisyonun sembolu"),
+});
+
+/**
+ * Turkiye makro girdileri (data/tr_macro.json) — ELLE girilir.
+ * TL mevduat yenileme kosullari bunlardan hesaplanir. Ucretsiz ve guvenilir
+ * otomatik kaynak yok; tahmini sayi yazmaktansa alani bos birakmak dogru.
+ */
+export const trMacroSchema = z.object({
+	cpi_yoy_pct: z.number().min(0).max(200).nullable().optional()
+		.describe("TUFE yillik %, son aciklanan"),
+	early_election_announced: z.boolean().nullable().optional()
+		.describe("Erken secim tarihi kesinlesti mi"),
+	policy_rate_pct: z.number().min(0).max(200).nullable().optional()
+		.describe("TCMB politika faizi %"),
+	source: z.string().min(3).max(300)
+		.describe("Kaynak (orn. 'TCMB 23 Eki PPK karari; TUIK Eylul TUFE'). Zorunlu."),
+	tcmb_meetings: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(12).optional()
+		.describe("PPK toplanti tarihleri (YYYY-AA-GG)"),
 });
 
 /** close_position gerekcesi ZORUNLU: neden ciktigini bilmeyen tekrarlar. */
