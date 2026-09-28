@@ -24,26 +24,52 @@ const BRANCH_PREFIX = "claude/mcp-";
 const BRANCH_RE = /^claude\/mcp-(\d{4}-\d{2}-\d{2})$/;
 
 /**
- * Bir calisma dali en fazla bu kadar gun yeniden kullanilir.
+ * CALISMA DALI HER GUN GUNCEL MAIN'DEN ACILIR.
  *
- * "Ileride olan her dali yeniden kullan" kurali tek basina tehlikeli:
- * birlestirilmeden kalmis ESKI bir dal (ornegin 13 gun once acilmis,
- * main'in 146 commit gerisinde) sonsuza dek secilmeye devam ederdi.
- * Uzerine yazilan her yeni analiz, o daldaki BAYAT data/cards surumleriyle
- * ayni PR'a girer; birlestirildiginde 13 gunluk veri geri gelir.
+ * Gecmis: ilk surum "main'den ileride olan HERHANGI bir dali" yeniden
+ * kullaniyordu ve 11 Eylul'de acilan claude/mcp-2026-09-11, 17 gun boyunca
+ * her yazmanin hedefi oldu. Dal main'in 206 commit gerisine dustu; PR #1
+ * 47 dosyada cakisti. (Cakismanin dogrudan sebebi Merge is akisinin dalda
+ * kart uretmesiydi — o merge.yml'de duzeltildi — ama bayat dal sorunu
+ * buyuttu.)
  *
- * Yine de "dun yazdim, bugun devam ediyorum" akisi bozulmamali. Bu yuzden
- * pencere gun degil, birkac gun: taze dal birikmeye devam eder, bayat dal
- * kendi PR'ini bekler ve list_pending_changes onu ayrica bildirir.
+ * Kural: yalnizca BUGUNUN tarihini tasiyan dal yeniden kullanilir. Dunden
+ * kalan, gonderilmemis bir dal varsa yeni yazmalar oraya GITMEZ;
+ * list_pending_changes onu ayrica bildirir ki kaybolmasin.
  */
-const MAX_BRANCH_AGE_DAYS = 7;
-
-function branchAgeDays(name: string, now = new Date()): number {
+function branchDate(name: string): string | null {
 	const m = BRANCH_RE.exec(name);
-	if (!m) return Number.POSITIVE_INFINITY;
-	const then = Date.parse(`${m[1]}T00:00:00Z`);
-	if (Number.isNaN(then)) return Number.POSITIVE_INFINITY;
-	return (now.getTime() - then) / 86_400_000;
+	return m ? m[1] : null;
+}
+
+function todayUtc(): string {
+	return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * MCP'NIN YAZABILECEGI DOSYALAR — beyaz liste.
+ *
+ * Kural: MCP otomasyonun yazdigi hicbir dosyaya DOKUNMAZ. Tarama, gunluk
+ * kosu, nabiz ve Merge is akisi data/cards/, data/candidates.json ve
+ * benzerlerini surekli yeniden yaziyor; MCP de yazarsa her PR cakisir.
+ *
+ * Asagidakiler yalnizca KULLANICI NIYETI tasir ve hicbir otomasyon
+ * bunlara yazmaz (git gecmisiyle dogrulandi):
+ *   claude_inbox/<T>.json  analiz, karar, katalizor puani
+ *   data/portfolio.json    pozisyonlar (elle girilen islem kayitlari)
+ *   data/watchlist.json    izleme listesi
+ *   data/overrides.json    ham veri duzeltmeleri (kaynakli)
+ *
+ * Yeni bir arac baska bir yola yazmaya calisirsa REDDEDILIR — sorunun
+ * sessizce geri gelmesi yerine yuksek sesle basarisiz olur.
+ */
+const WRITABLE_PATHS: RegExp[] = [
+	/^claude_inbox\/[A-Z0-9.\-]+\.json$/,
+	/^data\/(portfolio|watchlist|overrides)\.json$/,
+];
+
+export function isWritablePath(path: string): boolean {
+	return WRITABLE_PATHS.some((re) => re.test(path));
 }
 
 export type RepoRef = { owner: string; repo: string; base: string };
@@ -146,8 +172,8 @@ export class Repo {
 			.reverse(); // tarih adin icinde; en yenisi basta
 
 		for (const name of names) {
-			// Cok eski bir dala yazma: bayat veri tasir (yukaridaki nota bak).
-			if (branchAgeDays(name) > MAX_BRANCH_AGE_DAYS) continue;
+			// Yalnizca BUGUNUN dali (yukaridaki nota bak).
+			if (branchDate(name) !== todayUtc()) continue;
 			// main'e gore ilerlemis mi? Birlestirilmis eski bir dal yeniden
 			// kullanilmamali, yoksa kapali bir PR'a yazmaya calisiriz.
 			const { data: cmp } = await this.octokit.rest.repos.compareCommitsWithBasehead({
@@ -177,7 +203,7 @@ export class Repo {
 		for (const r of data) {
 			const name = r.ref.replace("refs/heads/", "");
 			if (!BRANCH_RE.test(name)) continue;
-			if (branchAgeDays(name) <= MAX_BRANCH_AGE_DAYS) continue;
+			if (branchDate(name) === todayUtc()) continue;
 			const { data: cmp } = await this.octokit.rest.repos.compareCommitsWithBasehead({
 				basehead: `${this.ref.base}...${name}`,
 				owner: this.ref.owner,
@@ -199,7 +225,7 @@ export class Repo {
 		const existing = await this.existingBranch();
 		if (existing) return existing;
 
-		const name = `${BRANCH_PREFIX}${new Date().toISOString().slice(0, 10)}`;
+		const name = `${BRANCH_PREFIX}${todayUtc()}`;
 		const { data: baseRef } = await this.octokit.rest.git.getRef({
 			owner: this.ref.owner,
 			ref: `heads/${this.ref.base}`,
@@ -222,6 +248,13 @@ export class Repo {
 
 	/** JSON dosyasini calisma dalina yazar (varsa uzerine). Dal adini doner. */
 	async writeJson(path: string, value: unknown, message: string): Promise<string> {
+		if (!isWritablePath(path)) {
+			throw new Error(
+				`'${path}' otomasyona ait bir dosya; MCP buraya yazamaz. ` +
+					"Kartlar ve aday listesi veri hattinin isidir — analiz " +
+					"claude_inbox/'a yazilir, PR birlesince Merge is akisi kartlari uretir.",
+			);
+		}
 		const branch = await this.ensureBranch();
 		const body = `${JSON.stringify(value, null, 2)}\n`;
 

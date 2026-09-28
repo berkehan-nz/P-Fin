@@ -218,9 +218,9 @@ export class PFinMCP extends McpAgent<Env, Record<string, never>, Props> {
 								`${b.name} (${b.ahead} commit ileride, ${b.behind} geride)`,
 							),
 							not:
-								"Bu dallar 7 gunden eski oldugu icin yeni yazmalar ORAYA GITMEZ. " +
-								"Icinde birlestirilmemis is olabilir: GitHub'da PR acip birlestir " +
-								"ya da dali sil.",
+								"Bu dallar bugunden eski oldugu icin yeni yazmalar ORAYA GITMEZ " +
+								"(calisma dali her gun guncel main'den acilir). Icinde " +
+								"birlestirilmemis is olabilir: PR'ini birlestir ya da dali sil.",
 						}
 					: null;
 

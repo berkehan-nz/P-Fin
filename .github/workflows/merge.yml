@@ -1,8 +1,21 @@
 # INBOX BIRLESTIRME — claude_inbox/ klasorune her yazildiginda calisir.
 #
-# Baska bir ajan (sohbetteki Claude, GitHub baglantisiyla) analiz yazdiginda
+# Baska bir ajan (sohbetteki Claude, MCP baglantisiyla) analiz yazdiginda
 # kartlar ~30 saniyede guncellenir; gunluk kosuyu beklemek gerekmez.
 # Ag erisimi GEREKTIRMEZ: yalnizca repodaki dosyalari okur ve yazar.
+#
+# KARTLAR YALNIZCA MAIN'DE URETILIR. Dallarda yalnizca DOGRULAMA yapilir.
+#
+# Neden: onceki surumde dal filtresi yoktu. MCP calisma dalina bir analiz
+# yazdiginda bu is akisi O DALDA calisiyor, kartlari dalin (11 Eylul'den
+# kalma) eski verisinden yeniden uretiyor ve DALA commit ediyordu. Main'de
+# ise tarama/gunluk/nabiz her saat ayni data/cards dosyalarina yaziyordu.
+# Ayni dosyaya iki taraf yazinca PR #1'de 47 dosyanin 37'si cakisti —
+# MCP'nin kendisi data/'ya hic yazmamisti, 18 commit'inin hepsi
+# claude_inbox/'a gitmisti.
+#
+# Simdi: dal yalnizca claude_inbox/ tasir; PR main'e girince bu is akisi
+# main'de calisir ve kartlari guncel veriden uretir.
 name: Merge (analiz birlestirme)
 
 on:
@@ -14,8 +27,10 @@ on:
 permissions:
   contents: write
 
+# Main'deki kosu veri gruplarini paylasir (es zamanli commit olmasin).
+# Dal dogrulamalari ise tarama kuyrugunu BEKLETMEMELI: ayri grup.
 concurrency:
-  group: finans-veri
+  group: ${{ github.ref == 'refs/heads/main' && 'finans-veri' || format('merge-kontrol-{0}', github.ref) }}
   cancel-in-progress: false
 
 jobs:
@@ -34,8 +49,21 @@ jobs:
         run: python -m src.run_merge --check
 
       - name: Kartlara isle
+        if: github.ref == 'refs/heads/main'
         run: python -m src.run_merge
 
       - name: Commit
+        if: github.ref == 'refs/heads/main'
         run: |
           scripts/commit_data.sh "veri: analiz birlestirildi (claude_inbox)" data/
+
+      - name: Dal notu
+        if: github.ref != 'refs/heads/main'
+        run: |
+          {
+            echo "### Inbox dogrulandi — kartlar DEGISMEDI"
+            echo ""
+            echo "Bu bir calisma dali (\`${GITHUB_REF_NAME}\`). Kartlar yalnizca"
+            echo "main'de uretilir; PR birlestirilince bu is akisi main'de calisip"
+            echo "kartlari guncel veriden gunceller."
+          } >> "$GITHUB_STEP_SUMMARY"
