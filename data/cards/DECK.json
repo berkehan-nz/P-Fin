@@ -1,6 +1,7 @@
 {
   "analyst": {
     "analyst_count": 22,
+    "as_of": "2026-09-29",
     "buy": 13,
     "hold": 11,
     "recommendation": "none",
@@ -9,12 +10,12 @@
     "target_high": 184.0,
     "target_low": 70.0,
     "target_median": 118.5,
-    "upside_to_median": 51.225114854517614
+    "upside_to_median": 51.225113676614555
   },
   "as_of": "2026-09-29",
   "calendar": {
-    "estimated": true,
-    "next_earnings": "2026-10-29"
+    "estimated": false,
+    "next_earnings": "2027-01-27"
   },
   "capped_for_scoring": {
     "interest_coverage": {
@@ -26,7 +27,6 @@
       "used": 60.0
     }
   },
-  "change_1d_pct": -0.39,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -80,7 +80,7 @@
     "z_unreliable": true,
     "z_unreliable_reason": "bilesen eksik"
   },
-  "generated_at": "2026-09-26T23:01:35+00:00",
+  "generated_at": "2026-09-29T16:04:11+00:00",
   "insider": {
     "form4_count": 39,
     "last_form4": "2026-09-02",
@@ -99,7 +99,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 60.4,
+      "sector_pct": 60.1,
       "value": -2.53
     },
     "cash_conversion": {
@@ -302,7 +302,7 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 16.7,
+      "sector_pct": 8.3,
       "value": -47.6
     },
     "return_12m": {
@@ -316,7 +316,7 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 16.7,
+      "sector_pct": 8.3,
       "value": -16.68
     },
     "rev_cagr_3y": {
@@ -394,6 +394,18 @@
   "net_debt_musd": -1602.59,
   "news": [
     {
+      "date": "2026-09-29",
+      "headline": "3 Out-of-Favor Stocks with Warning Signs",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=f97bf588c3e9644767e71e2aff9a298be226e82905276ba553bf48b9ea52c8b0"
+    },
+    {
+      "date": "2026-09-29",
+      "headline": "The S&P 500's Thanksgiving Leftovers In September 2026",
+      "source": "SeekingAlpha",
+      "url": "https://finnhub.io/api/news?id=fcd3a4d3298248d0fc37e7e291d89d08818d24f327c2dd3ac3b37282d519d565"
+    },
+    {
       "date": "2026-09-28",
       "headline": "On Holding's Premium Store Expansion Strengthens Consumer Connections",
       "source": "Yahoo",
@@ -428,24 +440,12 @@
       "headline": "2 Mid-Cap Stocks with Exciting Potential and 1 We Avoid",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=f0badc54248f0e05d1cfb1df60f56b10c775dc65add55feaa5e430b0f41ed54b"
-    },
-    {
-      "date": "2026-09-24",
-      "headline": "Deckers Outdoor (DECK) Stock May Be 48% Undervalued As UGG Campaign Starts",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=8f9c16dcf8317ab600b5f2100b26846e5ffb566552f7e5f8c2f69daa9aa38f54"
-    },
-    {
-      "date": "2026-09-23",
-      "headline": "Deckers (DECK): Buy, Sell, or Hold Post Q2 Earnings?",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=2edcf7355d4cc7e0052b545b9704c3cb8aef9b75e9b50039d2b013959aa877cd"
     }
   ],
   "overrides": [],
   "percentile_pool": {
     "sector": 12,
-    "universe": 354
+    "universe": 355
   },
   "price": 78.36,
   "price_as_of": "2026-09-28",
@@ -454,7 +454,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 9086.8,
     "fcf_ttm_musd": 1097.3,
-    "implied_growth_pct": -4.9774326560102296,
+    "implied_growth_pct": -4.98,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -462,8 +462,8 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "percentile": 60.4,
-          "scaled": 39.6,
+          "percentile": 60.1,
+          "scaled": 39.9,
           "weight": 0.2
         },
         "cash_conversion": {
@@ -488,13 +488,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 0.0,
-          "scaled": 0.0,
+          "percentile": 8.3,
+          "scaled": 8.3,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 16.7,
-          "scaled": 16.7,
+          "percentile": 8.3,
+          "scaled": 8.3,
           "weight": 0.4
         }
       },
@@ -635,7 +635,7 @@
       "value": 1.0
     },
     "earnings_quality": 49.8,
-    "momentum": 6.7,
+    "momentum": 8.3,
     "quality": 88.8,
     "safety": 95.7,
     "total": 73.0,

@@ -1,6 +1,7 @@
 {
   "analyst": {
     "analyst_count": 10,
+    "as_of": "2026-09-29",
     "buy": 5,
     "hold": 7,
     "recommendation": "none",
@@ -9,7 +10,7 @@
     "target_high": 515.0,
     "target_low": 300.0,
     "target_median": 438.0,
-    "upside_to_median": 0.5601983653227949
+    "upside_to_median": 0.5601989289840681
   },
   "as_of": "2026-09-29",
   "calendar": {
@@ -17,7 +18,6 @@
     "next_earnings": "2027-01-25"
   },
   "capped_for_scoring": {},
-  "change_1d_pct": -1.69,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -48,12 +48,13 @@
     ],
     "data_basis": "quarterly_ttm",
     "is_manual": false,
-    "kill_reason": "Ima edilen buyume %9.7 > izin verilen %9.6 (gerceklesen %4.6)",
+    "kill_reason": null,
     "one_off_earnings": false,
     "passed_stages": [
       0,
       1,
-      2
+      2,
+      3
     ],
     "rev_growth_organic_suspect": false,
     "roic_method": "a",
@@ -61,11 +62,11 @@
     "warnings": [
       "bilesen eksik"
     ],
-    "would_fail_at": 3,
+    "would_fail_at": null,
     "z_unreliable": true,
     "z_unreliable_reason": "bilesen eksik"
   },
-  "generated_at": "2026-09-26T23:01:43+00:00",
+  "generated_at": "2026-09-29T16:04:20+00:00",
   "insider": {
     "form4_count": 31,
     "last_form4": "2026-09-15",
@@ -161,7 +162,7 @@
       "color": "yellow",
       "own_5y_pct": 0.0,
       "pct_basis": "sector",
-      "sector_pct": 55.6,
+      "sector_pct": 59.3,
       "value": 4.2
     },
     "fcf_yield_mcap": {
@@ -252,7 +253,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 11.1,
+      "sector_pct": 18.5,
       "value": 5.72
     },
     "pe": {
@@ -287,21 +288,21 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 88.9,
+      "sector_pct": 92.6,
       "value": 23.54
     },
     "return_12m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 65.4,
+      "sector_pct": 61.5,
       "value": 34.43
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 88.9,
+      "sector_pct": 92.6,
       "value": 54.46
     },
     "rev_cagr_3y": {
@@ -379,6 +380,12 @@
   "net_debt_musd": -1605.78,
   "news": [
     {
+      "date": "2026-09-29",
+      "headline": "Is Corning (GLW) Stock Outpacing Its Computer and Technology Peers This Year?",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=5e01b01e544f8f1628009116611b5ec074a0fda4a37d8f7bf5b42150ef9445cb"
+    },
+    {
       "date": "2026-09-25",
       "headline": "These Tech Stocks Trade Near Buy Points. One Sees 80% To 100% Core Income Growth.",
       "source": "Yahoo",
@@ -419,18 +426,12 @@
       "headline": "Snowflake, F5, onsemi, Impinj, and Power Integrations Shares Are Soaring, What You Need To Know",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=4e2c75f0a6f0f53214fd61b8deab8114b4e3b18bca90471befcf3a8537e8d37f"
-    },
-    {
-      "date": "2026-09-17",
-      "headline": "F5 Positioned as Market Shaper in the Gartner Emerging Market Quadrant™ for AI Application Security",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=b6307ca16763345e334a2f50aa7019aaa9430c852e63eb6ff06fe711c6cc6f46"
     }
   ],
   "overrides": [],
   "percentile_pool": {
     "sector": 27,
-    "universe": 354
+    "universe": 355
   },
   "price": 435.56,
   "price_as_of": "2026-09-28",
@@ -439,7 +440,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 23058.8,
     "fcf_ttm_musd": 969.6,
-    "implied_growth_pct": 9.48269342011186,
+    "implied_growth_pct": 9.48,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -473,13 +474,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 88.9,
-          "scaled": 88.9,
+          "percentile": 85.2,
+          "scaled": 85.2,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 88.9,
-          "scaled": 88.9,
+          "percentile": 92.6,
+          "scaled": 92.6,
           "weight": 0.4
         }
       },
@@ -565,8 +566,8 @@
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 55.6,
-          "scaled": 55.6,
+          "percentile": 59.3,
+          "scaled": 59.3,
           "weight": 0.25
         }
       },
@@ -620,11 +621,11 @@
       "value": 1.0
     },
     "earnings_quality": 51.0,
-    "momentum": 88.9,
+    "momentum": 88.1,
     "quality": 86.9,
     "safety": 78.4,
-    "total": 51.2,
-    "value": 35.0,
+    "total": 51.4,
+    "value": 35.9,
     "weight_coverage": 0.95
   },
   "sector": "Makine ve bilgisayar donanimi",
