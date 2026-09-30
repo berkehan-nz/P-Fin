@@ -49,6 +49,17 @@ jobs:
           FRED_API_KEY:    ${{ secrets.FRED_API_KEY }}
         run: python -m src.run_pulse
 
+      # YEDEK PORTFOY TAZELEMESI. Ayrica saatlik portfolio.yml var, ama GitHub
+      # yeni bir zamanlamayi saatlerce baslatmayabiliyor ve saatlik kurulu
+      # kosulari birkac saatte bire dusuruyor. Nabiz zaten duzenli donuyor;
+      # portfoy fiyatlari onunla da tazelenir. Hata nabzi DURDURMAZ.
+      - name: Portfoy (yedek)
+        continue-on-error: true
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: python -m src.run_portfolio
+
       - name: Commit
         run: |
-          scripts/commit_data.sh "veri: nabiz $(date -u +'%Y-%m-%d %H:%M')" data/pulse.json data/macro.json
+          scripts/commit_data.sh "veri: nabiz $(date -u +'%Y-%m-%d %H:%M')" \
+            data/pulse.json data/macro.json data/portfolio_state.json data/portfolio_history.json
