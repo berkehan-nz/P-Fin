@@ -25,7 +25,7 @@
           "status": "gray"
         },
         {
-          "detail": "son 91 gunde %5.1",
+          "detail": "son 91 gunde %5.0",
           "key": "kur_temposu",
           "label": "Kur temposu ceyrekte %7'nin altinda",
           "status": "green"
@@ -77,32 +77,49 @@
   "closed": [],
   "dividends_unknown": [],
   "performance": {
-    "as_of": "2026-09-29",
+    "as_of": "2026-09-30",
     "benchmarks": {
       "all_qqq_usd": 2390.35,
       "all_sgov_usd": 2390.35,
-      "all_tl_usd": 2453.96
+      "all_tl_usd": 2455.22
     },
     "complete": true,
-    "day_change_pct": null,
-    "day_change_usd": null,
+    "day_change_pct": 0.03,
+    "day_change_usd": 0.63,
     "days": 1,
     "inception": "2026-09-29",
     "invested_usd": 2390.35,
     "missing": [],
-    "peak_value_usd": 2412.66,
-    "positions_day": {},
-    "prev_date": null,
-    "return_pct": 0.93,
-    "return_try_pct": -1.68,
-    "return_usd": 22.31,
+    "peak_value_usd": 2413.29,
+    "positions_day": {
+      "QQQM": {
+        "pct": 0.0,
+        "usd": 0.0
+      },
+      "SGOV": {
+        "pct": 0.0,
+        "usd": 0.0
+      },
+      "TL-ISBANK": {
+        "pct": 0.05,
+        "usd": 0.63
+      },
+      "VOO": {
+        "pct": 0.0,
+        "usd": 0.0
+      }
+    },
+    "prev_date": "2026-09-29",
+    "return_pct": 0.96,
+    "return_try_pct": -1.63,
+    "return_usd": 22.94,
     "status": "aktif",
-    "usdtry": 48.9962,
-    "value_try": 118211.17,
-    "value_usd": 2412.66,
-    "vs_all_qqq_usd": 22.31,
-    "vs_all_sgov_usd": 22.31,
-    "vs_all_tl_usd": -41.3
+    "usdtry": 49.0122,
+    "value_try": 118280.65,
+    "value_usd": 2413.29,
+    "vs_all_qqq_usd": 22.94,
+    "vs_all_sgov_usd": 22.94,
+    "vs_all_tl_usd": -41.93
   },
   "positions": [
     {
@@ -122,7 +139,7 @@
       "next_earnings": null,
       "notes": "Berke'nin tezi: kur tutuluyor, faiz inmiyor. USD->TRY cevrimi Midas'ta 50,3 kurundan. Stopaj orani teyit edilecek.",
       "pnl_pct": 2.71,
-      "pnl_usd": 32.34,
+      "pnl_usd": 32.37,
       "price": null,
       "price_as_of": null,
       "principal_try": 60000.0,
@@ -159,18 +176,18 @@
         "usdtry_breakeven": 54.1796,
         "usdtry_breakeven_vs_sgov": 53.6254,
         "usdtry_market_at_start": 48.9962,
-        "usdtry_now": 49.01350021362305,
+        "usdtry_now": 49.01219940185547,
         "usdtry_used_pct": -33.2,
         "value_try": 60050.3,
         "value_try_at_maturity": 64627.73,
-        "value_usd": 1225.18,
+        "value_usd": 1225.21,
         "withholding_pct": 15.0,
         "withholding_try": 8.88
       },
       "type": "GERCEK",
       "upside_to_target_pct": null,
       "usdtry_at_entry": 50.3,
-      "value_usd": 1225.18,
+      "value_usd": 1225.21,
       "vs_benchmark": {
         "kucuk_deger": {
           "benchmark_return_pct": null,
@@ -325,29 +342,29 @@
       "weight_pct": 9.61
     }
   ],
-  "priced_at": "2026-09-30T09:09:54+00:00",
+  "priced_at": "2026-09-30T09:12:12+00:00",
   "source": "manual+prices",
   "summary": {
     "cash_usd": 149.04,
     "cost_usd": 2241.31,
-    "equity_value_usd": 2264.22,
+    "equity_value_usd": 2264.25,
     "fx": {
       "as_of": "2026-09-30",
       "change_1w_pct": 0.36,
       "pair": "USDTRY",
-      "rate": 49.01350021362305,
+      "rate": 49.01219940185547,
       "source": "stooq/yfinance"
     },
     "fx_pace": {
       "as_of": "2026-09-30",
-      "change_quarter_pct": 5.06,
+      "change_quarter_pct": 5.05,
       "change_since_entry_pct": -2.56,
       "color": "yellow",
-      "rate": 49.01350021362305,
+      "rate": 49.01219940185547,
       "window_days": 91
     },
     "largest_position_pct": null,
-    "peak_value_usd": 2413.26,
+    "peak_value_usd": 2413.29,
     "phase": {
       "end": "2026-11-16",
       "key": "faz0",
@@ -355,9 +372,9 @@
       "start": "2026-09-01"
     },
     "pnl_pct": 1.02,
-    "pnl_usd": 22.91,
-    "portfolio_value_try": 118282.41,
-    "portfolio_value_usd": 2413.26,
+    "pnl_usd": 22.94,
+    "portfolio_value_try": 118280.74,
+    "portfolio_value_usd": 2413.29,
     "position_count": 4,
     "sector_mix_pct": {},
     "slices": [
@@ -395,7 +412,7 @@
         "off_target": false,
         "slice": "tl",
         "target_pct": 50.0,
-        "value_usd": 1225.18
+        "value_usd": 1225.21
       },
       {
         "actual_pct": 6.18,
@@ -425,7 +442,7 @@
         "status": "gray"
       },
       {
-        "detail": "son 91 gunde %5.1",
+        "detail": "son 91 gunde %5.0",
         "key": "kur_temposu",
         "label": "Kur temposu ceyrekte %7'nin altinda",
         "status": "green"
