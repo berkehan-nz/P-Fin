@@ -770,6 +770,14 @@ PORTFOLIO = {
     "ticker_slice": {"SGOV": "sgov"},
 }
 
+# SAATLIK PORTFOY KOSUSU (src/run_portfolio.py, portfolio.yml).
+# Gunluk kosu ~10:30 UTC'de, ABD piyasasi ACILMADAN calisiyor; yalnizca
+# portfoy fiyatlari icin bu yetmez — 29 Eylul'de alinan pozisyonlar 30
+# Eylul ogleden sonrasina kadar "baslamadi" gorundu. Bu kosu yalnizca eldeki
+# varliklari, kiyas serilerini ve kuru TAZE ceker (onbellek penceresi kisa).
+# stale_after_hours: pano bu kadar eski fiyati acikca "bayat" diye isaretler.
+PORTFOLIO_REFRESH = {"max_age_hours": 0.25, "stale_after_hours": 26}
+
 # USD/TRY tempo esikleri — CEYREKLIK (son 91 gun) degisim, %.
 # TL mevduat tezi "kur tutuluyor" varsayimina dayaniyor; tempo bu tezin
 # nabzidir. Yesil < 4, sari 4-7, kirmizi > 7.

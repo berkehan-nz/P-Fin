@@ -318,6 +318,7 @@ Claude'un analizini ve Berke'nin kararini silerdi.
 | **Bootstrap (tohum listesi)** | elle | 36 tohum sirket icin kart uretir — **ilk is bu** |
 | **Scan (saatlik evren taramasi)** | her saat :25 | kuyruktan 120 sirket isler; kuyruk bitince Asama 3-4 + kartlar |
 | **Daily (fiyat ve haber)** | hafta ici 07:00 TSI | fiyat, momentum, haber, kazanc takvimi, portfoy + `merge_story()` |
+| **Portfoy (saatlik fiyat)** | hafta ici her saat :40 | yalnizca eldeki varliklar + USD/TRY, TAZE fiyatla; genel bakistaki deger, "bugun" degisimi ve tarihce. Elle: Actions → Run workflow |
 | **Weekly (SEC toplu veri + yeni tur)** | pazar 05:00 TSI | yeni ceyrek verisini indirir, evren listesini tazeler, yeni tur baslatir |
 | **Merge (analiz birlestirme)** | `claude_inbox/` degisince | inbox dosyalarini dogrular ve kartlara isler (~30 sn, ag gerektirmez) |
 | **Tests** | her push | pytest + JSON gecerlilik |

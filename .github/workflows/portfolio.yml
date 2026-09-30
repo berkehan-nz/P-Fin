@@ -1,0 +1,58 @@
+# PORTFOY — saatlik, hafif. Genel bakistaki "bugun nasil gitti" icin.
+#
+# Neden ayri is akisi: gunluk kosu ~10:30 UTC'de (ABD piyasasi ACILMADAN)
+# calisiyor ve yuzlerce karti isliyor. Portfoy fiyatlari yalnizca oradan
+# gelirken 29 Eylul'de alinan pozisyonlar ertesi gun ogleye kadar
+# "baslamadi" gorundu. Bu kosu yalnizca eldeki varliklari + kuru TAZE ceker
+# (1-2 dakika) ve yalnizca iki dosyaya yazar.
+#
+# GERCEKCI BEKLENTI: GitHub zamanlanmis kosulari en iyi cabayla calistirir;
+# saatlik kurulu bir kosu pratikte birkac saatte bir donebilir. Pano
+# "fiyatlar ... once guncellendi" damgasini gosterir. Hemen tazelemek icin:
+# Actions -> Portfoy (saatlik fiyat) -> Run workflow.
+name: Portfoy (saatlik fiyat)
+
+on:
+  schedule:
+    - cron: '40 * * * 1-5'      # hafta ici her saat (kur TSI gunduz, ABD aksam hareket eder)
+    - cron: '40 0-2 * * 6'      # cuma kapanisi cumartesi sabahina sarkar
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  # Veri hattindan (finans-veri) AYRI grup: tarama partisi 26 dk surerken
+  # beklemesin ve ayni gruptaki bekleyen kosular birbirini iptal etmesin.
+  # Gunluk kosu da bu iki dosyaya yazar; commit_data.sh cakismada bu
+  # kosunun (daha taze) surumunu tutar.
+  group: finans-portfoy
+  cancel-in-progress: false
+
+jobs:
+  portfolio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      # Paylasilan .cache BILEREK geri yuklenmiyor: saatlik kosu her seferinde
+      # yeni bir onbellek kaydi birakir ve taramanin SEC onbellegini 10 GB
+      # sinirindan disari itebilirdi. Bu kosu zaten taze fiyat istiyor;
+      # dagitim ve kazanc takvimi birer istek.
+      - name: Portfoy
+        env:
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: python -m src.run_portfolio
+
+      - name: Commit
+        run: |
+          scripts/commit_data.sh "veri: portfoy $(date -u +'%Y-%m-%d %H:%M')" \
+            data/portfolio_state.json data/portfolio_history.json

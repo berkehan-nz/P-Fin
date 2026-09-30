@@ -8,7 +8,7 @@ from .fundamentals import Fundamentals
 from .sources import (analyst as analyst_src, edgar_api, edgar_bulk,
                       finnhub_api, finra_short, fred_api, prices)
 from . import overrides
-from .util import read_json, today_iso, try_fetch, write_json
+from .util import read_json, today_iso, try_fetch, utc_now_iso, write_json
 
 
 def load_company(ticker: str, *, with_price: bool = True,
@@ -323,12 +323,17 @@ def append_funnel_log(log: dict, *, partial: bool = False, cycle: int | None = N
     return write_json(path, {"runs": runs, "source": "funnel"})
 
 
-def write_portfolio_state(quotes: dict, bench: dict, ctx: dict) -> bool:
+def write_portfolio_state(quotes: dict, bench: dict, ctx: dict, *,
+                          max_age_hours: float = 12) -> bool:
     """Portfoy durumu + tarihce. POZISYON YOKKEN DE yazar.
 
     Sira onemli: once tarihce (zirve degeri ve gunluk degisim oradan gelir),
     sonra durum. Ikisi AYNI fiyat, kur ve dagitim verisini kullanir; aksi
     halde genel bakistaki "toplam" ile grafigin son noktasi ayrisirdi.
+
+    ``max_age_hours``: fiyat onbellegi. Gunluk kosu 12 saatlik onbellegi
+    kullanir (yuzlerce kart); saatlik portfoy kosusu TAZE fiyat ister —
+    onbellekten okursa "guncelleme" eski fiyati yeniden yazar.
     """
     from . import history
 
@@ -347,7 +352,8 @@ def write_portfolio_state(quotes: dict, bench: dict, ctx: dict) -> bool:
 
     price_series = {}
     for t in needed:
-        rows = try_fetch(prices.history, t, label=f"fiyat serisi {t}") or []
+        rows = try_fetch(prices.history, t, max_age_hours=max_age_hours,
+                         label=f"fiyat serisi {t}") or []
         price_series[t] = [(r["date"], r["close"]) for r in rows]
     divs = {t: try_fetch(prices.dividends, t, label=f"dagitim {t}") for t in needed}
 
@@ -366,6 +372,9 @@ def write_portfolio_state(quotes: dict, bench: dict, ctx: dict) -> bool:
                               tbill_pct=tbill, peak_value=perf.get("peak_value_usd"))
     state["performance"] = perf
     state["dividends_unknown"] = sorted(t for t in held if divs.get(t) is None)
+    # Fiyatlarin CEKILDIGI an. as_of yalnizca gunu soyler; pano "kac saat
+    # once" sorusunu bununla cevaplar ve bayat veriyi acikca isaretler.
+    state["priced_at"] = utc_now_iso()
     # stamp_matters: icerik ayni olsa bile "as_of" tazelensin.
     return write_json(DATA_DIR / "portfolio_state.json", state, stamp_matters=True)
 

@@ -63,19 +63,26 @@ window.ViewOverview = (function () {
     const s = port.summary || {};
     const el = $('ovHero');
 
+    const tazelik = freshnessLine(port);
+
     if (perf.status !== 'aktif') {
-      const kalan = perf.days_to_start;
+      const kalan = daysFromToday(perf.inception);
+      // Baslangic gunu GECMISSE "basliyor" demek yanlis: pozisyonlar alindi,
+      // yalnizca ilk kapanis fiyati henuz islenmedi.
+      const metin = Fmt.isNum(kalan) && kalan > 0
+        ? `Pozisyonlar <b>${Fmt.esc(shortDate(perf.inception))}</b> tarihinde basliyor
+           (${kalan} gun sonra). Ilk kapanistan sonra deger ve "bugun" degisimi burada.`
+        : `Pozisyonlar <b>${Fmt.esc(shortDate(perf.inception))}</b> tarihinde alindi;
+           ilk kapanis fiyati henuz islenmedi. Portfoy fiyatlari saatlik tazelenir —
+           bir sonraki kosuda deger ve "bugun" degisimi burada.`;
       el.innerHTML = `<div class="card ov-hero">
-        <div class="ov-label">Portfoy degeri · maliyet uzerinden</div>
+        <div class="ov-label">Portfoy degeri · henuz fiyatlanmayanlar maliyetten</div>
         <div class="ov-big">${usd(s.portfolio_value_usd)}</div>
         <div class="ov-sub">${tl(s.portfolio_value_try)} karsiligi${
           Fmt.isNum((s.fx || {}).rate) ? ` · USD/TRY ${Fmt.num(s.fx.rate, 2)}` : ''}</div>
-        <p class="small muted" style="margin:12px 0 0">
-          Pozisyonlar <b>${Fmt.esc(shortDate(perf.inception))}</b> tarihinde basliyor${
-            Fmt.isNum(kalan) && kalan > 0 ? ` (${kalan} gun sonra)` : ''}.
-          Ilk kapanistan sonraki sabah gunluk kosu ilk satiri yazar; "bugun"
-          degisimi ikinci kapanistan itibaren gorunur. Yatirilan sermaye
-          <b>${usd(perf.invested_usd)}</b>, fark komisyon.</p>
+        ${tazelik}
+        <p class="small muted" style="margin:12px 0 0">${metin}
+          Yatirilan sermaye <b>${usd(perf.invested_usd)}</b>, fark komisyon.</p>
       </div>`;
       return;
     }
@@ -105,6 +112,7 @@ window.ViewOverview = (function () {
           <div class="ov-label">Portfoy degeri · ${Fmt.esc(shortDate(perf.as_of))} kapanisi</div>
           <div class="ov-big">${usd(perf.value_usd)}</div>
           <div class="ov-sub">${tl(perf.value_try)} · USD/TRY ${Fmt.num(perf.usdtry, 2)}</div>
+          ${tazelik}
         </div>
         <div class="ov-today">
           <div class="ov-label">Bugun</div>
@@ -125,6 +133,26 @@ window.ViewOverview = (function () {
       </div>
       ${eksik}
     </div>`;
+  }
+
+  /* FIYAT TAZELIGI. "Guncel durumumu goremiyorum" sikayetinin kaynagi:
+     fiyatlar yalnizca gunluk kosuda, ABD piyasasi acilmadan cekiliyordu ve
+     ekran bunu soylemiyordu. Artik ne zaman cekildigi hep gorunur; bayatsa
+     sari uyari ve elle tazeleme yolu. */
+  function freshnessLine(port) {
+    const stamp = port.priced_at || port.as_of;
+    const saat = Fmt.hoursSince(stamp);
+    const gunler = (port.positions || []).map((p) => p.price_as_of).filter(Boolean).sort();
+    const fiyatGunu = gunler.length ? gunler[gunler.length - 1] : null;
+    const esik = 26;
+    const ne = `${fiyatGunu ? `fiyat tarihi ${Fmt.esc(shortDate(fiyatGunu))} · ` : ''}${
+      port.priced_at ? `${Fmt.esc(Fmt.sinceLabel(port.priced_at))} cekildi` : 'cekilme saati bilinmiyor'}`;
+    if (saat === null || saat > esik) {
+      return `<p class="tiny c-yellow" style="margin:6px 0 0">⚠ Fiyatlar bayat: ${ne}.
+        Otomatik kosu gecikmis olabilir; hemen tazelemek icin GitHub &rarr; Actions &rarr;
+        <b>Portfoy (saatlik fiyat)</b> &rarr; Run workflow.</p>`;
+    }
+    return `<p class="tiny dim" style="margin:6px 0 0">${ne}</p>`;
   }
 
   /* -------------------------------------------------- g) 30 gunluk grafik */
