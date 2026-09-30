@@ -205,3 +205,23 @@ class TestLotsAndDayChange:
         rows = H.rebuild(base_data(), price_series=ps, dividends=divs, fx_series=fx)
         day = H.positions_day(rows[0], rows[1])
         assert day["TL-X"]["usd"] == pytest.approx(1.0, abs=0.01)  # 50 TL / 50
+
+
+class TestFxDayBeforeUsOpen:
+    def test_todays_fx_adds_a_row_before_us_open(self):
+        """TSI sabahi: ETF fiyati dunku, kur bugunku. Bugunun satiri olmali
+        ki toplam ile pozisyon tablosu ayni gunu gostersin."""
+        ps, divs, fx = series()
+        fx = fx + [("2026-10-05", 51.0)]          # pazartesi, ABD henuz acilmadi
+        rows = H.rebuild(base_data(), price_series=ps, dividends=divs,
+                         fx_series=fx, upto="2026-10-05")
+        assert rows[-1]["date"] == "2026-10-05"
+        assert rows[-1]["positions"]["SGOV"]["price"] == 99.70   # dunku kapanis
+        assert rows[-1]["usdtry"] == 51.0
+
+    def test_weekend_fx_quote_adds_no_row(self):
+        ps, divs, fx = series()
+        fx = fx + [("2026-10-03", 51.0)]          # cumartesi
+        rows = H.rebuild(base_data(), price_series=ps, dividends=divs,
+                         fx_series=fx, upto="2026-10-03")
+        assert rows[-1]["date"] == DAYS[-1]

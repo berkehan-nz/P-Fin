@@ -269,6 +269,11 @@ window.ViewOverview = (function () {
       if (g && Fmt.isNum(g.usd)) {
         return `${delta(g.usd, signedUsd(g.usd))}<div class="tiny">${delta(g.pct, Fmt.signedPct(g.pct, 2))}</div>`;
       }
+      // Yedek: kaynagin gunluk degisimi. Alim GUNUNDE kullanilmaz — o gunun
+      // degisimi alimdan onceki hareketi de icerir; ilk gunun sonucu
+      // "Toplam K/Z"dedir.
+      const ilkGun = p.entry_date && p.price_as_of && p.entry_date >= p.price_as_of;
+      if (ilkGun) return '<span class="dim tiny">ilk gun</span>';
       if (p.started && Fmt.isNum(p.change_1d_pct) && Fmt.isNum(p.value_usd)) {
         const d = p.value_usd * p.change_1d_pct / (100 + p.change_1d_pct);
         return `${delta(d, signedUsd(d))}<div class="tiny">${delta(p.change_1d_pct, Fmt.signedPct(p.change_1d_pct, 2))}</div>`;

@@ -281,6 +281,16 @@ def trading_days(data: dict, price_series: dict, fx_series: list,
         days |= {str(d)[:10] for d, _ in price_series.get(t) or []}
     if not days:
         days = {str(d)[:10] for d, _ in fx_series or []}
+    # KURUN BUGUNU. TSI sabahi ABD piyasasi henuz acilmamisken USD/TRY ve
+    # mevduat faizi zaten hareket ediyor. Bu gun satir olarak eklenmezse
+    # genel bakisin toplami dunku kapanista kalir, pozisyon tablosu ise
+    # TL'yi bugunku kurla gosterir — iki sayi ayrisir. ETF'ler o gun icin
+    # bir onceki kapanisla degerlenir; ABD acilinca ayni satir guncellenir.
+    fx_days = sorted(str(d)[:10] for d, _ in fx_series or [])
+    if fx_days and days:
+        last_fx = fx_days[-1]
+        if last_fx > max(days) and date.fromisoformat(last_fx).weekday() < 5:
+            days.add(last_fx)
     return sorted(d for d in days if start <= d <= upto)
 
 
