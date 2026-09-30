@@ -16,6 +16,19 @@ on:
   schedule:
     - cron: '40 * * * 1-5'      # hafta ici her saat (kur TSI gunduz, ABD aksam hareket eder)
     - cron: '40 0-2 * * 6'      # cuma kapanisi cumartesi sabahina sarkar
+  # Portfoy girdisi ya da hesabi degisince HEMEN tazele: yeni bir pozisyon
+  # (MCP PR'i birlesince data/portfolio.json) saatlik kosuyu beklemesin.
+  # Bot commit'leri (GITHUB_TOKEN) is akisi tetiklemez; bu kosunun kendi
+  # yazdigi dosyalar da listede yok — dongu olusmaz.
+  push:
+    branches: [main]
+    paths:
+      - 'data/portfolio.json'
+      - 'data/tr_macro.json'
+      - 'src/portfolio.py'
+      - 'src/history.py'
+      - 'src/run_portfolio.py'
+      - '.github/workflows/portfolio.yml'
   workflow_dispatch:
 
 permissions:
