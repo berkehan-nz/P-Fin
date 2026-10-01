@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-30",
+  "as_of": "2026-10-01",
   "candidates": [
     {
       "as_of": "2026-09-30",
@@ -6937,6 +6937,147 @@
       "warnings": [
         "Buyume satin alma kaynakli olabilir; serefiye artisi ve 8-K devralma duyurulari kontrol edilmeli.",
         "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (cost_of_revenue). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
+      ],
+      "why_cheap": ""
+    },
+    {
+      "as_of": "2026-10-01",
+      "claude_verdict": "",
+      "core": {
+        "fcf_yield_ev": 4.07,
+        "gross_margin": 38.27,
+        "net_debt_to_ebitda": -1.55,
+        "piotroski_f": 6.0,
+        "rev_growth_ttm": 5.4,
+        "roic": 56.59
+      },
+      "data_quality": "sinirli",
+      "decision": "",
+      "flags": {
+        "is_manual": false,
+        "one_off_earnings": false,
+        "rev_growth_organic_suspect": false,
+        "z_unreliable": false
+      },
+      "headline": {
+        "ev_ebit": {
+          "color": "yellow",
+          "own_5y_pct": null,
+          "pct_basis": "universe",
+          "sector_pct": 27.8,
+          "value": 13.78
+        },
+        "fcf_yield_ev": {
+          "color": "yellow",
+          "own_5y_pct": 0.0,
+          "pct_basis": "universe",
+          "sector_pct": 43.2,
+          "value": 4.07
+        },
+        "roic": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "universe",
+          "sector_pct": 87.1,
+          "value": 56.59
+        }
+      },
+      "low_coverage_blocks": {},
+      "market_cap_musd": 1890.7,
+      "name": "IDT CORP",
+      "percentile_pool": {
+        "sector": 5,
+        "universe": 170
+      },
+      "price": 75.56,
+      "price_as_of": "2026-09-29",
+      "scores": {
+        "catalyst": null,
+        "coverage_factors": {
+          "earnings_quality": 1.0,
+          "momentum": 1.0,
+          "quality": 1.0,
+          "safety": 1.0,
+          "value": 1.0
+        },
+        "earnings_quality": 21.8,
+        "momentum": 89.6,
+        "quality": 49.9,
+        "safety": 70.6,
+        "total": 59.0,
+        "value": 68.2,
+        "weight_coverage": 0.75
+      },
+      "sector": "Iletisim",
+      "source": "funnel",
+      "sparkline": [
+        49.1,
+        48.47,
+        48.77,
+        50.01,
+        49.66,
+        51.27,
+        52.28,
+        51.98,
+        51.79,
+        52.19,
+        50.15,
+        51.88,
+        52.61,
+        52.16,
+        51.96,
+        52.0,
+        53.18,
+        52.69,
+        52.15,
+        54.05,
+        55.97,
+        54.03,
+        55.09,
+        55.5,
+        54.63,
+        54.09,
+        55.42,
+        54.07,
+        55.92,
+        57.95,
+        58.82,
+        61.08,
+        59.97,
+        61.4,
+        62.87,
+        63.16,
+        63.35,
+        62.71,
+        67.88,
+        65.94,
+        66.41,
+        66.03,
+        65.08,
+        65.4,
+        67.12,
+        66.46,
+        66.19,
+        68.29,
+        69.1,
+        68.99,
+        68.35,
+        68.73,
+        68.36,
+        69.42,
+        71.02,
+        69.05,
+        68.84,
+        67.87,
+        67.46,
+        75.56
+      ],
+      "story_age_days": null,
+      "ticker": "IDT",
+      "track": "A",
+      "warning_count": 1,
+      "warnings": [
+        "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (revenue, cost_of_revenue, gross_profit, operating_income, net_income, cfo). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
       ],
       "why_cheap": ""
     },
@@ -14157,7 +14298,7 @@
     }
   ],
   "counts": {
-    "funnel": 100,
+    "funnel": 101,
     "manual": 0,
     "seed": 36
   },
@@ -14165,12 +14306,12 @@
   "partial": {
     "cycle": 6,
     "is_partial": true,
-    "last_batch_at": "2026-09-30T19:33:43+00:00",
-    "pct": 39.3,
+    "last_batch_at": "2026-10-01T00:02:28+00:00",
+    "pct": 47.2,
     "ranked": 50,
-    "remaining": 2315,
-    "scanned": 1500,
-    "survivors": 140,
+    "remaining": 2015,
+    "scanned": 1800,
+    "survivors": 170,
     "universe": 3815
   },
   "seed": [
