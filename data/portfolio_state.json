@@ -3,7 +3,7 @@
     {
       "amount_usd": 149.0,
       "date": "2026-10-30",
-      "days": 30,
+      "days": 29,
       "kind": "alim",
       "note": "ikinci parca",
       "ticker": "QQQM",
@@ -11,7 +11,7 @@
     },
     {
       "date": "2026-11-16",
-      "days": 47,
+      "days": 46,
       "kind": "faz",
       "note": "hedef: Motor (tek hisse) %25, Cekirdek ETF %30, SGOV (nakit capasi) %10, TL mevduat %35",
       "title": "Faz 1 — ilk hisseler basliyor"
@@ -25,7 +25,7 @@
           "status": "gray"
         },
         {
-          "detail": "son 91 gunde %5.1",
+          "detail": "son 91 gunde %5.0",
           "key": "kur_temposu",
           "label": "Kur temposu ceyrekte %7'nin altinda",
           "status": "green"
@@ -38,37 +38,37 @@
         }
       ],
       "date": "2026-12-30",
-      "days": 91,
+      "days": 90,
       "kind": "vade",
       "note": "yenileme karari",
       "title": "TL mevduat vadesi (İş Bankası)"
     },
     {
       "date": "2027-03-01",
-      "days": 152,
+      "days": 151,
       "kind": "faz",
       "note": "hedef: Motor (tek hisse) %40, Cekirdek ETF %30, SGOV (nakit capasi) %10, TL mevduat %20",
       "title": "Faz 2 — tam motor basliyor"
     }
   ],
-  "as_of": "2026-09-30",
+  "as_of": "2026-10-01",
   "calendar": [
     {
       "date": "2026-10-27",
-      "days": 27,
+      "days": 26,
       "end": "2026-10-28",
       "kind": "fed",
       "title": "FOMC toplantisi"
     },
     {
       "date": "2026-11-03",
-      "days": 34,
+      "days": 33,
       "kind": "politika",
       "title": "ABD ara secimi"
     },
     {
       "date": "2026-12-08",
-      "days": 69,
+      "days": 68,
       "end": "2026-12-09",
       "kind": "fed",
       "title": "FOMC toplantisi"
@@ -77,49 +77,49 @@
   "closed": [],
   "dividends_unknown": [],
   "performance": {
-    "as_of": "2026-09-30",
+    "as_of": "2026-10-01",
     "benchmarks": {
-      "all_qqq_usd": 2396.31,
+      "all_qqq_usd": 2390.35,
       "all_sgov_usd": 2390.35,
-      "all_tl_usd": 2454.4
+      "all_tl_usd": 2458.12
     },
     "complete": true,
-    "day_change_pct": 0.02,
-    "day_change_usd": 0.5,
-    "days": 1,
+    "day_change_pct": 0.07,
+    "day_change_usd": 1.58,
+    "days": 2,
     "inception": "2026-09-29",
     "invested_usd": 2390.35,
     "missing": [],
-    "peak_value_usd": 2413.16,
+    "peak_value_usd": 2414.74,
     "positions_day": {
       "QQQM": {
-        "pct": 0.27,
-        "usd": 0.81
+        "pct": -0.27,
+        "usd": -0.81
       },
       "SGOV": {
         "pct": 0.0,
         "usd": 0.0
       },
       "TL-ISBANK": {
-        "pct": 0.02,
-        "usd": 0.22
+        "pct": 0.15,
+        "usd": 1.86
       },
       "VOO": {
-        "pct": -0.23,
-        "usd": -0.53
+        "pct": 0.23,
+        "usd": 0.53
       }
     },
-    "prev_date": "2026-09-29",
-    "return_pct": 0.95,
+    "prev_date": "2026-09-30",
+    "return_pct": 1.02,
     "return_try_pct": -1.6,
-    "return_usd": 22.81,
+    "return_usd": 24.39,
     "status": "aktif",
-    "usdtry": 49.0286,
-    "value_try": 118313.85,
-    "value_usd": 2413.16,
-    "vs_all_qqq_usd": 16.85,
-    "vs_all_sgov_usd": 22.81,
-    "vs_all_tl_usd": -41.24
+    "usdtry": 48.9953,
+    "value_try": 118310.91,
+    "value_usd": 2414.74,
+    "vs_all_qqq_usd": 24.39,
+    "vs_all_sgov_usd": 24.39,
+    "vs_all_tl_usd": -43.38
   },
   "positions": [
     {
@@ -129,17 +129,17 @@
       "broker": "İş Bankası",
       "change_1d_pct": null,
       "cost_usd": 1192.84,
-      "days_to_review": 91,
+      "days_to_review": 90,
       "dividends_usd": 0.0,
       "entry_date": "2026-09-29",
       "entry_price": 0.0,
       "fees_usd": 0.0,
-      "holding_days": 1,
+      "holding_days": 2,
       "maturity_date": "2026-12-30",
       "next_earnings": null,
       "notes": "Berke'nin tezi: kur tutuluyor, faiz inmiyor. USD->TRY cevrimi Midas'ta 50,3 kurundan. Stopaj orani teyit edilecek.",
-      "pnl_pct": 2.68,
-      "pnl_usd": 31.96,
+      "pnl_pct": 2.83,
+      "pnl_usd": 33.82,
       "price": null,
       "price_as_of": null,
       "principal_try": 60000.0,
@@ -159,15 +159,15 @@
         "breakeven_headroom_pct": 7.71,
         "breakeven_vs_sgov_headroom_pct": 6.62,
         "daily_net_interest_try": 50.3,
-        "days_to_maturity": 91,
-        "elapsed_days": 1,
+        "days_to_maturity": 90,
+        "elapsed_days": 2,
         "entry_rate_suspect": true,
         "entry_vs_market_pct": 2.66,
-        "gross_interest_try": 59.18,
+        "gross_interest_try": 118.36,
         "matured": false,
         "maturity_date": "2026-12-30",
-        "net_interest_try": 50.3,
-        "net_interest_usd": 1.03,
+        "net_interest_try": 100.6,
+        "net_interest_usd": 2.05,
         "principal_try": 60000.0,
         "start_date": "2026-09-29",
         "tbill_pct_used": 4.07,
@@ -176,53 +176,53 @@
         "usdtry_breakeven": 54.1796,
         "usdtry_breakeven_vs_sgov": 53.6294,
         "usdtry_market_at_start": 48.9962,
-        "usdtry_now": 49.02859878540039,
-        "usdtry_used_pct": -32.8,
-        "value_try": 60050.3,
+        "usdtry_now": 48.99530029296875,
+        "usdtry_used_pct": -33.6,
+        "value_try": 60100.6,
         "value_try_at_maturity": 64627.73,
-        "value_usd": 1224.8,
+        "value_usd": 1226.66,
         "withholding_pct": 15.0,
-        "withholding_try": 8.88
+        "withholding_try": 17.75
       },
       "type": "GERCEK",
       "upside_to_target_pct": null,
       "usdtry_at_entry": 50.3,
-      "value_usd": 1224.8,
+      "value_usd": 1226.66,
       "vs_benchmark": {
         "kucuk_deger": {
           "benchmark_return_pct": null,
           "excess_pct": null
         },
         "nasdaq100": {
-          "benchmark_return_pct": 0.79,
-          "excess_pct": 1.89
+          "benchmark_return_pct": 0.0,
+          "excess_pct": 2.83
         },
         "sp500": {
-          "benchmark_return_pct": -0.21,
-          "excess_pct": 2.89
+          "benchmark_return_pct": 0.0,
+          "excess_pct": 2.83
         }
       },
-      "weight_pct": 50.75,
+      "weight_pct": 50.8,
       "withholding_confirmed": false,
       "withholding_pct": 15.0
     },
     {
       "asset_class": "ETF",
       "broker": "Midas",
-      "change_1d_pct": 0.0,
+      "change_1d_pct": 0.009935568106089754,
       "cost_usd": 506.3,
-      "days_to_review": 47,
+      "days_to_review": 46,
       "dividends_usd": 0.0,
       "entry_date": "2026-09-29",
       "entry_price": 100.96,
       "fees_usd": 1.5,
-      "holding_days": 1,
+      "holding_days": 2,
       "next_earnings": null,
       "notes": "Nakit capasi. Kasim ortasi (Faz 1) hisse alimlarinin kaynagi.",
       "pnl_pct": -0.57,
       "pnl_usd": -2.9,
       "price": 100.68000030517578,
-      "price_as_of": "2026-09-30",
+      "price_as_of": "2026-09-29",
       "review_date": "2026-11-16",
       "sector": "",
       "shares": 5.0,
@@ -241,33 +241,33 @@
           "excess_pct": null
         },
         "nasdaq100": {
-          "benchmark_return_pct": 0.79,
-          "excess_pct": -1.36
+          "benchmark_return_pct": 0.0,
+          "excess_pct": -0.57
         },
         "sp500": {
-          "benchmark_return_pct": -0.21,
-          "excess_pct": -0.36
+          "benchmark_return_pct": 0.0,
+          "excess_pct": -0.57
         }
       },
-      "weight_pct": 20.86
+      "weight_pct": 20.85
     },
     {
       "asset_class": "ETF",
       "broker": "Midas",
-      "change_1d_pct": 0.26660570449625887,
+      "change_1d_pct": 0.1780401635828266,
       "cost_usd": 306.44,
       "days_to_review": null,
       "dividends_usd": 0.0,
       "entry_date": "2026-09-29",
       "entry_price": 304.94,
       "fees_usd": 1.5,
-      "holding_days": 1,
+      "holding_days": 2,
       "next_earnings": null,
       "notes": "Cekirdek ETF, ilk parca. Ikinci parca 30 Ekim.",
-      "pnl_pct": -0.59,
-      "pnl_usd": -1.8,
-      "price": 304.6400146484375,
-      "price_as_of": "2026-09-30",
+      "pnl_pct": -0.85,
+      "pnl_usd": -2.61,
+      "price": 303.8299865722656,
+      "price_as_of": "2026-09-29",
       "review_date": "",
       "sector": "",
       "shares": 1.0,
@@ -279,40 +279,40 @@
       "ticker": "QQQM",
       "type": "GERCEK",
       "upside_to_target_pct": null,
-      "value_usd": 304.64,
+      "value_usd": 303.83,
       "vs_benchmark": {
         "kucuk_deger": {
           "benchmark_return_pct": null,
           "excess_pct": null
         },
         "nasdaq100": {
-          "benchmark_return_pct": 0.79,
-          "excess_pct": -1.38
+          "benchmark_return_pct": 0.0,
+          "excess_pct": -0.85
         },
         "sp500": {
-          "benchmark_return_pct": -0.21,
-          "excess_pct": -0.38
+          "benchmark_return_pct": 0.0,
+          "excess_pct": -0.85
         }
       },
-      "weight_pct": 12.62
+      "weight_pct": 12.58
     },
     {
       "asset_class": "ETF",
       "broker": "Midas",
-      "change_1d_pct": -0.2277761824225233,
+      "change_1d_pct": -0.16343761499230114,
       "cost_usd": 235.73,
       "days_to_review": null,
       "dividends_usd": 0.0,
       "entry_date": "2026-09-29",
       "entry_price": 709.79,
       "fees_usd": 1.5,
-      "holding_days": 1,
+      "holding_days": 2,
       "next_earnings": null,
       "notes": "Cekirdek ETF (kesirli).",
-      "pnl_pct": -1.89,
-      "pnl_usd": -4.45,
-      "price": 700.8599853515625,
-      "price_as_of": "2026-09-30",
+      "pnl_pct": -1.66,
+      "pnl_usd": -3.92,
+      "price": 702.4600219726562,
+      "price_as_of": "2026-09-29",
       "review_date": "",
       "sector": "",
       "shares": 0.33,
@@ -324,57 +324,57 @@
       "ticker": "VOO",
       "type": "GERCEK",
       "upside_to_target_pct": null,
-      "value_usd": 231.28,
+      "value_usd": 231.81,
       "vs_benchmark": {
         "kucuk_deger": {
           "benchmark_return_pct": null,
           "excess_pct": null
         },
         "nasdaq100": {
-          "benchmark_return_pct": 0.79,
-          "excess_pct": -2.68
+          "benchmark_return_pct": 0.0,
+          "excess_pct": -1.66
         },
         "sp500": {
-          "benchmark_return_pct": -0.21,
-          "excess_pct": -1.68
+          "benchmark_return_pct": 0.0,
+          "excess_pct": -1.66
         }
       },
-      "weight_pct": 9.58
+      "weight_pct": 9.6
     }
   ],
-  "priced_at": "2026-09-30T22:59:49+00:00",
+  "priced_at": "2026-10-01T00:48:27+00:00",
   "source": "manual+prices",
   "summary": {
     "cash_usd": 149.04,
     "cost_usd": 2241.31,
-    "equity_value_usd": 2264.12,
+    "equity_value_usd": 2265.7,
     "fx": {
-      "as_of": "2026-09-30",
-      "change_1w_pct": 0.39,
+      "as_of": "2026-10-01",
+      "change_1w_pct": 0.3,
       "pair": "USDTRY",
-      "rate": 49.02859878540039,
+      "rate": 48.99530029296875,
       "source": "stooq/yfinance"
     },
     "fx_pace": {
-      "as_of": "2026-09-30",
-      "change_quarter_pct": 5.09,
-      "change_since_entry_pct": -2.53,
+      "as_of": "2026-10-01",
+      "change_quarter_pct": 4.97,
+      "change_since_entry_pct": -2.59,
       "color": "yellow",
-      "rate": 49.02859878540039,
+      "rate": 48.99530029296875,
       "window_days": 91
     },
     "largest_position_pct": null,
-    "peak_value_usd": 2413.16,
+    "peak_value_usd": 2414.74,
     "phase": {
       "end": "2026-11-16",
       "key": "faz0",
       "label": "Faz 0 — hazirlik",
       "start": "2026-09-01"
     },
-    "pnl_pct": 1.02,
-    "pnl_usd": 22.81,
-    "portfolio_value_try": 118314.04,
-    "portfolio_value_usd": 2413.16,
+    "pnl_pct": 1.09,
+    "pnl_usd": 24.39,
+    "portfolio_value_try": 118311.0,
+    "portfolio_value_usd": 2414.74,
     "position_count": 4,
     "sector_mix_pct": {},
     "slices": [
@@ -388,17 +388,17 @@
         "value_usd": 0.0
       },
       {
-        "actual_pct": 22.21,
-        "drift_pp": -4.79,
+        "actual_pct": 22.18,
+        "drift_pp": -4.82,
         "label": "Cekirdek ETF",
         "off_target": false,
         "slice": "cekirdek_etf",
         "target_pct": 27.0,
-        "value_usd": 535.92
+        "value_usd": 535.64
       },
       {
-        "actual_pct": 20.86,
-        "drift_pp": -2.14,
+        "actual_pct": 20.85,
+        "drift_pp": -2.15,
         "label": "SGOV (nakit capasi)",
         "off_target": false,
         "slice": "sgov",
@@ -406,16 +406,16 @@
         "value_usd": 503.4
       },
       {
-        "actual_pct": 50.75,
-        "drift_pp": 0.75,
+        "actual_pct": 50.8,
+        "drift_pp": 0.8,
         "label": "TL mevduat",
         "off_target": false,
         "slice": "tl",
         "target_pct": 50.0,
-        "value_usd": 1224.8
+        "value_usd": 1226.66
       },
       {
-        "actual_pct": 6.18,
+        "actual_pct": 6.17,
         "drift_pp": null,
         "label": "Nakit (USD)",
         "note": "planli alimlar icin bekliyor; sapma hesabina girmez",
@@ -429,8 +429,8 @@
     "tbill_pct": 4.07,
     "vs_benchmark": {
       "kucuk_deger": null,
-      "nasdaq100": 0.26,
-      "sp500": 1.26
+      "nasdaq100": 1.12,
+      "sp500": 1.12
     }
   },
   "tl_renewal": {
@@ -442,7 +442,7 @@
         "status": "gray"
       },
       {
-        "detail": "son 91 gunde %5.1",
+        "detail": "son 91 gunde %5.0",
         "key": "kur_temposu",
         "label": "Kur temposu ceyrekte %7'nin altinda",
         "status": "green"
