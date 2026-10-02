@@ -1,0 +1,1747 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Böğürtlen Bahçesi Fizibilitesi</title>
+<meta name="description" content="Karacabey/Muratlı 10 dekar akıllı dikensiz böğürtlen bahçesi: CAPEX, OPEX, senaryolar, stres testi, ortaklık ve kredi yapısı.">
+<style>
+:root {
+  --bg:#f7f6f2; --surface:#ffffff; --text:#1d1f1c; --muted:#5d625a; --line:#e2e0d8;
+  --accent:#5b2a6e; --accent-soft:#f1e9f4; --head:#f0eee7; --neg:#b3261e; --warn-bg:#fff6e0; --warn-line:#e0b44a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#141513; --surface:#1d1f1c; --text:#e8e7e2; --muted:#a3a79e; --line:#33362f;
+    --accent:#c99be0; --accent-soft:#2b2231; --head:#25271f; --neg:#ff8a80; --warn-bg:#2d2715; --warn-line:#8a6d22;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#141513; --surface:#1d1f1c; --text:#e8e7e2; --muted:#a3a79e; --line:#33362f;
+  --accent:#c99be0; --accent-soft:#2b2231; --head:#25271f; --neg:#ff8a80; --warn-bg:#2d2715; --warn-line:#8a6d22;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.wrap { max-width:1060px; margin:0 auto; padding:32px 16px 64px; }
+header h1 { font-size:clamp(1.5rem,3.4vw,2.2rem); line-height:1.2; margin:0 0 12px; letter-spacing:-.01em; }
+header .eyebrow { color:var(--accent); font-weight:600; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; }
+nav.toc { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 18px; margin:24px 0; }
+nav.toc ul { margin:0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px 18px; }
+nav.toc a { color:var(--muted); text-decoration:none; font-size:.92rem; }
+nav.toc a:hover { color:var(--accent); }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:20px 0; }
+.kpi { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+.kl { font-size:.8rem; color:var(--muted); }
+.kv { font-size:1.45rem; font-weight:700; margin:2px 0; font-variant-numeric:tabular-nums; }
+.ks { font-size:.78rem; color:var(--muted); }
+.verdict { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; }
+.badge { background:var(--accent); color:var(--bg); font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:999px; letter-spacing:.05em; }
+main h2 { font-size:1.45rem; margin:48px 0 12px; padding-top:12px; border-top:1px solid var(--line); scroll-margin-top:12px; }
+main h3 { font-size:1.12rem; margin:28px 0 8px; color:var(--accent); }
+p, li { max-width:78ch; }
+a { color:var(--accent); }
+code { background:var(--head); padding:1px 5px; border-radius:4px; font-size:.88em; }
+hr { display:none; }
+.tw { overflow-x:auto; margin:14px 0; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+table { border-collapse:collapse; width:100%; font-size:.9rem; font-variant-numeric:tabular-nums; }
+th, td { padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { background:var(--head); text-align:left; font-weight:600; white-space:nowrap; }
+tr:last-child td { border-bottom:none; }
+td[align="right"], th[align="right"], td[style*="right"], th[style*="right"] { white-space:nowrap; }
+.neg { color:var(--neg); }
+aside.note { background:var(--warn-bg); border-left:4px solid var(--warn-line); margin:16px 0; padding:4px 16px; border-radius:8px; }
+footer { margin-top:48px; color:var(--muted); font-size:.85rem; }
+@media print {
+  body { background:#fff; color:#000; font-size:11pt; }
+  nav.toc { display:none; } .tw { overflow:visible; } main h2 { break-before:page; }
+  tr { break-inside:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="eyebrow">Fizibilite ve yatırım analiz raporu · Ekim 2026</div>
+<h1>Akıllı Dikensiz Böğürtlen Bahçesi — Fizibilite ve Yatırım Analiz Raporu</h1>
+<div class="verdict"><span class="badge">KARAR</span> <strong>ŞARTLI OLUMLU</strong> — alım sözleşmesi, soğuk oda ve yalın CAPEX şartıyla.</div>
+<section class="kpis" aria-label="Özet göstergeler"><div class="kpi"><div class="kl">Önerilen CAPEX</div><div class="kv">$43.650</div><div class="ks">Yalın + soğuk oda (tam: $53.650)</div></div><div class="kpi"><div class="kl">Gerçekçi tam verim</div><div class="kv">20 t</div><div class="ks">2,0 t/da · talep 28 t</div></div><div class="kpi"><div class="kl">Gerçekçi IRR</div><div class="kv">%14,6–18,6</div><div class="ks">Tam / yalın CAPEX, USD</div></div><div class="kpi"><div class="kl">Geri dönüş</div><div class="kv">5,0–5,5 yıl</div><div class="ks">Dikimden itibaren</div></div><div class="kpi"><div class="kl">Stres başabaş fiyatı</div><div class="kv">$2,45/kg</div><div class="ks">Baz karma fiyatın %93'ü</div></div><div class="kpi"><div class="kl">Kredili özsermaye IRR</div><div class="kv">%18,8–23,8</div><div class="ks">Ziraat %50 kredi</div></div></section>
+</header>
+<nav class="toc" aria-label="İçindekiler"><div class="toc">
+<ul>
+<li><a href="#0-yonetici-ozeti">0. Yönetici Özeti</a></li>
+<li><a href="#1-capex-ilk-kurulum-maliyeti">1. CAPEX — İlk Kurulum Maliyeti</a></li>
+<li><a href="#2-opex-yllk-isletme-giderleri">2. OPEX — Yıllık İşletme Giderleri</a></li>
+<li><a href="#3-rekolte-gelir-ve-roi-modeli">3. Rekolte, Gelir ve ROI Modeli</a></li>
+<li><a href="#4-turkiye-sartlar-risk-ve-stres-testi">4. Türkiye Şartları — Risk ve Stres Testi</a></li>
+<li><a href="#5-is-ortaklg-ve-finansman-yaps">5. İş Ortaklığı ve Finansman Yapısı</a></li>
+<li><a href="#6-uygulama-takvimi-ve-karar-kaplar">6. Uygulama Takvimi ve Karar Kapıları</a></li>
+<li><a href="#7-sonuc">7. Sonuç</a></li>
+</ul>
+</div>
+</nav>
+<main>
+<p><strong>Proje:</strong> 10 dekar pilot, teknoloji odaklı dikensiz kültür böğürtleni (Chester / Loch Ness)<br />
+<strong>Lokasyon:</strong> Bursa / Karacabey / Muratlı Mah. — DSİ Uluabat 2. Kısım AT-TİGH sahası<br />
+<strong>Rapor tarihi:</strong> 2 Ekim 2026 · <strong>Para birimi:</strong> USD (TL karşılığı <strong>1 USD = 47 TL</strong> çalışma kuru ile)<br />
+<strong>Hesap modeli:</strong> <a href="https://github.com/berkehan-nz/P-Fin/blob/claude/thornless-blackberry-feasibility-5kpz6c/reports/bogurtlen-fizibilite/model.py" target="_blank" rel="noopener"><code>model.py</code></a>. Tablolardaki her rakam bu dosyadan üretildi. Varsayımı değiştirip <code>python reports/bogurtlen-fizibilite/model.py</code> ile yeniden hesaplayabilirsiniz.</p>
+<aside class="note">
+<p>Not: Repo herkese açık olduğu için ada/parsel numarası ve tam koordinatlar rapora yazılmadı. Analizde mahalle düzeyindeki konum bilgisi yeterli.</p>
+</aside>
+<hr />
+<h2 id="0-yonetici-ozeti">0. Yönetici Özeti</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Gösterge</th>
+<th style="text-align: right;">S1 Talep (toptan $2,50)</th>
+<th style="text-align: right;">S2 Talep (perakende $4,00)</th>
+<th style="text-align: right;"><strong>S3 Uzman gerçekçi (karma)</strong></th>
+<th style="text-align: right;">S4 Pesimistik stres</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CAPEX (soğuk oda dahil)</td>
+<td style="text-align: right;">$53.650</td>
+<td style="text-align: right;">$53.650</td>
+<td style="text-align: right;"><strong>$53.650</strong></td>
+<td style="text-align: right;">$61.697</td>
+</tr>
+<tr>
+<td>Tam verim rekoltesi</td>
+<td style="text-align: right;">28 t</td>
+<td style="text-align: right;">28 t</td>
+<td style="text-align: right;"><strong>20 t</strong></td>
+<td style="text-align: right;">15 t</td>
+</tr>
+<tr>
+<td>Tam verim yılı net nakit</td>
+<td style="text-align: right;">$30.550</td>
+<td style="text-align: right;">$47.350</td>
+<td style="text-align: right;"><strong>$18.594</strong></td>
+<td style="text-align: right;"><span class="neg">−$8.578</span></td>
+</tr>
+<tr>
+<td>Geri dönüş süresi (dikimden)</td>
+<td style="text-align: right;">3,8 yıl</td>
+<td style="text-align: right;">3,0 yıl</td>
+<td style="text-align: right;"><strong>5,5 yıl</strong></td>
+<td style="text-align: right;">geri dönmez</td>
+</tr>
+<tr>
+<td>NPV (10 yıl, %12 USD)</td>
+<td style="text-align: right;">$63.352</td>
+<td style="text-align: right;">$131.698</td>
+<td style="text-align: right;"><strong>$8.335</strong></td>
+<td style="text-align: right;"><span class="neg">−$103.204</span></td>
+</tr>
+<tr>
+<td>Proje IRR (USD)</td>
+<td style="text-align: right;">%29,2</td>
+<td style="text-align: right;">%42,3</td>
+<td style="text-align: right;"><strong>%14,6</strong></td>
+<td style="text-align: right;">negatif</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Beş ana bulgu:</strong></p>
+<ol>
+<li><strong>Hedef CAPEX bandı ($35-40k) kalemler eksiksiz sayıldığında tutmuyor.</strong> İstenen kalemlerin tam spesifikasyonu <strong>$45.150</strong> ediyor (%7 beklenmeyen gider dahil). Buna listede olmayan ama zorunlu gördüğüm <strong>ön soğutma ve soğuk oda ($8.500)</strong> eklenince toplam <strong>$53.650</strong> oluyor. Bölüm 1.3'teki yalın versiyonla bu tutar <strong>$35.150'ye (soğuk odasız) veya $43.650'ye (soğuk odalı)</strong> inebilir.</li>
+<li><strong>28 t/10 da verim (bitki başına 9,3 kg) üst sınır kabul edilmeli.</strong> Türkiye açık tarla Chester ortalaması 1,2-2,0 t/da. İyi yönetilen, fertigasyonlu, yüksek seddeli bahçelerde 2,0-2,5 t/da görülüyor. Banka ve yatırımcı sunumunda baz senaryo olarak <strong>20 t (2,0 t/da)</strong> kullanılmalı.</li>
+<li><strong>Projenin asıl riski satış.</strong> Karacabey'de temmuz-ağustos arasındaki 6-7 haftada 20-28 ton taze böğürtlen satmak gerekiyor. Ürünün raf ömrü soğuk zincirsiz 2-3 gün. Soğuk oda ve en az üç satış kanalı (hal, perakende/HoReCa, işleme/dondurma) olmadan $2,50/kg ortalama fiyat garanti değil.</li>
+<li><strong>Stres testi:</strong> Fiyat %30 düşer, işçilik %40 artar ve verim %25 kaybederse proje nakit üretmez. Tam verim yılında başabaş için 15 t rekoltede <strong>ağırlıklı satış fiyatının en az $2,45/kg</strong> olması gerekiyor (baz karma fiyat $2,635). Yani fiyatın baz değerin %93'ünün altına düşmemesi lazım. Tek başına en yıkıcı şok <strong>%30 fiyat düşüşü</strong>. Fiyatın sözleşmeyle korunması, sensör paketinden daha önemli.</li>
+<li><strong>Önerilen yapı:</strong> Yalın CAPEX ($43.650, soğuk odalı) + CAPEX'in %50'si için Ziraat Bankası Hazine faiz destekli TL kredisi + aşamalı kâr paylaşımı (waterfall). Bu yapıda gerçekçi senaryoda proje IRR'si %18,6'ya, kredili özsermaye IRR'si %18,8 (tam CAPEX) ile %23,8 (yalın CAPEX) arasına çıkıyor.</li>
+</ol>
+<p><strong>Karar: ŞARTLI OLUMLU.</strong> Şartlar: (i) dikimden önce en az bir işleme/dondurma tesisiyle alım sözleşmesi (taban fiyat ≥ $1,30/kg) ve bir perakende/HoReCa kanalı; (ii) soğuk oda; (iii) yalın CAPEX; (iv) ilk 2 yıl verim ölçümü bitmeden ikinci faza (alan genişletme) geçilmemesi.</p>
+<hr />
+<h2 id="1-capex-ilk-kurulum-maliyeti">1. CAPEX — İlk Kurulum Maliyeti</h2>
+<h3 id="11-tasarm-parametreleri-hesap-taban">1.1 Tasarım parametreleri (hesap tabanı)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Parametre</th>
+<th>Değer</th>
+<th>Hesap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alan</td>
+<td>10.000 m²</td>
+<td>~100 m × 100 m varsayımı</td>
+</tr>
+<tr>
+<td>Sıra arası × sıra üzeri</td>
+<td>3,0 m × 1,0 m</td>
+<td>10.000 / 3 = <strong>33 sıra</strong> × ~100 m = <strong>~3.300 m sıra</strong></td>
+</tr>
+<tr>
+<td>Fidan</td>
+<td>3.000 + %5 yedek</td>
+<td>3.300 m / 1 m − baş dönüm boşlukları ≈ 3.000</td>
+</tr>
+<tr>
+<td>Direk</td>
+<td>6 m aralık</td>
+<td>33 × (100/6 + 2) ≈ <strong>630 direk</strong></td>
+</tr>
+<tr>
+<td>Tel</td>
+<td>3 kat</td>
+<td>3.300 × 3 = 9.900 m ≈ <strong>10.000 m</strong></td>
+</tr>
+<tr>
+<td>Damla lateral</td>
+<td>çift hat</td>
+<td>3.300 × 2 = <strong>6.600 m</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="12-kalem-kalem-capex-tam-spesifikasyon">1.2 Kalem kalem CAPEX (tam spesifikasyon)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Grup</th>
+<th>Kalem</th>
+<th>Miktar</th>
+<th style="text-align: right;">USD</th>
+<th style="text-align: right;">TL (47)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arazi hazırlığı</td>
+<td>Toprak analizi (2 derinlik, 4 nokta) + drenaj kontrolü</td>
+<td>1 set</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">11.750</td>
+</tr>
+<tr>
+<td>Arazi hazırlığı</td>
+<td>Dip kazan (subsoiler) + diskaro + rototiller</td>
+<td>10 da</td>
+<td style="text-align: right;">600</td>
+<td style="text-align: right;">28.200</td>
+</tr>
+<tr>
+<td>Arazi hazırlığı</td>
+<td>Lazerli tesviye (%0,2-0,3 drenaj eğimi bırakılarak)</td>
+<td>10 da</td>
+<td style="text-align: right;">550</td>
+<td style="text-align: right;">25.850</td>
+</tr>
+<tr>
+<td>Arazi hazırlığı</td>
+<td>Yanmış çiftlik gübresi / kompost (4 t/da)</td>
+<td>40 t</td>
+<td style="text-align: right;">2.000</td>
+<td style="text-align: right;">94.000</td>
+</tr>
+<tr>
+<td>Arazi hazırlığı</td>
+<td>Yüksek sedde (30-40 cm) yapımı</td>
+<td>~3.300 m</td>
+<td style="text-align: right;">450</td>
+<td style="text-align: right;">21.150</td>
+</tr>
+<tr>
+<td>Arazi hazırlığı</td>
+<td>Sedde üstü agrotekstil malç örtü</td>
+<td>3.400 m²</td>
+<td style="text-align: right;">1.100</td>
+<td style="text-align: right;">51.700</td>
+</tr>
+<tr>
+<td>Fidan</td>
+<td>Doku kültürü M1 mavi sertifikalı fidan</td>
+<td>3.000 × $3,00</td>
+<td style="text-align: right;">9.000</td>
+<td style="text-align: right;">423.000</td>
+</tr>
+<tr>
+<td>Fidan</td>
+<td>Yedek fidan (%5) + dikim işçiliği</td>
+<td>150 ad + 15 yevmiye</td>
+<td style="text-align: right;">1.050</td>
+<td style="text-align: right;">49.350</td>
+</tr>
+<tr>
+<td>Telli terbiye</td>
+<td>Galvaniz direk 2,7 m</td>
+<td>~630 × $8,5</td>
+<td style="text-align: right;">5.350</td>
+<td style="text-align: right;">251.450</td>
+</tr>
+<tr>
+<td>Telli terbiye</td>
+<td>Gergi teli 2,5 mm (3 kat) + ankraj</td>
+<td>~10.000 m + 66 ankraj</td>
+<td style="text-align: right;">1.650</td>
+<td style="text-align: right;">77.550</td>
+</tr>
+<tr>
+<td>Telli terbiye</td>
+<td>T-kol (cross-arm) + montaj</td>
+<td>set</td>
+<td style="text-align: right;">1.500</td>
+<td style="text-align: right;">70.500</td>
+</tr>
+<tr>
+<td>Sulama &amp; fertigasyon</td>
+<td>Ana hat PE + vanalar + DSİ hidrant bağlantısı</td>
+<td>set</td>
+<td style="text-align: right;">900</td>
+<td style="text-align: right;">42.300</td>
+</tr>
+<tr>
+<td>Sulama &amp; fertigasyon</td>
+<td>Disk + kum filtre grubu</td>
+<td>1 set</td>
+<td style="text-align: right;">700</td>
+<td style="text-align: right;">32.900</td>
+</tr>
+<tr>
+<td>Sulama &amp; fertigasyon</td>
+<td>Damla lateral (16 mm, 33 cm, basınç ayarlı), çift hat</td>
+<td>~6.600 m</td>
+<td style="text-align: right;">850</td>
+<td style="text-align: right;">39.950</td>
+</tr>
+<tr>
+<td>Sulama &amp; fertigasyon</td>
+<td>Fertigasyon kontrolörü (4G/Wi-Fi), 4 selenoid vana</td>
+<td>4 zon</td>
+<td style="text-align: right;">1.800</td>
+<td style="text-align: right;">84.600</td>
+</tr>
+<tr>
+<td>Sulama &amp; fertigasyon</td>
+<td>EC/pH dozaj ünitesi (2 gübre + 1 asit kanalı)</td>
+<td>1 ad</td>
+<td style="text-align: right;">2.400</td>
+<td style="text-align: right;">112.800</td>
+</tr>
+<tr>
+<td>AgTech sensör</td>
+<td>Toprak istasyonu (30/60 cm nem + EC + sıcaklık), LoRa/4G</td>
+<td>3 × $650</td>
+<td style="text-align: right;">1.950</td>
+<td style="text-align: right;">91.650</td>
+</tr>
+<tr>
+<td>AgTech sensör</td>
+<td>Mikro meteoroloji istasyonu (yaprak ıslaklığı, don alarmı)</td>
+<td>1 ad</td>
+<td style="text-align: right;">1.900</td>
+<td style="text-align: right;">89.300</td>
+</tr>
+<tr>
+<td>AgTech sensör</td>
+<td>Gateway, kurulum, kalibrasyon, 1. yıl platform</td>
+<td>set</td>
+<td style="text-align: right;">600</td>
+<td style="text-align: right;">28.200</td>
+</tr>
+<tr>
+<td>Güvenlik</td>
+<td>Solar 4G PTZ AI kamera (360°)</td>
+<td>2 × $650</td>
+<td style="text-align: right;">1.300</td>
+<td style="text-align: right;">61.100</td>
+</tr>
+<tr>
+<td>Güvenlik</td>
+<td>Solar termal kamera</td>
+<td>1 ad</td>
+<td style="text-align: right;">1.600</td>
+<td style="text-align: right;">75.200</td>
+</tr>
+<tr>
+<td>Gölgeleme</td>
+<td>%35 beyaz gölge filesi, sıra üstü şerit</td>
+<td>~4.500 m²</td>
+<td style="text-align: right;">2.700</td>
+<td style="text-align: right;">126.900</td>
+</tr>
+<tr>
+<td>Gölgeleme</td>
+<td>Direk uzatma + file teli + montaj</td>
+<td>set</td>
+<td style="text-align: right;">1.100</td>
+<td style="text-align: right;">51.700</td>
+</tr>
+<tr>
+<td>Diğer</td>
+<td>Proje/danışmanlık, izinler, ilk TARSİM poliçesi</td>
+<td>–</td>
+<td style="text-align: right;">900</td>
+<td style="text-align: right;">42.300</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>Alt toplam</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>42.200</strong></td>
+<td style="text-align: right;"><strong>1.983.400</strong></td>
+</tr>
+<tr>
+<td></td>
+<td>Beklenmeyen giderler (%7)</td>
+<td></td>
+<td style="text-align: right;">2.950</td>
+<td style="text-align: right;">138.650</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>CAPEX, istenen kapsam</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>45.150</strong></td>
+<td style="text-align: right;"><strong>2.122.050</strong></td>
+</tr>
+<tr>
+<td></td>
+<td><strong>+ Ön soğutma + 20 m³ soğuk oda (+2/+4 °C)</strong> <em>(eklediğim kritik kalem)</em></td>
+<td></td>
+<td style="text-align: right;">8.500</td>
+<td style="text-align: right;">399.500</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>CAPEX, önerilen tam kapsam</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>53.650</strong></td>
+<td style="text-align: right;"><strong>2.521.550</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Grup dağılımı (tam kapsam $53.650 içinde):</strong> Fidan %18,7 · Telli terbiye %15,8 · Soğuk oda %15,8 · Sulama ve fertigasyon %12,4 · Arazi hazırlığı %9,2 · AgTech sensör %8,3 · Gölgeleme %7,1 · Güvenlik %5,4 · Beklenmeyen + diğer %7,2.</p>
+<p><strong>Teknik notlar:</strong><br />
+- <strong>Toprak pH sensörü:</strong> Toprağa gömülü pH probları 3-6 ayda kalibrasyondan kayar. pH kontrolü fertigasyon çözeltisinde ve drenaj suyunda yapılmalı. Toprakta nem, EC ve sıcaklık izlenmeli, pH için 3 ayda bir laboratuvar analizi yeterli. Bütçede toprak pH probu bu yüzden yer almıyor.<br />
+- <strong>Killi-tınlı toprak:</strong> Sedde yüksekliği 40 cm'den az olmamalı. Böğürtlende kök boğazı çürüklüğü (<em>Phytophthora</em>) ağır topraklarda en büyük fidan kaybı nedeni. DSİ drenajı yüzey suyunu alır ama kök bölgesi havalanmasını ancak sedde sağlar.<br />
+- <strong>Gölge filesi:</strong> Chester'da 33-35 °C üstünde güneş yanığı (beyaz dane, "sunscald") ciddi kayıp yaratır. Karacabey'de temmuz ortalama maksimumu 31-32 °C ve 38 °C'nin üstündeki ekstremler artık neredeyse her yıl görülüyor. File, verimi değil <strong>pazarlanabilir verimi</strong> korur.</p>
+<h3 id="13-yaln-capex-hedef-banda-cekme">1.3 Yalın CAPEX (hedef banda çekme)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kesinti / erteleme</th>
+<th style="text-align: right;">Tasarruf (USD)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fidan pazarlığı: 3.000 adet toplu alımda $3,00 → $2,50</td>
+<td style="text-align: right;">1.500</td>
+</tr>
+<tr>
+<td>Direk aralığı 6 m → 8 m (ara gergiyle)</td>
+<td style="text-align: right;">1.350</td>
+</tr>
+<tr>
+<td>Termal kamerayı 2. yıla ertele (PTZ AI kameralar 1. yıl yeterli)</td>
+<td style="text-align: right;">1.600</td>
+</tr>
+<tr>
+<td>Gölge filesini 2. yıla ertele (dikim yılında rekolte yok)</td>
+<td style="text-align: right;">3.800</td>
+</tr>
+<tr>
+<td>EC/pH dozaj: 3 kanal yerine venturi + tek asit pompası</td>
+<td style="text-align: right;">1.100</td>
+</tr>
+<tr>
+<td><strong>Toplam</strong></td>
+<td style="text-align: right;"><strong>9.350</strong></td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Versiyon</th>
+<th style="text-align: right;">USD</th>
+<th style="text-align: right;">TL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Yalın, soğuk odasız (%7 beklenmeyen dahil)</td>
+<td style="text-align: right;"><strong>35.150</strong></td>
+<td style="text-align: right;">1.652.050</td>
+</tr>
+<tr>
+<td><strong>Yalın + soğuk oda (önerilen)</strong></td>
+<td style="text-align: right;"><strong>43.650</strong></td>
+<td style="text-align: right;">2.051.550</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ertelenen $5.400'lük kalem (file + termal kamera) 2. yılın ilk hasat gelirinden karşılanır.</p>
+<hr />
+<h2 id="2-opex-yllk-isletme-giderleri">2. OPEX — Yıllık İşletme Giderleri</h2>
+<h3 id="21-sabit-opex-usdyl-10-da">2.1 Sabit OPEX (USD/yıl, 10 da)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kalem</th>
+<th style="text-align: right;">Yıl 1</th>
+<th style="text-align: right;">Yıl 2</th>
+<th style="text-align: right;">Yıl 3</th>
+<th style="text-align: right;">Yıl 4+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gübre (fertigasyon + organik)</td>
+<td style="text-align: right;">700</td>
+<td style="text-align: right;">1.100</td>
+<td style="text-align: right;">1.500</td>
+<td style="text-align: right;">1.600</td>
+</tr>
+<tr>
+<td>Biyolojik/kimyasal mücadele (SWD tuzağı, Bt, avcı akar, bakır)</td>
+<td style="text-align: right;">400</td>
+<td style="text-align: right;">900</td>
+<td style="text-align: right;">1.300</td>
+<td style="text-align: right;">1.400</td>
+</tr>
+<tr>
+<td>Budama + sürgün bağlama işçiliği</td>
+<td style="text-align: right;">600</td>
+<td style="text-align: right;">1.300</td>
+<td style="text-align: right;">1.800</td>
+<td style="text-align: right;">1.900</td>
+</tr>
+<tr>
+<td>Ot / sıra arası biçim, malç bakımı</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">550</td>
+<td style="text-align: right;">600</td>
+<td style="text-align: right;">600</td>
+</tr>
+<tr>
+<td>DSİ su ücreti + pompa elektriği</td>
+<td style="text-align: right;">250</td>
+<td style="text-align: right;">400</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">500</td>
+</tr>
+<tr>
+<td>IoT veri / 4G SIM + platform aboneliği</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">950</td>
+<td style="text-align: right;">950</td>
+<td style="text-align: right;">950</td>
+</tr>
+<tr>
+<td>Bakım-onarım (ekipmanın ~%4'ü)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">700</td>
+<td style="text-align: right;">900</td>
+<td style="text-align: right;">1.000</td>
+</tr>
+<tr>
+<td>TARSİM sigortası</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">700</td>
+<td style="text-align: right;">750</td>
+</tr>
+<tr>
+<td>Soğuk oda elektriği</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">400</td>
+<td style="text-align: right;">700</td>
+<td style="text-align: right;">750</td>
+</tr>
+<tr>
+<td>Muhasebe, borsa tescili, sabit nakliye</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">500</td>
+<td style="text-align: right;">600</td>
+<td style="text-align: right;">600</td>
+</tr>
+<tr>
+<td><strong>Toplam sabit OPEX</strong></td>
+<td style="text-align: right;"><strong>3.250</strong></td>
+<td style="text-align: right;"><strong>7.300</strong></td>
+<td style="text-align: right;"><strong>9.550</strong></td>
+<td style="text-align: right;"><strong>10.050</strong></td>
+</tr>
+<tr>
+<td>TL karşılığı</td>
+<td style="text-align: right;">152.750</td>
+<td style="text-align: right;">343.100</td>
+<td style="text-align: right;">448.850</td>
+<td style="text-align: right;">472.350</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="22-degisken-opex-kg-bas">2.2 Değişken OPEX (kg başı)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kalem</th>
+<th style="text-align: right;">Toptan (hal)</th>
+<th style="text-align: right;">Perakende/gurme</th>
+<th style="text-align: right;">İşleme/dondurma</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Elle hasat işçiliği</td>
+<td style="text-align: right;">$0,60</td>
+<td style="text-align: right;">$0,60</td>
+<td style="text-align: right;">$0,60</td>
+</tr>
+<tr>
+<td>Ambalaj + soğuk lojistik</td>
+<td style="text-align: right;">$0,20 (kasa/viyol)</td>
+<td style="text-align: right;">$0,75 (250 g klapa, etiket, soğuk zincir)</td>
+<td style="text-align: right;">$0,05 (kasa)</td>
+</tr>
+<tr>
+<td>Komisyon / fire / stopaj</td>
+<td style="text-align: right;">%10 (hal komisyonu %8 + rüsum/stopaj ~%2)</td>
+<td style="text-align: right;">%15 (kanal payı + iade/fire)</td>
+<td style="text-align: right;">%3</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Hasat işçiliği kontrolü:</strong> 2026 tarım yevmiyesi yaklaşık 1.500-1.800 TL ($32-38). Taze pazar kalitesinde toplama hızı 7-9 kg/saat, günde 55-70 kg eder. Buradan kg başı maliyet <strong>$0,50-0,65</strong> çıkıyor, yani verdiğiniz $0,50-0,70 bandı doğru. Modelde $0,60 kullanıldı. Tam verimde (20-28 t) bu, 6 hafta boyunca <strong>günde 7-10 toplayıcı</strong> demek. İşçi bulma riski bu nedenle ciddi (Bölüm 4).</p>
+<h3 id="23-yllara-gore-toplam-opex">2.3 Yıllara göre toplam OPEX</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th style="text-align: right;">Rekolte (S3)</th>
+<th style="text-align: right;">Sabit OPEX</th>
+<th style="text-align: right;">Hasat ($0,60)</th>
+<th style="text-align: right;">Ambalaj + komisyon</th>
+<th style="text-align: right;"><strong>Toplam OPEX</strong></th>
+<th style="text-align: right;">kg başı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td style="text-align: right;">0 t</td>
+<td style="text-align: right;">3.250</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><strong>3.250</strong></td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">5 t</td>
+<td style="text-align: right;">7.300</td>
+<td style="text-align: right;">3.000</td>
+<td style="text-align: right;">3.014</td>
+<td style="text-align: right;"><strong>13.314</strong></td>
+<td style="text-align: right;">$2,66</td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align: right;">14 t</td>
+<td style="text-align: right;">9.550</td>
+<td style="text-align: right;">8.400</td>
+<td style="text-align: right;">8.439</td>
+<td style="text-align: right;"><strong>26.389</strong></td>
+<td style="text-align: right;">$1,88</td>
+</tr>
+<tr>
+<td>4+</td>
+<td style="text-align: right;">20 t</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">12.000</td>
+<td style="text-align: right;">12.056</td>
+<td style="text-align: right;"><strong>34.106</strong></td>
+<td style="text-align: right;"><strong>$1,71</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>Talep senaryosunda (28 t, %100 toptan) 4. yıl toplam OPEX: 10.050 + 16.800 + 12.600 = <strong>$39.450</strong> (kg başı $1,41).</p>
+<hr />
+<h2 id="3-rekolte-gelir-ve-roi-modeli">3. Rekolte, Gelir ve ROI Modeli</h2>
+<h3 id="31-verim-varsaymlar-elestirel-degerlendirme">3.1 Verim varsayımları — eleştirel değerlendirme</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th style="text-align: right;">Talep (t)</th>
+<th style="text-align: right;">t/da</th>
+<th style="text-align: right;">kg/bitki</th>
+<th style="text-align: right;">Uzman gerçekçi (t)</th>
+<th>Gerekçe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 (dikim)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td>Primokan büyüme yılı</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">1,0</td>
+<td style="text-align: right;">3,3</td>
+<td style="text-align: right;"><strong>5</strong></td>
+<td>İlk floricane yılında 1-2 kg/bitki normal. 3,3 kg ancak çok güçlü fidanla mümkün</td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">2,5</td>
+<td style="text-align: right;">8,3</td>
+<td style="text-align: right;"><strong>14</strong></td>
+<td>Kanopi henüz tam dolmuyor</td>
+</tr>
+<tr>
+<td>4-8</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">2,8</td>
+<td style="text-align: right;">9,3</td>
+<td style="text-align: right;"><strong>20</strong></td>
+<td>2,0 t/da: iyi yönetilen açık tarla Chester'ın üst-orta seviyesi</td>
+</tr>
+<tr>
+<td>9-10</td>
+<td style="text-align: right;">25,2 / 22,4</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">18 / 16</td>
+<td>Yaşlanma, %10-20 düşüş</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="32-senaryo-s1-talep-verimi-100-toptan-250kg">3.2 Senaryo S1 — Talep verimi, %100 toptan $2,50/kg</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th style="text-align: right;">Rekolte (t)</th>
+<th style="text-align: right;">Brüt gelir</th>
+<th style="text-align: right;">Ambalaj+komisyon</th>
+<th style="text-align: right;">Hasat işçiliği</th>
+<th style="text-align: right;">Sabit OPEX</th>
+<th style="text-align: right;">Net nakit</th>
+<th style="text-align: right;">Kümülatif</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;"><span class="neg">−53.650</span></td>
+<td style="text-align: right;"><span class="neg">−53.650</span></td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align: right;">0,0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3.250</td>
+<td style="text-align: right;"><span class="neg">−3.250</span></td>
+<td style="text-align: right;"><span class="neg">−56.900</span></td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">10,0</td>
+<td style="text-align: right;">25.000</td>
+<td style="text-align: right;">4.500</td>
+<td style="text-align: right;">6.000</td>
+<td style="text-align: right;">7.300</td>
+<td style="text-align: right;">7.200</td>
+<td style="text-align: right;"><span class="neg">−49.700</span></td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align: right;">25,0</td>
+<td style="text-align: right;">62.500</td>
+<td style="text-align: right;">11.250</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">9.550</td>
+<td style="text-align: right;">26.700</td>
+<td style="text-align: right;"><span class="neg">−23.000</span></td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align: right;">28,0</td>
+<td style="text-align: right;">70.000</td>
+<td style="text-align: right;">12.600</td>
+<td style="text-align: right;">16.800</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">30.550</td>
+<td style="text-align: right;">7.550</td>
+</tr>
+<tr>
+<td>5-8</td>
+<td style="text-align: right;">28,0</td>
+<td style="text-align: right;">70.000</td>
+<td style="text-align: right;">12.600</td>
+<td style="text-align: right;">16.800</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">30.550</td>
+<td style="text-align: right;">129.750 (Y8)</td>
+</tr>
+<tr>
+<td>9</td>
+<td style="text-align: right;">25,2</td>
+<td style="text-align: right;">63.000</td>
+<td style="text-align: right;">11.340</td>
+<td style="text-align: right;">15.120</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">26.490</td>
+<td style="text-align: right;">156.240</td>
+</tr>
+<tr>
+<td>10</td>
+<td style="text-align: right;">22,4</td>
+<td style="text-align: right;">56.000</td>
+<td style="text-align: right;">10.080</td>
+<td style="text-align: right;">13.440</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">22.430</td>
+<td style="text-align: right;">178.670</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Geri dönüş 3,8 yıl · NPV@12 $63.352 · IRR %29,2.</strong> Tam verim yılı net nakit $30.550 ≈ <strong>1,44 milyon TL</strong>.</p>
+<h3 id="33-senaryo-s2-talep-verimi-100-perakendegurme-400kg">3.3 Senaryo S2 — Talep verimi, %100 perakende/gurme $4,00/kg</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th style="text-align: right;">Rekolte (t)</th>
+<th style="text-align: right;">Brüt gelir</th>
+<th style="text-align: right;">Ambalaj+komisyon</th>
+<th style="text-align: right;">Hasat işçiliği</th>
+<th style="text-align: right;">Sabit OPEX</th>
+<th style="text-align: right;">Net nakit</th>
+<th style="text-align: right;">Kümülatif</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;"><span class="neg">−53.650</span></td>
+<td style="text-align: right;"><span class="neg">−53.650</span></td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align: right;">0,0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3.250</td>
+<td style="text-align: right;"><span class="neg">−3.250</span></td>
+<td style="text-align: right;"><span class="neg">−56.900</span></td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">10,0</td>
+<td style="text-align: right;">40.000</td>
+<td style="text-align: right;">13.500</td>
+<td style="text-align: right;">6.000</td>
+<td style="text-align: right;">7.300</td>
+<td style="text-align: right;">13.200</td>
+<td style="text-align: right;"><span class="neg">−43.700</span></td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align: right;">25,0</td>
+<td style="text-align: right;">100.000</td>
+<td style="text-align: right;">33.750</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">9.550</td>
+<td style="text-align: right;">41.700</td>
+<td style="text-align: right;"><span class="neg">−2.000</span></td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align: right;">28,0</td>
+<td style="text-align: right;">112.000</td>
+<td style="text-align: right;">37.800</td>
+<td style="text-align: right;">16.800</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">47.350</td>
+<td style="text-align: right;">45.350</td>
+</tr>
+<tr>
+<td>5-8</td>
+<td style="text-align: right;">28,0</td>
+<td style="text-align: right;">112.000</td>
+<td style="text-align: right;">37.800</td>
+<td style="text-align: right;">16.800</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">47.350</td>
+<td style="text-align: right;">234.750 (Y8)</td>
+</tr>
+<tr>
+<td>9</td>
+<td style="text-align: right;">25,2</td>
+<td style="text-align: right;">100.800</td>
+<td style="text-align: right;">34.020</td>
+<td style="text-align: right;">15.120</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">41.610</td>
+<td style="text-align: right;">276.360</td>
+</tr>
+<tr>
+<td>10</td>
+<td style="text-align: right;">22,4</td>
+<td style="text-align: right;">89.600</td>
+<td style="text-align: right;">30.240</td>
+<td style="text-align: right;">13.440</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">35.870</td>
+<td style="text-align: right;">312.230</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Geri dönüş 3,0 yıl · NPV@12 $131.698 · IRR %42,3.</strong><br />
+⚠️ <strong>Gerçeklik kontrolü:</strong> 28 t'nin tamamını 250 g klapada perakende satmak, 6 haftada <strong>112.000 klapa</strong> (günde ~2.700) demek. Bu hacim marka, zincir market listelemesi ve günlük soğuk dağıtım gerektirir ve 10 da'lık bir işletmenin ilk 3 yılında gerçekçi değil. Bu senaryoyu bir tavan olarak okuyun. Perakende payı ilk yıllarda %20-30'u geçmez.</p>
+<h3 id="34-senaryo-s3-uzman-gercekci-20-t-karma-kanal-onerilen-baz-senaryo">3.4 Senaryo S3 — Uzman gerçekçi: 20 t, karma kanal (önerilen baz senaryo)</h3>
+<p>Kanal dağılımı: <strong>%55 toptan ($2,50) + %25 perakende ($4,00) + %20 işleme/dondurma ($1,30)</strong>, ağırlıklı ortalama <strong>$2,635/kg</strong>.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th style="text-align: right;">Rekolte (t)</th>
+<th style="text-align: right;">Brüt gelir</th>
+<th style="text-align: right;">Ambalaj+komisyon</th>
+<th style="text-align: right;">Hasat işçiliği</th>
+<th style="text-align: right;">Sabit OPEX</th>
+<th style="text-align: right;">Net nakit</th>
+<th style="text-align: right;">Kümülatif</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;"><span class="neg">−53.650</span></td>
+<td style="text-align: right;"><span class="neg">−53.650</span></td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align: right;">0,0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3.250</td>
+<td style="text-align: right;"><span class="neg">−3.250</span></td>
+<td style="text-align: right;"><span class="neg">−56.900</span></td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">5,0</td>
+<td style="text-align: right;">13.175</td>
+<td style="text-align: right;">3.014</td>
+<td style="text-align: right;">3.000</td>
+<td style="text-align: right;">7.300</td>
+<td style="text-align: right;"><span class="neg">−139</span></td>
+<td style="text-align: right;"><span class="neg">−57.039</span></td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align: right;">14,0</td>
+<td style="text-align: right;">36.890</td>
+<td style="text-align: right;">8.439</td>
+<td style="text-align: right;">8.400</td>
+<td style="text-align: right;">9.550</td>
+<td style="text-align: right;">10.501</td>
+<td style="text-align: right;"><span class="neg">−46.538</span></td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">52.700</td>
+<td style="text-align: right;">12.056</td>
+<td style="text-align: right;">12.000</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">18.594</td>
+<td style="text-align: right;"><span class="neg">−27.944</span></td>
+</tr>
+<tr>
+<td>5</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">52.700</td>
+<td style="text-align: right;">12.056</td>
+<td style="text-align: right;">12.000</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">18.594</td>
+<td style="text-align: right;"><span class="neg">−9.350</span></td>
+</tr>
+<tr>
+<td>6</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">52.700</td>
+<td style="text-align: right;">12.056</td>
+<td style="text-align: right;">12.000</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">18.594</td>
+<td style="text-align: right;">9.244</td>
+</tr>
+<tr>
+<td>7</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">52.700</td>
+<td style="text-align: right;">12.056</td>
+<td style="text-align: right;">12.000</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">18.594</td>
+<td style="text-align: right;">27.838</td>
+</tr>
+<tr>
+<td>8</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">52.700</td>
+<td style="text-align: right;">12.056</td>
+<td style="text-align: right;">12.000</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">18.594</td>
+<td style="text-align: right;">46.432</td>
+</tr>
+<tr>
+<td>9</td>
+<td style="text-align: right;">18,0</td>
+<td style="text-align: right;">47.430</td>
+<td style="text-align: right;">10.850</td>
+<td style="text-align: right;">10.800</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">15.730</td>
+<td style="text-align: right;">62.161</td>
+</tr>
+<tr>
+<td>10</td>
+<td style="text-align: right;">16,0</td>
+<td style="text-align: right;">42.160</td>
+<td style="text-align: right;">9.645</td>
+<td style="text-align: right;">9.600</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">12.865</td>
+<td style="text-align: right;">75.027</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Geri dönüş 5,5 yıl · NPV@12 $8.335 · IRR %14,6.</strong><br />
+<strong>Yalın CAPEX ($43.650) ile:</strong> geri dönüş <strong>5,0 yıl</strong>, NPV@12 <strong>$18.335</strong>, IRR <strong>%18,6</strong>.<br />
+NPV'nin sıfırlandığı tam verim rekoltesi <strong>18,5 t</strong> (1,85 t/da). Baz senaryonun güvenlik payı sadece <strong>%7,6</strong>.</p>
+<h3 id="35-roi-ve-amortisman-ozeti">3.5 ROI ve amortisman özeti</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Metrik</th>
+<th style="text-align: right;">S1</th>
+<th style="text-align: right;">S2</th>
+<th style="text-align: right;">S3</th>
+<th style="text-align: right;">S3 yalın</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basit geri dönüş (yıl, dikimden)</td>
+<td style="text-align: right;">3,8</td>
+<td style="text-align: right;">3,0</td>
+<td style="text-align: right;">5,5</td>
+<td style="text-align: right;">5,0</td>
+</tr>
+<tr>
+<td>10 yıllık kümülatif net nakit</td>
+<td style="text-align: right;">$178.670</td>
+<td style="text-align: right;">$312.230</td>
+<td style="text-align: right;">$75.027</td>
+<td style="text-align: right;">$85.027</td>
+</tr>
+<tr>
+<td>10 yıllık ROI (kümülatif / CAPEX)</td>
+<td style="text-align: right;">%333</td>
+<td style="text-align: right;">%582</td>
+<td style="text-align: right;">%140</td>
+<td style="text-align: right;">%195</td>
+</tr>
+<tr>
+<td>IRR</td>
+<td style="text-align: right;">%29,2</td>
+<td style="text-align: right;">%42,3</td>
+<td style="text-align: right;">%14,6</td>
+<td style="text-align: right;">%18,6</td>
+</tr>
+<tr>
+<td>Muhasebe amortismanı (VUK, telli terbiye + sulama ~10 yıl, elektronik ~5 yıl)</td>
+<td style="text-align: right;">Yıllık ~$4.000-4.500</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="4-turkiye-sartlar-risk-ve-stres-testi">4. Türkiye Şartları — Risk ve Stres Testi</h2>
+<h3 id="41-tek-faktorlu-duyarllk-s3-baznda">4.1 Tek faktörlü duyarlılık (S3 bazında)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Şok</th>
+<th style="text-align: right;">Tam verim yılı net</th>
+<th style="text-align: right;">Geri dönüş</th>
+<th style="text-align: right;">NPV@12</th>
+<th style="text-align: right;">IRR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Baz S3</strong></td>
+<td style="text-align: right;">$18.594</td>
+<td style="text-align: right;">5,5 yıl</td>
+<td style="text-align: right;">$8.335</td>
+<td style="text-align: right;">%14,6</td>
+</tr>
+<tr>
+<td>Tüccar baskısı: fiyat −%30</td>
+<td style="text-align: right;">$4.556</td>
+<td style="text-align: right;"><strong>geri dönmez</strong></td>
+<td style="text-align: right;"><span class="neg">−$45.649</span></td>
+<td style="text-align: right;">−%11,1</td>
+</tr>
+<tr>
+<td>İklim/sıcak stresi: verim −%25</td>
+<td style="text-align: right;">$11.433</td>
+<td style="text-align: right;">7,7 yıl</td>
+<td style="text-align: right;"><span class="neg">−$19.203</span></td>
+<td style="text-align: right;">%4,8</td>
+</tr>
+<tr>
+<td>İşçi krizi: hasat $0,84/kg (+%40)</td>
+<td style="text-align: right;">$13.794</td>
+<td style="text-align: right;">6,7 yıl</td>
+<td style="text-align: right;"><span class="neg">−$10.123</span></td>
+<td style="text-align: right;">%8,4</td>
+</tr>
+<tr>
+<td>Enflasyon/kur: USD bazlı maliyet +%8/yıl (3 yıl)</td>
+<td style="text-align: right;">$12.867</td>
+<td style="text-align: right;">6,9 yıl</td>
+<td style="text-align: right;"><span class="neg">−$12.737</span></td>
+<td style="text-align: right;">%7,4</td>
+</tr>
+<tr>
+<td>CAPEX +%15 (kur şoku kurulum anında)</td>
+<td style="text-align: right;">$18.594</td>
+<td style="text-align: right;">5,9 yıl</td>
+<td style="text-align: right;">$287</td>
+<td style="text-align: right;">%12,1</td>
+</tr>
+<tr>
+<td><strong>Hepsi birlikte (S4)</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−$8.578</strong></span></td>
+<td style="text-align: right;"><strong>geri dönmez</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−$103.204</strong></span></td>
+<td style="text-align: right;">negatif</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>"Enflasyon stresi" ile "kur baskısı" nasıl modellendi:</strong> Türkiye'de son yıllarda görülen örüntü, TL enflasyonunun kur artışından hızlı seyretmesi (reel TL değerlenmesi). Bu durumda işçilik, gübre ve elektrik <strong>USD bazında pahalanıyor</strong>. Satış fiyatları ise ithal/ihraç paritesi nedeniyle USD'de yatay kalma eğiliminde. Modelde maliyetler ilk 3 yıl USD bazında %8/yıl artıyor ve sonra yatay seyrediyor. Toplam etki +%26.</p>
+<h3 id="42-pesimistik-senaryo-s4-tum-soklar-ayn-anda">4.2 Pesimistik senaryo S4 (tüm şoklar aynı anda)</h3>
+<p>Varsayımlar: fiyat −%30 (karma $1,84/kg), verim −%25 (tam verim 15 t), hasat $0,84/kg (yıllık %8 artışla 4. yılda $1,06), maliyet +%8/yıl (3 yıl), CAPEX +%15 ($61.697).</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th style="text-align: right;">Rekolte (t)</th>
+<th style="text-align: right;">Brüt gelir</th>
+<th style="text-align: right;">Ambalaj+komisyon</th>
+<th style="text-align: right;">Hasat</th>
+<th style="text-align: right;">Sabit OPEX</th>
+<th style="text-align: right;">Net nakit</th>
+<th style="text-align: right;">Kümülatif</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;"><span class="neg">−61.697</span></td>
+<td style="text-align: right;"><span class="neg">−61.697</span></td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align: right;">0,0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3.250</td>
+<td style="text-align: right;"><span class="neg">−3.250</span></td>
+<td style="text-align: right;"><span class="neg">−64.947</span></td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">3,8</td>
+<td style="text-align: right;">6.917</td>
+<td style="text-align: right;">1.928</td>
+<td style="text-align: right;">3.402</td>
+<td style="text-align: right;">7.884</td>
+<td style="text-align: right;"><span class="neg">−6.297</span></td>
+<td style="text-align: right;"><span class="neg">−71.245</span></td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align: right;">10,5</td>
+<td style="text-align: right;">19.367</td>
+<td style="text-align: right;">5.399</td>
+<td style="text-align: right;">10.288</td>
+<td style="text-align: right;">11.139</td>
+<td style="text-align: right;"><span class="neg">−7.459</span></td>
+<td style="text-align: right;"><span class="neg">−78.704</span></td>
+</tr>
+<tr>
+<td>4-8</td>
+<td style="text-align: right;">15,0</td>
+<td style="text-align: right;">27.668</td>
+<td style="text-align: right;">7.713</td>
+<td style="text-align: right;">15.872</td>
+<td style="text-align: right;">12.660</td>
+<td style="text-align: right;"><span class="neg">−8.578</span></td>
+<td style="text-align: right;"><span class="neg">−121.594 (Y8)</span></td>
+</tr>
+<tr>
+<td>10</td>
+<td style="text-align: right;">12,0</td>
+<td style="text-align: right;">22.134</td>
+<td style="text-align: right;">6.171</td>
+<td style="text-align: right;">12.698</td>
+<td style="text-align: right;">12.660</td>
+<td style="text-align: right;"><span class="neg">−9.395</span></td>
+<td style="text-align: right;"><span class="neg">−139.975</span></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="43-basabas-noktalar-break-even">4.3 Başabaş noktaları (break-even)</h3>
+<p><strong>(a) Başabaş fiyatı.</strong> Tam verim yılında nakit sıfır için gereken ağırlıklı fiyat:</p>
+<aside class="note">
+<p>P* = (Sabit OPEX / kg + hasat + ambalaj) / (1 − komisyon oranı)</p>
+</aside>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Durum</th>
+<th>Hesap</th>
+<th style="text-align: right;"><strong>Başabaş fiyat</strong></th>
+<th style="text-align: right;">Baz fiyata oranı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Talep (28 t, toptan)</td>
+<td>(10.050/28.000 + 0,60 + 0,20) / 0,90</td>
+<td style="text-align: right;"><strong>$1,29/kg</strong></td>
+<td style="text-align: right;">%52</td>
+</tr>
+<tr>
+<td>S3 gerçekçi (20 t, karma)</td>
+<td>(10.050/20.000 + 0,60 + 0,3075) / 0,9015</td>
+<td style="text-align: right;"><strong>$1,56/kg</strong></td>
+<td style="text-align: right;">%59</td>
+</tr>
+<tr>
+<td>S4 stres (15 t, hasat $1,06, OPEX +%26)</td>
+<td>(12.660/15.000 + 1,06 + 0,3075) / 0,9015</td>
+<td style="text-align: right;"><strong>$2,45/kg</strong></td>
+<td style="text-align: right;"><strong>%93</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>(b) Başabaş rekolte.</strong> Kg başı katkı payı = fiyat × (1 − komisyon) − ambalaj − hasat:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Durum</th>
+<th style="text-align: right;">Katkı payı / kg</th>
+<th style="text-align: right;"><strong>Başabaş rekolte</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baz maliyet, baz fiyat ($2,635)</td>
+<td style="text-align: right;">$1,47</td>
+<td style="text-align: right;"><strong>6,8 t</strong> (0,68 t/da)</td>
+</tr>
+<tr>
+<td>Stres maliyet, baz fiyat</td>
+<td style="text-align: right;">$1,01</td>
+<td style="text-align: right;"><strong>12,5 t</strong> (1,25 t/da)</td>
+</tr>
+<tr>
+<td>Stres maliyet, fiyat −%30</td>
+<td style="text-align: right;">$0,30</td>
+<td style="text-align: right;"><strong>42,6 t → 10 da'da imkânsız</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>(c) Sermaye başabaşı.</strong> S4 koşullarında 10 yılda yatırımın sadece geri dönmesi (NPV@0) için fiyatların stres seviyesinin <strong>1,22 katı</strong> olması gerekiyor (≈ $2,25/kg, baz fiyatın %85'i). %12 getiri için <strong>1,47 katı</strong> (≈ $2,71/kg).</p>
+<p><strong>Yorum:</strong> Proje maliyet ve verim şoklarını tek tek kaldırabiliyor. <strong>Fiyat şokunu, özellikle işçilik şokuyla birlikte gelirse, kaldıramıyor.</strong> Kg başı katkı payı $1,47'den $0,30'a düşüyor. Bu yüzden risk yönetimi önceliği şu sırada olmalı: <strong>(1) fiyat ve kanal, (2) hasat işgücü, (3) iklim, (4) maliyet.</strong></p>
+<h3 id="44-risk-matrisi-ve-onlemler">4.4 Risk matrisi ve önlemler</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Olasılık</th>
+<th>Etki</th>
+<th>Önlem</th>
+<th>Maliyet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tüccar/hal fiyat baskısı</strong> (hasat zirvesinde fiyat %30-50 düşer)</td>
+<td>Yüksek</td>
+<td>Çok yüksek</td>
+<td>Dikimden önce işleme/dondurma tesisiyle taban fiyatlı alım sözleşmesi ($1,30/kg, ürünün %20-30'u). Soğuk oda ile satışı 5-7 gün kaydırma. Perakende/HoReCa (Bursa-İstanbul) payını 3. yılda %25'e çıkarma</td>
+<td>Soğuk oda $8.500 (CAPEX'te)</td>
+</tr>
+<tr>
+<td><strong>Drosophila suzukii (SWD)</strong></td>
+<td>Yüksek (Marmara'da yaygın)</td>
+<td>Yüksek (%20-50 kayıp)</td>
+<td>Elma sirkesi tuzak ağı, 2 günde bir hasat, düşük meyve sanitasyonu, gerekirse sıra kenarına böcek tülü</td>
+<td>OPEX'te (mücadele kalemi)</td>
+</tr>
+<tr>
+<td><strong>Hasat işçisi bulamama</strong></td>
+<td>Orta-yüksek</td>
+<td>Yüksek</td>
+<td>Muratlı ve çevre köylerden 8-10 kişilik sabit ekip, sezon başı avans + kg başı prim, Loch Ness karışımıyla hasadı 2 haftaya yayma</td>
+<td>+$0,05-0,10/kg prim</td>
+</tr>
+<tr>
+<td><strong>Yaz sıcağı / güneş yanığı</strong></td>
+<td>Orta-yüksek</td>
+<td>Orta</td>
+<td>Gölge filesi, sabah erken hasat, sıcak dalgası öncesi IoT tetikli serinletme sulaması</td>
+<td>CAPEX'te</td>
+</tr>
+<tr>
+<td><strong>Phytophthora / kök boğulması</strong></td>
+<td>Orta (killi toprak)</td>
+<td>Yüksek</td>
+<td>40 cm sedde, drip ile kontrollü nem, sensör eşiği (30 cm'de tarla kapasitesinin %85'i üstü alarm)</td>
+<td>CAPEX'te</td>
+</tr>
+<tr>
+<td><strong>Geç bahar donu</strong></td>
+<td>Düşük (orman kalkanı + Chester'ın geç çiçeklenmesi)</td>
+<td>Orta</td>
+<td>Meteoroloji istasyonu don alarmı</td>
+<td>CAPEX'te</td>
+</tr>
+<tr>
+<td><strong>Hırsızlık / vandalizm</strong></td>
+<td>Orta</td>
+<td>Düşük-orta</td>
+<td>Solar AI kamera + termal kamera</td>
+<td>CAPEX'te</td>
+</tr>
+<tr>
+<td><strong>Kur şoku (kurulum anında)</strong></td>
+<td>Orta</td>
+<td>Orta</td>
+<td>İthal ekipmanı (sensör, kontrolör) peşin USD fiyatla sabitleme, fidan için ön sipariş</td>
+<td>–</td>
+</tr>
+<tr>
+<td><strong>Politika / destek değişikliği</strong></td>
+<td>Orta</td>
+<td>Düşük-orta</td>
+<td>Kredi faiz desteğinde kilit tarih: 31.12.2026 (aşağıya bakın)</td>
+<td>–</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="45-agtech-paketinin-ekonomik-gerekcesi">4.5 AgTech paketinin ekonomik gerekçesi</h3>
+<p>$7.350'lik sensör ve güvenlik paketi (E + F grupları), 10 yılda kendini <strong>yılda ~%1,5 pazarlanabilir verim kurtararak</strong> öder ($52.700 × %1,5 × 10 yıl ≈ $7.900). Gerçekçi faydalar: %15-25 su ve gübre tasarrufu (yıllık ~$400-600), don ve hastalık uyarısıyla kayıp önleme, hırsızlıkta caydırıcılık. Asıl katkısı ise <strong>yatırımcıya uzaktan şeffaflık</strong>: kameralar ve sensör verisi waterfall ortaklığında güven mekanizması işlevi görür (Bölüm 5). Bu paket verimi kendi başına 20 t'dan 28 t'ya çıkarmaz.</p>
+<hr />
+<h2 id="5-is-ortaklg-ve-finansman-yaps">5. İş Ortaklığı ve Finansman Yapısı</h2>
+<h3 id="51-katklarn-degerlemesi">5.1 Katkıların değerlemesi</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Taraf</th>
+<th>Katkı</th>
+<th>Değer (10 yıl)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Yatırımcı</strong></td>
+<td>CAPEX ($43.650 yalın / $53.650 tam) + ilk 2 yıl işletme açığı (~$3.400) + pazar/kanal erişimi</td>
+<td><strong>~$47.000-57.000</strong> nakit</td>
+</tr>
+<tr>
+<td><strong>Arazi sahibi</strong></td>
+<td>10 da sulu arazi kirası (~7.000 TL/da/yıl ≈ $150/da → $1.500/yıl), DSİ su hakkı, 7/24 saha yönetimi (yarı zamanlı yönetici ≈ $4.000/yıl)</td>
+<td><strong>~$55.000</strong> ayni katkı</td>
+</tr>
+</tbody>
+</table></div>
+<p>Katkılar yaklaşık eşit. Fakat yatırımcının sermayesi <strong>ilk günden riskte</strong>, arazi sahibinin katkısı ise zamana yayılıyor. Bu asimetri, düz 50/50 yerine <strong>waterfall</strong> yapısını gerekçelendiriyor.</p>
+<h3 id="52-onerilen-asamal-kar-paylasm-waterfall">5.2 Önerilen aşamalı kâr paylaşımı (waterfall)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kademe</th>
+<th>Kural</th>
+<th style="text-align: right;">Yatırımcı</th>
+<th style="text-align: right;">Arazi sahibi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0 — Saha ücreti</strong></td>
+<td>Brüt satış gelirinin %5'i, her yıl, diğer dağıtımlardan önce (arazi sahibinin emeğini ve performansını ödüllendirir)</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">%100</td>
+</tr>
+<tr>
+<td><strong>1 — Sermaye iadesi</strong></td>
+<td>Yatırımcının koyduğu tüm nakit geri dönene kadar</td>
+<td style="text-align: right;"><strong>%85</strong></td>
+<td style="text-align: right;">%15</td>
+</tr>
+<tr>
+<td><strong>2 — Tercihli getiri</strong></td>
+<td>Yatırımcının USD IRR'si %12'ye ulaşana kadar</td>
+<td style="text-align: right;"><strong>%70</strong></td>
+<td style="text-align: right;">%30</td>
+</tr>
+<tr>
+<td><strong>3 — Kalıcı ortaklık</strong></td>
+<td>Sonrası</td>
+<td style="text-align: right;">%50</td>
+<td style="text-align: right;">%50</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Model sonuçları (tam CAPEX, 10 yıl, USD):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Senaryo</th>
+<th style="text-align: right;">Yatırımcı IRR</th>
+<th style="text-align: right;">Yatırımcı 10 yıl net kazanç</th>
+<th style="text-align: right;">Arazi sahibine 10 yıl nakit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S1 Talep, toptan</td>
+<td style="text-align: right;">%18,0</td>
+<td style="text-align: right;">$80.680</td>
+<td style="text-align: right;">$97.990</td>
+</tr>
+<tr>
+<td>S2 Talep, perakende</td>
+<td style="text-align: right;">%27,0</td>
+<td style="text-align: right;">$136.584</td>
+<td style="text-align: right;">$175.646</td>
+</tr>
+<tr>
+<td><strong>S3 Gerçekçi</strong></td>
+<td style="text-align: right;"><strong>%7,3</strong></td>
+<td style="text-align: right;"><strong>$31.281</strong></td>
+<td style="text-align: right;"><strong>$43.746</strong></td>
+</tr>
+<tr>
+<td>S3 Gerçekçi + yalın CAPEX</td>
+<td style="text-align: right;"><strong>%10,5</strong></td>
+<td style="text-align: right;">$39.516</td>
+<td style="text-align: right;">$45.510</td>
+</tr>
+</tbody>
+</table></div>
+<p>S3'te yatırımcı getirisi %7-10 USD seviyesinde kalıyor. Bu, risk primi için düşük. Yatırımcı tarafının getirisini yükseltmenin iki yolu var: <strong>kredi kaldıracı</strong> (5.3) ve aşağıdaki <strong>müzakere kolları</strong>.</p>
+<p><strong>Sözleşme maddeleri (müzakere listesi):</strong><br />
+1. <strong>Süre:</strong> 10 yıl + 5 yıl uzatma opsiyonu. Tapuya şerh edilmiş <strong>intifa veya kira sözleşmesi</strong> (yatırımcının sabit yatırım güvencesi için zorunlu).<br />
+2. <strong>Varlıkların akıbeti:</strong> Süre sonunda telli terbiye, sulama ve sedde araziye kalır. Elektronik ekipman (sensör, kamera, kontrolör, soğuk oda ünitesi) yatırımcıya döner veya defter değerinden arazi sahibine satılır.<br />
+3. <strong>Performans eşiği:</strong> 4. yıldan itibaren rekolte 2 yıl üst üste 12 t'nin altında kalırsa ve sebep iklim dışıysa, Kademe 0 saha ücreti %5'ten %2'ye iner.<br />
+4. <strong>Şeffaflık:</strong> Sensör ve kamera platformunda yatırımcıya salt-okuma erişimi, hasat günlüğü (kg/gün, kanal, fiyat) aylık paylaşımı, ortak banka hesabı.<br />
+5. <strong>Satış yetkisi:</strong> Kanal sözleşmeleri yatırımcıda, hal satışı ve günlük operasyon arazi sahibinde. Fiyat tabanı ($2,00/kg altı satış) çift imza gerektirir.<br />
+6. <strong>Çıkış:</strong> Taraflardan biri çıkarsa diğerinin önalım hakkı. Değerleme = son 2 yıl ortalama net nakit × 3.<br />
+7. <strong>Kademe 2 tavanı için alternatif:</strong> Yatırımcı IRR'si %12 yerine %10'da kesilirse arazi sahibinin payı erken artar. Gerçekçi senaryoda bu fark arazi sahibi lehine ~$4-6k.</p>
+<h3 id="53-ziraat-bankas-hazine-faiz-destekli-kredi-stratejisi">5.3 Ziraat Bankası (Hazine faiz destekli) kredi stratejisi</h3>
+<p><strong>Mevcut çerçeve (doğrulanmalı):</strong> Hazine destekli tarımsal kredilerde faiz indirimi oranı 31.12.2026'ya kadar geçerli olmak üzere %50 olarak açıklandı. Bitkisel üretim, bahçe tesisi ve basınçlı sulama konuları destek kapsamında. Kesin oranlar, limitler ve geri ödemesiz süreler başvuru anında şubeden teyit edilmeli. <strong>Başvurunun 2026 sonundan önce yapılması</strong>, yeni dönem koşullarının belirsizliği nedeniyle önemli.</p>
+<p><strong>Modellenen kredi:</strong> CAPEX'in %50'si ($26.825 ≈ <strong>1.260.775 TL</strong>), %18,5 nominal TL faiz (indirimli), 2 yıl anapara ödemesiz (faiz ödenir), 5 yıl vade, 3-5. yıllarda eşit anapara. TL'nin yıllık %18 değer kaybettiği varsayıldı.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th style="text-align: right;">Kur (TL/USD)</th>
+<th style="text-align: right;">Faiz (TL)</th>
+<th style="text-align: right;">Anapara (TL)</th>
+<th style="text-align: right;">Taksit (TL)</th>
+<th style="text-align: right;"><strong>Taksit (USD)</strong></th>
+<th style="text-align: right;">Kalan (TL)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td style="text-align: right;">55,5</td>
+<td style="text-align: right;">233.243</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">233.243</td>
+<td style="text-align: right;"><strong>4.206</strong></td>
+<td style="text-align: right;">1.260.775</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">65,4</td>
+<td style="text-align: right;">233.243</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">233.243</td>
+<td style="text-align: right;"><strong>3.564</strong></td>
+<td style="text-align: right;">1.260.775</td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align: right;">77,2</td>
+<td style="text-align: right;">233.243</td>
+<td style="text-align: right;">420.258</td>
+<td style="text-align: right;">653.502</td>
+<td style="text-align: right;"><strong>8.463</strong></td>
+<td style="text-align: right;">840.517</td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align: right;">91,1</td>
+<td style="text-align: right;">155.496</td>
+<td style="text-align: right;">420.258</td>
+<td style="text-align: right;">575.754</td>
+<td style="text-align: right;"><strong>6.318</strong></td>
+<td style="text-align: right;">420.258</td>
+</tr>
+<tr>
+<td>5</td>
+<td style="text-align: right;">107,5</td>
+<td style="text-align: right;">77.748</td>
+<td style="text-align: right;">420.258</td>
+<td style="text-align: right;">498.006</td>
+<td style="text-align: right;"><strong>4.632</strong></td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>Toplam</strong></td>
+<td style="text-align: right;"><strong>$27.182</strong></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Efektif USD maliyeti: toplamda %1,3 (yıllık ~%0,4).</strong> Faiz TL bazında, gelir ise USD paritesine bağlı. TL değer kaybı faizi büyük ölçüde eritiyor. Bu, projenin en ucuz fonlama kaynağı.</p>
+<ul>
+<li><strong>S3 özsermaye IRR'si:</strong> kredisiz %14,6 → <strong>kredili %18,8</strong> (tam CAPEX). Yalın CAPEX ($43.650) + %50 kredi ile <strong>%23,8</strong>.</li>
+<li><strong>Kümülatif özsermaye nakdi (S3, kredili):</strong> Y0 −26.825 → Y2 −37.984 (en derin nokta) → <strong>Y6'da pozitife geçer</strong> → Y10 +74.669.</li>
+<li>⚠️ <strong>Kredi riski:</strong> TL değer kaybı %18'in altında kalırsa (reel TL değerlenmesi) kredinin USD maliyeti artar. Ama bu durumda bile nominal %18,5 TL faiz, TL enflasyonunun altında kalarak negatif reel faiz sağlar. Asıl risk 3. yıl taksiti ($8.463): S3'te 3. yıl net nakdi $10.501, yani <strong>karşılama oranı 1,24x, ince</strong>. Geri ödemesiz sürenin 3 yıl olarak pazarlık edilmesi önerilir.</li>
+</ul>
+<p><strong>Hibe ve destekler (başvuru öncesi uygunluk kontrolü gerekli):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Program</th>
+<th>Kapsam</th>
+<th>Potansiyel etki</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>KKYDP — Bireysel sulama sistemleri</td>
+<td>Damla/fertigasyon ekipmanında %50 hibe</td>
+<td>~$3.000-3.500 CAPEX düşüşü (D grubu)</td>
+</tr>
+<tr>
+<td>Sertifikalı fidan kullanım desteği</td>
+<td>Sertifikalı fidanla bahçe tesisine dekar başı destek</td>
+<td>Küçük ama nakit</td>
+</tr>
+<tr>
+<td>TARSİM devlet prim desteği</td>
+<td>Primin ~%50'si</td>
+<td>OPEX'te varsayıldı</td>
+</tr>
+<tr>
+<td>Genç Çiftçi / kırsal kalkınma programları</td>
+<td>Arazi sahibi yaş ve şartlara uyuyorsa</td>
+<td>Hibe</td>
+</tr>
+<tr>
+<td>İyi Tarım / organik sertifikası</td>
+<td>Zincir market ve ihracat kanalına giriş</td>
+<td>Perakende payını artırır</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Önerilen finansman karması (yalın CAPEX $43.650 için):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kaynak</th>
+<th style="text-align: right;">Pay</th>
+<th style="text-align: right;">USD</th>
+<th>Not</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ziraat Hazine destekli TL kredi</td>
+<td style="text-align: right;">%50</td>
+<td style="text-align: right;">21.825</td>
+<td>2+3 yıl, TL</td>
+</tr>
+<tr>
+<td>KKYDP sulama hibesi</td>
+<td style="text-align: right;">~%7</td>
+<td style="text-align: right;">~3.200</td>
+<td>Ön finansman yatırımcıdan, hibe sonra gelir</td>
+</tr>
+<tr>
+<td>Yatırımcı özsermayesi</td>
+<td style="text-align: right;">~%43</td>
+<td style="text-align: right;">~18.600</td>
+<td>+ ilk 2 yıl işletme açığı ~$3.400</td>
+</tr>
+</tbody>
+</table></div>
+<p>Kredi borçlusu arazi sahibi (çiftçi kaydı ÇKS ve tapu onda), kefili veya teminat sağlayan yatırımcı olur. Kredi taksitleri, waterfall'dan önce ödenen bir operasyon kalemi olarak sözleşmeye yazılmalı.</p>
+<hr />
+<h2 id="6-uygulama-takvimi-ve-karar-kaplar">6. Uygulama Takvimi ve Karar Kapıları</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Dönem</th>
+<th>İş</th>
+<th>Karar kapısı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ekim-Kasım 2026</td>
+<td>Toprak analizi, satış/işleme ön sözleşmeleri, Ziraat kredi başvurusu (31.12.2026 öncesi), fidan ön siparişi</td>
+<td><strong>Kapı 1:</strong> Alım sözleşmesi yoksa dikim yapılmaz</td>
+</tr>
+<tr>
+<td>Aralık 2026 - Şubat 2027</td>
+<td>Dip kazan, tesviye, gübreleme, sedde, sulama ana hattı, telli terbiye</td>
+<td></td>
+</tr>
+<tr>
+<td>Mart-Nisan 2027</td>
+<td>Dikim (doku kültürü fidan, don riski sonrası), malç, sensör ve kamera kurulumu</td>
+<td></td>
+</tr>
+<tr>
+<td>2027 yazı</td>
+<td>Primokan yönetimi, IoT kalibrasyonu, SWD izleme</td>
+<td></td>
+</tr>
+<tr>
+<td>Haziran-Ağustos 2028</td>
+<td>İlk hasat (hedef 5 t)</td>
+<td><strong>Kapı 2:</strong> ≥ 4 t ve ≥ $2,30/kg ortalama: soğuk oda + gölge filesi tamamlanır</td>
+</tr>
+<tr>
+<td>2029</td>
+<td>14 t hedefi</td>
+<td><strong>Kapı 3:</strong> ≥ 12 t ise 2. faz (ek 10-20 da) değerlendirilir</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="7-sonuc">7. Sonuç</h2>
+<ol>
+<li>Talep edilen senaryolar (S1/S2) bahçenin teknik olarak mümkün olan <strong>üst sınırını</strong> temsil ediyor. Gerçekçi beklenti S3: <strong>IRR %14,6-18,6, geri dönüş 5-5,5 yıl.</strong></li>
+<li>Proje <strong>maliyet ve verim şoklarına dayanıklı, fiyat şokuna kırılgan.</strong> Başarının belirleyicisi sensör paketi değil, <strong>dikimden önce kurulan satış kanalı ve soğuk zincir.</strong></li>
+<li>Ziraat faiz destekli TL kredisi, TL değer kaybı varsayımıyla neredeyse sıfır USD maliyetli ve özsermaye getirisini ~4-8 puan artırıyor. Başvuru <strong>2026 sonundan önce</strong> yapılmalı.</li>
+<li>Ortaklıkta waterfall yapısı (Kademe 0 %5 saha ücreti → 85/15 → 70/30 → 50/50), her iki tarafın katkı ve risk profiline uygun. Tapuya şerhli intifa ve şeffaf veri erişimi sözleşmenin olmazsa olmazları.</li>
+</ol>
+<hr />
+<h3 id="ek-a-ana-varsaymlar">Ek A — Ana varsayımlar</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Varsayım</th>
+<th>Değer</th>
+<th>Hassasiyet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>USD/TRY</td>
+<td>47,0 (Ekim 2026 çalışma kuru)</td>
+<td>Tüm TL tabloları doğrusal ölçeklenir. Güncel TCMB kuruyla <code>FX</code> değişkenini güncelleyin</td>
+</tr>
+<tr>
+<td>İskonto oranı</td>
+<td>%12 USD</td>
+<td>Tarım projesi risk primi dahil</td>
+</tr>
+<tr>
+<td>Ekonomik ömür</td>
+<td>10 yıl</td>
+<td>Böğürtlende 10-12 yıl</td>
+</tr>
+<tr>
+<td>Arazi kirası / sahibin emeği</td>
+<td>Proje nakit akışına dahil değil (ayni katkı)</td>
+<td>Bölüm 5.1'de değerlendi</td>
+</tr>
+<tr>
+<td>Vergi</td>
+<td>Dahil değil (gerçek kişi çiftçide %2 stopaj komisyon kalemine dahil)</td>
+<td>Şirketleşilirse kurumlar vergisi ayrıca hesaplanmalı</td>
+</tr>
+<tr>
+<td>Fiyatlar</td>
+<td>Talep edilen $2,50 / $4,00, işleme $1,30</td>
+<td>2026 hal ve işleme fiyatları sezon başında teyit edilmeli</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ek-b-kaynaklar-ve-dogrulama-notlar">Ek B — Kaynaklar ve doğrulama notları</h3>
+<ul>
+<li>Hazine destekli tarımsal kredilerde faiz indirimi (31.12.2026'ya kadar %50): <a href="https://www.bloomberght.com/tarimsal-uretimde-kullandirilacak-kredilere-iliskin-esaslar-belirlendi-2351935" target="_blank" rel="noopener">Bloomberg HT</a>, <a href="https://www.dunya.com/kose-yazisi/tarimin-stklari-ses-verdi-hazine-destekli-subvansiyonlu-kredi-faizlerinde-geri-adim-atiliyor/800602" target="_blank" rel="noopener">Dünya</a>, <a href="https://www.bloomberght.com/subvansiyonlu-tarim-kredilerinde-eski-faiz-destegi-geri-geldi-3760308" target="_blank" rel="noopener">Bloomberg HT — faiz desteği geri geldi</a></li>
+<li>Böğürtlen yetiştiriciliği ve verim aralıkları: <a href="https://arastirma.tarimorman.gov.tr/yalovabahce/Belgeler/brosurler/OrganikBogurtlen.pdf" target="_blank" rel="noopener">TAGEM Yalova Atatürk Bahçe Kültürleri MAE — Organik Böğürtlen</a></li>
+<li>Perakende fidan fiyat referansı: <a href="https://www.trendyol.com/bogurtlen-fidani-y-s280710" target="_blank" rel="noopener">Trendyol — böğürtlen fidanı</a> (toplu sertifikalı fidan fiyatı fidanlıktan teklifle alınmalı)</li>
+<li>Ekipman fiyatları (direk, damla, sensör, kamera, soğuk oda) 2026 Türkiye piyasa bantlarına dayalı tahminler. Kurulumdan önce en az 3 teklif alınmalı.</li>
+</ul>
+</main>
+<footer>Tüm rakamlar <code>reports/bogurtlen-fizibilite/model.py</code> hesap modelinden üretilmiştir. TL karşılıkları 1 USD = 47 TL çalışma kuru iledir; ekipman fiyatları tahmindir ve teklifle doğrulanmalıdır.</footer>
+</div>
+</body>
+</html>
