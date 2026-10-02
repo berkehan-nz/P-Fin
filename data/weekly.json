@@ -1,31 +1,35 @@
 {
   "action_required": 0,
-  "as_of": "2026-09-27",
+  "as_of": "2026-10-02",
   "fx": {
-    "as_of": "2026-09-25",
-    "change_1w_pct": 0.38,
-    "deposits": [],
-    "usdtry": 48.960201263427734
+    "as_of": "2026-10-02",
+    "change_1w_pct": 0.39,
+    "deposits": [
+      {
+        "breakeven_headroom_pct": 7.71,
+        "days_to_maturity": 89,
+        "net_interest_try": 150.9,
+        "ticker": "TL-ISBANK",
+        "usdtry_at_entry": 50.3,
+        "usdtry_breakeven": 54.1796,
+        "usdtry_used_pct": -29.9,
+        "value_try": 60150.9,
+        "value_usd": 1224.08
+      }
+    ],
+    "usdtry": 49.139801025390625
   },
   "macro": {
     "key_rates": {
       "cpi_yoy": 3.35,
       "fed_funds": 3.88,
-      "us10y": 5.18
+      "us10y": 5.29
     },
-    "risk_note": "VIX 15 — normal aralikta.",
+    "risk_note": "VIX 16 — normal aralikta.",
     "upcoming": [
       {
-        "date": "2026-09-30",
-        "days": 3,
-        "detail": "buyume",
-        "kind": "makro",
-        "ticker": null,
-        "title": "GSYH (GDP)"
-      },
-      {
         "date": "2026-10-02",
-        "days": 5,
+        "days": 0,
         "detail": "isgucu",
         "kind": "makro",
         "ticker": null,
@@ -33,7 +37,7 @@
       },
       {
         "date": "2026-10-14",
-        "days": 17,
+        "days": 12,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -41,7 +45,7 @@
       },
       {
         "date": "2026-10-15",
-        "days": 18,
+        "days": 13,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -49,7 +53,7 @@
       },
       {
         "date": "2026-10-16",
-        "days": 19,
+        "days": 14,
         "detail": "uretim",
         "kind": "makro",
         "ticker": null,
@@ -57,7 +61,7 @@
       },
       {
         "date": "2026-10-27",
-        "days": 30,
+        "days": 25,
         "detail": "talep",
         "kind": "makro",
         "ticker": null,
@@ -65,7 +69,7 @@
       },
       {
         "date": "2026-10-29",
-        "days": 32,
+        "days": 27,
         "detail": "buyume",
         "kind": "makro",
         "ticker": null,
@@ -73,7 +77,7 @@
       },
       {
         "date": "2026-11-06",
-        "days": 40,
+        "days": 35,
         "detail": "isgucu",
         "kind": "makro",
         "ticker": null,
@@ -81,15 +85,31 @@
       },
       {
         "date": "2026-11-10",
-        "days": 44,
+        "days": 39,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
         "title": "TUFE (CPI)"
       },
       {
+        "date": "2026-11-13",
+        "days": 42,
+        "detail": "enflasyon",
+        "kind": "makro",
+        "ticker": null,
+        "title": "URFE (PPI)"
+      },
+      {
+        "date": "2026-11-17",
+        "days": 46,
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "GFF",
+        "title": "GFF bilanco"
+      },
+      {
         "date": "2026-11-19",
-        "days": 53,
+        "days": 48,
         "detail": null,
         "kind": "bilanco",
         "ticker": "BKE",
@@ -97,19 +117,11 @@
       },
       {
         "date": "2026-12-02",
-        "days": 66,
+        "days": 61,
         "detail": null,
         "kind": "bilanco",
         "ticker": "DOCU",
         "title": "DOCU bilanco"
-      },
-      {
-        "date": "2026-12-09",
-        "days": 73,
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "MITK",
-        "title": "MITK bilanco"
       }
     ]
   },
@@ -181,11 +193,13 @@
       "HQY",
       "HRMY",
       "HUBS",
+      "IDT",
       "INCY",
       "INVA",
       "JKHY",
       "KAI",
       "KFY",
+      "KTB",
       "LEVI",
       "LMAT",
       "LOGI",
@@ -206,6 +220,7 @@
       "PRDO",
       "RH",
       "RMD",
+      "SD",
       "SKYW",
       "SPSC",
       "TTD",
@@ -215,29 +230,114 @@
       "YUMC",
       "ZD"
     ],
-    "entered": [],
+    "entered": [
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "yellow",
+            "own_5y_pct": null,
+            "pct_basis": "universe",
+            "sector_pct": 27.8,
+            "value": 14.69
+          },
+          "fcf_yield_ev": {
+            "color": "yellow",
+            "own_5y_pct": 0.0,
+            "pct_basis": "universe",
+            "sector_pct": 43.2,
+            "value": 3.82
+          },
+          "roic": {
+            "color": "green",
+            "own_5y_pct": null,
+            "pct_basis": "universe",
+            "sector_pct": 87.1,
+            "value": 56.59
+          }
+        },
+        "name": "IDT CORP",
+        "score": 59.0,
+        "ticker": "IDT"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "green",
+            "own_5y_pct": 16.7,
+            "pct_basis": "sector",
+            "sector_pct": 4.5,
+            "value": 5.26
+          },
+          "fcf_yield_ev": {
+            "color": "green",
+            "own_5y_pct": 25.0,
+            "pct_basis": "sector",
+            "sector_pct": 25.0,
+            "value": 10.91
+          },
+          "roic": {
+            "color": "yellow",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 62.5,
+            "value": 13.28
+          }
+        },
+        "name": "SANDRIDGE ENERGY INC",
+        "score": 58.5,
+        "ticker": "SD"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "yellow",
+            "own_5y_pct": 37.5,
+            "pct_basis": "universe",
+            "sector_pct": 26.8,
+            "value": 13.53
+          },
+          "fcf_yield_ev": {
+            "color": "green",
+            "own_5y_pct": 83.3,
+            "pct_basis": "universe",
+            "sector_pct": 83.3,
+            "value": 9.54
+          },
+          "roic": {
+            "color": "yellow",
+            "own_5y_pct": null,
+            "pct_basis": "universe",
+            "sector_pct": 43.1,
+            "value": 14.96
+          }
+        },
+        "name": "Kontoor Brands, Inc.",
+        "score": 55.5,
+        "ticker": "KTB"
+      }
+    ],
     "first_report": false,
     "left": []
   },
   "portfolio": {
-    "pnl_pct": null,
-    "position_count": 0,
-    "value_usd": 1000.0
+    "pnl_pct": 0.99,
+    "position_count": 4,
+    "value_usd": 2412.52
   },
   "scan": {
-    "cycle": 5,
-    "data_missing": 66,
-    "done": 900,
-    "eliminated": 761,
-    "last_finalized": "2026-09-26",
-    "pct": 23.5,
-    "retry_queue": 66,
-    "survivors": 73,
-    "total": 3826
+    "cycle": 6,
+    "data_missing": 218,
+    "done": 3300,
+    "eliminated": 2784,
+    "last_finalized": "2026-09-29",
+    "pct": 86.5,
+    "retry_queue": 218,
+    "survivors": 298,
+    "total": 3815
   },
   "slice_drift": [],
   "source": "weekly",
   "triggered_breakers": [],
   "upcoming_earnings": [],
-  "week_of": "2026-09-21"
+  "week_of": "2026-09-28"
 }
