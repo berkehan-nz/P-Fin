@@ -219,6 +219,10 @@ def loans(mitigated=True):
     return out
 
 
+# ------------------------------------------------------------------ dış senaryo kancaları (model_v4)
+ADJ = {"fixed_add": {}, "corp_mult": {}}   # yıl → ek sabit gider / kurumsal hacim çarpanı
+
+
 # ------------------------------------------------------------------ çekirdek hesap
 def year_pnl(y, yld_mult=1.0, pack_mult=1.0, hal_mult=1.0, harv_mult=1.0, unpicked=0.0,
              insurance_payout=0.0, freezer=True, fd=True, price_mult=1.0, contracts=True):
@@ -226,7 +230,8 @@ def year_pnl(y, yld_mult=1.0, pack_mult=1.0, hal_mult=1.0, harv_mult=1.0, unpick
     kg = base_kg(y) * yld_mult * (1 - unpicked)
     second = kg * SECOND
     first = kg - second
-    corp = min(CORP_T[k] * 1000 * (CUR["corp_factor"] if scaled(y) else 1) * (1 if contracts else 0), first)
+    corp = min(CORP_T[k] * 1000 * (CUR["corp_factor"] if scaled(y) else 1) * ADJ["corp_mult"].get(y, 1.0)
+               * (1 if contracts else 0), first)
     rest = first - corp
     packed = rest * PACK_SHARE[k] * (CUR["pack_factor"] if scaled(y) else 1)
     surplus = rest - packed
@@ -256,7 +261,7 @@ def year_pnl(y, yld_mult=1.0, pack_mult=1.0, hal_mult=1.0, harv_mult=1.0, unpick
     fd_cost = fd_in * (FD_OWN if y >= own_fd_from() else FD_TOLL) + fd_out * FD_PACK
     svc = r_serv * v2.SERVICE_COST + r_lab * v2.LAB_COST + r_cons * v2.CONSULT_COST
     cogs = harvest + packaging + dist + frozen_cost + fd_cost + svc
-    fx = fixed(y)
+    fx = fixed(y) + ADJ["fixed_add"].get(y, 0.0)
     return dict(y=y, kg=kg, packed=packed, corp=corp, hal=hal, proc=proc, iqf=iqf, fd_in=fd_in, fd_out=fd_out,
                 r_pack=r_pack, r_corp=r_corp, r_hal=r_hal, r_proc=r_proc, r_iqf=r_iqf, r_fd=r_fd,
                 r_serv=r_serv, r_lab=r_lab, r_cons=r_cons, r_ins=insurance_payout, rev=rev,

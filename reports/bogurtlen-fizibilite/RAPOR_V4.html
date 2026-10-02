@@ -1,0 +1,3254 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Berry Lab Fizibilite v4</title>
+<meta name="description" content="Karacabey/Muratlı akıllı böğürtlen üretim, soğuk zincir, paketleme ve AgTech test tesisi: iş modeli, CAPEX, 5 yıllık gelir tablosu, nakit akışı, vergi ve finansman.">
+<style>
+:root {
+  --bg:#f7f6f2; --surface:#ffffff; --text:#1d1f1c; --muted:#5d625a; --line:#e2e0d8;
+  --accent:#5b2a6e; --accent-soft:#f1e9f4; --head:#f0eee7; --neg:#b3261e; --warn-bg:#fff6e0; --warn-line:#e0b44a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#141513; --surface:#1d1f1c; --text:#e8e7e2; --muted:#a3a79e; --line:#33362f;
+    --accent:#c99be0; --accent-soft:#2b2231; --head:#25271f; --neg:#ff8a80; --warn-bg:#2d2715; --warn-line:#8a6d22;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#141513; --surface:#1d1f1c; --text:#e8e7e2; --muted:#a3a79e; --line:#33362f;
+  --accent:#c99be0; --accent-soft:#2b2231; --head:#25271f; --neg:#ff8a80; --warn-bg:#2d2715; --warn-line:#8a6d22;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.wrap { max-width:1060px; margin:0 auto; padding:32px 16px 64px; }
+header h1 { font-size:clamp(1.5rem,3.4vw,2.2rem); line-height:1.2; margin:0 0 12px; letter-spacing:-.01em; }
+header .eyebrow { color:var(--accent); font-weight:600; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; }
+nav.toc { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 18px; margin:24px 0; }
+nav.toc ul { margin:0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px 18px; }
+nav.toc a { color:var(--muted); text-decoration:none; font-size:.92rem; }
+nav.toc a:hover { color:var(--accent); }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:20px 0; }
+.kpi { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+.kl { font-size:.8rem; color:var(--muted); }
+.kv { font-size:1.45rem; font-weight:700; margin:2px 0; font-variant-numeric:tabular-nums; }
+.ks { font-size:.78rem; color:var(--muted); }
+.verdict { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; }
+.badge { background:var(--accent); color:var(--bg); font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:999px; letter-spacing:.05em; }
+main h2 { font-size:1.45rem; margin:48px 0 12px; padding-top:12px; border-top:1px solid var(--line); scroll-margin-top:12px; }
+main h3 { font-size:1.12rem; margin:28px 0 8px; color:var(--accent); }
+p, li { max-width:78ch; }
+a { color:var(--accent); }
+code { background:var(--head); padding:1px 5px; border-radius:4px; font-size:.88em; }
+hr { display:none; }
+.tw { overflow-x:auto; margin:14px 0; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+table { border-collapse:collapse; width:100%; font-size:.9rem; font-variant-numeric:tabular-nums; }
+th, td { padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { background:var(--head); text-align:left; font-weight:600; white-space:nowrap; }
+tr:last-child td { border-bottom:none; }
+td[align="right"], th[align="right"], td[style*="right"], th[style*="right"] { white-space:nowrap; }
+.neg { color:var(--neg); }
+aside.note { background:var(--warn-bg); border-left:4px solid var(--warn-line); margin:16px 0; padding:4px 16px; border-radius:8px; }
+footer { margin-top:48px; color:var(--muted); font-size:.85rem; }
+@media print {
+  body { background:#fff; color:#000; font-size:11pt; }
+  nav.toc { display:none; } .tw { overflow:visible; } main h2 { break-before:page; }
+  tr { break-inside:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="eyebrow">Fizibilite v4 · 20 dönüm planı · sanayileşme ve imar etkisi · Ekim 2026</div>
+<h1>Muratlı Berry Lab — Fizibilite v4: Hibrit Model, Mevsim Riskleri, 20 Dönüm Planı, Sanayileşme/İmar Etkisi ve 10 Yıllık Projeksiyon</h1>
+<div class="verdict"><span class="badge">KARAR</span> <strong>OLUMLU — HEDEF 20 DA, KADEMELİ</strong> — 2027’de 10 da; 2028 satış verisi olumluysa 2029’da ikinci 10 da.</div>
+<section class="kpis" aria-label="Özet göstergeler"><div class="kpi"><div class="kl">Hedef işletme</div><div class="kv">20 da</div><div class="ks">10 da 2027 + 10 da 2029</div></div><div class="kpi"><div class="kl">20 da proje IRR</div><div class="kv">%15,0</div><div class="ks">Sanayi komşusu senaryosu: %14,8</div></div><div class="kpi"><div class="kl">2032 gelir (20 da)</div><div class="kv">$220.017</div><div class="ks">10 yıl net kâr $218.968</div></div><div class="kpi"><div class="kl">Zarar yılı olasılığı</div><div class="kv">%0,1</div><div class="ks">Mevsim riskleri, önlemli plan</div></div><div class="kpi"><div class="kl">İmar/kamulaştırma etkisi</div><div class="kv">~%45</div><div class="ks">2036'ya kadar (tahmin)</div></div><div class="kpi"><div class="kl">Taşınabilir yatırım</div><div class="kv">%55-62</div><div class="ks">Beklenen NPV 20 da: +$11.418</div></div></section>
+</header>
+<nav class="toc" aria-label="İçindekiler"><div class="toc">
+<ul>
+<li><a href="#0-yonetici-ozeti">0. Yönetici Özeti</a></li>
+<li><a href="#1-bogurtlen-bu-senaryoda-en-mantkl-secim-mi">1. Böğürtlen Bu Senaryoda En Mantıklı Seçim mi?</a></li>
+<li><a href="#2-bogurtleni-tanmak">2. Böğürtleni Tanımak</a></li>
+<li><a href="#3-bir-yln-nasl-gececek-donem-donem">3. Bir Yılın Nasıl Geçecek: Dönem Dönem</a></li>
+<li><a href="#4-hibrit-kanal-modeli-taze-cogunluk-dondurulmus-ve-kuru-emniyet-supab">4. Hibrit Kanal Modeli: Taze Çoğunluk, Dondurulmuş ve Kuru Emniyet Supabı</a></li>
+<li><a href="#5-mevsim-riskleri-gozunde-mi-buyutuyorsun">5. Mevsim Riskleri: Gözünde mi Büyütüyorsun?</a></li>
+<li><a href="#6-10-yllk-finansal-projeksiyon-2027-2036">6. 10 Yıllık Finansal Projeksiyon (2027-2036)</a></li>
+<li><a href="#7-20-donum-plan">7. 20 Dönüm Planı</a></li>
+<li><a href="#8-sanayilesme-ulasm-ve-imar-teknosab-komsulugunun-etkileri">8. Sanayileşme, Ulaşım ve İmar: TEKNOSAB Komşuluğunun Etkileri</a></li>
+<li><a href="#9-finansman-hukuki-yap-ve-ortaklk-v2den-degisenler">9. Finansman, Hukuki Yapı ve Ortaklık (v2'den değişenler)</a></li>
+<li><a href="#10-10-yllk-yol-haritas-ve-karar-kaplar">10. 10 Yıllık Yol Haritası ve Karar Kapıları</a></li>
+<li><a href="#11-sonuc">11. Sonuç</a></li>
+</ul>
+</div>
+</nav>
+<main>
+<p><strong>Kapsam:</strong> 10 da pilot + <strong>20 da hedef işletme</strong> dikensiz böğürtlen (3 çeşitli portföy). Kanal planı: taze çoğunluk (100/200/500 g + kurumsal paket), dondurulmuş (IQF) ve liyofilize (fason) yan kanallar. Soğuk zincir ve AgTech altyapısı v2'den devralınır.<br />
+<strong>Lokasyon:</strong> Bursa / Karacabey / Muratlı Mah. · <strong>Kurucu:</strong> Ankara merkezli, düzenli saha ziyaretli uzaktan yönetim<br />
+<strong>Rapor tarihi:</strong> 2 Ekim 2026 · <strong>Sürüm:</strong> v4 (v3 + Bölüm 8: TEKNOSAB, demiryolu ve imar etkisi; CAPEX kalem detayı için v2 Bölüm 3 geçerlidir)<br />
+<strong>Para birimi:</strong> 2026 sabit fiyatlarıyla USD (reel); 1 USD = 47 TL<br />
+<strong>Hesap modeli:</strong> <a href="https://github.com/berkehan-nz/P-Fin/blob/claude/thornless-blackberry-feasibility-5kpz6c/reports/bogurtlen-fizibilite/model_v3.py" target="_blank" rel="noopener"><code>model_v3.py</code></a> (<code>--tables</code>, <code>--mc</code>) ve sanayileşme senaryoları için <a href="https://github.com/berkehan-nz/P-Fin/blob/claude/thornless-blackberry-feasibility-5kpz6c/reports/bogurtlen-fizibilite/model_v4.py" target="_blank" rel="noopener"><code>model_v4.py</code></a></p>
+<hr />
+<h2 id="0-yonetici-ozeti">0. Yönetici Özeti</h2>
+<p><strong>Sorularının kısa cevapları:</strong></p>
+<ol>
+<li><strong>Böğürtlen doğru seçim mi?</strong> Evet. Toprak (pH 7-7,5, killi-tınlı), DSİ suyu, iklim, taze + dondurulmuş + liyofilize hibrit kanal ve teknoloji konsepti birlikte değerlendirildiğinde en dengeli seçenek böğürtlen. İki değişiklik öneriyorum: (a) tek çeşit yerine <strong>3 çeşitli portföy</strong> kur; hasat sezonu 6 haftadan <strong>haziran ortası–ekim sonu arasında ~4,5 aya</strong> yayılıyor. (b) Living lab içinde <strong>1 da ahududu pilotu</strong> dene; ahududu liyofilize pazarının en değerli meyvesi.</li>
+<li><strong>Mevsim risklerini gözünde mi büyütüyorsun?</strong> Kısmen evet. 5.000 senaryoluk risk simülasyonunda bu plandaki önlemlerle <strong>olgun bir yılın zararla kapanma olasılığı %0,1</strong>. Önlemsiz kurulan bir bahçede bu oran %17,1. Mevsim riskleri ölçülebilir ve büyük ölçüde yönetilebilir. Asıl riskler başka yerde: <strong>pazar</strong> (sezonda günde 300-500 paketin satılabilmesi), <strong>ölçek</strong> (10 da'da sabit giderler ağır kalıyor) ve <strong>uzaktan yönetim</strong> (sahadaki teknisyenin kalitesi).</li>
+<li><strong>20 dönüm planı?</strong> Bölüm 7'de: iki seçenek (tek seferde / kademeli), ek yatırım, organizasyon, kapasite ve 10 yıllık tablolar.</li>
+<li><strong>Yılın nasıl geçecek?</strong> Bölüm 3'te ay ay anlatılıyor. Olgun bir yılda haziran ortasından ekim sonuna kadar <strong>~60 hasat günü</strong> var. Her bitki yılda <strong>15-20 kez</strong> toplanıyor ve hasat 2-3 günde bir tekrarlanıyor. Sen yılda <strong>~30 ziyaretle</strong> yönetiyorsun: kışın ayda 1, hasat zirvesinde haftalık veya sahada kalarak.</li>
+<li><strong>Sanayileşme ve imar ne getirir?</strong> Bölüm 8'de. Arazin <strong>TEKNOSAB'ın sınır komşusu</strong>: Muratlı'nın mahalle yolunun bir kısmı OSB sınırında kaldığı için yeni yol için kamulaştırma kararı alındı. 10 yıl tahminin gerçekçi. 2036'ya kadar arazinin bir biçimde imar veya kamulaştırmadan etkilenme olasılığını <strong>~%45</strong> görüyorum, tamamen tarım dışına çıkma olasılığını <strong>~%27</strong>. En olası durum (%55) tarımın sürmesi ve sanayinin komşu olması. Bu durumda işçilik pahalanıyor ama TEKNOSAB firmaları kurumsal müşteri oluyor; iki etki birbirini büyük ölçüde götürüyor. 20 da kademeli planın olasılık ağırlıklı beklenen NPV'si pozitif kalıyor (+$11.418).</li>
+</ol>
+<p><strong>10 yıllık tablo — üç plan (baz senaryo):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Gösterge</th>
+<th style="text-align: right;">10 da</th>
+<th style="text-align: right;">20 da — tek seferde (2027)</th>
+<th style="text-align: right;">20 da — kademeli (2027 + 2029)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Toplam yatırım (10 yıl, yenileme dahil)</td>
+<td style="text-align: right;">$134.910</td>
+<td style="text-align: right;">$193.459</td>
+<td style="text-align: right;">$193.459</td>
+</tr>
+<tr>
+<td>2032 rekolte</td>
+<td style="text-align: right;">20 t</td>
+<td style="text-align: right;">40 t</td>
+<td style="text-align: right;">40 t</td>
+</tr>
+<tr>
+<td>2032 gelir</td>
+<td style="text-align: right;">$122.427</td>
+<td style="text-align: right;">$220.017</td>
+<td style="text-align: right;">$220.017</td>
+</tr>
+<tr>
+<td>2032 vergi öncesi kâr</td>
+<td style="text-align: right;">$30.642</td>
+<td style="text-align: right;">$67.215</td>
+<td style="text-align: right;">$65.784</td>
+</tr>
+<tr>
+<td>10 yıl toplam gelir</td>
+<td style="text-align: right;">$901.543</td>
+<td style="text-align: right;">$1.626.926</td>
+<td style="text-align: right;">$1.487.220</td>
+</tr>
+<tr>
+<td>10 yıl toplam net kâr</td>
+<td style="text-align: right;">$81.991</td>
+<td style="text-align: right;">$251.306</td>
+<td style="text-align: right;">$218.968</td>
+</tr>
+<tr>
+<td>Proje IRR</td>
+<td style="text-align: right;">%9,5</td>
+<td style="text-align: right;">%16,7</td>
+<td style="text-align: right;">%15,0</td>
+</tr>
+<tr>
+<td>Özsermaye IRR (kredili)</td>
+<td style="text-align: right;">%12,0</td>
+<td style="text-align: right;">%21,4</td>
+<td style="text-align: right;">%19,1</td>
+</tr>
+<tr>
+<td>Proje NPV (%12)</td>
+<td style="text-align: right;"><span class="neg">−$15.631</span></td>
+<td style="text-align: right;">$46.210</td>
+<td style="text-align: right;">$27.719</td>
+</tr>
+<tr>
+<td>Geri dönüş (kaldıraçsız)</td>
+<td style="text-align: right;">6,9 yıl</td>
+<td style="text-align: right;">5,8 yıl</td>
+<td style="text-align: right;">6,6 yıl</td>
+</tr>
+<tr>
+<td>Azami özsermaye ihtiyacı</td>
+<td style="text-align: right;">$103.797</td>
+<td style="text-align: right;">$133.058</td>
+<td style="text-align: right;">$129.462</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Karar: Hedef işletme 20 da.</strong> 10 da tek başına "iyi bir tarım işletmesi" düzeyinde kalıyor: düşük riskli, pozitif nakit üretiyor, ama %12 hedefin altında (IRR %9,5). Soğuk zincir, pakethane, dondurucu ve AgTech altyapısı ancak 20 da'da tam kullanılıyor ve getiri %15-17'ye çıkıyor (Bölüm 7).<br />
+- <strong>Varsayılan yol: kademeli 20 da.</strong> 2027'de 10 da, 2029'da ikinci 10 da. İkinci bloğun $30.445'lik tarla yatırımı, 2028 satış verisi görüldükten sonra (Kapı 2) yapılıyor.<br />
+- <strong>Sanayileşme bu kararı değiştirmiyor, güçlendiriyor:</strong> Yatırımın %55-62'si taşınabilir (konteyner pakethane, reefer, dondurucu, GES, sensörler). Kamulaştırma veya imar hâlinde bahçe ve sabit tesisler için bedel alınıyor, taşınabilir varlıklar yeni araziye götürülebiliyor. Arazi değerindeki artış ise ayrı ve tarımla çelişmeyen bir kazanç.<br />
+- <strong>Tek seferde 20 da</strong>, ancak <strong>Mart 2027'den önce</strong> yılda ≥ 5 t'luk bir kurumsal ortak veya ön sözleşme sağlanırsa seçilmeli. IRR'si 1,7 puan daha yüksek, ama pazarı görmeden iki kat ürünü satmayı varsayıyor.</p>
+<hr />
+<h2 id="1-bogurtlen-bu-senaryoda-en-mantkl-secim-mi">1. Böğürtlen Bu Senaryoda En Mantıklı Seçim mi?</h2>
+<h3 id="11-aday-urunlerin-karslastrmas">1.1 Aday ürünlerin karşılaştırması</h3>
+<p>Puanlar 1 (zayıf) ile 5 (güçlü) arasında, bu arazi ve bu iş modeli için verildi.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kriter</th>
+<th style="text-align: center;"><strong>Dikensiz böğürtlen</strong></th>
+<th style="text-align: center;">Ahududu</th>
+<th style="text-align: center;">Yaban mersini</th>
+<th style="text-align: center;">Çilek (tünel)</th>
+<th style="text-align: center;">Aronya</th>
+<th style="text-align: center;">Kiraz</th>
+<th style="text-align: center;">Goji</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Toprak uyumu (pH 7-7,5, killi-tınlı)</td>
+<td style="text-align: center;"><strong>5</strong></td>
+<td style="text-align: center;">3 (kök çürüklüğüne hassas)</td>
+<td style="text-align: center;">1 (pH 4,5-5,5 ister)</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">3 (ağır toprakta riskli)</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td>Karacabey iklimi (yaz 35 °C+)</td>
+<td style="text-align: center;"><strong>4</strong> (fileyle)</td>
+<td style="text-align: center;">2 (sıcağa hassas)</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td>İlk ürün / tam verim</td>
+<td style="text-align: center;"><strong>1. yıl az / 4. yıl</strong></td>
+<td style="text-align: center;">1. yıl / 3. yıl</td>
+<td style="text-align: center;">3. / 6-7. yıl</td>
+<td style="text-align: center;">1. yıl / her yıl dikim</td>
+<td style="text-align: center;">3. / 5. yıl</td>
+<td style="text-align: center;">4. / 7-8. yıl</td>
+<td style="text-align: center;">2. / 4. yıl</td>
+</tr>
+<tr>
+<td>Kurulum maliyeti</td>
+<td style="text-align: center;"><strong>3</strong></td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">1 (saksı + RO, v1)</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td>İşçilik yoğunluğu (5 = az)</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">5 (makineli hasat)</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td>Taze pazar talebi ve fiyatı</td>
+<td style="text-align: center;"><strong>4</strong> (arz az)</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">3 (arz çok)</td>
+<td style="text-align: center;">1 (taze yenmez)</td>
+<td style="text-align: center;">4 (arz çok)</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr>
+<td>Dondurulmuş / liyofilize uygunluğu</td>
+<td style="text-align: center;"><strong>4</strong></td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td>Raf ömrü (taze)</td>
+<td style="text-align: center;">3 (soğuk zincirle 7-10 gün)</td>
+<td style="text-align: center;">2 (3-5 gün)</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">–</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">–</td>
+</tr>
+<tr>
+<td>Bölgede rekabet (5 = az)</td>
+<td style="text-align: center;"><strong>5</strong></td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td>Teknoloji / izlenebilirlik değeri</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr>
+<td><strong>Toplam (yaklaşık)</strong></td>
+<td style="text-align: center;"><strong>~39</strong></td>
+<td style="text-align: center;">~35</td>
+<td style="text-align: center;">~31</td>
+<td style="text-align: center;">~28</td>
+<td style="text-align: center;">~33</td>
+<td style="text-align: center;">~29</td>
+<td style="text-align: center;">~30</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Sonuç:</strong><br />
+- <strong>Böğürtlen</strong> bu arazinin doğal yapısıyla (nötr pH, derin toprak, bol su) en uyumlu yüksek değerli meyve. Bölgede ticari dikensiz böğürtlen üreticisi az olduğu için taze pazarda rekabet sınırlı.<br />
+- <strong>Ahududu</strong> daha pahalı satılıyor ve liyofilize pazarında en çok aranan meyve. Ancak sıcağa ve ağır topraktaki kök çürüklüğüne hassas. Bu nedenle ana ürün değil, <strong>living lab'de 1 da pilot</strong> olarak öneriyorum (Y3, ~$3.500; sonbahar ürünlü primocane çeşitlerle). Başarılı olursa ikinci blokta %20-30 pay alabilir.<br />
+- <strong>Aronya</strong> toprağa ve iklime en dayanıklı seçenek, ama taze tüketilmediği için paketli taze modeline uymuyor. Tamamen işleme odaklı bir senaryoda düşünülebilir.<br />
+- <strong>Yaban mersini</strong> v1'de saksı + RO maliyeti ($185k+) nedeniyle elenmişti; bu karar geçerli.</p>
+<h3 id="12-neden-uc-cesit">1.2 Neden üç çeşit?</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Çeşit</th>
+<th style="text-align: right;">Alan payı</th>
+<th>Tip</th>
+<th>Hasat penceresi (Karacabey, tahmini)</th>
+<th style="text-align: right;">Tam verim</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Loch Ness</td>
+<td style="text-align: right;">%30 (3 da)</td>
+<td>floricane, yarı dik</td>
+<td>5 Tem – 10 Ağu</td>
+<td style="text-align: right;">2,2 t/da</td>
+</tr>
+<tr>
+<td>Chester</td>
+<td style="text-align: right;">%40 (4 da)</td>
+<td>floricane, yarı yatık, geç</td>
+<td>25 Tem – 10 Eyl</td>
+<td style="text-align: right;">2,0 t/da</td>
+</tr>
+<tr>
+<td>Prime-Ark Freedom / Traveler</td>
+<td style="text-align: right;">%30 (3 da)</td>
+<td>primocane (1. yıl kolda sonbahar ürünü)</td>
+<td>15 Haz – 5 Tem (az) + 1 Eyl – 31 Eki</td>
+<td style="text-align: right;">1,6 t/da</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ağırlıklı tam verim ≈ <strong>1,94 t/da</strong> (modelde 2,0 t/da). Portföyün faydaları:<br />
+1. <strong>Hasat 6 haftadan ~4,5 aya yayılıyor.</strong> Günlük tepe hacim yarıya iniyor; daha az işçi, daha küçük soğuk oda ve daha kolay satış demek.<br />
+2. <strong>Risk dağılıyor.</strong> Bir sıcak dalgası, yağış veya fiyat çöküşü sezonun yalnız bir bölümünü vuruyor.<br />
+3. <strong>Primocane çeşit dikim yılında (2027 sonbaharı) ürün veriyor.</strong> Erken nakit ve pazar testi için fırsat.</p>
+<aside class="note">
+<p>⚠️ Prime-Ark Freedom ve Prime-Ark Traveler, Arkansas Üniversitesi'nin lisanslı çeşitleri. Türkiye'de sertifikalı ve doku kültürü tedariki fidanlıklarla doğrulanmalı. Bulunamazsa Chester ile birlikte, olgunlaşma tarihi farklı dikensiz çeşitler (ör. Triple Crown, Navaho) kullanılarak benzer bir yayılım kurulabilir.</p>
+</aside>
+<hr />
+<h2 id="2-bogurtleni-tanmak">2. Böğürtleni Tanımak</h2>
+<h3 id="21-biyolojisi-anlaman-gereken-tek-sey">2.1 Biyolojisi: anlaman gereken tek şey</h3>
+<ul>
+<li><strong>Kök ve taç çok yıllık</strong> (ekonomik ömür 12-15 yıl), <strong>kollar (kamçılar) iki yıllık.</strong></li>
+<li><strong>1. yıl kolu = primocane.</strong> İlkbaharda topraktan çıkar ve büyür. Floricane çeşitlerde bu yıl meyve vermez.</li>
+<li><strong>2. yıl kolu = floricane.</strong> Aynı kol ikinci yazında çiçek açar, meyve verir ve <strong>ölür.</strong> Hasattan sonra dipten kesilir.</li>
+<li>Yani her yaz bitkide iki kuşak kol yan yana bulunur: meyve veren yaşlılar ve gelecek yılın meyvesini taşıyacak gençler. <strong>Böğürtlen yönetiminin özü, bu iki kuşağı tele doğru bağlayıp ayırmak.</strong></li>
+<li><strong>Primocane çeşitler</strong> (Prime-Ark) 1. yıl kolunun ucunda, sonbaharda da meyve verir. Bu yüzden dikim yılında ürün alınabiliyor.</li>
+<li><strong>Kendine verimli</strong> (tozlayıcı çeşit gerekmez), ama arılar meyve tutumunu ve iriliğini artırır. Modelde çiçeklenmede 15 kovan kiralanıyor.</li>
+<li><strong>Kök boğulmasına hassas.</strong> Seddeli dikim ve damla sulama zorunlu. Toprak nemi sensörü burada gerçek bir değer üretiyor.</li>
+</ul>
+<h3 id="22-hasat-kac-kez-nasl">2.2 Hasat: kaç kez, nasıl?</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Soru</th>
+<th>Cevap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bir çeşidin hasat süresi</td>
+<td>4-7 hafta</td>
+</tr>
+<tr>
+<td>Hasat sıklığı</td>
+<td>Aynı sıra <strong>2-3 günde bir</strong> toplanır. SWD sineği nedeniyle 3 günü geçmemeli</td>
+</tr>
+<tr>
+<td>Bir bitki yılda kaç kez toplanır</td>
+<td><strong>15-20 kez</strong></td>
+</tr>
+<tr>
+<td>Yılda toplam hasat günü (3 çeşit)</td>
+<td><strong>~60 gün</strong> (haziran ortası – ekim sonu, çakışmalarla)</td>
+</tr>
+<tr>
+<td>Tepe dönem</td>
+<td>25 Temmuz – 10 Ağustos (Loch Ness + Chester üst üste)</td>
+</tr>
+<tr>
+<td>Tepe günlük hacim</td>
+<td>~400-450 kg/gün → <strong>7-8 toplayıcı</strong></td>
+</tr>
+<tr>
+<td>Günlük çalışma saatleri</td>
+<td>05:30-11:00 hasat (serin saatler), 2 saat içinde ön soğutma, öğleden sonra paketleme, akşam sevkiyat</td>
+</tr>
+<tr>
+<td>Olgunluk ölçütü</td>
+<td>Parlak siyahtan <strong>mat siyaha</strong> dönen meyve. Parlak siyah meyve henüz ekşidir</td>
+</tr>
+<tr>
+<td>Toplama biçimi</td>
+<td>Paketli ürün doğrudan tarlada punnet'e toplanır (ikinci kez elleme yok)</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="23-bitkinin-hayat-egrisi">2.3 Bitkinin hayat eğrisi</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yaş</th>
+<th>Dönem</th>
+<th style="text-align: right;">Verim (10 da, baz)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2027 (1. yıl)</td>
+<td>Dikim, primocane büyümesi; Prime-Ark'ta sonbahar ürünü</td>
+<td style="text-align: right;">0,5 t</td>
+</tr>
+<tr>
+<td>2028 (2. yıl)</td>
+<td>İlk floricane hasadı</td>
+<td style="text-align: right;">5,5 t</td>
+</tr>
+<tr>
+<td>2029 (3. yıl)</td>
+<td>Kanopi doluyor</td>
+<td style="text-align: right;">14,5 t</td>
+</tr>
+<tr>
+<td>2030-2034</td>
+<td>Tam verim</td>
+<td style="text-align: right;">20 t</td>
+</tr>
+<tr>
+<td>2035-2036</td>
+<td>Hafif yaşlanma</td>
+<td style="text-align: right;">18 → 16 t</td>
+</tr>
+<tr>
+<td>2037+</td>
+<td>Yenileme kararı: kısmi yeniden dikim veya gençleştirme budaması</td>
+<td style="text-align: right;">–</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="3-bir-yln-nasl-gececek-donem-donem">3. Bir Yılın Nasıl Geçecek: Dönem Dönem</h2>
+<h3 id="31-kurulus-donemi-ekim-2026-aralk-2027">3.1 Kuruluş dönemi (Ekim 2026 – Aralık 2027)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Dönem</th>
+<th>Sahada</th>
+<th>Masada (Ankara'dan)</th>
+<th>Ziyaret</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ekim-Kasım 2026</strong></td>
+<td>Toprak analizi, dip kazan (toprak kuruyken), lazer tesviye, 40 t organik gübre, sedde yapımı (kış yağmurlarından önce)</td>
+<td>Ltd. kuruluşu, Ziraat Faz 1 kredi başvurusu (<strong>31.12.2026 öncesi</strong>), elektrik keşfi, 5403 yapı izni başvurusu, fidan siparişi (3 çeşit)</td>
+<td>3-4 ziyaret</td>
+</tr>
+<tr>
+<td><strong>Aralık 2026 – Şubat 2027</strong></td>
+<td>Telli terbiye direkleri ve teller, ana sulama hattı</td>
+<td>Teknisyen işe alımı (Şubat'tan itibaren), sensör düğümlerinin tasarımı ve prototipi, ambalaj ve marka tasarımı</td>
+<td>Ayda 1</td>
+</tr>
+<tr>
+<td><strong>Mart 2027</strong></td>
+<td>Lateraller, fertigasyon ünitesi, malç örtü, gateway + meteoroloji istasyonu</td>
+<td>Edge sunucu ve panel yazılımının ilk sürümü</td>
+<td>2 ziyaret</td>
+</tr>
+<tr>
+<td><strong>Nisan 2027</strong></td>
+<td><strong>Dikim</strong> (doku kültürü fidanlar, don riskinden sonra), ilk sulama ayarları, kameralar</td>
+<td>Alarm kuralları (don, kuru toprak, güvenlik)</td>
+<td>2 ziyaret, dikim haftası sahada</td>
+</tr>
+<tr>
+<td><strong>Mayıs-Ağustos 2027</strong></td>
+<td>Primocane'lerin büyümesi; kolların tele bağlanması (2 haftada bir), ot kontrolü, tuzaklar, ilk sezon IPM</td>
+<td>Sensör verisiyle sulama modelinin kalibrasyonu, alıcı görüşmeleri, KKYDP başvurusu</td>
+<td>Ayda 2</td>
+</tr>
+<tr>
+<td><strong>Eylül-Ekim 2027</strong></td>
+<td><strong>İlk hasat: Prime-Ark sonbahar ürünü (~0,5 t)</strong>. Yerel satış ve numune dağıtımı</td>
+<td>Fiyat ve paket testi, alıcılardan geri bildirim</td>
+<td>Ayda 2</td>
+</tr>
+<tr>
+<td><strong>Kasım-Aralık 2027</strong></td>
+<td>Kış hazırlığı, toprak analizi</td>
+<td><strong>Kapı 1:</strong> ≥ 2 alıcı ön anlaşması → Faz 2 (soğuk zincir + pakethane) siparişi</td>
+<td>Ayda 1</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="32-olgun-bir-yl-2030-ve-sonras-ay-ay">3.2 Olgun bir yıl (2030 ve sonrası) — ay ay</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Ay</th>
+<th>Bitkide ne oluyor</th>
+<th>Saha işleri</th>
+<th>Teknoloji ne yapıyor</th>
+<th>Ticaret ve yönetim</th>
+<th>Senin ziyaretin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ocak</strong></td>
+<td>Dinlenme</td>
+<td><strong>Kış budaması:</strong> bitki başına 4-6 sağlam kol bırak, yan dalları 30-45 cm'ye kısalt, tele yelpaze şeklinde bağla. Kış bakır ilaçlaması</td>
+<td>Sensör kalibrasyonu, yazılım güncellemesi, geçen sezon verisinin analizi</td>
+<td>Yıllık plan; kurumsal ve HoReCa sözleşmeleri; ambalaj siparişi. <strong>Dondurulmuş ve liyofilize stok satışı</strong></td>
+<td>1 (budama denetimi)</td>
+</tr>
+<tr>
+<td><strong>Şubat</strong></td>
+<td>Dinlenme, gözler şişmeye başlar</td>
+<td>Budamanın tamamlanması, tel gerginlik kontrolü, damla hat bakımı</td>
+<td>Fertigasyon sistemi testi, debimetre kontrolü</td>
+<td>Hasat ekibi ön görüşmeleri, sezon kutusu ön siparişi</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>Mart</strong></td>
+<td>Uyanma, sürgünler</td>
+<td>İlk gübreleme (fertigasyon başlar), ot kontrolü</td>
+<td><strong>Don alarmı aktif</strong> (gece sıcaklığı &lt; 0 °C → bildirim)</td>
+<td>Fiyat listesi, distribütör anlaşması</td>
+<td>1-2</td>
+</tr>
+<tr>
+<td><strong>Nisan</strong></td>
+<td>Sürgün gelişimi, yeni primocane'ler çıkar</td>
+<td>IPM başlar (akar, yaprak biti), SWD tuzakları kurulur, sıra arası biçim</td>
+<td>Toprak nemi/EC ile sulama planı; hastalık modeli (yaprak ıslaklığı)</td>
+<td>Living lab pilot anlaşmaları</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>Mayıs</strong></td>
+<td><strong>Çiçeklenme</strong> (Loch Ness → Chester)</td>
+<td>Arı kovanları gelir, primocane'ler seyreltilir, sulama artar</td>
+<td>Çiçeklenme takibi; meyve sayım kameraları kalibre edilir</td>
+<td>İşçi ekibinin kesinleşmesi</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>Haziran</strong></td>
+<td>Meyve gelişimi; Prime-Ark ilk küçük hasadı</td>
+<td><strong>Gölge filesi gerilir</strong> (Haziran ortası), primocane bağlama, hasat ekipmanı hazırlığı</td>
+<td><strong>Rekolte tahmini</strong> (kameralar, 3 hafta önceden) → satış miktarları sözleşmelere bağlanır</td>
+<td>Soğuk zincir testi, ambalaj stoğu</td>
+<td>2-3</td>
+</tr>
+<tr>
+<td><strong>Temmuz</strong></td>
+<td><strong>Loch Ness hasadı</strong>, ayın sonunda Chester başlar</td>
+<td>2-3 günde bir hasat, ön soğutma, paketleme; SWD için düşük meyve temizliği</td>
+<td>NFC hasat takibi, soğuk zincir alarmları, sıcak dalgasında serinletme sulaması</td>
+<td>Günlük sevkiyat, kurumsal teslimatlar</td>
+<td><strong>Haftalık veya sahada kalış</strong></td>
+</tr>
+<tr>
+<td><strong>Ağustos</strong></td>
+<td><strong>Tepe:</strong> Loch Ness biter, Chester zirvede</td>
+<td>Tepe hasat (7-8 toplayıcı), 2. sınıf ve fazla ürün şok dondurucuya</td>
+<td>Günlük otomatik saha raporu (LLM); lot bazında izlenebilirlik</td>
+<td>Fiyat takibi; bolluk varsa dondurucuya yönlendirme</td>
+<td><strong>Haftalık veya sahada kalış</strong></td>
+</tr>
+<tr>
+<td><strong>Eylül</strong></td>
+<td>Chester biter; <strong>Prime-Ark sonbahar hasadı</strong> başlar</td>
+<td><strong>Meyve vermiş kollar dipten kesilir</strong>; yeni primocane'ler bağlanır</td>
+<td>Sezon verisi kapanışı: kg/da, kg/işçi-saat, m³/kg, fire %</td>
+<td>Sezon sonu görüşmeleri; liyofilize partisi fasona gönderilir</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>Ekim</strong></td>
+<td>Prime-Ark hasadı (ilk sert soğuğa kadar)</td>
+<td>Son potasyum gübresi, sıra arası örtü bitkisi ekimi</td>
+<td>Yıllık KPI raporu</td>
+<td>Gelecek yılın sözleşme müzakeresi; IQF satışı başlar</td>
+<td>2</td>
+</tr>
+<tr>
+<td><strong>Kasım</strong></td>
+<td>Yaprak dökümü</td>
+<td>Bakır, toprak analizi, drenaj kontrolü, file sökümü</td>
+<td>Donanım bakımı, yedekleme</td>
+<td>Muhasebe, hibe ve kredi başvuruları</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>Aralık</strong></td>
+<td>Dinlenme</td>
+<td>Hafif bakım</td>
+<td>Yazılım geliştirme, yeni sensör denemeleri</td>
+<td>Living lab proje yazımı, kurumsal yılbaşı kutuları (liyofilize)</td>
+<td>1</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Ziyaret toplamı:</strong> ~25-30 (modelde ulaşım ve konaklama için $3.500/yıl ayrıldı). Ankara–Karacabey ~470 km ve ~5 saat. Sezonda, pakethane konteynerine eklenecek basit bir dinlenme alanıyla 3-4 günlük kalışlar en verimlisi.</p>
+<h3 id="33-hasat-sezonunda-tipik-bir-gun">3.3 Hasat sezonunda tipik bir gün</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Saat</th>
+<th>İş</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>05:30</td>
+<td>Toplayıcılar gelir, NFC kartla giriş, günün sıra planı tabletten okunur</td>
+</tr>
+<tr>
+<td>05:45-11:00</td>
+<td>Hasat: paketli kalite doğrudan punnet'e, 2. sınıf kasaya. Her kasa tartılır, kayda toplayıcı ve sıra yazılır</td>
+</tr>
+<tr>
+<td>Her 45-60 dk</td>
+<td>Dolu kasalar gölgeden ön soğutma tüneline (hedef: hasattan 2 saat içinde iç sıcaklık &lt; 5 °C)</td>
+</tr>
+<tr>
+<td>11:00-15:00</td>
+<td>Paketleme: top-seal, QR lot etiketi, koli. 2. sınıf şok dondurucuya</td>
+</tr>
+<tr>
+<td>15:00-17:00</td>
+<td>Sevkiyat hazırlığı, soğuk zincir logger'larının koliye konması, distribütör teslimi</td>
+</tr>
+<tr>
+<td>17:00</td>
+<td>Otomatik gün sonu raporu sana ulaşır: kg, kanal, fire, işçi verimi, yarının hasat tahmini, uyarılar</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="34-ankaradan-uzaktan-yonetim-modeli">3.4 Ankara'dan uzaktan yönetim modeli</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Rol</th>
+<th>Kim</th>
+<th>Sorumluluk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kurucu (sen)</strong></td>
+<td>Ankara + ziyaret</td>
+<td>Strateji, satış ve kurumsal ilişkiler, teknoloji geliştirme, finans, haftalık KPI değerlendirmesi</td>
+</tr>
+<tr>
+<td><strong>Saha şefi / tarım teknisyeni</strong></td>
+<td>Daimi, Karacabey/Muratlı'dan</td>
+<td>Günlük operasyon, işçi yönetimi, ilaçlama ve gübre uygulaması, ilk müdahale</td>
+</tr>
+<tr>
+<td><strong>Sezonluk pakethane sorumlusu</strong></td>
+<td>Haziran-Ekim</td>
+<td>Paketleme kalitesi, soğuk zincir, sevkiyat</td>
+</tr>
+<tr>
+<td><strong>Ziraat danışmanı</strong></td>
+<td>Aylık ziyaret, sözleşmeli</td>
+<td>Budama, hastalık ve beslenme kararlarına ikinci göz (v2 sabit giderlerine dahil)</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Uzaktan yönetim araçları:</strong> canlı panel, kritik alarmların telefona bildirimi (don, kuru toprak, soğuk oda sıcaklığı, hareket algılama), kameralar, haftalık görüntülü toplantı, LLM ile otomatik günlük rapor.<br />
+<strong>Kural:</strong> Kritik kararlar (ilaçlama, hasat başlangıcı, fiyat) sahadan fotoğraf ve sensör verisiyle <strong>senin onayınla</strong> alınır. Otomasyon, sulama ve alarm dışında kendi kendine karar vermez.</p>
+<hr />
+<h2 id="4-hibrit-kanal-modeli-taze-cogunluk-dondurulmus-ve-kuru-emniyet-supab">4. Hibrit Kanal Modeli: Taze Çoğunluk, Dondurulmuş ve Kuru Emniyet Supabı</h2>
+<h3 id="41-kanal-ekonomisi-taze-kg-basna-katk-pay">4.1 Kanal ekonomisi (taze kg başına katkı payı)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kanal</th>
+<th style="text-align: right;">Taze kg başına katkı (USD)</th>
+<th>Not</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kurumsal markalı paket</td>
+<td style="text-align: right;">6,38</td>
+<td>Ön sözleşmeli, fiyat sabit</td>
+</tr>
+<tr>
+<td>Taze paketli (100/200/500 g)</td>
+<td style="text-align: right;">3,26</td>
+<td>Ana kanal; raf ömrü 7-10 gün</td>
+</tr>
+<tr>
+<td>Liyofilize — kendi makine</td>
+<td style="text-align: right;">3,13</td>
+<td>Makine + izin: ~$4.200/yıl sabit</td>
+</tr>
+<tr>
+<td>Liyofilize — fason</td>
+<td style="text-align: right;">1,83</td>
+<td>Yatırımsız, 12-24 ay raf ömrü</td>
+</tr>
+<tr>
+<td>IQF dondurulmuş</td>
+<td style="text-align: right;">1,71</td>
+<td>Kış satışı, emniyet supabı</td>
+</tr>
+<tr>
+<td>Hal / dökme taze</td>
+<td style="text-align: right;">1,50</td>
+<td>Bolluk yılında −%30</td>
+</tr>
+<tr>
+<td>İşleme tesisine 2. sınıf</td>
+<td style="text-align: right;">0,66</td>
+<td>Dondurucu yoksa tek çıkış</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Kural basit:</strong> Ürün önce <strong>en yüksek katkılı kanala</strong> gider: kurumsal → taze paketli. Paketlenemeyen veya 2. sınıf ürün <strong>hal yerine dondurucuya</strong> gider. Dondurulan ürün kışın IQF olarak satılır, bir kısmı fasonda liyofilize edilir.</p>
+<h3 id="42-hacim-aks-baz">4.2 Hacim akışı (baz)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th style="text-align: right;">Rekolte</th>
+<th style="text-align: right;">Taze paketli</th>
+<th style="text-align: right;">Kurumsal</th>
+<th style="text-align: right;">Hal</th>
+<th style="text-align: right;">IQF</th>
+<th style="text-align: right;">Liyofilize girdi → kuru</th>
+<th style="text-align: right;">Taze payı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2027</td>
+<td style="text-align: right;">0,5 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">0,4 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">0,0 t → 0 kg</td>
+<td style="text-align: right;">%80</td>
+</tr>
+<tr>
+<td>2028</td>
+<td style="text-align: right;">5,5 t</td>
+<td style="text-align: right;">2,2 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">2,2 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">0,0 t → 0 kg</td>
+<td style="text-align: right;">%80</td>
+</tr>
+<tr>
+<td>2029</td>
+<td style="text-align: right;">14,5 t</td>
+<td style="text-align: right;">7,2 t</td>
+<td style="text-align: right;">0,5 t</td>
+<td style="text-align: right;">1,9 t</td>
+<td style="text-align: right;">3,9 t</td>
+<td style="text-align: right;">1,0 t → 114 kg</td>
+<td style="text-align: right;">%67</td>
+</tr>
+<tr>
+<td>2030</td>
+<td style="text-align: right;">20,0 t</td>
+<td style="text-align: right;">10,9 t</td>
+<td style="text-align: right;">1,5 t</td>
+<td style="text-align: right;">1,8 t</td>
+<td style="text-align: right;">4,1 t</td>
+<td style="text-align: right;">1,7 t → 205 kg</td>
+<td style="text-align: right;">%71</td>
+</tr>
+<tr>
+<td>2031</td>
+<td style="text-align: right;">20,0 t</td>
+<td style="text-align: right;">10,8 t</td>
+<td style="text-align: right;">2,5 t</td>
+<td style="text-align: right;">1,4 t</td>
+<td style="text-align: right;">3,2 t</td>
+<td style="text-align: right;">2,1 t → 252 kg</td>
+<td style="text-align: right;">%73</td>
+</tr>
+<tr>
+<td>2032</td>
+<td style="text-align: right;">20,0 t</td>
+<td style="text-align: right;">10,4 t</td>
+<td style="text-align: right;">3,0 t</td>
+<td style="text-align: right;">1,3 t</td>
+<td style="text-align: right;">2,6 t</td>
+<td style="text-align: right;">2,6 t → 312 kg</td>
+<td style="text-align: right;">%74</td>
+</tr>
+<tr>
+<td>2033</td>
+<td style="text-align: right;">20,0 t</td>
+<td style="text-align: right;">10,4 t</td>
+<td style="text-align: right;">3,0 t</td>
+<td style="text-align: right;">1,3 t</td>
+<td style="text-align: right;">2,6 t</td>
+<td style="text-align: right;">2,6 t → 312 kg</td>
+<td style="text-align: right;">%74</td>
+</tr>
+<tr>
+<td>2034</td>
+<td style="text-align: right;">20,0 t</td>
+<td style="text-align: right;">10,4 t</td>
+<td style="text-align: right;">3,0 t</td>
+<td style="text-align: right;">1,3 t</td>
+<td style="text-align: right;">2,6 t</td>
+<td style="text-align: right;">2,6 t → 312 kg</td>
+<td style="text-align: right;">%74</td>
+</tr>
+<tr>
+<td>2035</td>
+<td style="text-align: right;">18,0 t</td>
+<td style="text-align: right;">9,1 t</td>
+<td style="text-align: right;">3,0 t</td>
+<td style="text-align: right;">1,1 t</td>
+<td style="text-align: right;">2,4 t</td>
+<td style="text-align: right;">2,4 t → 279 kg</td>
+<td style="text-align: right;">%74</td>
+</tr>
+<tr>
+<td>2036</td>
+<td style="text-align: right;">16,0 t</td>
+<td style="text-align: right;">7,8 t</td>
+<td style="text-align: right;">3,0 t</td>
+<td style="text-align: right;">1,0 t</td>
+<td style="text-align: right;">2,1 t</td>
+<td style="text-align: right;">2,1 t → 246 kg</td>
+<td style="text-align: right;">%74</td>
+</tr>
+</tbody>
+</table></div>
+<p>Gelirin ~%73'ü taze (paketli + kurumsal + hal), ~%16'sı dondurulmuş ve liyofilize, kalanı hizmet, lab ve danışmanlık (2032).</p>
+<h3 id="43-neden-kendi-liyofilize-makinesi-degil-fason">4.3 Neden kendi liyofilize makinesi değil, fason?</h3>
+<p>Kendi makine fasona göre taze kg başına $1,30 tasarruf sağlıyor. Ama makine amortismanı ve gıda üretim izni/HACCP yılda ~$4.200 sabit maliyet getiriyor. Başabaş için yılda <strong>~3,2 t taze girdi</strong> gerekiyor; 10 da'da liyofilizeye giden miktar 2,1-2,6 t. Kendi makine ancak <strong>20 da'da</strong> (girdi ~5 t) mantıklı. O güne kadar fason ile ürün, pazar ve fiyat test edilir.</p>
+<h3 id="44-faz-3-ve-yenileme-yatrmlar">4.4 Faz 3 ve yenileme yatırımları</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th>Kalem</th>
+<th style="text-align: right;">USD</th>
+<th style="text-align: right;">Ömür</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2028 sonu</td>
+<td>İkinci 40' reefer, -20 °C dondurulmuş stok deposu</td>
+<td style="text-align: right;">8.500</td>
+<td style="text-align: right;">10 yıl</td>
+</tr>
+<tr>
+<td>2028 sonu</td>
+<td>Şok dondurucu (-35 °C, 300 kg/parti)</td>
+<td style="text-align: right;">14.000</td>
+<td style="text-align: right;">8 yıl</td>
+</tr>
+<tr>
+<td>2032 sonu</td>
+<td>Elektronik yenileme (sensör, kamera, edge)</td>
+<td style="text-align: right;">8.000</td>
+<td style="text-align: right;">5 yıl</td>
+</tr>
+<tr>
+<td>2034 sonu</td>
+<td>Gölge filesi + malç örtü yenileme</td>
+<td style="text-align: right;">4.900</td>
+<td style="text-align: right;">7 yıl</td>
+</tr>
+</tbody>
+</table></div>
+<p>Faz 3 (şok dondurucu + dondurulmuş depo, $22.500) 2. sınıf ürünün değerini $0,66'dan ~$1,71-1,83/kg'a çıkarıyor. Asıl değeri ise <strong>bolluk yılında fazla ürünü hale düşük fiyattan vermek zorunda kalmamak.</strong> Risk simülasyonundaki önlemlerin önemli bir kısmı bu yatırıma dayanıyor.</p>
+<hr />
+<h2 id="5-mevsim-riskleri-gozunde-mi-buyutuyorsun">5. Mevsim Riskleri: Gözünde mi Büyütüyorsun?</h2>
+<h3 id="51-risk-olaylar-ve-onlemlerin-etkisi">5.1 Risk olayları ve önlemlerin etkisi</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Olay</th>
+<th style="text-align: right;">Yıllık olasılık</th>
+<th style="text-align: right;">Önlemsiz verim kaybı</th>
+<th style="text-align: right;">Önlemli verim kaybı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sıcak dalgası / güneş yanığı</td>
+<td style="text-align: right;">%30</td>
+<td style="text-align: right;">%15</td>
+<td style="text-align: right;">%5</td>
+</tr>
+<tr>
+<td>Hasat döneminde yoğun yağış (meyve çürümesi)</td>
+<td style="text-align: right;">%15</td>
+<td style="text-align: right;">%10</td>
+<td style="text-align: right;">%6</td>
+</tr>
+<tr>
+<td>SWD (Drosophila suzukii) salgını</td>
+<td style="text-align: right;">%35</td>
+<td style="text-align: right;">%20</td>
+<td style="text-align: right;">%5</td>
+</tr>
+<tr>
+<td>Geç bahar donu</td>
+<td style="text-align: right;">%5</td>
+<td style="text-align: right;">%20</td>
+<td style="text-align: right;">%10 (+ TARSİM %60)</td>
+</tr>
+<tr>
+<td>Dolu</td>
+<td style="text-align: right;">%5</td>
+<td style="text-align: right;">%40</td>
+<td style="text-align: right;">%40 (+ TARSİM %60)</td>
+</tr>
+<tr>
+<td>İşçi bulamama</td>
+<td style="text-align: right;">%20</td>
+<td style="text-align: right;">işçilik +%35, ürünün %6'sı toplanamaz</td>
+<td style="text-align: right;">işçilik +%15, %1</td>
+</tr>
+<tr>
+<td>Pazar bolluğu (fiyat çöküşü)</td>
+<td style="text-align: right;">%25</td>
+<td style="text-align: right;">hal −%30, paketli −%10</td>
+<td style="text-align: right;">hal −%30, paketli −%5, fazla ürün dondurucuya</td>
+</tr>
+<tr>
+<td>Normal dalgalanma (her yıl)</td>
+<td style="text-align: right;">–</td>
+<td style="text-align: right;">verim σ %8, fiyat σ %7</td>
+<td style="text-align: right;">aynı</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Önlemler ve yaklaşık maliyetleri:</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Önlem</th>
+<th>Neye karşı</th>
+<th>Maliyet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%35 gölge filesi + sıcak dalgasında serinletme sulaması</td>
+<td>Güneş yanığı</td>
+<td>$4.100 CAPEX</td>
+</tr>
+<tr>
+<td>3 çeşitli portföy</td>
+<td>Sıcak, yağış, fiyat ve işçi yoğunlaşması</td>
+<td>Ek maliyet yok</td>
+</tr>
+<tr>
+<td>SWD tuzak ağı + AI sayım + 2 günde bir hasat + düşük meyve temizliği</td>
+<td>SWD</td>
+<td>Kameralar $450 + ilaç bütçesi</td>
+</tr>
+<tr>
+<td>Meteoroloji istasyonu + hastalık modeli</td>
+<td>Yağış sonrası küf/çürüme</td>
+<td>v2'de dahil</td>
+</tr>
+<tr>
+<td>Orman rüzgâr kıranı + don alarmı</td>
+<td>Geç don</td>
+<td>Doğal</td>
+</tr>
+<tr>
+<td><strong>TARSİM</strong> (dolu, don, fırtına)</td>
+<td>Dolu, don</td>
+<td>~$600/yıl</td>
+</tr>
+<tr>
+<td>NFC tartılı parça başı ödeme + köyden sabit ekip + sezon başı avans</td>
+<td>İşçi bulamama</td>
+<td>v2'de dahil</td>
+</tr>
+<tr>
+<td>Şok dondurucu + dondurulmuş depo</td>
+<td>Fiyat çöküşü, satılamayan ürün</td>
+<td>$22.500 (Faz 3)</td>
+</tr>
+<tr>
+<td>Kurumsal ön sözleşmeler</td>
+<td>Fiyat çöküşü</td>
+<td>Satış emeği</td>
+</tr>
+<tr>
+<td>Ön soğutma + soğuk zincir</td>
+<td>Raf ömrü, fire</td>
+<td>v2'de dahil</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="52-risk-simulasyonu-5000-farkl-10-yl">5.2 Risk simülasyonu: 5.000 farklı 10 yıl</h3>
+<p>Her senaryoda yukarıdaki olaylar her yıl kendi olasılığıyla rastgele gerçekleşiyor; üstüne verimde ±%8 ve fiyatta ±%7 doğal dalgalanma ekleniyor. "Önlemsiz" bahçe: tek çeşit, gölge filesi yok, sigorta yok, dondurucu yok (2. sınıf işleme tesisine, fazla ürün hale), kurumsal sözleşme yok.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Gösterge (5.000 simülasyon)</th>
+<th style="text-align: right;">Önlemsiz</th>
+<th style="text-align: right;">Önlemli (bu plan)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sermayenin 10 yılda geri dönmeme olasılığı (reel)</td>
+<td style="text-align: right;">%55,9</td>
+<td style="text-align: right;">%0,0</td>
+</tr>
+<tr>
+<td>%12 hedef getirinin altında kalma olasılığı (NPV@12 &lt; 0)</td>
+<td style="text-align: right;">%100,0</td>
+<td style="text-align: right;">%96,4</td>
+</tr>
+<tr>
+<td>Proje IRR — kötü / ortanca / iyi (P10/P50/P90)</td>
+<td style="text-align: right;">−%4,9 / −%0,4 / %3,5</td>
+<td style="text-align: right;">%7,6 / %9,4 / %11,2</td>
+</tr>
+<tr>
+<td>Olgun yıllarda (2031-36) bir yılın zararla kapanma olasılığı</td>
+<td style="text-align: right;">%17,1</td>
+<td style="text-align: right;">%0,1</td>
+</tr>
+<tr>
+<td>Olgun yıl vergi öncesi kâr — kötü (P10)</td>
+<td style="text-align: right;"><span class="neg">−$3.561</span></td>
+<td style="text-align: right;">$16.368</td>
+</tr>
+<tr>
+<td>Olgun yıl vergi öncesi kâr — ortanca (P50)</td>
+<td style="text-align: right;">$9.817</td>
+<td style="text-align: right;">$27.966</td>
+</tr>
+<tr>
+<td>Olgun yıl vergi öncesi kâr — iyi (P90)</td>
+<td style="text-align: right;">$23.568</td>
+<td style="text-align: right;">$40.889</td>
+</tr>
+<tr>
+<td>2030-36'da ortalama zarar yılı sayısı (7 yılda)</td>
+<td style="text-align: right;">1,7</td>
+<td style="text-align: right;">0,1</td>
+</tr>
+<tr>
+<td>7 yılda 2+ zarar yılı yaşama olasılığı</td>
+<td style="text-align: right;">%56,6</td>
+<td style="text-align: right;">%0,0</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="53-yorum">5.3 Yorum</h3>
+<ol>
+<li><strong>Mevsim riskleri gerçek ama yönetilebilir.</strong> Önlemsiz bir bahçe 7 olgun yılın ortalama 1,7'sini zararla kapatıyor ve sermayesini 10 yılda geri alamama olasılığı %56. Bu plandaki önlemlerle zarar yılı neredeyse ortadan kalkıyor (%0,1) ve sermayenin geri dönmeme olasılığı simülasyonda sıfır. Korkun haklı, ama önlemleri zaten planda var.</li>
+<li><strong>Simülasyonun kötü senaryosu (P10) bile kârlı:</strong> olgun bir yılda vergi öncesi en az ~$16.000.</li>
+<li><strong>Simülasyonun yakalayamadığı asıl riskler</strong> aşağıda.</li>
+</ol>
+<p><strong>Pazar riski:</strong> paketli fiyatın veya satış kapasitesinin <strong>kalıcı olarak</strong> düşük çıkması. Deterministik pesimistik senaryo (Bölüm 6.4) bunu gösteriyor: bütün olumsuzluklar 10 yıl boyunca birlikte olursa proje zararda. Önlem: Kapı 1 ve Kapı 2 (ön anlaşma ve 2028 satış verisi görülmeden büyük yatırım yok).</p>
+<p><strong>Ölçek riski:</strong> 10 da'da proje IRR'si %9,5 ile hedefin altında. Önlem: 2. blok veya kurumsal ortak.</p>
+<p><strong>Uygulama riski:</strong> Ankara'dan yönetimde teknisyenin kalitesi. Önlem: iyi ücret + performans primi, ilk sezon sık ziyaret, danışman ziraat mühendisi.</p>
+<hr />
+<h2 id="6-10-yllk-finansal-projeksiyon-2027-2036">6. 10 Yıllık Finansal Projeksiyon (2027-2036)</h2>
+<h3 id="61-gelir-tablosu-kurulus-ve-buyume-2027-2031">6.1 Gelir tablosu — Kuruluş ve büyüme (2027-2031)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>USD</th>
+<th style="text-align: right;">2027</th>
+<th style="text-align: right;">2028</th>
+<th style="text-align: right;">2029</th>
+<th style="text-align: right;">2030</th>
+<th style="text-align: right;">2031</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rekolte (t)</td>
+<td style="text-align: right;">0,5</td>
+<td style="text-align: right;">5,5</td>
+<td style="text-align: right;">14,5</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">20,0</td>
+</tr>
+<tr>
+<td>Taze paketli</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">12.436</td>
+<td style="text-align: right;">40.783</td>
+<td style="text-align: right;">61.471</td>
+<td style="text-align: right;">61.047</td>
+</tr>
+<tr>
+<td>Kurumsal paket</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4.500</td>
+<td style="text-align: right;">13.500</td>
+<td style="text-align: right;">22.500</td>
+</tr>
+<tr>
+<td>Hal / dökme taze</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">5.500</td>
+<td style="text-align: right;">4.856</td>
+<td style="text-align: right;">4.531</td>
+<td style="text-align: right;">3.375</td>
+</tr>
+<tr>
+<td>İşleme (2. sınıf, dondurucu öncesi)</td>
+<td style="text-align: right;">130</td>
+<td style="text-align: right;">1.430</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>IQF dondurulmuş</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">10.847</td>
+<td style="text-align: right;">11.392</td>
+<td style="text-align: right;">8.988</td>
+</tr>
+<tr>
+<td>Liyofilize (kuru)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4.558</td>
+<td style="text-align: right;">8.206</td>
+<td style="text-align: right;">10.071</td>
+</tr>
+<tr>
+<td>Hizmet + lab + danışmanlık</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.500</td>
+<td style="text-align: right;">5.000</td>
+<td style="text-align: right;">11.000</td>
+</tr>
+<tr>
+<td><strong>TOPLAM GELİR</strong></td>
+<td style="text-align: right;"><strong>1.130</strong></td>
+<td style="text-align: right;"><strong>19.366</strong></td>
+<td style="text-align: right;"><strong>67.044</strong></td>
+<td style="text-align: right;"><strong>104.101</strong></td>
+<td style="text-align: right;"><strong>116.981</strong></td>
+</tr>
+<tr>
+<td>Hasat</td>
+<td style="text-align: right;"><span class="neg">−275</span></td>
+<td style="text-align: right;"><span class="neg">−3.355</span></td>
+<td style="text-align: right;"><span class="neg">−9.132</span></td>
+<td style="text-align: right;"><span class="neg">−12.856</span></td>
+<td style="text-align: right;"><span class="neg">−12.995</span></td>
+</tr>
+<tr>
+<td>Ambalaj + pakethane</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−1.574</span></td>
+<td style="text-align: right;"><span class="neg">−5.520</span></td>
+<td style="text-align: right;"><span class="neg">−8.854</span></td>
+<td style="text-align: right;"><span class="neg">−9.516</span></td>
+</tr>
+<tr>
+<td>Dağıtım + komisyon</td>
+<td style="text-align: right;"><span class="neg">−189</span></td>
+<td style="text-align: right;"><span class="neg">−3.240</span></td>
+<td style="text-align: right;"><span class="neg">−8.533</span></td>
+<td style="text-align: right;"><span class="neg">−13.255</span></td>
+<td style="text-align: right;"><span class="neg">−14.173</span></td>
+</tr>
+<tr>
+<td>Dondurma + IQF lojistik</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−2.237</span></td>
+<td style="text-align: right;"><span class="neg">−2.459</span></td>
+<td style="text-align: right;"><span class="neg">−2.054</span></td>
+</tr>
+<tr>
+<td>Liyofilize (fason/kendi) + ambalaj</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−2.108</span></td>
+<td style="text-align: right;"><span class="neg">−3.795</span></td>
+<td style="text-align: right;"><span class="neg">−4.658</span></td>
+</tr>
+<tr>
+<td>Hizmet maliyeti</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−525</span></td>
+<td style="text-align: right;"><span class="neg">−1.550</span></td>
+<td style="text-align: right;"><span class="neg">−2.700</span></td>
+</tr>
+<tr>
+<td>Sabit giderler</td>
+<td style="text-align: right;"><span class="neg">−13.600</span></td>
+<td style="text-align: right;"><span class="neg">−25.950</span></td>
+<td style="text-align: right;"><span class="neg">−30.800</span></td>
+<td style="text-align: right;"><span class="neg">−31.450</span></td>
+<td style="text-align: right;"><span class="neg">−31.450</span></td>
+</tr>
+<tr>
+<td><strong>FAVÖK</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−12.934</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−14.754</strong></span></td>
+<td style="text-align: right;"><strong>8.189</strong></td>
+<td style="text-align: right;"><strong>29.881</strong></td>
+<td style="text-align: right;"><strong>39.434</strong></td>
+</tr>
+<tr>
+<td>Amortisman</td>
+<td style="text-align: right;"><span class="neg">−5.020</span></td>
+<td style="text-align: right;"><span class="neg">−12.486</span></td>
+<td style="text-align: right;"><span class="neg">−15.086</span></td>
+<td style="text-align: right;"><span class="neg">−14.753</span></td>
+<td style="text-align: right;"><span class="neg">−14.403</span></td>
+</tr>
+<tr>
+<td>Faiz</td>
+<td style="text-align: right;"><span class="neg">−3.538</span></td>
+<td style="text-align: right;"><span class="neg">−7.261</span></td>
+<td style="text-align: right;"><span class="neg">−7.917</span></td>
+<td style="text-align: right;"><span class="neg">−5.992</span></td>
+<td style="text-align: right;"><span class="neg">−3.605</span></td>
+</tr>
+<tr>
+<td><strong>VERGİ ÖNCESİ KÂR</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−21.492</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−34.501</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−14.814</strong></span></td>
+<td style="text-align: right;"><strong>9.137</strong></td>
+<td style="text-align: right;"><strong>21.427</strong></td>
+</tr>
+<tr>
+<td>Kurumlar vergisi (%25)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><strong>NET KÂR</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−21.492</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−34.501</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−14.814</strong></span></td>
+<td style="text-align: right;"><strong>9.137</strong></td>
+<td style="text-align: right;"><strong>21.427</strong></td>
+</tr>
+<tr>
+<td>Net marj</td>
+<td style="text-align: right;">−%1902</td>
+<td style="text-align: right;">−%178</td>
+<td style="text-align: right;">−%22</td>
+<td style="text-align: right;">%9</td>
+<td style="text-align: right;">%18</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="62-gelir-tablosu-olgunluk-2032-2036">6.2 Gelir tablosu — Olgunluk (2032-2036)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>USD</th>
+<th style="text-align: right;">2032</th>
+<th style="text-align: right;">2033</th>
+<th style="text-align: right;">2034</th>
+<th style="text-align: right;">2035</th>
+<th style="text-align: right;">2036</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rekolte (t)</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">18,0</td>
+<td style="text-align: right;">16,0</td>
+</tr>
+<tr>
+<td>Taze paketli</td>
+<td style="text-align: right;">58.786</td>
+<td style="text-align: right;">58.786</td>
+<td style="text-align: right;">58.786</td>
+<td style="text-align: right;">51.551</td>
+<td style="text-align: right;">44.316</td>
+</tr>
+<tr>
+<td>Kurumsal paket</td>
+<td style="text-align: right;">27.000</td>
+<td style="text-align: right;">27.000</td>
+<td style="text-align: right;">27.000</td>
+<td style="text-align: right;">27.000</td>
+<td style="text-align: right;">27.000</td>
+</tr>
+<tr>
+<td>Hal / dökme taze</td>
+<td style="text-align: right;">3.250</td>
+<td style="text-align: right;">3.250</td>
+<td style="text-align: right;">3.250</td>
+<td style="text-align: right;">2.850</td>
+<td style="text-align: right;">2.450</td>
+</tr>
+<tr>
+<td>İşleme (2. sınıf, dondurucu öncesi)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>IQF dondurulmuş</td>
+<td style="text-align: right;">7.420</td>
+<td style="text-align: right;">7.420</td>
+<td style="text-align: right;">7.420</td>
+<td style="text-align: right;">6.636</td>
+<td style="text-align: right;">5.852</td>
+</tr>
+<tr>
+<td>Liyofilize (kuru)</td>
+<td style="text-align: right;">12.471</td>
+<td style="text-align: right;">12.471</td>
+<td style="text-align: right;">12.471</td>
+<td style="text-align: right;">11.153</td>
+<td style="text-align: right;">9.835</td>
+</tr>
+<tr>
+<td>Hizmet + lab + danışmanlık</td>
+<td style="text-align: right;">13.500</td>
+<td style="text-align: right;">16.000</td>
+<td style="text-align: right;">16.000</td>
+<td style="text-align: right;">16.000</td>
+<td style="text-align: right;">16.000</td>
+</tr>
+<tr>
+<td><strong>TOPLAM GELİR</strong></td>
+<td style="text-align: right;"><strong>122.427</strong></td>
+<td style="text-align: right;"><strong>124.927</strong></td>
+<td style="text-align: right;"><strong>124.927</strong></td>
+<td style="text-align: right;"><strong>115.190</strong></td>
+<td style="text-align: right;"><strong>105.453</strong></td>
+</tr>
+<tr>
+<td>Hasat</td>
+<td style="text-align: right;"><span class="neg">−13.010</span></td>
+<td style="text-align: right;"><span class="neg">−13.010</span></td>
+<td style="text-align: right;"><span class="neg">−13.010</span></td>
+<td style="text-align: right;"><span class="neg">−11.718</span></td>
+<td style="text-align: right;"><span class="neg">−10.426</span></td>
+</tr>
+<tr>
+<td>Ambalaj + pakethane</td>
+<td style="text-align: right;"><span class="neg">−9.588</span></td>
+<td style="text-align: right;"><span class="neg">−9.588</span></td>
+<td style="text-align: right;"><span class="neg">−9.588</span></td>
+<td style="text-align: right;"><span class="neg">−8.672</span></td>
+<td style="text-align: right;"><span class="neg">−7.756</span></td>
+</tr>
+<tr>
+<td>Dağıtım + komisyon</td>
+<td style="text-align: right;"><span class="neg">−14.359</span></td>
+<td style="text-align: right;"><span class="neg">−14.359</span></td>
+<td style="text-align: right;"><span class="neg">−14.359</span></td>
+<td style="text-align: right;"><span class="neg">−13.035</span></td>
+<td style="text-align: right;"><span class="neg">−11.711</span></td>
+</tr>
+<tr>
+<td>Dondurma + IQF lojistik</td>
+<td style="text-align: right;"><span class="neg">−1.828</span></td>
+<td style="text-align: right;"><span class="neg">−1.828</span></td>
+<td style="text-align: right;"><span class="neg">−1.828</span></td>
+<td style="text-align: right;"><span class="neg">−1.635</span></td>
+<td style="text-align: right;"><span class="neg">−1.442</span></td>
+</tr>
+<tr>
+<td>Liyofilize (fason/kendi) + ambalaj</td>
+<td style="text-align: right;"><span class="neg">−5.768</span></td>
+<td style="text-align: right;"><span class="neg">−5.768</span></td>
+<td style="text-align: right;"><span class="neg">−5.768</span></td>
+<td style="text-align: right;"><span class="neg">−5.158</span></td>
+<td style="text-align: right;"><span class="neg">−4.549</span></td>
+</tr>
+<tr>
+<td>Hizmet maliyeti</td>
+<td style="text-align: right;"><span class="neg">−3.225</span></td>
+<td style="text-align: right;"><span class="neg">−3.750</span></td>
+<td style="text-align: right;"><span class="neg">−3.750</span></td>
+<td style="text-align: right;"><span class="neg">−3.750</span></td>
+<td style="text-align: right;"><span class="neg">−3.750</span></td>
+</tr>
+<tr>
+<td>Sabit giderler</td>
+<td style="text-align: right;"><span class="neg">−31.450</span></td>
+<td style="text-align: right;"><span class="neg">−31.450</span></td>
+<td style="text-align: right;"><span class="neg">−31.450</span></td>
+<td style="text-align: right;"><span class="neg">−31.450</span></td>
+<td style="text-align: right;"><span class="neg">−31.450</span></td>
+</tr>
+<tr>
+<td><strong>FAVÖK</strong></td>
+<td style="text-align: right;"><strong>43.198</strong></td>
+<td style="text-align: right;"><strong>45.173</strong></td>
+<td style="text-align: right;"><strong>45.173</strong></td>
+<td style="text-align: right;"><strong>39.771</strong></td>
+<td style="text-align: right;"><strong>34.369</strong></td>
+</tr>
+<tr>
+<td>Amortisman</td>
+<td style="text-align: right;"><span class="neg">−11.107</span></td>
+<td style="text-align: right;"><span class="neg">−11.427</span></td>
+<td style="text-align: right;"><span class="neg">−11.427</span></td>
+<td style="text-align: right;"><span class="neg">−11.584</span></td>
+<td style="text-align: right;"><span class="neg">−10.822</span></td>
+</tr>
+<tr>
+<td>Faiz</td>
+<td style="text-align: right;"><span class="neg">−1.449</span></td>
+<td style="text-align: right;"><span class="neg">−303</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><strong>VERGİ ÖNCESİ KÂR</strong></td>
+<td style="text-align: right;"><strong>30.642</strong></td>
+<td style="text-align: right;"><strong>33.443</strong></td>
+<td style="text-align: right;"><strong>33.746</strong></td>
+<td style="text-align: right;"><strong>28.187</strong></td>
+<td style="text-align: right;"><strong>23.547</strong></td>
+</tr>
+<tr>
+<td>Kurumlar vergisi (%25)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−5.960</span></td>
+<td style="text-align: right;"><span class="neg">−8.437</span></td>
+<td style="text-align: right;"><span class="neg">−7.047</span></td>
+<td style="text-align: right;"><span class="neg">−5.887</span></td>
+</tr>
+<tr>
+<td><strong>NET KÂR</strong></td>
+<td style="text-align: right;"><strong>30.642</strong></td>
+<td style="text-align: right;"><strong>27.482</strong></td>
+<td style="text-align: right;"><strong>25.310</strong></td>
+<td style="text-align: right;"><strong>21.140</strong></td>
+<td style="text-align: right;"><strong>17.660</strong></td>
+</tr>
+<tr>
+<td>Net marj</td>
+<td style="text-align: right;">%25</td>
+<td style="text-align: right;">%22</td>
+<td style="text-align: right;">%20</td>
+<td style="text-align: right;">%18</td>
+<td style="text-align: right;">%17</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Notlar:</strong><br />
+- 2027-2029 zararları (toplam $70.807) 5 yıl boyunca mahsup ediliyor. Kurumlar vergisi ilk kez <strong>2033'te</strong> ödeniyor. 2027 zararının mahsup süresi 2032'de doluyor.<br />
+- Sabit giderler v2 bazı + kurucu ulaşımı ($3.500) + arı kovanları ($300) + dondurulmuş depo elektriği ($900, 2029+). Toplam olgun yılda $31.450.<br />
+- 2035-36'daki verim düşüşü, bitki yaşlanmasının temkinli bir tahmini. İyi gençleştirme budamasıyla verim 2037+'ya kadar korunabilir.</p>
+<h3 id="63-nakit-aks-ve-finansman">6.3 Nakit akışı ve finansman</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>USD</th>
+<th style="text-align: right;">Y0</th>
+<th style="text-align: right;">2027</th>
+<th style="text-align: right;">2028</th>
+<th style="text-align: right;">2029</th>
+<th style="text-align: right;">2030</th>
+<th style="text-align: right;">2031</th>
+<th style="text-align: right;">2032</th>
+<th style="text-align: right;">2033</th>
+<th style="text-align: right;">2034</th>
+<th style="text-align: right;">2035</th>
+<th style="text-align: right;">2036</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FAVÖK</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−12.934</span></td>
+<td style="text-align: right;"><span class="neg">−14.754</span></td>
+<td style="text-align: right;">8.189</td>
+<td style="text-align: right;">29.881</td>
+<td style="text-align: right;">39.434</td>
+<td style="text-align: right;">43.198</td>
+<td style="text-align: right;">45.173</td>
+<td style="text-align: right;">45.173</td>
+<td style="text-align: right;">39.771</td>
+<td style="text-align: right;">34.369</td>
+</tr>
+<tr>
+<td>Vergi</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−5.960</span></td>
+<td style="text-align: right;"><span class="neg">−8.437</span></td>
+<td style="text-align: right;"><span class="neg">−7.047</span></td>
+<td style="text-align: right;"><span class="neg">−5.887</span></td>
+</tr>
+<tr>
+<td>Yatırım + yenileme</td>
+<td style="text-align: right;"><span class="neg">−45.130</span></td>
+<td style="text-align: right;"><span class="neg">−54.380</span></td>
+<td style="text-align: right;"><span class="neg">−22.500</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−8.000</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−4.900</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Kalıntı değer (net defter değerinin %50'si)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">8.396</td>
+</tr>
+<tr>
+<td>Kredi kullanımı</td>
+<td style="text-align: right;">22.565</td>
+<td style="text-align: right;">27.190</td>
+<td style="text-align: right;">11.250</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Faiz</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−3.538</span></td>
+<td style="text-align: right;"><span class="neg">−7.261</span></td>
+<td style="text-align: right;"><span class="neg">−7.917</span></td>
+<td style="text-align: right;"><span class="neg">−5.992</span></td>
+<td style="text-align: right;"><span class="neg">−3.605</span></td>
+<td style="text-align: right;"><span class="neg">−1.449</span></td>
+<td style="text-align: right;"><span class="neg">−303</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Anapara</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−4.578</span></td>
+<td style="text-align: right;"><span class="neg">−9.396</span></td>
+<td style="text-align: right;"><span class="neg">−10.245</span></td>
+<td style="text-align: right;"><span class="neg">−5.896</span></td>
+<td style="text-align: right;"><span class="neg">−1.639</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><strong>Özsermaye nakit akışı</strong></td>
+<td style="text-align: right;"><span class="neg">−22.565</span></td>
+<td style="text-align: right;"><span class="neg">−43.662</span></td>
+<td style="text-align: right;"><span class="neg">−33.265</span></td>
+<td style="text-align: right;"><span class="neg">−4.306</span></td>
+<td style="text-align: right;">14.494</td>
+<td style="text-align: right;">25.585</td>
+<td style="text-align: right;">27.854</td>
+<td style="text-align: right;">37.271</td>
+<td style="text-align: right;">31.837</td>
+<td style="text-align: right;">32.725</td>
+<td style="text-align: right;">36.879</td>
+</tr>
+<tr>
+<td><strong>Kümülatif</strong></td>
+<td style="text-align: right;"><span class="neg">−22.565</span></td>
+<td style="text-align: right;"><span class="neg">−66.227</span></td>
+<td style="text-align: right;"><span class="neg">−99.491</span></td>
+<td style="text-align: right;"><span class="neg">−103.797</span></td>
+<td style="text-align: right;"><span class="neg">−89.304</span></td>
+<td style="text-align: right;"><span class="neg">−63.719</span></td>
+<td style="text-align: right;"><span class="neg">−35.865</span></td>
+<td style="text-align: right;">1.406</td>
+<td style="text-align: right;">33.243</td>
+<td style="text-align: right;">65.967</td>
+<td style="text-align: right;">102.846</td>
+</tr>
+</tbody>
+</table></div>
+<p>Kredi kurgusu: Faz 1, 2 ve 3'ün %50'si Ziraat Hazine faiz destekli TL kredisiyle karşılanıyor (%18,5, 2+3 yıl). <strong>Özsermaye ihtiyacı 2029'da tepe yapıyor: $103.797.</strong> Kümülatif özsermaye nakdi <strong>2033'te</strong> pozitife dönüyor. Ayrıca temmuz-ekim arasında, alıcı vadeleri nedeniyle $10-15k sezonluk işletme sermayesi gerekir.</p>
+<h3 id="64-senaryolar">6.4 Senaryolar</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Gösterge</th>
+<th style="text-align: right;">Baz</th>
+<th style="text-align: right;">Pesimistik</th>
+<th style="text-align: right;">İyimser</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10 yıl toplam gelir</td>
+<td style="text-align: right;">$901.543</td>
+<td style="text-align: right;">$594.061</td>
+<td style="text-align: right;">$1.095.352</td>
+</tr>
+<tr>
+<td>10 yıl toplam vergi öncesi kâr</td>
+<td style="text-align: right;">$109.322</td>
+<td style="text-align: right;"><span class="neg">−$131.534</span></td>
+<td style="text-align: right;">$234.907</td>
+</tr>
+<tr>
+<td>10 yıl toplam net kâr</td>
+<td style="text-align: right;">$81.991</td>
+<td style="text-align: right;"><span class="neg">−$131.534</span></td>
+<td style="text-align: right;">$176.180</td>
+</tr>
+<tr>
+<td>Tam verim yılı (2032) net kâr</td>
+<td style="text-align: right;">$30.642</td>
+<td style="text-align: right;"><span class="neg">−$1.637</span></td>
+<td style="text-align: right;">$35.538</td>
+</tr>
+<tr>
+<td>Proje NPV (%12)</td>
+<td style="text-align: right;"><span class="neg">−$15.631</span></td>
+<td style="text-align: right;"><span class="neg">−$124.758</span></td>
+<td style="text-align: right;">$32.911</td>
+</tr>
+<tr>
+<td>Proje IRR</td>
+<td style="text-align: right;">%9,5</td>
+<td style="text-align: right;">−%14,0</td>
+<td style="text-align: right;">%16,8</td>
+</tr>
+<tr>
+<td>Özsermaye IRR (kredili)</td>
+<td style="text-align: right;">%12,0</td>
+<td style="text-align: right;">−%17,0</td>
+<td style="text-align: right;">%21,6</td>
+</tr>
+<tr>
+<td>Geri dönüş (kaldıraçsız)</td>
+<td style="text-align: right;">6,9 yıl</td>
+<td style="text-align: right;">geri dönmez</td>
+<td style="text-align: right;">5,7 yıl</td>
+</tr>
+<tr>
+<td>Azami özsermaye ihtiyacı</td>
+<td style="text-align: right;">$103.797</td>
+<td style="text-align: right;">$156.480</td>
+<td style="text-align: right;">$96.020</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>Baz:</strong> Bu raporun varsayımları. Mevsim olayları "ortalama bir yıl" düzeyinde.</li>
+<li><strong>Pesimistik (stres testi):</strong> Verim −%25, tüm fiyatlar −%20, hasat işçiliği +%30, <strong>10 yıl boyunca her yıl birlikte.</strong> Mevsim olaylarının rastgele değil kalıcı bir pazar ve verim sorunu olduğu durumu gösteriyor. Gerçekleşme olasılığı düşük, ama Kapı 1-2'nin neden şart olduğunu açıklıyor.</li>
+<li><strong>İyimser:</strong> Verim +%20 (tam verimde 24 t), fiyatlar +%5.</li>
+</ul>
+<h3 id="65-olcek">6.5 Ölçek</h3>
+<p>10 da'nın getirisi ölçek nedeniyle sınırlı. 20 da planı ve tabloları bir sonraki bölümde.</p>
+<hr />
+<h2 id="7-20-donum-plan">7. 20 Dönüm Planı</h2>
+<h3 id="71-neden-20-da">7.1 Neden 20 da?</h3>
+<p>v2'den bu yana tekrar eden bulgu şu: pakethane, soğuk zincir, şok dondurucu, AgTech ağı, teknisyen ve marka giderleri 10 da'yı da 20 da'yı da neredeyse aynı maliyetle taşıyor. 10 da'da kg başı sabit gider ~$1,57; 20 da'da ~$1,25'e iniyor. Ayrıca liyofilize girdisi ~6 t'ya çıktığı için <strong>kendi makine ekonomik hâle geliyor</strong> (başabaş 3,2 t, Bölüm 4.3).</p>
+<h3 id="72-iki-secenek">7.2 İki seçenek</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th><strong>A. Tek seferde</strong> (2 × 10 da, Nisan 2027)</th>
+<th><strong>B. Kademeli</strong> (10 da 2027 + 10 da Nisan 2029)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>İkinci blok tarla yatırımı</td>
+<td>Q4-2026 / Q1-2027</td>
+<td>Q4-2028 / Q1-2029 (Kapı 2 sonrası)</td>
+</tr>
+<tr>
+<td>İlk 20 da tam verim yılı</td>
+<td>2030</td>
+<td>2032</td>
+</tr>
+<tr>
+<td>Pazar bilgisi</td>
+<td>Pazarı görmeden iki kat ürün varsayımı</td>
+<td>2028 satış verisi görüldükten sonra karar</td>
+</tr>
+<tr>
+<td>Proje IRR / özsermaye IRR</td>
+<td>%16,7 / %21,4</td>
+<td>%15,0 / %19,1</td>
+</tr>
+<tr>
+<td>Azami özsermaye</td>
+<td>$133.058</td>
+<td>$129.462</td>
+</tr>
+<tr>
+<td>Ne zaman seçilmeli</td>
+<td>Mart 2027'den önce ≥ 5 t/yıl kurumsal ortak veya ön sözleşme varsa</td>
+<td><strong>Varsayılan</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>İki seçenekte de <strong>toplam yatırım aynı</strong> ($193.459, 10 yıl, yenilemeler dahil). Fark zamanlamada: A, iki yıl önce tam verime ulaştığı için daha yüksek getiri sağlıyor. B ise ikinci $30k'yı pazar kanıtlandıktan sonra harcıyor. Bölüm 5'te gösterildiği gibi asıl risk mevsim değil pazar olduğu için <strong>B öneriliyor</strong>.</p>
+<h3 id="73-ek-yatrm-10-da-20-da">7.3 Ek yatırım (10 da → 20 da)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kalem (2. blok, 10 da)</th>
+<th style="text-align: right;">USD</th>
+<th style="text-align: right;">TL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Toprak analizi + dip kazan + lazer tesviye + 40 t organik gübre + sedde</td>
+<td style="text-align: right;">3.850</td>
+<td style="text-align: right;">180.950</td>
+</tr>
+<tr>
+<td>Sedde üstü agrotekstil malç (3.400 m²)</td>
+<td style="text-align: right;">1.100</td>
+<td style="text-align: right;">51.700</td>
+</tr>
+<tr>
+<td>Doku kültürü M1 sertifikalı fidan 3.000 ad + %5 yedek + dikim</td>
+<td style="text-align: right;">10.050</td>
+<td style="text-align: right;">472.350</td>
+</tr>
+<tr>
+<td>Telli terbiye: ~630 galvaniz direk, 3 kat tel, T-kol, ankraj, montaj</td>
+<td style="text-align: right;">8.500</td>
+<td style="text-align: right;">399.500</td>
+</tr>
+<tr>
+<td>Sulama hidroliği: DSİ hidrant bağlantısı, ana hat, disk+kum filtre, 6.600 m çift lateral</td>
+<td style="text-align: right;">2.450</td>
+<td style="text-align: right;">115.150</td>
+</tr>
+<tr>
+<td>8 adet ek DIY toprak düğümü (LoRaWAN ağı genişletme)</td>
+<td style="text-align: right;">2.240</td>
+<td style="text-align: right;">105.280</td>
+</tr>
+<tr>
+<td>Beklenmeyen giderler (%8)</td>
+<td style="text-align: right;">2.255</td>
+<td style="text-align: right;">105.994</td>
+</tr>
+<tr>
+<td><strong>Tarla kurulumu toplamı</strong> (dikimden önceki kış)</td>
+<td style="text-align: right;"><strong>30.445</strong></td>
+<td style="text-align: right;"><strong>1.430.924</strong></td>
+</tr>
+<tr>
+<td>Gölge filesi (ilk hasattan önce, %8 dahil)</td>
+<td style="text-align: right;">4.104</td>
+<td style="text-align: right;">192.888</td>
+</tr>
+<tr>
+<td>Kendi liyofilize makinesi + kurulum (20 da'da ekonomik)</td>
+<td style="text-align: right;">24.000</td>
+<td style="text-align: right;">1.128.000</td>
+</tr>
+<tr>
+<td><strong>20 da için ek yatırım toplamı</strong></td>
+<td style="text-align: right;"><strong>58.549</strong></td>
+<td style="text-align: right;"><strong>2.751.812</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>İkinci blok mevcut pakethane, reefer, GES, dondurucu, gateway ve edge sunucuyu paylaşıyor. Kapasite kontrolü:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Varlık</th>
+<th>20 da tepe yükü</th>
+<th>Kapasite</th>
+<th>Durum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ön soğutma tüneli</td>
+<td>~850-900 kg/gün</td>
+<td>~1 t/parti, günde 2 parti</td>
+<td>Yeterli</td>
+</tr>
+<tr>
+<td>40' reefer (0/+2 °C)</td>
+<td>2-3 günlük taze stok (~2,5 t)</td>
+<td>~8-10 t</td>
+<td>Yeterli</td>
+</tr>
+<tr>
+<td>Top-seal makinesi</td>
+<td>Tepe günde ~1.500 paket</td>
+<td>400-600 paket/saat</td>
+<td>Yeterli (3-4 saat)</td>
+</tr>
+<tr>
+<td>Şok dondurucu</td>
+<td>~300-400 kg/gün</td>
+<td>300 kg/parti</td>
+<td>Tepe günlerde 2 parti</td>
+</tr>
+<tr>
+<td>İkinci reefer (-20 °C)</td>
+<td>Yıllık ~12 t dondurulmuş</td>
+<td>~10 t anlık</td>
+<td>Kış satışıyla döner; gerekirse fason depo</td>
+</tr>
+<tr>
+<td>GES 10 kWp</td>
+<td>Elektrik ihtiyacı ~1,6 kat</td>
+<td>–</td>
+<td>Şebeke takviyeli; Faz 3'te +5 kWp değerlendirilebilir</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="74-organizasyon-20-da">7.4 Organizasyon (20 da)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Rol</th>
+<th>10 da</th>
+<th>20 da</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Saha şefi / tarım teknisyeni (daimi)</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Daimi tarım işçisi</td>
+<td>–</td>
+<td><strong>1</strong> (ikinci blok dikiminden itibaren)</td>
+</tr>
+<tr>
+<td>Sezonluk pakethane sorumlusu</td>
+<td>1</td>
+<td>1 (+1 yardımcı tepe dönemde)</td>
+</tr>
+<tr>
+<td>Tepe hasat toplayıcısı</td>
+<td>7-8</td>
+<td><strong>14-15</strong></td>
+</tr>
+<tr>
+<td>Budama ekibi (Ocak-Şubat, yevmiyeli)</td>
+<td>3-4 kişi × 2 hafta</td>
+<td>3-4 kişi × 4 hafta</td>
+</tr>
+<tr>
+<td>Kurucu ziyareti</td>
+<td>~25-30/yıl</td>
+<td>~30-35/yıl (sezonda daha uzun kalış)</td>
+</tr>
+</tbody>
+</table></div>
+<p>14-15 toplayıcıyı her sezon bulmak 20 da'nın en zorlu operasyonel işi. Muratlı ve çevre köylerden sabit bir ekip (sezon başı avans, kg başı prim, servis aracı) ve 3 çeşit portföyünün yaydığı hasat bu yüzden kritik.</p>
+<h3 id="75-20-da-kademeli-plan-hacim-aks">7.5 20 da kademeli plan — hacim akışı</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th style="text-align: right;">Rekolte</th>
+<th style="text-align: right;">Taze paketli</th>
+<th style="text-align: right;">Kurumsal</th>
+<th style="text-align: right;">Hal</th>
+<th style="text-align: right;">IQF</th>
+<th style="text-align: right;">Liyofilize girdi → kuru</th>
+<th style="text-align: right;">Taze payı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2027</td>
+<td style="text-align: right;">0,5 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">0,4 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">0,0 t → 0 kg</td>
+<td style="text-align: right;">%80</td>
+</tr>
+<tr>
+<td>2028</td>
+<td style="text-align: right;">5,5 t</td>
+<td style="text-align: right;">2,2 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">2,2 t</td>
+<td style="text-align: right;">0,0 t</td>
+<td style="text-align: right;">0,0 t → 0 kg</td>
+<td style="text-align: right;">%80</td>
+</tr>
+<tr>
+<td>2029</td>
+<td style="text-align: right;">15,0 t</td>
+<td style="text-align: right;">7,5 t</td>
+<td style="text-align: right;">0,5 t</td>
+<td style="text-align: right;">2,0 t</td>
+<td style="text-align: right;">4,0 t</td>
+<td style="text-align: right;">1,0 t → 118 kg</td>
+<td style="text-align: right;">%67</td>
+</tr>
+<tr>
+<td>2030</td>
+<td style="text-align: right;">25,5 t</td>
+<td style="text-align: right;">12,3 t</td>
+<td style="text-align: right;">2,2 t</td>
+<td style="text-align: right;">2,9 t</td>
+<td style="text-align: right;">5,6 t</td>
+<td style="text-align: right;">2,4 t → 284 kg</td>
+<td style="text-align: right;">%68</td>
+</tr>
+<tr>
+<td>2031</td>
+<td style="text-align: right;">34,5 t</td>
+<td style="text-align: right;">17,2 t</td>
+<td style="text-align: right;">3,8 t</td>
+<td style="text-align: right;">3,3 t</td>
+<td style="text-align: right;">6,1 t</td>
+<td style="text-align: right;">4,1 t → 482 kg</td>
+<td style="text-align: right;">%70</td>
+</tr>
+<tr>
+<td>2032</td>
+<td style="text-align: right;">40,0 t</td>
+<td style="text-align: right;">19,8 t</td>
+<td style="text-align: right;">4,5 t</td>
+<td style="text-align: right;">3,9 t</td>
+<td style="text-align: right;">5,9 t</td>
+<td style="text-align: right;">5,9 t → 697 kg</td>
+<td style="text-align: right;">%70</td>
+</tr>
+<tr>
+<td>2033</td>
+<td style="text-align: right;">40,0 t</td>
+<td style="text-align: right;">19,8 t</td>
+<td style="text-align: right;">4,5 t</td>
+<td style="text-align: right;">3,9 t</td>
+<td style="text-align: right;">5,9 t</td>
+<td style="text-align: right;">5,9 t → 697 kg</td>
+<td style="text-align: right;">%70</td>
+</tr>
+<tr>
+<td>2034</td>
+<td style="text-align: right;">40,0 t</td>
+<td style="text-align: right;">19,8 t</td>
+<td style="text-align: right;">4,5 t</td>
+<td style="text-align: right;">3,9 t</td>
+<td style="text-align: right;">5,9 t</td>
+<td style="text-align: right;">5,9 t → 697 kg</td>
+<td style="text-align: right;">%70</td>
+</tr>
+<tr>
+<td>2035</td>
+<td style="text-align: right;">38,0 t</td>
+<td style="text-align: right;">18,6 t</td>
+<td style="text-align: right;">4,5 t</td>
+<td style="text-align: right;">3,6 t</td>
+<td style="text-align: right;">5,6 t</td>
+<td style="text-align: right;">5,6 t → 660 kg</td>
+<td style="text-align: right;">%70</td>
+</tr>
+<tr>
+<td>2036</td>
+<td style="text-align: right;">36,0 t</td>
+<td style="text-align: right;">17,5 t</td>
+<td style="text-align: right;">4,5 t</td>
+<td style="text-align: right;">3,4 t</td>
+<td style="text-align: right;">5,3 t</td>
+<td style="text-align: right;">5,3 t → 624 kg</td>
+<td style="text-align: right;">%71</td>
+</tr>
+</tbody>
+</table></div>
+<p>Sezon başına ~96.000 paket, ~4,5 t kurumsal ürün, ~700 kg liyofilize. Kendi liyofilize makinesi 2031 sonunda alınıyor ve 2032'den itibaren fasonun yerini alıyor.</p>
+<h3 id="76-20-da-kademeli-plan-gelir-tablosu-2027-2031">7.6 20 da kademeli plan — gelir tablosu (2027-2031)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>USD</th>
+<th style="text-align: right;">2027</th>
+<th style="text-align: right;">2028</th>
+<th style="text-align: right;">2029</th>
+<th style="text-align: right;">2030</th>
+<th style="text-align: right;">2031</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rekolte (t)</td>
+<td style="text-align: right;">0,5</td>
+<td style="text-align: right;">5,5</td>
+<td style="text-align: right;">15,0</td>
+<td style="text-align: right;">25,5</td>
+<td style="text-align: right;">34,5</td>
+</tr>
+<tr>
+<td>Taze paketli</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">12.436</td>
+<td style="text-align: right;">42.252</td>
+<td style="text-align: right;">69.250</td>
+<td style="text-align: right;">97.065</td>
+</tr>
+<tr>
+<td>Kurumsal paket</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4.500</td>
+<td style="text-align: right;">20.250</td>
+<td style="text-align: right;">33.750</td>
+</tr>
+<tr>
+<td>Hal / dökme taze</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">5.500</td>
+<td style="text-align: right;">5.031</td>
+<td style="text-align: right;">7.373</td>
+<td style="text-align: right;">8.348</td>
+</tr>
+<tr>
+<td>İşleme (2. sınıf, dondurucu öncesi)</td>
+<td style="text-align: right;">130</td>
+<td style="text-align: right;">1.430</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>IQF dondurulmuş</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">11.228</td>
+<td style="text-align: right;">15.777</td>
+<td style="text-align: right;">17.202</td>
+</tr>
+<tr>
+<td>Liyofilize (kuru)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4.718</td>
+<td style="text-align: right;">11.364</td>
+<td style="text-align: right;">19.273</td>
+</tr>
+<tr>
+<td>Hizmet + lab + danışmanlık</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.500</td>
+<td style="text-align: right;">5.000</td>
+<td style="text-align: right;">11.000</td>
+</tr>
+<tr>
+<td><strong>TOPLAM GELİR</strong></td>
+<td style="text-align: right;"><strong>1.130</strong></td>
+<td style="text-align: right;"><strong>19.366</strong></td>
+<td style="text-align: right;"><strong>69.229</strong></td>
+<td style="text-align: right;"><strong>129.014</strong></td>
+<td style="text-align: right;"><strong>186.637</strong></td>
+</tr>
+<tr>
+<td>Hasat</td>
+<td style="text-align: right;"><span class="neg">−275</span></td>
+<td style="text-align: right;"><span class="neg">−3.355</span></td>
+<td style="text-align: right;"><span class="neg">−9.446</span></td>
+<td style="text-align: right;"><span class="neg">−16.200</span></td>
+<td style="text-align: right;"><span class="neg">−22.113</span></td>
+</tr>
+<tr>
+<td>Ambalaj + pakethane</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−1.574</span></td>
+<td style="text-align: right;"><span class="neg">−5.706</span></td>
+<td style="text-align: right;"><span class="neg">−10.376</span></td>
+<td style="text-align: right;"><span class="neg">−14.970</span></td>
+</tr>
+<tr>
+<td>Dağıtım + komisyon</td>
+<td style="text-align: right;"><span class="neg">−189</span></td>
+<td style="text-align: right;"><span class="neg">−3.240</span></td>
+<td style="text-align: right;"><span class="neg">−8.818</span></td>
+<td style="text-align: right;"><span class="neg">−16.013</span></td>
+<td style="text-align: right;"><span class="neg">−22.802</span></td>
+</tr>
+<tr>
+<td>Dondurma + IQF lojistik</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−2.316</span></td>
+<td style="text-align: right;"><span class="neg">−3.405</span></td>
+<td style="text-align: right;"><span class="neg">−3.932</span></td>
+</tr>
+<tr>
+<td>Liyofilize (fason/kendi) + ambalaj</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−2.182</span></td>
+<td style="text-align: right;"><span class="neg">−5.256</span></td>
+<td style="text-align: right;"><span class="neg">−8.914</span></td>
+</tr>
+<tr>
+<td>Hizmet maliyeti</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−525</span></td>
+<td style="text-align: right;"><span class="neg">−1.550</span></td>
+<td style="text-align: right;"><span class="neg">−2.700</span></td>
+</tr>
+<tr>
+<td>Sabit giderler</td>
+<td style="text-align: right;"><span class="neg">−13.600</span></td>
+<td style="text-align: right;"><span class="neg">−25.950</span></td>
+<td style="text-align: right;"><span class="neg">−38.050</span></td>
+<td style="text-align: right;"><span class="neg">−46.850</span></td>
+<td style="text-align: right;"><span class="neg">−48.400</span></td>
+</tr>
+<tr>
+<td><strong>FAVÖK</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−12.934</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−14.754</strong></span></td>
+<td style="text-align: right;"><strong>2.186</strong></td>
+<td style="text-align: right;"><strong>29.365</strong></td>
+<td style="text-align: right;"><strong>62.807</strong></td>
+</tr>
+<tr>
+<td>Amortisman</td>
+<td style="text-align: right;"><span class="neg">−5.020</span></td>
+<td style="text-align: right;"><span class="neg">−12.486</span></td>
+<td style="text-align: right;"><span class="neg">−18.131</span></td>
+<td style="text-align: right;"><span class="neg">−18.384</span></td>
+<td style="text-align: right;"><span class="neg">−18.034</span></td>
+</tr>
+<tr>
+<td>Faiz</td>
+<td style="text-align: right;"><span class="neg">−3.538</span></td>
+<td style="text-align: right;"><span class="neg">−7.261</span></td>
+<td style="text-align: right;"><span class="neg">−10.304</span></td>
+<td style="text-align: right;"><span class="neg">−8.336</span></td>
+<td style="text-align: right;"><span class="neg">−5.591</span></td>
+</tr>
+<tr>
+<td><strong>VERGİ ÖNCESİ KÂR</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−21.492</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−34.501</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−26.249</strong></span></td>
+<td style="text-align: right;"><strong>2.646</strong></td>
+<td style="text-align: right;"><strong>39.182</strong></td>
+</tr>
+<tr>
+<td>Kurumlar vergisi (%25)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td><strong>NET KÂR</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−21.492</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−34.501</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−26.249</strong></span></td>
+<td style="text-align: right;"><strong>2.646</strong></td>
+<td style="text-align: right;"><strong>39.182</strong></td>
+</tr>
+<tr>
+<td>Net marj</td>
+<td style="text-align: right;">−%1902</td>
+<td style="text-align: right;">−%178</td>
+<td style="text-align: right;">−%38</td>
+<td style="text-align: right;">%2</td>
+<td style="text-align: right;">%21</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="77-20-da-kademeli-plan-gelir-tablosu-2032-2036">7.7 20 da kademeli plan — gelir tablosu (2032-2036)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>USD</th>
+<th style="text-align: right;">2032</th>
+<th style="text-align: right;">2033</th>
+<th style="text-align: right;">2034</th>
+<th style="text-align: right;">2035</th>
+<th style="text-align: right;">2036</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rekolte (t)</td>
+<td style="text-align: right;">40,0</td>
+<td style="text-align: right;">40,0</td>
+<td style="text-align: right;">40,0</td>
+<td style="text-align: right;">38,0</td>
+<td style="text-align: right;">36,0</td>
+</tr>
+<tr>
+<td>Taze paketli</td>
+<td style="text-align: right;">111.920</td>
+<td style="text-align: right;">111.920</td>
+<td style="text-align: right;">111.920</td>
+<td style="text-align: right;">105.408</td>
+<td style="text-align: right;">98.896</td>
+</tr>
+<tr>
+<td>Kurumsal paket</td>
+<td style="text-align: right;">40.500</td>
+<td style="text-align: right;">40.500</td>
+<td style="text-align: right;">40.500</td>
+<td style="text-align: right;">40.500</td>
+<td style="text-align: right;">40.500</td>
+</tr>
+<tr>
+<td>Hal / dökme taze</td>
+<td style="text-align: right;">9.625</td>
+<td style="text-align: right;">9.625</td>
+<td style="text-align: right;">9.625</td>
+<td style="text-align: right;">9.065</td>
+<td style="text-align: right;">8.505</td>
+</tr>
+<tr>
+<td>İşleme (2. sınıf, dondurucu öncesi)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>IQF dondurulmuş</td>
+<td style="text-align: right;">16.590</td>
+<td style="text-align: right;">16.590</td>
+<td style="text-align: right;">16.590</td>
+<td style="text-align: right;">15.716</td>
+<td style="text-align: right;">14.843</td>
+</tr>
+<tr>
+<td>Liyofilize (kuru)</td>
+<td style="text-align: right;">27.882</td>
+<td style="text-align: right;">27.882</td>
+<td style="text-align: right;">27.882</td>
+<td style="text-align: right;">26.414</td>
+<td style="text-align: right;">24.946</td>
+</tr>
+<tr>
+<td>Hizmet + lab + danışmanlık</td>
+<td style="text-align: right;">13.500</td>
+<td style="text-align: right;">16.000</td>
+<td style="text-align: right;">16.000</td>
+<td style="text-align: right;">16.000</td>
+<td style="text-align: right;">16.000</td>
+</tr>
+<tr>
+<td><strong>TOPLAM GELİR</strong></td>
+<td style="text-align: right;"><strong>220.017</strong></td>
+<td style="text-align: right;"><strong>222.517</strong></td>
+<td style="text-align: right;"><strong>222.517</strong></td>
+<td style="text-align: right;"><strong>213.103</strong></td>
+<td style="text-align: right;"><strong>203.690</strong></td>
+</tr>
+<tr>
+<td>Hasat</td>
+<td style="text-align: right;"><span class="neg">−25.645</span></td>
+<td style="text-align: right;"><span class="neg">−25.645</span></td>
+<td style="text-align: right;"><span class="neg">−25.645</span></td>
+<td style="text-align: right;"><span class="neg">−24.372</span></td>
+<td style="text-align: right;"><span class="neg">−23.099</span></td>
+</tr>
+<tr>
+<td>Ambalaj + pakethane</td>
+<td style="text-align: right;"><span class="neg">−17.387</span></td>
+<td style="text-align: right;"><span class="neg">−17.387</span></td>
+<td style="text-align: right;"><span class="neg">−17.387</span></td>
+<td style="text-align: right;"><span class="neg">−16.562</span></td>
+<td style="text-align: right;"><span class="neg">−15.738</span></td>
+</tr>
+<tr>
+<td>Dağıtım + komisyon</td>
+<td style="text-align: right;"><span class="neg">−26.503</span></td>
+<td style="text-align: right;"><span class="neg">−26.503</span></td>
+<td style="text-align: right;"><span class="neg">−26.503</span></td>
+<td style="text-align: right;"><span class="neg">−25.275</span></td>
+<td style="text-align: right;"><span class="neg">−24.047</span></td>
+</tr>
+<tr>
+<td>Dondurma + IQF lojistik</td>
+<td style="text-align: right;"><span class="neg">−4.088</span></td>
+<td style="text-align: right;"><span class="neg">−4.088</span></td>
+<td style="text-align: right;"><span class="neg">−4.088</span></td>
+<td style="text-align: right;"><span class="neg">−3.873</span></td>
+<td style="text-align: right;"><span class="neg">−3.658</span></td>
+</tr>
+<tr>
+<td>Liyofilize (fason/kendi) + ambalaj</td>
+<td style="text-align: right;"><span class="neg">−5.193</span></td>
+<td style="text-align: right;"><span class="neg">−5.193</span></td>
+<td style="text-align: right;"><span class="neg">−5.193</span></td>
+<td style="text-align: right;"><span class="neg">−4.920</span></td>
+<td style="text-align: right;"><span class="neg">−4.646</span></td>
+</tr>
+<tr>
+<td>Hizmet maliyeti</td>
+<td style="text-align: right;"><span class="neg">−3.225</span></td>
+<td style="text-align: right;"><span class="neg">−3.750</span></td>
+<td style="text-align: right;"><span class="neg">−3.750</span></td>
+<td style="text-align: right;"><span class="neg">−3.750</span></td>
+<td style="text-align: right;"><span class="neg">−3.750</span></td>
+</tr>
+<tr>
+<td>Sabit giderler</td>
+<td style="text-align: right;"><span class="neg">−49.925</span></td>
+<td style="text-align: right;"><span class="neg">−49.925</span></td>
+<td style="text-align: right;"><span class="neg">−49.925</span></td>
+<td style="text-align: right;"><span class="neg">−49.925</span></td>
+<td style="text-align: right;"><span class="neg">−49.925</span></td>
+</tr>
+<tr>
+<td><strong>FAVÖK</strong></td>
+<td style="text-align: right;"><strong>88.051</strong></td>
+<td style="text-align: right;"><strong>90.026</strong></td>
+<td style="text-align: right;"><strong>90.026</strong></td>
+<td style="text-align: right;"><strong>84.426</strong></td>
+<td style="text-align: right;"><strong>78.826</strong></td>
+</tr>
+<tr>
+<td>Amortisman</td>
+<td style="text-align: right;"><span class="neg">−17.738</span></td>
+<td style="text-align: right;"><span class="neg">−18.058</span></td>
+<td style="text-align: right;"><span class="neg">−18.058</span></td>
+<td style="text-align: right;"><span class="neg">−18.215</span></td>
+<td style="text-align: right;"><span class="neg">−17.453</span></td>
+</tr>
+<tr>
+<td>Faiz</td>
+<td style="text-align: right;"><span class="neg">−4.529</span></td>
+<td style="text-align: right;"><span class="neg">−2.438</span></td>
+<td style="text-align: right;"><span class="neg">−1.406</span></td>
+<td style="text-align: right;"><span class="neg">−763</span></td>
+<td style="text-align: right;"><span class="neg">−323</span></td>
+</tr>
+<tr>
+<td><strong>VERGİ ÖNCESİ KÂR</strong></td>
+<td style="text-align: right;"><strong>65.784</strong></td>
+<td style="text-align: right;"><strong>69.529</strong></td>
+<td style="text-align: right;"><strong>70.561</strong></td>
+<td style="text-align: right;"><strong>65.447</strong></td>
+<td style="text-align: right;"><strong>61.050</strong></td>
+</tr>
+<tr>
+<td>Kurumlar vergisi (%25)</td>
+<td style="text-align: right;"><span class="neg">−6.342</span></td>
+<td style="text-align: right;"><span class="neg">−17.382</span></td>
+<td style="text-align: right;"><span class="neg">−17.640</span></td>
+<td style="text-align: right;"><span class="neg">−16.362</span></td>
+<td style="text-align: right;"><span class="neg">−15.262</span></td>
+</tr>
+<tr>
+<td><strong>NET KÂR</strong></td>
+<td style="text-align: right;"><strong>59.441</strong></td>
+<td style="text-align: right;"><strong>52.147</strong></td>
+<td style="text-align: right;"><strong>52.921</strong></td>
+<td style="text-align: right;"><strong>49.086</strong></td>
+<td style="text-align: right;"><strong>45.787</strong></td>
+</tr>
+<tr>
+<td>Net marj</td>
+<td style="text-align: right;">%27</td>
+<td style="text-align: right;">%23</td>
+<td style="text-align: right;">%24</td>
+<td style="text-align: right;">%23</td>
+<td style="text-align: right;">%22</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="78-20-da-kademeli-plan-nakit-aks">7.8 20 da kademeli plan — nakit akışı</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>USD</th>
+<th style="text-align: right;">Y0</th>
+<th style="text-align: right;">2027</th>
+<th style="text-align: right;">2028</th>
+<th style="text-align: right;">2029</th>
+<th style="text-align: right;">2030</th>
+<th style="text-align: right;">2031</th>
+<th style="text-align: right;">2032</th>
+<th style="text-align: right;">2033</th>
+<th style="text-align: right;">2034</th>
+<th style="text-align: right;">2035</th>
+<th style="text-align: right;">2036</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FAVÖK</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−12.934</span></td>
+<td style="text-align: right;"><span class="neg">−14.754</span></td>
+<td style="text-align: right;">2.186</td>
+<td style="text-align: right;">29.365</td>
+<td style="text-align: right;">62.807</td>
+<td style="text-align: right;">88.051</td>
+<td style="text-align: right;">90.026</td>
+<td style="text-align: right;">90.026</td>
+<td style="text-align: right;">84.426</td>
+<td style="text-align: right;">78.826</td>
+</tr>
+<tr>
+<td>Vergi</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−6.342</span></td>
+<td style="text-align: right;"><span class="neg">−17.382</span></td>
+<td style="text-align: right;"><span class="neg">−17.640</span></td>
+<td style="text-align: right;"><span class="neg">−16.362</span></td>
+<td style="text-align: right;"><span class="neg">−15.262</span></td>
+</tr>
+<tr>
+<td>Yatırım + yenileme</td>
+<td style="text-align: right;"><span class="neg">−45.130</span></td>
+<td style="text-align: right;"><span class="neg">−54.380</span></td>
+<td style="text-align: right;"><span class="neg">−52.945</span></td>
+<td style="text-align: right;"><span class="neg">−4.104</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−24.000</span></td>
+<td style="text-align: right;"><span class="neg">−8.000</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−4.900</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Kalıntı değer (net defter değerinin %50'si)</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">15.941</td>
+</tr>
+<tr>
+<td>Kredi kullanımı</td>
+<td style="text-align: right;">22.565</td>
+<td style="text-align: right;">27.190</td>
+<td style="text-align: right;">26.473</td>
+<td style="text-align: right;">2.052</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">12.000</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Faiz</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−3.538</span></td>
+<td style="text-align: right;"><span class="neg">−7.261</span></td>
+<td style="text-align: right;"><span class="neg">−10.304</span></td>
+<td style="text-align: right;"><span class="neg">−8.336</span></td>
+<td style="text-align: right;"><span class="neg">−5.591</span></td>
+<td style="text-align: right;"><span class="neg">−4.529</span></td>
+<td style="text-align: right;"><span class="neg">−2.438</span></td>
+<td style="text-align: right;"><span class="neg">−1.406</span></td>
+<td style="text-align: right;"><span class="neg">−763</span></td>
+<td style="text-align: right;"><span class="neg">−323</span></td>
+</tr>
+<tr>
+<td>Anapara</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−4.578</span></td>
+<td style="text-align: right;"><span class="neg">−9.396</span></td>
+<td style="text-align: right;"><span class="neg">−13.333</span></td>
+<td style="text-align: right;"><span class="neg">−8.929</span></td>
+<td style="text-align: right;"><span class="neg">−4.210</span></td>
+<td style="text-align: right;"><span class="neg">−2.734</span></td>
+<td style="text-align: right;"><span class="neg">−2.063</span></td>
+<td style="text-align: right;"><span class="neg">−1.748</span></td>
+</tr>
+<tr>
+<td><strong>Özsermaye nakit akışı</strong></td>
+<td style="text-align: right;"><span class="neg">−22.565</span></td>
+<td style="text-align: right;"><span class="neg">−43.662</span></td>
+<td style="text-align: right;"><span class="neg">−48.487</span></td>
+<td style="text-align: right;"><span class="neg">−14.748</span></td>
+<td style="text-align: right;">11.633</td>
+<td style="text-align: right;">31.882</td>
+<td style="text-align: right;">60.250</td>
+<td style="text-align: right;">65.995</td>
+<td style="text-align: right;">63.346</td>
+<td style="text-align: right;">65.238</td>
+<td style="text-align: right;">77.433</td>
+</tr>
+<tr>
+<td><strong>Kümülatif</strong></td>
+<td style="text-align: right;"><span class="neg">−22.565</span></td>
+<td style="text-align: right;"><span class="neg">−66.227</span></td>
+<td style="text-align: right;"><span class="neg">−114.714</span></td>
+<td style="text-align: right;"><span class="neg">−129.462</span></td>
+<td style="text-align: right;"><span class="neg">−117.828</span></td>
+<td style="text-align: right;"><span class="neg">−85.946</span></td>
+<td style="text-align: right;"><span class="neg">−25.696</span></td>
+<td style="text-align: right;">40.299</td>
+<td style="text-align: right;">103.645</td>
+<td style="text-align: right;">168.882</td>
+<td style="text-align: right;">246.315</td>
+</tr>
+</tbody>
+</table></div>
+<p>Kredi kurgusu: Faz 1-3, ikinci blok ve liyofilize makinesinin %50'si Ziraat Hazine faiz destekli TL kredisi; yenileme yatırımları özsermayeden.</p>
+<h3 id="79-20-da-risk-simulasyonu-onlemli-plan">7.9 20 da risk simülasyonu (önlemli plan)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Önlemli plan, 5.000 simülasyon</th>
+<th style="text-align: right;">10 da</th>
+<th style="text-align: right;">20 da — tek seferde (2027)</th>
+<th style="text-align: right;">20 da — kademeli (2027 + 2029)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sermayenin geri dönmeme olasılığı</td>
+<td style="text-align: right;">%0,0</td>
+<td style="text-align: right;">%0,0</td>
+<td style="text-align: right;">%0,0</td>
+</tr>
+<tr>
+<td>%12 hedefin altında kalma olasılığı</td>
+<td style="text-align: right;">%96,4</td>
+<td style="text-align: right;">%0,5</td>
+<td style="text-align: right;">%3,6</td>
+</tr>
+<tr>
+<td>Proje IRR P10 / P50 / P90</td>
+<td style="text-align: right;">%7,6 / %9,4 / %11,2</td>
+<td style="text-align: right;">%14,4 / %16,5 / %18,6</td>
+<td style="text-align: right;">%12,9 / %14,9 / %16,8</td>
+</tr>
+<tr>
+<td>Olgun yılın zararla kapanma olasılığı</td>
+<td style="text-align: right;">%0,1</td>
+<td style="text-align: right;">%0,0</td>
+<td style="text-align: right;">%0,0</td>
+</tr>
+<tr>
+<td>Olgun yıl vergi öncesi kâr P10 / P50</td>
+<td style="text-align: right;">$16.368 / $27.966</td>
+<td style="text-align: right;">$39.373 / $61.153</td>
+<td style="text-align: right;">$36.111 / $61.633</td>
+</tr>
+</tbody>
+</table></div>
+<p>20 da'da hedef getirinin altında kalma olasılığı %96'dan <strong>%3,6'ya (kademeli)</strong> ve <strong>%0,5'e (tek seferde)</strong> düşüyor. Simülasyonun kapsamadığı pazar riski (Bölüm 5.3) 20 da'da iki kat büyük. Kademeli yolun öncelikli olmasının nedeni bu.</p>
+<h3 id="710-20-da-takviminde-farklar">7.10 20 da takviminde farklar</h3>
+<ul>
+<li><strong>2027:</strong> İkinci blok için yalnız gözlem: toprak analizi, drenaj, örtü bitkisi.</li>
+<li><strong>Eylül 2028 (Kapı 2):</strong> 2028 sezon verisi olumluysa fidan siparişi (doku kültürü için 5-6 ay tedarik süresi).</li>
+<li><strong>Ekim 2028 – Mart 2029:</strong> İkinci blokta toprak hazırlığı, sedde, telli terbiye, sulama, sensör ağının genişletilmesi.</li>
+<li><strong>Nisan 2029:</strong> İkinci blok dikimi. Aynı yıl birinci blokta ilk büyük hasat (14,5 t): 2029 en yoğun yıl.</li>
+<li><strong>2031 sonu:</strong> Kendi liyofilize makinesi ve gıda üretim izni.</li>
+<li><strong>Olgun yıl takvimi</strong> (Bölüm 3.2) aynı; budama ve hasat iş günleri yaklaşık iki katına çıkıyor.</li>
+</ul>
+<hr />
+<h2 id="8-sanayilesme-ulasm-ve-imar-teknosab-komsulugunun-etkileri">8. Sanayileşme, Ulaşım ve İmar: TEKNOSAB Komşuluğunun Etkileri</h2>
+<h3 id="81-bolgede-ne-oluyor-ekim-2026-itibaryla-kamuya-ack-bilgiler">8.1 Bölgede ne oluyor? (Ekim 2026 itibarıyla kamuya açık bilgiler)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Proje</th>
+<th>Durum</th>
+<th>Araziye etkisi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TEKNOSAB</strong> (Bursa Teknoloji OSB), Karacabey</td>
+<td>825-837 ha, 169 parsel. Tüzel kişilik 2015; ilk fabrikalar 2021; ~30 firma üretimde. 2026 sonu hedefi 42 firma, ~9.000 istihdam, toplam yatırım ~100 milyar TL. Uzun vadeli hedef 45.000 (bazı açıklamalarda 77.000) çalışan</td>
+<td><strong>Doğrudan komşu.</strong> Muratlı'ya ulaşan mevcut yolun bir kısmı OSB sınırında kaldı; Büyükşehir Meclisi OSB dışından yeni bağlantı yolu için kamulaştırmayı onayladı</td>
+</tr>
+<tr>
+<td><strong>TEKNOSAB Lojistik Teknopark</strong></td>
+<td>~$210 milyon, girişim sermayesi fonu modeli; temel atıldı, inşaat süresi 18-24 ay</td>
+<td>Soğuk zincir ve sevkiyat altyapısı yakınlaşıyor; ağır vasıta trafiği artıyor</td>
+</tr>
+<tr>
+<td><strong>TEKNOSAB Kavşağı</strong> (KGM)</td>
+<td>Temeli atıldı</td>
+<td>Otoyol erişimi iyileşiyor</td>
+</tr>
+<tr>
+<td><strong>Bandırma–Bursa–Osmaneli hızlı tren</strong></td>
+<td>Bursa–Osmaneli etabı 2026 hedefi. TEKNOSAB–Karacabey–Bandırma batı etabı resmî hedefi 2028; TEKNOSAB ve Karacabey'de istasyon planlı. Karacabey kesiminde zemin sorunu nedeniyle <strong>güzergâh değişikliği</strong> ve önceki kamulaştırmalarda "iade krizi" haberleri var</td>
+<td>İstasyon yakınlığı değer artışı getirir, ama takvim belirsiz; ray koridoru kamulaştırma riski taşır</td>
+</tr>
+<tr>
+<td><strong>TOKİ, 3.445 konut</strong> (Karakoca Mah.)</td>
+<td>TEKNOSAB'ın yanında planlandı</td>
+<td>Nüfus ve kentsel baskı Muratlı yönüne yaklaşıyor</td>
+</tr>
+<tr>
+<td><strong>Karacabey nüfus planı</strong></td>
+<td>2021: 84.241 kişi → planlama hedefi ~150.000</td>
+<td>Kentsel genişleme baskısı, yerel pazar büyümesi</td>
+</tr>
+<tr>
+<td><strong>Doğalgaz</strong></td>
+<td>Belediye TEKNOSAB'a yakın 7 köye doğalgaz kararı aldı</td>
+<td>Altyapı yaklaşıyor (dondurucu/ısıtma enerjisi, trifaze şebeke)</td>
+</tr>
+<tr>
+<td><strong>DSİ Uluabat AT-TİGH</strong></td>
+<td>Bölgede 38.850 da arazi modern basınçlı sulamaya kavuşuyor</td>
+<td>Devletin büyük <strong>tarımsal</strong> yatırımı: bölgenin orta vadede tarımda kalması yönünde güçlü sinyal</td>
+</tr>
+<tr>
+<td><strong>Plan ve yargı</strong></td>
+<td>2022'de 1/100.000 Bursa ÇDP değişikliğiyle Karacabey Ovası'nda yeni sanayi alanları açıldı; meslek odaları ve akademisyenler dava açtı. 1/25.000 Karacabey ÇDP revizyonu askıya çıkarıldı (ÇŞB duyurusu); Büyükşehir Meclisi Eylül 2026 oturumunda Karacabey imar itirazlarını görüştü. Bölgesel plan Karacabey'i <strong>tarım ve tarıma dayalı sanayi</strong> odağı olarak tanımlıyor</td>
+<td>Plan kararları değişebiliyor ama dava ve itiraz süreçleri yıllar alıyor</td>
+</tr>
+<tr>
+<td><strong>Mevzuat (4 Nisan 2026)</strong></td>
+<td>Yeni Tarım Arazilerinin Korunması ve Kullanılması Yönetmeliği: izinsiz tarım dışı kullanım ve hobi bahçesi/tiny house tipi fiilî bölünme açıkça yasak, yıkım yetkisi Bakanlıkta</td>
+<td>Bireysel imar talebi daha da zorlaştı. Değişiklik ancak <strong>kamu yararı kararıyla</strong> (OSB, yol, ray, TOKİ) gelir</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="82-ornek-projeler-bu-surecler-nasl-gelisiyor">8.2 Örnek projeler: bu süreçler nasıl gelişiyor?</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Örnek</th>
+<th>Gözlenen gelişim</th>
+<th>Bu araziye dersi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TEKNOSAB'ın kendisi</strong></td>
+<td>2015 tüzel kişilik → 2016 köylü itirazları ve dava → 2021 ilk fabrika → 2026 ~42 firma, ~9.000 çalışan → konut (TOKİ) ve lojistik ikinci dalga</td>
+<td>Karar → ilk üretim <strong>~6 yıl</strong>, karar → yerleşim etkisi <strong>~10-11 yıl</strong>. "10 yıl" tahminin bu takvimle uyumlu</td>
+</tr>
+<tr>
+<td><strong>Manisa Muradiye OSB</strong></td>
+<td>4 yılda 3.000 da'dan 7.000 da'ya genişledi</td>
+<td>OSB'ler kurulduktan sonra <strong>komşu tarım arazisine doğru genişliyor</strong>. Muratlı için en olası imar mekanizması bu</td>
+</tr>
+<tr>
+<td><strong>Ergene Havzası (Çorlu–Çerkezköy)</strong></td>
+<td>1. sınıf tarım arazisinde OSB kümeleri; on yıllar içinde tarım–sanayi çatışması, su kirliliği ve büyük maliyetli havza eylem planı</td>
+<td>Sanayi komşuluğu <strong>su ve hava kalitesi</strong> riskini uzun vadede büyütüyor. Ölçüm ve kayıt şart</td>
+</tr>
+<tr>
+<td><strong>Karacabey hızlı tren kesimi</strong></td>
+<td>Kamulaştırma yapıldı, ödendi, sonra zemin sorunu nedeniyle güzergâh değişti</td>
+<td>Altyapı takvimleri resmî hedeflerden <strong>3-5 yıl</strong> sapabiliyor. İstasyonu yatırım kararına baz almamak gerek</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="83-ureticilige-etkileri">8.3 Üreticiliğe etkileri</h3>
+<p><strong>Olumsuz etkiler</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Etki</th>
+<th>Ne zaman</th>
+<th>Büyüklük</th>
+<th>Önlem</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>İşgücü rekabeti:</strong> fabrikalar sigortalı ve yıl boyu iş sunuyor; sezonluk toplayıcı ve daimi işçi bulmak zorlaşıyor</td>
+<td>2028+ (istihdam 9k → 20k+)</td>
+<td>Hasat ve işçilik maliyeti 2031'den sonra +%25-35 (Senaryo B)</td>
+<td>Parça başı ve primli ödeme, servis aracı, esnek vardiya (fabrika vardiya dışı saatler), sabit köy ekibi; işlemeye giden ürün için <strong>sıra üstü hasat makinesi kiralama</strong></td>
+</tr>
+<tr>
+<td><strong>Hava kalitesi ve toz</strong></td>
+<td>OSB doluluğu arttıkça</td>
+<td>Meyvede toz/kalıntı, "temiz ürün" algısı</td>
+<td>AgTech'e <strong>PM2.5/PM10 + gaz sensörü</strong> ekle; yıllık ağır metal ve kalıntı analizi; QR sayfasında yayımla (şeffaflık hem kalite kanıtı hem hukuki kayıt)</td>
+</tr>
+<tr>
+<td><strong>Su:</strong> kuraklıkta öncelik içme suyu ve sanayiye; drenaj kanallarına deşarj riski</td>
+<td>Kurak yıllar</td>
+<td>Sulama kısıtı, su kalitesi</td>
+<td>Kuyu izni (yedek kaynak), küçük depolama havuzu, sulama suyu EC/pH sürekli ölçümü (zaten var)</td>
+</tr>
+<tr>
+<td><strong>Kamulaştırma koridorları</strong> (yol, ray, enerji hattı)</td>
+<td>2027-2032</td>
+<td>Alanın bir kısmı (Senaryo E: %10)</td>
+<td>Parsel sınırlarında sıra planı esnek; bedel tespiti için kayıtlar</td>
+</tr>
+<tr>
+<td><strong>Güvenlik, hırsızlık, trafik</strong></td>
+<td>Nüfus arttıkça</td>
+<td>Orta</td>
+<td>Termal kamera + AI (planda var), çit, sigorta</td>
+</tr>
+<tr>
+<td><strong>Belirsizlik maliyeti:</strong> 10+ yıllık ortaklık ve kurumsal sözleşmelerde imar/kamulaştırma maddesi gerekir</td>
+<td>Sözleşme anında</td>
+<td>Müzakere gücü</td>
+<td>Sözleşmelere "kamulaştırma ve imar hâlinde fesih, bedel paylaşımı, tesisin taşınması" maddesi</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Olumlu etkiler</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Etki</th>
+<th>Büyüklük</th>
+<th>Nasıl kullanılır</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Yanı başında kurumsal pazar:</strong> 42+ firma, 9.000 → 45.000 çalışan</td>
+<td>Kurumsal kanal 2 katı (Senaryo C): 10 da IRR %9,5 → %12,8</td>
+<td>Fabrika yemekhaneleri (taze meyve, tatlı), çalışan hediye kutuları, ESG/çalışan programları ("fabrikanın yanındaki akıllı bahçe"), yılbaşı liyofilize kutuları</td>
+</tr>
+<tr>
+<td><strong>Lojistik:</strong> otoyol kavşağı, lojistik park, ileride demiryolu</td>
+<td>Soğuk sevkiyat maliyeti ve süresi düşer</td>
+<td>Lojistik parkla soğuk zincir iş birliği, İstanbul/İzmir dağıtımı</td>
+</tr>
+<tr>
+<td><strong>Teknoloji ekosistemi:</strong> otomotiv, savunma, elektronik firmaları; mühendis havuzu</td>
+<td>Living lab'in en doğal ortakları</td>
+<td>Sensör, otomasyon, görüntü işleme firmalarıyla pilot proje; staj ve tez işbirlikleri</td>
+</tr>
+<tr>
+<td><strong>Altyapı:</strong> trifaze şebeke, doğalgaz, yol</td>
+<td>v2'deki "elektrik bağlantısı" riski azalır</td>
+<td>Faz 2 öncesi bağlantı maliyeti yeniden teklif alınmalı</td>
+</tr>
+<tr>
+<td><strong>Arazi değeri artışı</strong></td>
+<td>Aşağıdaki tablo</td>
+<td>Tarımla çelişmeyen ayrı bir servet kalemi; kredi teminat gücü artar</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="84-senaryolar-ve-finansal-etkiler">8.4 Senaryolar ve finansal etkiler</h3>
+<p>Senaryolar v3 modeli üzerine kuruldu (model_v4.py). <strong>Arazi değeri proje nakit akışına dahil değil</strong>; yalnız işletme (bahçe + tesis) getirisi gösteriliyor. Kamulaştırma ve imar senaryolarında işletme o yıl sona eriyor:<br />
+- <strong>Bahçe ve sabit tesis bedeli:</strong> net defter değeri (F), ya da bahçenin gelir yöntemiyle değerlenmesi hâlinde NBV × 2 (F2).<br />
+- <strong>Taşınabilir varlıklar:</strong> NBV'nin %60'ıyla geri kazanılıyor (taşınıp yeniden kurulur ya da satılır).<br />
+- <strong>Kalan kredi:</strong> bedelden kapatılıyor.</p>
+<p><strong>10 da:</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Senaryo</th>
+<th style="text-align: right;">Proje IRR</th>
+<th style="text-align: right;">Özsermaye IRR</th>
+<th style="text-align: right;">NPV (%12)</th>
+<th style="text-align: right;">Dönem net kârı</th>
+<th style="text-align: right;">Tesis/bahçe bedeli</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A. Baz (v3)</td>
+<td style="text-align: right;">%9,5</td>
+<td style="text-align: right;">%12,0</td>
+<td style="text-align: right;"><span class="neg">−$15.631</span></td>
+<td style="text-align: right;">$81.991</td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr>
+<td>B. İşgücü baskısı (hasat ve sabit işçilik 2031'den +%25-35)</td>
+<td style="text-align: right;">%6,3</td>
+<td style="text-align: right;">%7,8</td>
+<td style="text-align: right;"><span class="neg">−$34.591</span></td>
+<td style="text-align: right;">$41.799</td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr>
+<td>C. TEKNOSAB pazarı (kurumsal hacim 2 katı)</td>
+<td style="text-align: right;">%12,8</td>
+<td style="text-align: right;">%16,1</td>
+<td style="text-align: right;">$5.532</td>
+<td style="text-align: right;">$129.270</td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr>
+<td>D. Sanayi komşusu — en olası (B + C)</td>
+<td style="text-align: right;">%10,0</td>
+<td style="text-align: right;">%12,5</td>
+<td style="text-align: right;"><span class="neg">−$13.268</span></td>
+<td style="text-align: right;">$88.957</td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr>
+<td>E. Kısmi kamulaştırma: yol/ray koridoru, alanın %10'u (2029 sonu)</td>
+<td style="text-align: right;">%8,3</td>
+<td style="text-align: right;">%10,4</td>
+<td style="text-align: right;"><span class="neg">−$23.145</span></td>
+<td style="text-align: right;">$63.710</td>
+<td style="text-align: right;">$3.448</td>
+</tr>
+<tr>
+<td>F. Tam kamulaştırma / OSB genişlemesi (2032 sonu)</td>
+<td style="text-align: right;">%1,1</td>
+<td style="text-align: right;">%1,5</td>
+<td style="text-align: right;"><span class="neg">−$47.969</span></td>
+<td style="text-align: right;"><span class="neg">−$7.847</span></td>
+<td style="text-align: right;">$42.599</td>
+</tr>
+<tr>
+<td>F2. Tam kamulaştırma 2032, bahçe bedeli gelir yöntemiyle (NBV × 2)</td>
+<td style="text-align: right;">%4,0</td>
+<td style="text-align: right;">%5,4</td>
+<td style="text-align: right;"><span class="neg">−$37.448</span></td>
+<td style="text-align: right;"><span class="neg">−$7.847</span></td>
+<td style="text-align: right;">$63.366</td>
+</tr>
+<tr>
+<td>G. İmar gelir, gönüllü çıkış (2034 sonu)</td>
+<td style="text-align: right;">%7,5</td>
+<td style="text-align: right;">%9,7</td>
+<td style="text-align: right;"><span class="neg">−$25.459</span></td>
+<td style="text-align: right;">$47.839</td>
+<td style="text-align: right;">$30.374</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>20 da kademeli:</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Senaryo</th>
+<th style="text-align: right;">Proje IRR</th>
+<th style="text-align: right;">Özsermaye IRR</th>
+<th style="text-align: right;">NPV (%12)</th>
+<th style="text-align: right;">Dönem net kârı</th>
+<th style="text-align: right;">Tesis/bahçe bedeli</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A. Baz (v3)</td>
+<td style="text-align: right;">%15,0</td>
+<td style="text-align: right;">%19,1</td>
+<td style="text-align: right;">$27.719</td>
+<td style="text-align: right;">$218.968</td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr>
+<td>B. İşgücü baskısı (hasat ve sabit işçilik 2031'den +%25-35)</td>
+<td style="text-align: right;">%11,3</td>
+<td style="text-align: right;">%14,4</td>
+<td style="text-align: right;"><span class="neg">−$5.997</span></td>
+<td style="text-align: right;">$144.816</td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr>
+<td>C. TEKNOSAB pazarı (kurumsal hacim 2 katı)</td>
+<td style="text-align: right;">%18,2</td>
+<td style="text-align: right;">%23,1</td>
+<td style="text-align: right;">$59.822</td>
+<td style="text-align: right;">$291.014</td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr>
+<td>D. Sanayi komşusu — en olası (B + C)</td>
+<td style="text-align: right;">%14,8</td>
+<td style="text-align: right;">%18,9</td>
+<td style="text-align: right;">$26.110</td>
+<td style="text-align: right;">$216.607</td>
+<td style="text-align: right;">–</td>
+</tr>
+<tr>
+<td>E. Kısmi kamulaştırma: yol/ray koridoru, alanın %10'u (2029 sonu)</td>
+<td style="text-align: right;">%13,0</td>
+<td style="text-align: right;">%16,5</td>
+<td style="text-align: right;">$8.334</td>
+<td style="text-align: right;">$167.768</td>
+<td style="text-align: right;">$6.599</td>
+</tr>
+<tr>
+<td>F. Tam kamulaştırma / OSB genişlemesi (2032 sonu)</td>
+<td style="text-align: right;">%4,0</td>
+<td style="text-align: right;">%6,3</td>
+<td style="text-align: right;"><span class="neg">−$45.112</span></td>
+<td style="text-align: right;">$18.606</td>
+<td style="text-align: right;">$75.811</td>
+</tr>
+<tr>
+<td>F2. Tam kamulaştırma 2032, bahçe bedeli gelir yöntemiyle (NBV × 2)</td>
+<td style="text-align: right;">%8,1</td>
+<td style="text-align: right;">%11,6</td>
+<td style="text-align: right;"><span class="neg">−$24.148</span></td>
+<td style="text-align: right;">$18.606</td>
+<td style="text-align: right;">$117.190</td>
+</tr>
+<tr>
+<td>G. İmar gelir, gönüllü çıkış (2034 sonu)</td>
+<td style="text-align: right;">%11,8</td>
+<td style="text-align: right;">%15,5</td>
+<td style="text-align: right;"><span class="neg">−$1.915</span></td>
+<td style="text-align: right;">$124.128</td>
+<td style="text-align: right;">$52.725</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Okuma:</strong><br />
+1. <strong>En olası durum (D)</strong>, sanayi komşusu olarak tarımın sürmesi. İşgücü baskısı (B) ile TEKNOSAB pazarı (C) birbirini büyük ölçüde dengeliyor: 20 da'da IRR %15,0 → %14,8. <strong>Kurumsal kanalı TEKNOSAB'a yönelik kurmak, işgücü baskısının en iyi panzehiri.</strong><br />
+2. <strong>Kamulaştırma ne kadar erken gelirse işletme getirisi o kadar düşük.</strong> 2032'de tam kamulaştırmada 20 da'nın işletme IRR'si %4-8'e iniyor. Ama bu, arazi bedelinin dışarıda bırakıldığı en kötü işletme görünümü. Arazi bedeli (aşağıda) bu kaybı fazlasıyla karşılar.<br />
+3. <strong>İmar 2034'te gelirse</strong> (G), 20 da'nın işletme getirisi %11,8 ile hâlâ makul ve ardından arazi değeri realize ediliyor.</p>
+<p><strong>Arazi değeri (bilgi amaçlı, ilan fiyatları — gerçekleşen satış değil):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Durum</th>
+<th style="text-align: right;">TL/m² (ilan)</th>
+<th style="text-align: right;">10 da değeri (TL)</th>
+<th style="text-align: right;">10 da değeri (USD)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Muratlı tarla, mevcut (ilan aralığı alt-orta)</td>
+<td style="text-align: right;">550–1.000</td>
+<td style="text-align: right;">5,5–10,0 M</td>
+<td style="text-align: right;">$117.021–$212.766</td>
+</tr>
+<tr>
+<td>TEKNOSAB çevresi tarla (ilanlar)</td>
+<td style="text-align: right;">600–2.000</td>
+<td style="text-align: right;">6,0–20,0 M</td>
+<td style="text-align: right;">$127.660–$425.532</td>
+</tr>
+<tr>
+<td>TEKNOSAB'a bitişik, ana yol cepheli tarla (ilan)</td>
+<td style="text-align: right;">5.000–5.600</td>
+<td style="text-align: right;">50,0–56,0 M</td>
+<td style="text-align: right;">$1.063.830–$1.191.489</td>
+</tr>
+<tr>
+<td>Karacabey sanayi imarlı arsa (ilan)</td>
+<td style="text-align: right;">3.500–8.000</td>
+<td style="text-align: right;">35,0–80,0 M</td>
+<td style="text-align: right;">$744.681–$1.702.128</td>
+</tr>
+</tbody>
+</table></div>
+<p>Bugünkü tarım arazisi değeri (10 da ≈ $117-213k) bile toplam yatırımın üstünde. TEKNOSAB'a bitişik, yol cepheli parsellerde istenen fiyatlar 5-10 katına çıkıyor. <strong>Bu değer artışını tarım engellemiyor</strong>: arazi zaten tarımsal niteliğiyle korunuyor; verimli, kayıtlı ve sertifikalı bir bahçe kamulaştırmada <strong>ağaç ve tesis bedelini artırıyor</strong> (2942 sayılı Kamulaştırma Kanunu'nda ağaç ve tesis değerleri bedele dahil).</p>
+<h3 id="85-olaslklar-ve-beklenti-uzman-tahmini">8.5 Olasılıklar ve beklenti (uzman tahmini)</h3>
+<p>Benim tahminim. Kesin bilgiye değil, yukarıdaki emsallere ve mevzuata dayanıyor:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Dönem</th>
+<th style="text-align: right;">Arazinin tarımda kalma olasılığı</th>
+<th>Gerekçe</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-2031 (0-5 yıl)</td>
+<td style="text-align: right;"><strong>~%90</strong></td>
+<td>TEKNOSAB kendi 825 ha'sını henüz doldurmadı (169 parselin ~42'si); DSİ sulama yatırımı yeni; mevzuat sıkılaştı; ray takvimi kayıyor</td>
+</tr>
+<tr>
+<td>2031-2036 (5-10 yıl)</td>
+<td style="text-align: right;"><strong>~%70</strong></td>
+<td>OSB dolunca genişleme talebi (Muradiye örneği), TOKİ ve nüfus artışı, ray/istasyon etkisi</td>
+</tr>
+<tr>
+<td>2036-2046 (10-20 yıl)</td>
+<td style="text-align: right;"><strong>~%40-50</strong></td>
+<td>Kentsel ve sanayi saçaklanmasının olgunlaştığı dönem</td>
+</tr>
+</tbody>
+</table></div>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Sonuç (2036'ya kadar)</th>
+<th style="text-align: right;">Olasılık (tahmin)</th>
+<th style="text-align: right;">NPV 10 da</th>
+<th style="text-align: right;">NPV 20 da kademeli</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tarım sürer, sanayi komşusu (D)</td>
+<td style="text-align: right;">%55</td>
+<td style="text-align: right;"><span class="neg">−$13.268</span></td>
+<td style="text-align: right;">$26.110</td>
+</tr>
+<tr>
+<td>Kısmi kamulaştırma, koridor (E)</td>
+<td style="text-align: right;">%18</td>
+<td style="text-align: right;"><span class="neg">−$23.145</span></td>
+<td style="text-align: right;">$8.334</td>
+</tr>
+<tr>
+<td>Tam kamulaştırma / OSB genişlemesi 2032 (F/F2 ortalaması)</td>
+<td style="text-align: right;">%12</td>
+<td style="text-align: right;"><span class="neg">−$42.709</span></td>
+<td style="text-align: right;"><span class="neg">−$34.630</span></td>
+</tr>
+<tr>
+<td>İmar gelir, gönüllü çıkış 2034 (G)</td>
+<td style="text-align: right;">%15</td>
+<td style="text-align: right;"><span class="neg">−$25.459</span></td>
+<td style="text-align: right;"><span class="neg">−$1.915</span></td>
+</tr>
+<tr>
+<td><strong>Olasılık ağırlıklı beklenen NPV (%12)</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><span class="neg"><strong>−$20.407</strong></span></td>
+<td style="text-align: right;"><strong>$11.418</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Sonuç:</strong> Senin "10 yılı bulur" tahminin bence doğru. Projenin 10 yıllık ufku da bu pencereye denk geliyor. 20 da kademeli plan <strong>sanayileşme senaryolarının olasılık ağırlıklı ortalamasında da pozitif</strong> (NPV +$11.418). 10 da ise baz senaryoda olduğu gibi negatif kalıyor (−$20.407). Arazi değer artışı bu hesabın <strong>üstüne</strong> eklenen bağımsız bir kazanç.</p>
+<h3 id="86-stratejik-oneriler">8.6 Stratejik öneriler</h3>
+<ol>
+<li><strong>"Taşınabilir yatırım" ilkesini koru.</strong> Pakethane konteyner, soğuk depo reefer, dondurucu, GES, sensörler ve kameralar taşınabilir: 10 da'da yatırımın <strong>%62'si</strong>, 20 da'da <strong>%55'i</strong>. Pakethaneye kalıcı betonarme bina yapma.</li>
+<li><strong>Kurumsal kanalı TEKNOSAB'dan başlat.</strong> 2027 sonbaharındaki ilk ürünle OSB firmalarına numune ve yemekhane teklifi götür. 9.000 çalışan, ilk kurumsal müşteri havuzun.</li>
+<li><strong>Kayıt tut, kayıt kanıttır.</strong> Hasat, verim, gelir ve sensör verileri; İyi Tarım belgesi; ağaç sayımı. Kamulaştırmada bedel tespitini doğrudan etkiler. AgTech altyapısının görünmeyen bir faydası daha.</li>
+<li><strong>Hava kalitesi sensörü ekle</strong> (~$400-600, living lab KPI'ı): ürün güvenliği ve olası bir çevre uyuşmazlığında kanıt.</li>
+<li><strong>Sözleşmelere imar/kamulaştırma maddesi koy</strong> (ortak, kurumsal müşteri, kredi): fesih koşulları, bedel paylaşımı, ekipmanın taşınması.</li>
+<li><strong>İzle, ama spekülasyona göre karar verme.</strong> Takip edilecek göstergeler: TEKNOSAB doluluk oranı ve genişleme başvurusu, 1/25.000 Karacabey ÇDP revizyonunun kesinleşmesi, demiryolu güzergâhı ve istasyon yeri, çevre parsellerde kamulaştırma ilanları. Yılda bir bu göstergelerle Bölüm 8.5'teki olasılıkları güncelle.</li>
+<li><strong>İkinci blok kararında arazi seçimi:</strong> İkinci 10 da'yı aynı parselde değil OSB'den uzak taraftaki bağlantılı parsellerde planlamak kamulaştırma riskini bölüyor. Tersine, OSB tarafındaki parsel imar opsiyonu için korunabilir.</li>
+</ol>
+<hr />
+<h2 id="9-finansman-hukuki-yap-ve-ortaklk-v2den-degisenler">9. Finansman, Hukuki Yapı ve Ortaklık (v2'den değişenler)</h2>
+<ul>
+<li><strong>Toplam fon ihtiyacı:</strong> CAPEX $122.010 (3 faz) + ilk yıl işletme açıkları + $10-15k sezon sermayesi. Kredi payı $61.005, <strong>özsermaye tepe ihtiyacı $103.797.</strong></li>
+<li><strong>Hibe:</strong> KKYDP %50 hibesi (soğuk depo + paketleme + şok dondurucu) gelirse özsermaye tepe ihtiyacı yaklaşık $70-75k'ya iner. Başvuru takvimi Faz 2/3 zamanlamasını belirlemeli.</li>
+<li><strong>Şirket:</strong> Ltd. Şti. önerisi geçerli: zarar mahsubu, ortak ve kurum alımı, fason liyofilizeyle kendi markanla satış.</li>
+<li><strong>20 da kademeli plan:</strong> Toplam yatırım $193.459 (10 yıl), özsermaye tepe ihtiyacı <strong>$129.462</strong> (2029-2030). Kurumsal ortak ikinci bloğu finanse ederse bu ihtiyaç ~$110-115k'ya iner.</li>
+<li><strong>Kurumsal ortak:</strong> İkinci 10 da'nın en iyi finansman yolu bu (v2 Bölüm 9.2). Kurum CAPEX'i finanse eder, ürünün yarısını sabit fiyatla kendi markasıyla alır. Bu model aynı zamanda pazar riskine karşı en güçlü önlem.</li>
+</ul>
+<hr />
+<h2 id="10-10-yllk-yol-haritas-ve-karar-kaplar">10. 10 Yıllık Yol Haritası ve Karar Kapıları</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yıl</th>
+<th>Odak</th>
+<th>Karar kapısı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026 Q4</td>
+<td>Şirket, kredi, izinler, toprak hazırlığı, fidan siparişi; ÇDP revizyonu ve TEKNOSAB sınırlarının parsel bazında kontrolü</td>
+<td>Kredi onayı</td>
+</tr>
+<tr>
+<td>2027</td>
+<td>Dikim (3 çeşit), AgTech v1 (+ hava kalitesi sensörü), marka; ilk sonbahar ürünüyle TEKNOSAB firmalarına pazar testi</td>
+<td><strong>Kapı 1:</strong> ≥ 2 alıcı ön anlaşması → Faz 2</td>
+</tr>
+<tr>
+<td>2028</td>
+<td>Faz 2 (soğuk zincir + pakethane), ilk floricane hasadı (5,5 t)</td>
+<td><strong>Kapı 2 (Eylül):</strong> paketli fiyat ≥ $5/kg ve satış oranı ≥ %80 → Faz 3 + 2. blok fidan siparişi</td>
+</tr>
+<tr>
+<td>2029</td>
+<td><strong>2. blok dikimi (Nisan)</strong>, Faz 3 (dondurucu), ilk IQF ve fason liyofilize, 1 da ahududu pilotu, ilk living lab projesi</td>
+<td>Liyofilize B2B fiyatı ≥ $35/kg mı?</td>
+</tr>
+<tr>
+<td>2030-2031</td>
+<td>1. blok tam verim, 2. blok büyüme, kurumsal kanal, danışmanlık</td>
+<td><strong>Kapı 3 (2031 sonu):</strong> liyofilize girdi ≥ 3,2 t → kendi makine</td>
+</tr>
+<tr>
+<td>2032</td>
+<td>Elektronik yenileme, FaaS pilot birimi tasarımı; imar/kamulaştırma göstergelerinin yıllık değerlendirmesi</td>
+<td><strong>Kapı 4:</strong> 3 yıllık doğrulanmış veri seti → FaaS. İmar sinyali güçlüyse yeni yatırımı taşınabilir varlıklarla sınırla</td>
+</tr>
+<tr>
+<td>2033-2036</td>
+<td>Olgun işletme, FaaS büyümesi, kısmi yenileme dikimi planı</td>
+<td>2036: bahçe yenileme / gençleştirme kararı</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="11-sonuc">11. Sonuç</h2>
+<ol>
+<li><strong>Böğürtlen doğru ürün.</strong> 3 çeşitli portföy (Loch Ness + Chester + Prime-Ark) ile sezon ~4,5 aya yayılıyor ve risk dağılıyor. Ahududu, living lab'de 1 da pilot olarak deneniyor.</li>
+<li><strong>Mevsim riskleri yönetilebilir.</strong> Plandaki önlemlerle olgun bir yılın zararla kapanma olasılığı %0,1. Korkulması gereken mevsim değil, <strong>pazar ve ölçek</strong>. Bunlar karar kapılarıyla yönetiliyor.</li>
+<li><strong>Hibrit model</strong> (taze ~%73, dondurulmuş + liyofilize ~%16) satılamayan ürünü bir kayıptan stoklanabilir bir ürüne çeviriyor. Liyofilize fasonla başlıyor; kendi makine 20 da'da.</li>
+<li><strong>10 da</strong> (10 yıl): gelir $901.543, net kâr $81.991, IRR %9,5. <strong>20 da kademeli:</strong> gelir $1,49 M, net kâr $218.968, IRR %15,0, özsermaye IRR %19,1. 10 da'yı pilot, 20 da'yı hedef işletme olarak planla. Mart 2027'den önce kurumsal ortak bulunursa iki bloğu birlikte dik (IRR %16,7).</li>
+<li><strong>Sanayileşme:</strong> Arazi TEKNOSAB komşusu; 10 yıl içinde imar veya kamulaştırma etkisi olasılığını ~%45 görüyorum. En olası durumda (tarım sürer) işgücü baskısını TEKNOSAB kurumsal pazarı dengeliyor. Yatırımın yarısından fazlası taşınabilir, bahçe ve tesis için bedel alınır, arazi değer artışı ayrı bir kazanç. <strong>Sanayileşme, 20 da kademeli planı değiştirmiyor; kurumsal kanalın TEKNOSAB'dan başlamasını ve taşınabilir yatırım ilkesini öne çıkarıyor.</strong></li>
+<li><strong>İlk adımlar:</strong> Ltd. kuruluşu ve Ziraat Faz 1 kredi başvurusu 31.12.2026'dan önce; 3 çeşit için fidanlık tedarik teyidi; toprak işlerinin kış yağmurlarından önce bitirilmesi.</li>
+</ol>
+<hr />
+<h3 id="ek-a-v3te-degisen-varsaymlar">Ek A — v3'te değişen varsayımlar</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Varsayım</th>
+<th>Değer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Çeşit portföyü</td>
+<td>Loch Ness %30, Chester %40, Prime-Ark %30 → verim 0,5 / 5,5 / 14,5 / 20 t ... 2035: 18, 2036: 16 t</td>
+</tr>
+<tr>
+<td>Dondurma</td>
+<td>Şok dondurucu 2029 sezonundan itibaren; 2. sınıf ürünün tamamı ve paketlenemeyen tazenin %50'si</td>
+</tr>
+<tr>
+<td>Liyofilize</td>
+<td>Dondurulmuş havuzun %20 → %50'si; 8,5 kg taze = 1 kg kuru; B2B $40/kg; fason $2,00/kg taze girdi; ambalaj $1,50/kg kuru (<strong>fiyatlar tahmin, teklif alınmalı</strong>)</td>
+</tr>
+<tr>
+<td>IQF</td>
+<td>B2B $2,80/kg, ambalaj $0,10, navlun $0,15, komisyon %5</td>
+</tr>
+<tr>
+<td>Kurucu ulaşımı</td>
+<td>$3.500/yıl (~30 Ankara–Karacabey ziyareti)</td>
+</tr>
+<tr>
+<td>Kalıntı değer</td>
+<td>2036 sonu net defter değerinin %50'si ($8.396)</td>
+</tr>
+<tr>
+<td>Vergi</td>
+<td>%25 kurumlar vergisi, zarar mahsubu 5 yıl (süre dolan zarar düşer)</td>
+</tr>
+<tr>
+<td>Risk simülasyonu</td>
+<td>5.000 tekrar; olay olasılıkları Bölüm 5.1; baz verim önlemli planın ortalama yılı kabul edildi</td>
+</tr>
+<tr>
+<td>Sanayileşme senaryoları</td>
+<td>İşgücü çarpanı 2029: 1,10 → 2031: 1,25 → 2035: 1,35; kurumsal hacim 2030: ×1,5, 2031+: ×2; kamulaştırmada sabit varlık bedeli NBV (veya ×2), taşınabilir varlık %60 NBV; arazi bedeli hariç</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="ek-b-bolum-8-kaynaklar">Ek B — Bölüm 8 kaynakları</h3>
+<ul>
+<li>TEKNOSAB künyesi: <a href="https://teknosab.org.tr/en/sayfa/22/38/1/teknosab-hakkinda.html" target="_blank" rel="noopener">teknosab.org.tr</a>, <a href="https://bursainvest.gov.tr/investment-areas/organized-industrial-zones/" target="_blank" rel="noopener">Bursa Invest — OSB'ler</a></li>
+<li>TEKNOSAB firma ve istihdam: <a href="https://www.kalkinmakutuphanesi.gov.tr/assets/upload/dosyalar/karacabey_ilce_raporu.pdf" target="_blank" rel="noopener">Karacabey İlçe Raporu (BEBKA)</a>, <a href="https://www.iha.com.tr/bursa-haberleri/-3129375" target="_blank" rel="noopener">İHA</a>, <a href="https://www.gercekbandirma.com/teknosab-karacabeyde-77-bin-kisiye-verecek" target="_blank" rel="noopener">Gerçek Bandırma</a>, <a href="https://sanayigazetesi.com.tr/yeni-nesil-osb-projesiyle-karacabey-yatirimcilarin-gozdesi/" target="_blank" rel="noopener">Sanayi Gazetesi</a></li>
+<li>Muratlı yolu ve kamulaştırma: <a href="https://www.bursahakimiyet.com.tr/bursa/bursa-da-teknosab-nedeniyle-mahalle-yolunda-yeni-duzenleme-1709522" target="_blank" rel="noopener">Bursa Hakimiyet (yol düzenlemesi)</a>, <a href="https://www.bursahakimiyet.com.tr/bursa/kamulastirma-onayi-cikti-bursa-da-o-mahalleye-ulasim-icin-yeni-yol-karari-1710641" target="_blank" rel="noopener">Bursa Hakimiyet (kamulaştırma onayı)</a>, <a href="https://www.bursadabugun.com/haber/bursa-da-teknosab-nedeniyle-bir-mahallenin-yolu-degisiyor-1948799.html" target="_blank" rel="noopener">Bursadabugün</a></li>
+<li>Lojistik park ve kavşak: <a href="https://www.btso.org.tr/guncel/haberler-ve-duyurular/haber-duyuru-detay/60839" target="_blank" rel="noopener">BTSO — Lojistik Park</a>, <a href="https://www.ekonomigazetesi.com/sehirler/teknosab-lojistik-teknoparkta-temel-atma-hedefi-nisan-2026-74977" target="_blank" rel="noopener">Ekonomi Gazetesi</a>, <a href="https://www.btso.org.tr/guncel/haberler-ve-duyurular/haber-duyuru-detay/59337" target="_blank" rel="noopener">BTSO — Kavşak</a></li>
+<li>Hızlı tren: <a href="https://rayhaber.com/2026/09/bursa-hizli-tren-projesinde-2026-ve-2028-hedefleri-korunuyor/" target="_blank" rel="noopener">RayHaber (Eylül 2026)</a>, <a href="https://www.bbyoyht.com/proje-tanitimi" target="_blank" rel="noopener">BBYO proje tanıtımı</a>, <a href="https://www.olay.com.tr/yazar/ahmet-emin-yilmaz/karacabeyde-tren-guzergahi-degisiyor-kamulastirma-parasi-icin-iade-krizi-cikti-1438412" target="_blank" rel="noopener">Olay — güzergâh değişikliği ve iade krizi</a>, <a href="https://www.bursatv.com.tr/bursa-hizli-treninde-kritik-takvim-2026-ve-2028-hedefleri-aciklandi" target="_blank" rel="noopener">Bursa TV</a></li>
+<li>TOKİ konutları: <a href="https://www.ekonomim.com/sehirler/teknosabin-yani-basina-3-bin-445-konut-insa-edilecek-haberi-808577" target="_blank" rel="noopener">Ekonomim</a></li>
+<li>Plan ve davalar: <a href="https://www.bursamimar.org.tr/2023/01/31/karacabey-ovasina-tarimina-halkin-sagligina-kasteden-plan-degisikligine-dava-actik/" target="_blank" rel="noopener">Bursa Mimarlar Odası</a>, <a href="https://www.bursaport.com/guncel/karacabey-ovasi-nda-plan-degisikligine-dava-134116" target="_blank" rel="noopener">Bursaport</a>, <a href="https://www.bursaant.com/karacabey-ovasinda-teknosab-tepkisi-tarim-arazilerinin-sanayiye-acilmasina-karsi-dava/" target="_blank" rel="noopener">Bursaant — TEKNOSAB davası</a>, <a href="https://bursa.csb.gov.tr/1-25.000-olcekli-karacabey-cevre-duzeni-plani-revizyonu-duyuru-13279" target="_blank" rel="noopener">ÇŞB — 1/25.000 Karacabey ÇDP revizyonu</a>, <a href="https://www.ekonomim.com/sehirler/guncellenen-karacabey-imar-planina-dava-acildi-haberi-679634" target="_blank" rel="noopener">Ekonomim — imar planı davası</a></li>
+<li>Mevzuat: <a href="https://www.hukukihaber.net/tarim-arazilerinin-korunmasi-ve-kullanilmasi-hakkinda-yonetmelik/amp" target="_blank" rel="noopener">Hukuki Haber — 4 Nisan 2026 yönetmeliği</a>, <a href="https://www.alomaliye.com/2026/04/04/tarim-arazilerinin-korunmasi-ve-kullanilmasi-hakkinda-yonetmelik/" target="_blank" rel="noopener">Alomaliye</a></li>
+<li>DSİ sulama ve doğalgaz: <a href="https://www.bursahakimiyet.com.tr/bursa/bursa-karacabey-de-dev-proje-hiz-kesmiyor-38-bin-850-dekar-arazi-modern-sulamayla-bulusuyor-1683530" target="_blank" rel="noopener">Bursa Hakimiyet — 38.850 da</a>, <a href="https://www.bursaport.com/belediye/belediye-karar-aldi-karacabey-de-teknosab-a-yakin-7-koye-dogalgaz-mujdesi-194096" target="_blank" rel="noopener">Bursaport — 7 köye doğalgaz</a></li>
+<li>Emsal: <a href="https://sanayigazetesi.com.tr/?p=22819" target="_blank" rel="noopener">Sanayi Gazetesi — Muradiye OSB</a>, <a href="https://www.alomaliye.com/2016/04/26/ergene-havzasindaki-10-organize-sanayi-bolgesine-75-milyon-tl/amp/" target="_blank" rel="noopener">Alomaliye — Ergene</a></li>
+<li>Arazi ilanları: <a href="https://www.emlakjet.com/satilik-tarla/bursa-karacabey-muratli-mahallesi" target="_blank" rel="noopener">Emlakjet — Muratlı tarla</a>, <a href="https://www.emlakjet.com/satilik-sanayi-imarli-arsa/bursa-karacabey" target="_blank" rel="noopener">Emlakjet — Karacabey sanayi imarlı</a>, <a href="https://toprakarsa.com/bursa/karacabey/muratli-koyu/satilik/arsa" target="_blank" rel="noopener">Toprakarsa — Muratlı</a></li>
+</ul>
+</main>
+<footer>Tüm rakamlar <code>reports/bogurtlen-fizibilite/model_v3.py</code> ve <code>model_v4.py</code> hesap modellerinden üretilmiştir. TL karşılıkları 1 USD = 47 TL çalışma kuru iledir; ekipman fiyatları tahmindir ve teklifle doğrulanmalıdır.</footer>
+</div>
+</body>
+</html>
