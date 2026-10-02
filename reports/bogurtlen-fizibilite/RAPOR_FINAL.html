@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Böğürtlen İş Planı</title>
+<meta name="description" content="Karacabey/Muratlı akıllı böğürtlen üretim, soğuk zincir, paketleme ve AgTech test tesisi: iş modeli, CAPEX, 5 yıllık gelir tablosu, nakit akışı, vergi ve finansman.">
+<style>
+:root {
+  --bg:#f7f6f2; --surface:#ffffff; --text:#1d1f1c; --muted:#5d625a; --line:#e2e0d8;
+  --accent:#5b2a6e; --accent-soft:#f1e9f4; --head:#f0eee7; --neg:#b3261e; --warn-bg:#fff6e0; --warn-line:#e0b44a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#141513; --surface:#1d1f1c; --text:#e8e7e2; --muted:#a3a79e; --line:#33362f;
+    --accent:#c99be0; --accent-soft:#2b2231; --head:#25271f; --neg:#ff8a80; --warn-bg:#2d2715; --warn-line:#8a6d22;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#141513; --surface:#1d1f1c; --text:#e8e7e2; --muted:#a3a79e; --line:#33362f;
+  --accent:#c99be0; --accent-soft:#2b2231; --head:#25271f; --neg:#ff8a80; --warn-bg:#2d2715; --warn-line:#8a6d22;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.wrap { max-width:1060px; margin:0 auto; padding:32px 16px 64px; }
+header h1 { font-size:clamp(1.5rem,3.4vw,2.2rem); line-height:1.2; margin:0 0 12px; letter-spacing:-.01em; }
+header .eyebrow { color:var(--accent); font-weight:600; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; }
+nav.toc { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 18px; margin:24px 0; }
+nav.toc ul { margin:0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px 18px; }
+nav.toc a { color:var(--muted); text-decoration:none; font-size:.92rem; }
+nav.toc a:hover { color:var(--accent); }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:20px 0; }
+.kpi { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+.kl { font-size:.8rem; color:var(--muted); }
+.kv { font-size:1.45rem; font-weight:700; margin:2px 0; font-variant-numeric:tabular-nums; }
+.ks { font-size:.78rem; color:var(--muted); }
+.verdict { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; }
+.badge { background:var(--accent); color:var(--bg); font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:999px; letter-spacing:.05em; }
+main h2 { font-size:1.45rem; margin:48px 0 12px; padding-top:12px; border-top:1px solid var(--line); scroll-margin-top:12px; }
+main h3 { font-size:1.12rem; margin:28px 0 8px; color:var(--accent); }
+p, li { max-width:78ch; }
+a { color:var(--accent); }
+code { background:var(--head); padding:1px 5px; border-radius:4px; font-size:.88em; }
+hr { display:none; }
+.tw { overflow-x:auto; margin:14px 0; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+table { border-collapse:collapse; width:100%; font-size:.9rem; font-variant-numeric:tabular-nums; }
+th, td { padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { background:var(--head); text-align:left; font-weight:600; white-space:nowrap; }
+tr:last-child td { border-bottom:none; }
+td[align="right"], th[align="right"], td[style*="right"], th[style*="right"] { white-space:nowrap; }
+.neg { color:var(--neg); }
+aside.note { background:var(--warn-bg); border-left:4px solid var(--warn-line); margin:16px 0; padding:4px 16px; border-radius:8px; }
+footer { margin-top:48px; color:var(--muted); font-size:.85rem; }
+@media print {
+  body { background:#fff; color:#000; font-size:11pt; }
+  nav.toc { display:none; } .tw { overflow:visible; } main h2 { break-before:page; }
+  tr { break-inside:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="eyebrow">İş planı ve fizibilite · son hâl · Ekim 2026</div>
+<h1>Muratlı Böğürtlen — İş Planı ve Fizibilite (Son Hâl)</h1>
+<div class="verdict"><span class="badge">KARAR</span> <strong>SON HÂL — 10 DA, HİBRİT FİDAN, DENGELİ TEKNOLOJİ</strong> — ilk adım: toprak + su analizi ve profil çukuru (~20-35 bin TL, 2-3 hafta).</div>
+<section class="kpis" aria-label="Özet göstergeler"><div class="kpi"><div class="kl">Başlangıç yatırımı</div><div class="kv">1,57 M TL</div><div class="ks">≈ $31.900 · teknoloji 119 bin TL</div></div><div class="kpi"><div class="kl">Cepten en yüksek</div><div class="kv">1,70 M TL</div><div class="ks">2027 işletme açığı dahil</div></div><div class="kpi"><div class="kl">2028 net kâr</div><div class="kv">0,83 M TL</div><div class="ks">İlk büyük hasat 10 t</div></div><div class="kpi"><div class="kl">2031 net kâr</div><div class="kv">2,43 M TL</div><div class="ks">Aylık ~202 bin TL · 20 t</div></div><div class="kpi"><div class="kl">Geri dönüş</div><div class="kv">2,3 yıl</div><div class="ks">Fiyat −%30 ile 3,2 yıl</div></div><div class="kpi"><div class="kl">Maks. üretim</div><div class="kv">25-28 t</div><div class="ks">3,2-3,6 M TL net/yıl</div></div></section>
+</header>
+<nav class="toc" aria-label="İçindekiler"><div class="toc">
+<ul>
+<li><a href="#0-ozet">0. Özet</a></li>
+<li><a href="#1-is-modeli-tek-paragraf">1. İş Modeli (tek paragraf)</a></li>
+<li><a href="#2-baslangc-yatrm-capex-kalem-kalem">2. Başlangıç Yatırımı (CAPEX): Kalem Kalem</a></li>
+<li><a href="#3-teknoloji-paketi-dengeli-kaliteden-ve-riskten-odun-yok">3. Teknoloji Paketi (dengeli: kaliteden ve riskten ödün yok)</a></li>
+<li><a href="#4-isletme-giderleri-opex">4. İşletme Giderleri (OPEX)</a></li>
+<li><a href="#5-bes-yllk-projeksiyon-2027-2031">5. Beş Yıllık Projeksiyon (2027-2031)</a></li>
+<li><a href="#6-ne-kadar-uretebilirim-maksimum-kapasite">6. Ne Kadar Üretebilirim? (Maksimum Kapasite)</a></li>
+<li><a href="#7-hzl-sonuc-icin-ne-yapld">7. Hızlı Sonuç İçin Ne Yapıldı?</a></li>
+<li><a href="#8-stres-testi">8. Stres Testi</a></li>
+<li><a href="#9-adim-1-fizibiliteyi-derinlestirmek-once-ne-lazm">9. ADIM 1 — Fizibiliteyi Derinleştirmek: Önce Ne Lazım?</a></li>
+<li><a href="#10-adim-2-ve-sonras-takvim">10. ADIM 2 ve Sonrası: Takvim</a></li>
+<li><a href="#11-hala-dogrulanmas-gereken-varsaymlar">11. Hâlâ Doğrulanması Gereken Varsayımlar</a></li>
+</ul>
+</div>
+</nav>
+<main>
+<p><strong>Plan:</strong> 10 dönüm dikensiz böğürtlen (Loch Ness + Chester + Prime-Ark), hibrit fidan (%70 doku kültürü + %30 2 yaşlı tüplü), satış ortağı + hafta sonu kendin-topla, kendi kurduğun dengeli teknoloji paketi<br />
+<strong>Lokasyon:</strong> Bursa / Karacabey / Muratlı · <strong>Tarih:</strong> 2 Ekim 2026<br />
+<strong>Para birimi:</strong> 2026 sabit fiyatlarıyla TL (1 USD = 49,1 TL, TCMB 1-2 Ekim 2026)<br />
+<strong>Hesap modeli:</strong> <a href="https://github.com/berkehan-nz/P-Fin/blob/claude/thornless-blackberry-feasibility-5kpz6c/reports/bogurtlen-fizibilite/model_final.py" target="_blank" rel="noopener"><code>model_final.py</code></a> (<code>--tables</code> ile bütün tablolar yeniden üretilir)</p>
+<aside class="note">
+<p>Bu belge v1-v9'un vardığı son noktadır. Fiyatlar Ekim 2026 internet verileriyle güncellendi; doğrulanan kalemler tablolarda <strong>D</strong>, teklif alınması gerekenler <strong>T</strong> ile işaretli. Bölge, risk ve TEKNOSAB analizleri için v3-v4; seçenek karşılaştırmaları için v8'e bakılabilir.</p>
+</aside>
+<hr />
+<h2 id="0-ozet">0. Özet</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Gösterge</th>
+<th style="text-align: right;">Değer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Başlangıç yatırımı (CAPEX)</strong></td>
+<td style="text-align: right;"><strong>1.566.179 TL</strong> (≈ $31.900)</td>
+</tr>
+<tr>
+<td>— dikimden önce (Kasım 2026 – Mart 2027)</td>
+<td style="text-align: right;">1.187.099 TL</td>
+</tr>
+<tr>
+<td>— 2027 içinde (soğuk oda, gölge filesi, hasat)</td>
+<td style="text-align: right;">379.080 TL</td>
+</tr>
+<tr>
+<td>Teknoloji payı</td>
+<td style="text-align: right;">119.232 TL (%8)</td>
+</tr>
+<tr>
+<td><strong>Cepten çıkan en yüksek tutar</strong> (2027 işletme açığı dahil)</td>
+<td style="text-align: right;"><strong>1.703.005 TL</strong></td>
+</tr>
+<tr>
+<td>İlk hasat</td>
+<td style="text-align: right;">2027 sonbaharı (~1,5 t)</td>
+</tr>
+<tr>
+<td>2028 rekolte / net kâr</td>
+<td style="text-align: right;">10,1 t / 0,83 M TL</td>
+</tr>
+<tr>
+<td><strong>2031 (tam verim) rekolte / net kâr</strong></td>
+<td style="text-align: right;"><strong>20 t / 2,43 M TL</strong> (aylık ~202 bin TL)</td>
+</tr>
+<tr>
+<td>5 yıl toplam net kâr</td>
+<td style="text-align: right;">7,42 M TL</td>
+</tr>
+<tr>
+<td><strong>Geri dönüş</strong></td>
+<td style="text-align: right;"><strong>2,3 yıl</strong> (yatırım 2029 içinde çıkıyor)</td>
+</tr>
+<tr>
+<td>Fiyatlar %30 düşük çıkarsa: 2031 net / geri dönüş</td>
+<td style="text-align: right;">1,17 M TL / 3,2 yıl</td>
+</tr>
+<tr>
+<td>Maksimum üretim (çok iyi yönetim)</td>
+<td style="text-align: right;">25-28 t/yıl → 3,2-3,6 M TL net</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>İlk adım:</strong> Toprak + sulama suyu analizi ve arazide profil çukuru. Toplam ~20-35 bin TL, 2-3 hafta (Bölüm 9). Bu sonuçlar sedde yüksekliğini, gübre/asit programını ve arazinin böğürtlene gerçekten uygun olup olmadığını belirler. Yatırım kararından önce alınması gereken tek teknik veri bu.</p>
+<hr />
+<h2 id="1-is-modeli-tek-paragraf">1. İş Modeli (tek paragraf)</h2>
+<p>10 dönümde üç çeşit dikensiz böğürtlen yetiştirip hasadı <strong>haziran ortası – ekim sonuna</strong> yayıyorsun. Ürünün ~%75-80'i tarlada kapaklı kaplara toplanıp kendi soğuk odanda soğutuluyor ve <strong>satış ortağına</strong> (taban fiyatlı sözleşmeyle) teslim ediliyor. Yola bakan sıralarda hafta sonu <strong>kendin-topla</strong> satışı yapılıyor (Bursa ~40-50 dk, TEKNOSAB komşu); fazla ürün hale, 2. sınıf ürün işlemeye gidiyor. Saha işini sen (Ankara'dan ~20-25 ziyaret/yıl), baban (Bursa) ve yevmiyeli ekip yürütüyor; sulama, gübre, hastalık riski ve soğuk zincir senin kurduğun sensör sistemiyle uzaktan izleniyor. Vergi: çiftçi statüsünde satışta %2 stopaj.</p>
+<hr />
+<h2 id="2-baslangc-yatrm-capex-kalem-kalem">2. Başlangıç Yatırımı (CAPEX): Kalem Kalem</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Faz</th>
+<th>Grup</th>
+<th>Kalem</th>
+<th>Miktar</th>
+<th style="text-align: right;">TL</th>
+<th style="text-align: center;">Fiyat</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Arazi</td>
+<td>Dip kazan + diskaro + sedde (40 cm); lazer tesviye yok</td>
+<td>10 da</td>
+<td style="text-align: right;">64.800</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Arazi</td>
+<td>Yanmış çiftlik gübresi ~3 t/da, temin + serme (~45 m³ × 1.771 TL)</td>
+<td>45 m³</td>
+<td style="text-align: right;">86.400</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Arazi</td>
+<td>Siyah PE malç 1,2 m (500 m rulo 1.450-2.220 TL) + serme</td>
+<td>7 rulo</td>
+<td style="text-align: right;">21.600</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Fidan</td>
+<td>Doku kültürü fidan, viyolde (216'lık viyol ~5.300 TL) + 2-3 ay saksıda alıştırma</td>
+<td>3.171 ad × 46 TL</td>
+<td style="text-align: right;">157.535</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Fidan</td>
+<td>2 yaşlı tüplü fidan, hızlı blok (%30; tek tek 250 TL, toplu teklif)</td>
+<td>1.359 ad × 150 TL</td>
+<td style="text-align: right;">220.158</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Fidan</td>
+<td>Dikim işçiliği (~18 yevmiye)</td>
+<td></td>
+<td style="text-align: right;">27.000</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Telli sistem</td>
+<td>Galvaniz direk 2,7 m, 8 m ara + baş direkleri</td>
+<td>483 ad × 350 TL</td>
+<td style="text-align: right;">182.574</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Telli sistem</td>
+<td>Galvaniz tel 3 kat (75 TL/kg) + gergi/ankraj + montaj</td>
+<td>~10.000 m</td>
+<td style="text-align: right;">118.800</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Sulama</td>
+<td>Damla sulama (9.000-12.000 TL/da) + hidrant bağlantısı, disk filtre, ana hat</td>
+<td>10 da</td>
+<td style="text-align: right;">172.800</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Teknoloji</td>
+<td>Fertigasyon: 3 × Hunter PGV 1" selenoid (1.299 TL), venturi + bypass, ESP32 kontrolör + 24 VAC trafo</td>
+<td>3 zon</td>
+<td style="text-align: right;">12.960</td>
+<td style="text-align: center;">D/T</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Teknoloji</td>
+<td>Hat içi EC probu (gübre suyu uzaktan izleme)</td>
+<td>1</td>
+<td style="text-align: right;">5.400</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Teknoloji</td>
+<td>Hanna HI98129 pH/EC/TDS el ölçer</td>
+<td>1</td>
+<td style="text-align: right;">14.472</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Teknoloji</td>
+<td>Toprak düğümü: 2 × RS485 nem/sıcaklık/EC probu (4.232 TL) + Heltec ESP32-LoRa + solar/akü/kutu</td>
+<td>3 × 12.000 TL</td>
+<td style="text-align: right;">38.880</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Teknoloji</td>
+<td>LoRaWAN gateway (Dragino, ~€160-245) + 4G modem</td>
+<td>1</td>
+<td style="text-align: right;">14.040</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Teknoloji</td>
+<td>Hava düğümü: sıcaklık/nem + yaprak ıslaklığı + yağmur ölçer + ESP32/solar</td>
+<td>1</td>
+<td style="text-align: right;">8.640</td>
+<td style="text-align: center;">D/T</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Teknoloji</td>
+<td>Ana hat debimetresi (darbe çıkışlı)</td>
+<td>1</td>
+<td style="text-align: right;">4.320</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Teknoloji</td>
+<td>Raspberry Pi 5 + UPS + SSD (yerel sunucu, internet kesilse de çalışır)</td>
+<td>1</td>
+<td style="text-align: right;">12.960</td>
+<td style="text-align: center;">D/T</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Teknoloji</td>
+<td>Solar 4G güvenlik kamerası (3.100-8.000 TL)</td>
+<td>1</td>
+<td style="text-align: right;">7.560</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>0</td>
+<td>Diğer</td>
+<td>ÇKS kaydı, tarımsal yapı bildirimi, küçük giderler</td>
+<td></td>
+<td style="text-align: right;">16.200</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Soğuk zincir</td>
+<td>Soğuk oda: 100 mm panel ~32 m² (890-1.050 TL/m²) + kapı/profil/montaj</td>
+<td>~12 m³</td>
+<td style="text-align: right;">55.080</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Soğuk zincir</td>
+<td>24.000 BTU inverter klima (54-75 bin TL) + termostat kontrolü + ön soğutma fanı</td>
+<td>1</td>
+<td style="text-align: right;">75.600</td>
+<td style="text-align: center;">D</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Soğuk zincir</td>
+<td>Elektrik bağlantısı (monofaze) + pano</td>
+<td></td>
+<td style="text-align: right;">43.200</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Soğuk zincir</td>
+<td>Wi-Fi sıcaklık sensörü + Telegram alarmı + 2 logger</td>
+<td></td>
+<td style="text-align: right;">5.400</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Kalite</td>
+<td>%35 gölge filesi (güney cephe + Chester sıraları, ~3.000 m² × ~35 TL) + montaj</td>
+<td>~3.000 m²</td>
+<td style="text-align: right;">135.000</td>
+<td style="text-align: center;">D/T</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Hasat</td>
+<td>60 hasat kasası, 2 el arabası, terazi, etiket yazıcı</td>
+<td></td>
+<td style="text-align: right;">32.400</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Hasat</td>
+<td>Gıda işletme kaydı (İyi Tarım ortak isterse sonra)</td>
+<td></td>
+<td style="text-align: right;">10.800</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Kendin-topla</td>
+<td>Tabela, satış tezgâhı, gölgelik (WC kiralık)</td>
+<td></td>
+<td style="text-align: right;">21.600</td>
+<td style="text-align: center;">T</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><strong>Faz 0 — dikimden önce (Kasım 2026 – Mart 2027)</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>1.187.099</strong></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><strong>Faz 1 — 2027 içinde, ilk büyük hasattan önce</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>379.080</strong></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><strong>TOPLAM BAŞLANGIÇ YATIRIMI</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>1.566.179</strong></td>
+<td style="text-align: center;">≈ $31.898</td>
+</tr>
+</tbody>
+</table></div>
+<p><em>D: Ekim 2026 internet fiyatıyla doğrulandı · T: tahmin, teklif alınmalı · D/T: ana bileşen doğrulandı, kalan tahmin. Tutarlar %8 beklenmeyen gider payı dahil.</em></p>
+<h3 id="grup-ozeti">Grup özeti</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Grup</th>
+<th style="text-align: right;">TL</th>
+<th style="text-align: right;">Pay</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fidan</td>
+<td style="text-align: right;">404.693</td>
+<td style="text-align: right;">%26</td>
+</tr>
+<tr>
+<td>Telli sistem</td>
+<td style="text-align: right;">301.374</td>
+<td style="text-align: right;">%19</td>
+</tr>
+<tr>
+<td>Soğuk zincir</td>
+<td style="text-align: right;">179.280</td>
+<td style="text-align: right;">%11</td>
+</tr>
+<tr>
+<td>Arazi</td>
+<td style="text-align: right;">172.800</td>
+<td style="text-align: right;">%11</td>
+</tr>
+<tr>
+<td>Sulama</td>
+<td style="text-align: right;">172.800</td>
+<td style="text-align: right;">%11</td>
+</tr>
+<tr>
+<td>Kalite</td>
+<td style="text-align: right;">135.000</td>
+<td style="text-align: right;">%9</td>
+</tr>
+<tr>
+<td>Teknoloji</td>
+<td style="text-align: right;">119.232</td>
+<td style="text-align: right;">%8</td>
+</tr>
+<tr>
+<td>Hasat</td>
+<td style="text-align: right;">43.200</td>
+<td style="text-align: right;">%3</td>
+</tr>
+<tr>
+<td>Kendin-topla</td>
+<td style="text-align: right;">21.600</td>
+<td style="text-align: right;">%1</td>
+</tr>
+<tr>
+<td>Diğer</td>
+<td style="text-align: right;">16.200</td>
+<td style="text-align: right;">%1</td>
+</tr>
+<tr>
+<td><strong>Toplam</strong></td>
+<td style="text-align: right;"><strong>1.566.179</strong></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Neler bilinçli olarak yok:</strong> lazer tesviye (arazi toplulaştırmada düzlenmiş; profil çukuru ve analiz sonucu gerekirse eklenir), agrotekstil (PE malç yeterli), pakethane, tünel, güneş paneli, şok dondurucu, traktör (hizmet alımı), çit, ofis konteyneri, İyi Tarım belgesi (ortak isterse).</p>
+<hr />
+<h2 id="3-teknoloji-paketi-dengeli-kaliteden-ve-riskten-odun-yok">3. Teknoloji Paketi (dengeli: kaliteden ve riskten ödün yok)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Bileşen</th>
+<th>Ne işe yarar</th>
+<th>Kalite/risk etkisi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3 zonlu otomatik sulama (selenoid + ESP32 kontrolör)</td>
+<td>Her çeşit bloğu kendi ihtiyacına göre sulanır</td>
+<td>Kök boğulması ve susuz kalma riskini önler</td>
+</tr>
+<tr>
+<td>Venturi + hat içi EC probu + Hanna pH/EC el ölçer</td>
+<td>Gübre suyunun yoğunluğu uzaktan, pH'ı haftada 2 el ölçümüyle</td>
+<td>Demir eksikliği ve tuzlanma kontrolü</td>
+</tr>
+<tr>
+<td>3 toprak düğümü (her blokta 30 ve 60 cm nem/EC/sıcaklık)</td>
+<td>Sulama kararı veriye dayanır</td>
+<td>Ankara'dan yönetimin temeli</td>
+</tr>
+<tr>
+<td>LoRaWAN gateway + 4G</td>
+<td>10 dönümü kablosuz kapsar</td>
+<td>Kesintisiz veri</td>
+</tr>
+<tr>
+<td>Hava düğümü (sıcaklık/nem, yaprak ıslaklığı, yağmur)</td>
+<td>Hastalık riski ve don uyarısı</td>
+<td>İlaçlama doğru zamanda</td>
+</tr>
+<tr>
+<td>Ana hat debimetresi</td>
+<td>Tıkanma/kaçak alarmı</td>
+<td>Sessiz sulama arızasını yakalar</td>
+</tr>
+<tr>
+<td>Raspberry Pi 5 yerel sunucu + UPS</td>
+<td>İnternet kesilse de sulama ve alarm çalışır</td>
+<td>Sistem güvenilirliği</td>
+</tr>
+<tr>
+<td>Solar 4G kamera</td>
+<td>Hırsızlık ve uzaktan gözlem</td>
+<td>Güvenlik</td>
+</tr>
+<tr>
+<td>Soğuk oda Wi-Fi sensörü + Telegram alarmı + logger</td>
+<td>Oda arızasında telefona alarm</td>
+<td>Bir günün hasadını (~60 bin TL) korur</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Toplam: 119 bin TL</strong> (v8'deki ~370 bin TL'lik pakete göre −%68). <strong>Çıkarılanlar:</strong> dozaj pompaları, fazladan 3 toprak düğümü, profesyonel meteoroloji istasyonu ve referans prob, yapay zekâlı PTZ/termal kamera, ayrı mini PC. Bunlar ileride 2028 gelirinden eklenebilir; ESP32 ve LoRa altyapısı genişlemeye hazır. <strong>Yazılım</strong> tamamen açık kaynak: ChirpStack, InfluxDB, Grafana, Node-RED, Telegram botu.</p>
+<hr />
+<h2 id="4-isletme-giderleri-opex">4. İşletme Giderleri (OPEX)</h2>
+<h3 id="sabit-giderler">Sabit giderler</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Sabit gider (TL/yıl)</th>
+<th style="text-align: right;">2027</th>
+<th style="text-align: right;">2028</th>
+<th style="text-align: right;">2029</th>
+<th style="text-align: right;">2030</th>
+<th style="text-align: right;">2031</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gübre + mücadele (böğürtlen)</td>
+<td style="text-align: right;">30.000</td>
+<td style="text-align: right;">55.000</td>
+<td style="text-align: right;">70.000</td>
+<td style="text-align: right;">75.000</td>
+<td style="text-align: right;">75.000</td>
+</tr>
+<tr>
+<td>Budama, bağlama, ot (yevmiyeli)</td>
+<td style="text-align: right;">50.000</td>
+<td style="text-align: right;">90.000</td>
+<td style="text-align: right;">110.000</td>
+<td style="text-align: right;">120.000</td>
+<td style="text-align: right;">120.000</td>
+</tr>
+<tr>
+<td>Traktör/ilaçlama hizmet alımı</td>
+<td style="text-align: right;">18.000</td>
+<td style="text-align: right;">18.000</td>
+<td style="text-align: right;">18.000</td>
+<td style="text-align: right;">18.000</td>
+<td style="text-align: right;">18.000</td>
+</tr>
+<tr>
+<td>DSİ sulama ücreti</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">15.000</td>
+</tr>
+<tr>
+<td>Sezonluk soğuk oda/etiket yardımcısı</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">45.000</td>
+<td style="text-align: right;">60.000</td>
+<td style="text-align: right;">60.000</td>
+<td style="text-align: right;">60.000</td>
+</tr>
+<tr>
+<td>Elektrik (soğuk oda)</td>
+<td style="text-align: right;">3.000</td>
+<td style="text-align: right;">10.000</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">16.000</td>
+<td style="text-align: right;">16.000</td>
+</tr>
+<tr>
+<td>Bakım-onarım</td>
+<td style="text-align: right;">10.000</td>
+<td style="text-align: right;">30.000</td>
+<td style="text-align: right;">40.000</td>
+<td style="text-align: right;">45.000</td>
+<td style="text-align: right;">50.000</td>
+</tr>
+<tr>
+<td>TARSİM sigortası</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">30.000</td>
+<td style="text-align: right;">40.000</td>
+<td style="text-align: right;">45.000</td>
+<td style="text-align: right;">50.000</td>
+</tr>
+<tr>
+<td>Arı kovanı kiralama</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">15.000</td>
+<td style="text-align: right;">15.000</td>
+</tr>
+<tr>
+<td>SIM/4G + bulut, muhasebe, analiz</td>
+<td style="text-align: right;">50.000</td>
+<td style="text-align: right;">50.000</td>
+<td style="text-align: right;">50.000</td>
+<td style="text-align: right;">50.000</td>
+<td style="text-align: right;">50.000</td>
+</tr>
+<tr>
+<td>Kurucu ulaşımı (Ankara, ~20-25 ziyaret)</td>
+<td style="text-align: right;">125.000</td>
+<td style="text-align: right;">125.000</td>
+<td style="text-align: right;">125.000</td>
+<td style="text-align: right;">125.000</td>
+<td style="text-align: right;">125.000</td>
+</tr>
+<tr>
+<td>Baba: yakıt/harcırah</td>
+<td style="text-align: right;">40.000</td>
+<td style="text-align: right;">40.000</td>
+<td style="text-align: right;">40.000</td>
+<td style="text-align: right;">40.000</td>
+<td style="text-align: right;">40.000</td>
+</tr>
+<tr>
+<td>Kendin-topla: ilan, sosyal medya</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">25.000</td>
+<td style="text-align: right;">25.000</td>
+<td style="text-align: right;">25.000</td>
+<td style="text-align: right;">25.000</td>
+</tr>
+<tr>
+<td><strong>Toplam</strong></td>
+<td style="text-align: right;"><strong>341.000</strong></td>
+<td style="text-align: right;"><strong>548.000</strong></td>
+<td style="text-align: right;"><strong>623.000</strong></td>
+<td style="text-align: right;"><strong>649.000</strong></td>
+<td style="text-align: right;"><strong>659.000</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="degisken-giderler-kg-bas">Değişken giderler (kg başı)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kalem</th>
+<th style="text-align: right;">TL/kg</th>
+<th>Dayanak</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hasat, paket kalitesi (kişi/gün 55 kg)</td>
+<td style="text-align: right;">28</td>
+<td>Yevmiye 1.400 TL + %10 dayıbaşı (Bursa 2026: 1.100-1.500 TL)</td>
+</tr>
+<tr>
+<td>Hasat, dökme (kişi/gün 70 kg)</td>
+<td style="text-align: right;">22</td>
+<td>Aynı</td>
+</tr>
+<tr>
+<td>Kapaklı kap + etiket + koli</td>
+<td style="text-align: right;">25</td>
+<td>250 cc kap ~2,9 TL/ad</td>
+</tr>
+<tr>
+<td>Ortağa yükleme (ortak tarladan alır)</td>
+<td style="text-align: right;">5</td>
+<td>Sözleşme maddesi</td>
+</tr>
+<tr>
+<td>Hal komisyonu + kasa</td>
+<td style="text-align: right;">%10 + 8</td>
+<td></td>
+</tr>
+<tr>
+<td>Kendin-topla görevli, kap, ilan</td>
+<td style="text-align: right;">40</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="5-bes-yllk-projeksiyon-2027-2031">5. Beş Yıllık Projeksiyon (2027-2031)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>TL</th>
+<th style="text-align: right;">2027</th>
+<th style="text-align: right;">2028</th>
+<th style="text-align: right;">2029</th>
+<th style="text-align: right;">2030</th>
+<th style="text-align: right;">2031</th>
+<th style="text-align: right;">5 yıl</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rekolte (t)</td>
+<td style="text-align: right;">1,5</td>
+<td style="text-align: right;">10,1</td>
+<td style="text-align: right;">17,9</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">20,0</td>
+<td style="text-align: right;">69,5</td>
+</tr>
+<tr>
+<td>— Ortak üzerinden paketli</td>
+<td style="text-align: right;">144.648</td>
+<td style="text-align: right;">1.398.510</td>
+<td style="text-align: right;">2.582.016</td>
+<td style="text-align: right;">2.853.600</td>
+<td style="text-align: right;">2.794.560</td>
+<td style="text-align: right;">9.773.334</td>
+</tr>
+<tr>
+<td>— Kendin-topla</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">200.000</td>
+<td style="text-align: right;">480.000</td>
+<td style="text-align: right;">600.000</td>
+<td style="text-align: right;">720.000</td>
+<td style="text-align: right;">2.000.000</td>
+</tr>
+<tr>
+<td>— Hal</td>
+<td style="text-align: right;">105.483</td>
+<td style="text-align: right;">339.949</td>
+<td style="text-align: right;">470.726</td>
+<td style="text-align: right;">520.238</td>
+<td style="text-align: right;">509.475</td>
+<td style="text-align: right;">1.945.870</td>
+</tr>
+<tr>
+<td>— 2. sınıf → işleme</td>
+<td style="text-align: right;">19.110</td>
+<td style="text-align: right;">131.300</td>
+<td style="text-align: right;">232.700</td>
+<td style="text-align: right;">260.000</td>
+<td style="text-align: right;">260.000</td>
+<td style="text-align: right;">903.110</td>
+</tr>
+<tr>
+<td><strong>Gelir</strong></td>
+<td style="text-align: right;"><strong>269.241</strong></td>
+<td style="text-align: right;"><strong>2.069.759</strong></td>
+<td style="text-align: right;"><strong>3.765.442</strong></td>
+<td style="text-align: right;"><strong>4.233.838</strong></td>
+<td style="text-align: right;"><strong>4.284.035</strong></td>
+<td style="text-align: right;"><strong>14.622.314</strong></td>
+</tr>
+<tr>
+<td>Değişken gider (hasat, kap, kanal)</td>
+<td style="text-align: right;"><span class="neg">−59.682</span></td>
+<td style="text-align: right;"><span class="neg">−461.120</span></td>
+<td style="text-align: right;"><span class="neg">−832.148</span></td>
+<td style="text-align: right;"><span class="neg">−927.800</span></td>
+<td style="text-align: right;"><span class="neg">−924.080</span></td>
+<td style="text-align: right;"><span class="neg">−3.204.830</span></td>
+</tr>
+<tr>
+<td>Sabit gider (OPEX)</td>
+<td style="text-align: right;"><span class="neg">−341.000</span></td>
+<td style="text-align: right;"><span class="neg">−548.000</span></td>
+<td style="text-align: right;"><span class="neg">−623.000</span></td>
+<td style="text-align: right;"><span class="neg">−649.000</span></td>
+<td style="text-align: right;"><span class="neg">−659.000</span></td>
+<td style="text-align: right;"><span class="neg">−2.820.000</span></td>
+</tr>
+<tr>
+<td><strong>FAVÖK</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−131.441</strong></span></td>
+<td style="text-align: right;"><strong>1.060.639</strong></td>
+<td style="text-align: right;"><strong>2.310.294</strong></td>
+<td style="text-align: right;"><strong>2.657.038</strong></td>
+<td style="text-align: right;"><strong>2.700.955</strong></td>
+<td style="text-align: right;"><strong>8.597.484</strong></td>
+</tr>
+<tr>
+<td>Amortisman</td>
+<td style="text-align: right;"><span class="neg">−137.941</span></td>
+<td style="text-align: right;"><span class="neg">−190.455</span></td>
+<td style="text-align: right;"><span class="neg">−190.455</span></td>
+<td style="text-align: right;"><span class="neg">−183.255</span></td>
+<td style="text-align: right;"><span class="neg">−186.682</span></td>
+<td style="text-align: right;"><span class="neg">−888.787</span></td>
+</tr>
+<tr>
+<td>Stopaj (%2)</td>
+<td style="text-align: right;"><span class="neg">−5.385</span></td>
+<td style="text-align: right;"><span class="neg">−41.395</span></td>
+<td style="text-align: right;"><span class="neg">−75.309</span></td>
+<td style="text-align: right;"><span class="neg">−84.677</span></td>
+<td style="text-align: right;"><span class="neg">−85.681</span></td>
+<td style="text-align: right;"><span class="neg">−292.446</span></td>
+</tr>
+<tr>
+<td><strong>Net kâr</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−274.767</strong></span></td>
+<td style="text-align: right;"><strong>828.789</strong></td>
+<td style="text-align: right;"><strong>2.044.530</strong></td>
+<td style="text-align: right;"><strong>2.389.107</strong></td>
+<td style="text-align: right;"><strong>2.428.592</strong></td>
+<td style="text-align: right;"><strong>7.416.251</strong></td>
+</tr>
+<tr>
+<td>Aylık net kâr</td>
+<td style="text-align: right;"><span class="neg">−22.897</span></td>
+<td style="text-align: right;">69.066</td>
+<td style="text-align: right;">170.378</td>
+<td style="text-align: right;">199.092</td>
+<td style="text-align: right;">202.383</td>
+<td style="text-align: right;"></td>
+</tr>
+<tr>
+<td>Yatırım (CAPEX) / yenileme</td>
+<td style="text-align: right;"><span class="neg">−379.080</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−20.000</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;"><span class="neg">−399.080</span></td>
+</tr>
+<tr>
+<td><strong>Kümülatif nakit (yatırım dahil)</strong></td>
+<td style="text-align: right;"><span class="neg"><strong>−1.703.005</strong></span></td>
+<td style="text-align: right;"><span class="neg"><strong>−683.762</strong></span></td>
+<td style="text-align: right;"><strong>1.551.223</strong></td>
+<td style="text-align: right;"><strong>4.103.585</strong></td>
+<td style="text-align: right;"><strong>6.718.859</strong></td>
+<td style="text-align: right;"></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Satış fiyatı varsayımları:</strong></p>
+<ul>
+<li><strong>Hal:</strong> mevsime göre ağırlıklı 199 TL/kg. Haziran 450, temmuz 250, ağustos 180, eylül 220, ekim 300; %15 hacim/kalite iskontosuyla.</li>
+<li><strong>Satış ortağı:</strong> paketli 300 TL/kg; %18 komisyon düşülüyor.</li>
+<li><strong>Kendin-topla:</strong> 400 TL/kg perakende.</li>
+<li><strong>2. sınıf ürün:</strong> 65 TL/kg (işleme).</li>
+</ul>
+<p>Kaynaklar Ek A'da.</p>
+<hr />
+<h2 id="6-ne-kadar-uretebilirim-maksimum-kapasite">6. Ne Kadar Üretebilirim? (Maksimum Kapasite)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Üretim düzeyi (tam verim)</th>
+<th style="text-align: right;">t/da</th>
+<th style="text-align: right;">Rekolte</th>
+<th style="text-align: right;">Net kâr / yıl</th>
+<th style="text-align: right;">Aylık</th>
+<th style="text-align: right;">Fiyat −%30 ile net</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Temkinli</td>
+<td style="text-align: right;">1,5</td>
+<td style="text-align: right;">15 t</td>
+<td style="text-align: right;">1,69 M TL</td>
+<td style="text-align: right;">140.783 TL</td>
+<td style="text-align: right;">0,72 M TL</td>
+</tr>
+<tr>
+<td>Baz (iyi yönetim)</td>
+<td style="text-align: right;">2,0</td>
+<td style="text-align: right;">20 t</td>
+<td style="text-align: right;">2,43 M TL</td>
+<td style="text-align: right;">202.383 TL</td>
+<td style="text-align: right;">1,17 M TL</td>
+</tr>
+<tr>
+<td>Çok iyi yönetim</td>
+<td style="text-align: right;">2,5</td>
+<td style="text-align: right;">25 t</td>
+<td style="text-align: right;">3,17 M TL</td>
+<td style="text-align: right;">263.983 TL</td>
+<td style="text-align: right;">1,62 M TL</td>
+</tr>
+<tr>
+<td>Üst sınır (açık tarla Chester/Loch Ness)</td>
+<td style="text-align: right;">2,8</td>
+<td style="text-align: right;">28 t</td>
+<td style="text-align: right;">3,61 M TL</td>
+<td style="text-align: right;">300.943 TL</td>
+<td style="text-align: right;">1,88 M TL</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>2 t/da (baz)</strong>, sertifikalı fidan, damla + fertigasyon, sık dikim ve iyi budamayla Türkiye'de açık tarlada ulaşılabilir bir hedef.</li>
+<li><strong>2,5 t/da</strong>, ilk iki sezonun sensör ve hasat verisiyle sulama/gübre programı oturduğunda mümkün.</li>
+<li><strong>2,8 t/da</strong> açık tarla için üst sınır. Bunu aşmak tünel, saksı veya topraksız sistem ister (v8'de ekonomik bulunmadı).</li>
+<li><strong>Altyapı kapasitesi:</strong> 12 m³ soğuk oda 28 t'luk yılda tepe gün yükünü (~450 kg) taşır. 25 t üstünde 4-5 yerine 6-7 toplayıcı gerekir.</li>
+<li><strong>Dikkat:</strong> Rekolte arttıkça yerel fiyat düşebilir. Ortakla yıllık hacim taahhüdü bunu dengeler.</li>
+</ul>
+<hr />
+<h2 id="7-hzl-sonuc-icin-ne-yapld">7. Hızlı Sonuç İçin Ne Yapıldı?</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Hızlandırıcı</th>
+<th>Etkisi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%30 2 yaşlı tüplü fidan</td>
+<td>2028 rekoltesi 8 t yerine 10 t; ~290 bin TL ek net kâr</td>
+</tr>
+<tr>
+<td>Prime-Ark (sonbahar ürünlü) çeşit</td>
+<td>Dikim yılında, 2027 eylül-ekimde ilk satış</td>
+</tr>
+<tr>
+<td>Kendin-topla kanalı</td>
+<td>2028'den itibaren en yüksek kg kârı (perakende 400 TL)</td>
+</tr>
+<tr>
+<td>Dikim Nisan 2027</td>
+<td>Fidan siparişi <strong>Ekim-Kasım 2026'da</strong> verilmeli (viyolden alıştırma 2-3 ay)</td>
+</tr>
+<tr>
+<td>Satış ortağı</td>
+<td>2028'den itibaren ürünün %75-80'i doğrudan alıcılı</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Para akışı:</strong> 2027 eksi (yatırım + ilk yıl), 2028'den itibaren artı (aylık ~69 bin TL), 2029'da yatırımın tamamı geri dönmüş oluyor.</p>
+<hr />
+<h2 id="8-stres-testi">8. Stres Testi</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Senaryo</th>
+<th style="text-align: right;">2031 net</th>
+<th style="text-align: right;">Geri dönüş</th>
+<th style="text-align: right;">10 yıl IRR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baz</td>
+<td style="text-align: right;">2,43 M TL</td>
+<td style="text-align: right;">2,3 yıl</td>
+<td style="text-align: right;">%71,4</td>
+</tr>
+<tr>
+<td>Tüm fiyatlar −%30</td>
+<td style="text-align: right;">1,17 M TL</td>
+<td style="text-align: right;">3,2 yıl</td>
+<td style="text-align: right;">%41,6</td>
+</tr>
+<tr>
+<td>Verim −%25</td>
+<td style="text-align: right;">1,69 M TL</td>
+<td style="text-align: right;">2,7 yıl</td>
+<td style="text-align: right;">%54,7</td>
+</tr>
+<tr>
+<td>İşçilik +%40</td>
+<td style="text-align: right;">2,19 M TL</td>
+<td style="text-align: right;">2,4 yıl</td>
+<td style="text-align: right;">%65,8</td>
+</tr>
+<tr>
+<td>Ortak fiyatı 200 TL (hal düzeyi)</td>
+<td style="text-align: right;">1,52 M TL</td>
+<td style="text-align: right;">2,9 yıl</td>
+<td style="text-align: right;">%50,5</td>
+</tr>
+<tr>
+<td>Fiyat −%30 + verim −%15 + işçilik +%20</td>
+<td style="text-align: right;">0,80 M TL</td>
+<td style="text-align: right;">3,9 yıl</td>
+<td style="text-align: right;">%30,1</td>
+</tr>
+</tbody>
+</table></div>
+<p>Proje en kötü kombinasyonda bile (fiyat −%30, verim −%15, işçilik +%20) 4 yıl içinde geri dönüyor. <strong>En kritik değişkenler:</strong> satış ortağının fiyatı ve genel fiyat seviyesi. Bursa halinde 16 Eylül 2026'da 60-70 TL/kg işlem görmüş olması (muhtemelen yabani/sezon sonu) yerel fiyatın düşük olabileceğini gösteriyor. <strong>Ortak sözleşmesinde taban fiyat şart.</strong></p>
+<hr />
+<h2 id="9-adim-1-fizibiliteyi-derinlestirmek-once-ne-lazm">9. ADIM 1 — Fizibiliteyi Derinleştirmek: Önce Ne Lazım?</h2>
+<h3 id="91-toprak-ve-sulama-suyu-analizi-en-onemli-ilk-adm">9.1 Toprak ve sulama suyu analizi (en önemli ilk adım)</h3>
+<p><strong>Neden:</strong> Böğürtlenin başarısı üç toprak özelliğine bağlı:</p>
+<ul>
+<li><strong>Drenaj ve kil oranı:</strong> Kök boğulmasına hassas; sedde yüksekliğini belirler.</li>
+<li><strong>pH ve kireç:</strong> pH 7,5 üstünde ve kireç yüksekse demir eksikliği görülür; asit programı gerekir.</li>
+<li><strong>Tuz ve bor:</strong> Böğürtlen bora hassastır.</li>
+</ul>
+<p>Ayrıca sulama suyunun bikarbonatı yüksekse gübre suyuna asit gerekir.</p>
+<p><strong>Kime gideceksin (Bursa):</strong></p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Laboratuvar</th>
+<th>Not</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Bursa İl Tarım ve Orman Müdürlüğü, Toprak-Bitki Analiz Laboratuvarı</strong></td>
+<td>Resmî laboratuvar; numune kabulünü telefonla sor</td>
+</tr>
+<tr>
+<td><strong>Trakya Birlik Karacabey Toprak Tahlil Laboratuvarı</strong></td>
+<td>Bakanlığın yetkili laboratuvar listesinde; Karacabey'de, araziye en yakın</td>
+</tr>
+<tr>
+<td><strong>Nilüfer Belediyesi Tarımsal Analiz Laboratuvarı</strong> (Ulutek Teknopark)</td>
+<td>Üreticiye yönelik</td>
+</tr>
+<tr>
+<td>TÜBİTAK BUTAL (Bursa)</td>
+<td>Tek tek parametre fiyatlı (ör. kireç 1.000 TL + KDV)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ayrıca <strong>Karacabey İlçe Tarım ve Orman Müdürlüğü:</strong> ÇKS kaydı, ücretsiz yayım/danışmanlık, numune alma tavsiyesi.</p>
+<p><strong>Ne isteyeceksin (laboratuvara aynen söyle):</strong></p>
+<ol>
+<li><strong>Toprak:</strong> "Meyve bahçesi tesisi için verimlilik analizi: bünye (kum-silt-kil), pH, EC/tuz, kireç, organik madde, yarayışlı fosfor ve potasyum, <strong>mikro elementler (Fe, Zn, Mn, Cu) ve bor</strong>, mümkünse değişebilir sodyum." Referans fiyat: standart paket ~975 TL/numune (Bilecik Üni. 2026 tarifesi). Mikro elementler ve bor ek; Bursa laboratuvarlarından teyit edilmeli.</li>
+<li><strong>Su:</strong> "Sulama suyu sınıflandırma analizi: EC, pH, Na, Ca, Mg, SAR, <strong>bikarbonat</strong>, klor, <strong>bor</strong>." Referans: tek tek parametre ~227-348 TL; paket ~2.500-3.500 TL.</li>
+</ol>
+<p><strong>Numune nasıl alınır (sen ya da baban, 1 gün):</strong></p>
+<ul>
+<li><strong>Bölme:</strong> 10 dönümü iki yarıya böl (kuzey/güney ya da göze çarpan farka göre).</li>
+<li><strong>Noktalar:</strong> Her yarıda zikzak çizerek <strong>15-20 noktadan</strong> burgu ya da kürekle toprak al.</li>
+<li><strong>Derinlik:</strong> <strong>0-30 cm</strong> ve <strong>30-60 cm</strong> ayrı torbalara. Toplam <strong>4 karışık numune</strong>, her biri ~1 kg.</li>
+<li><strong>Kaçınılacak yerler:</strong> Gübre yığını yerleri, tarla kenarları ve yol dibi.</li>
+<li><strong>Etiket:</strong> Torbaya ada/parsel, derinlik ve tarih yaz.</li>
+<li><strong>Su:</strong> DSİ hidrantından temiz şişeye 1-1,5 litre al; kuyu varsa ondan da ayrı numune.</li>
+<li><strong>Teslim:</strong> Numuneleri 2-3 gün içinde laboratuvara ver. Sonuçlar genellikle 1-2 haftada çıkar.</li>
+</ul>
+<h3 id="92-arazide-profil-cukuru-ayn-gun">9.2 Arazide profil çukuru (aynı gün)</h3>
+<p>Bir kepçeyle (1-2 saat) <strong>1-1,2 m derinliğinde</strong> çukur açtır ve fotoğrafla. Bakılacaklar:</p>
+<ul>
+<li><strong>Taban taşı / sert katman (pulluk tabanı):</strong> Varsa dip kazan derinliğini belirler.</li>
+<li><strong>Kök bölgesinde gri-mavi lekeler (taban suyu izi):</strong> Varsa sedde 50 cm'ye çıkar.</li>
+<li><strong>Su gelip gelmediği:</strong> Çukura su geliyorsa drenaj önlemi gerekir.</li>
+</ul>
+<p>Bu tek gözlem lazer tesviye ve sedde kararını netleştirir.</p>
+<h3 id="93-ayn-ay-yaplacak-diger-kontroller-masrafsz-ya-da-dusuk-maliyetli">9.3 Aynı ay yapılacak diğer kontroller (masrafsız ya da düşük maliyetli)</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Konu</th>
+<th>Kime</th>
+<th>Ne soracaksın</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Elektrik</td>
+<td><strong>UEDAŞ</strong> (Bursa elektrik dağıtım)</td>
+<td>Parsele en yakın hat (monofaze/trifaze), bağlantı bedeli ve süresi</td>
+</tr>
+<tr>
+<td>Sulama</td>
+<td><strong>DSİ / sulama birliği</strong></td>
+<td>Hidrant yeri ve debisi, 2026 meyve bahçesi su ücreti, sulama takvimi</td>
+</tr>
+<tr>
+<td>Satış</td>
+<td><strong>Satış ortağı</strong></td>
+<td>Ön protokol: yıllık tonaj, ay bazında fiyat, <strong>taban fiyat</strong>, teslim şekli, ödeme vadesi</td>
+</tr>
+<tr>
+<td>Fidan</td>
+<td><strong>Fidanlıklar</strong> (doku kültürü viyol + tüplü)</td>
+<td>3 çeşit için 3.200 viyol + 1.360 tüplü fidan: fiyat, sertifika, <strong>teslim tarihi</strong></td>
+</tr>
+<tr>
+<td>Finansman</td>
+<td><strong>Ziraat Bankası</strong></td>
+<td>Hazine faiz destekli kredi şartları; başvuru <strong>31.12.2026'dan önce</strong></td>
+</tr>
+<tr>
+<td>İzin</td>
+<td><strong>Karacabey İlçe Tarım</strong></td>
+<td>ÇKS kaydı; soğuk oda için tarımsal yapı izni gerekip gerekmediği</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="94-adm-1in-maliyeti">9.4 Adım 1'in maliyeti</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Kalem</th>
+<th style="text-align: right;">Tahmini TL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4 toprak numunesi (paket + mikro element + bor)</td>
+<td style="text-align: right;">6.000-10.000</td>
+</tr>
+<tr>
+<td>1-2 sulama suyu analizi</td>
+<td style="text-align: right;">2.500-6.000</td>
+</tr>
+<tr>
+<td>Profil çukuru (kepçe 1-2 saat)</td>
+<td style="text-align: right;">3.000-5.000</td>
+</tr>
+<tr>
+<td>Ziraat mühendisi arazi ziyareti ve analiz yorumu (İlçe Tarım'da ücretsiz; serbest danışman ücretli)</td>
+<td style="text-align: right;">0-15.000</td>
+</tr>
+<tr>
+<td>Ankara–Karacabey 1-2 ziyaret (yakıt + otoyol)</td>
+<td style="text-align: right;">5.000-10.000</td>
+</tr>
+<tr>
+<td><strong>Toplam</strong></td>
+<td style="text-align: right;"><strong>~20.000-35.000 TL</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="95-sonuclara-gore-karar-kurallar">9.5 Sonuçlara göre karar kuralları</h3>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Sonuç</th>
+<th>Ne anlama gelir</th>
+<th>Karar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pH ≤ 7,5, kireç &lt; %10, EC &lt; 1 dS/m, bor &lt; 0,5 mg/L (su)</td>
+<td>Uygun</td>
+<td>Plan aynen devam</td>
+</tr>
+<tr>
+<td>pH 7,5-8,0 veya kireç %10-20</td>
+<td>Demir eksikliği riski</td>
+<td>Gübre suyuna asit (sülfürik/fosforik), demir şelat; maliyet +~20-30 bin TL/yıl</td>
+</tr>
+<tr>
+<td>Kil &gt; %45 veya profil çukurunda su/gri leke</td>
+<td>Kök boğulması riski</td>
+<td>Sedde 50 cm, gerekirse lazer tesviye (+~55 bin TL)</td>
+</tr>
+<tr>
+<td>Suda bikarbonat yüksek</td>
+<td>Damlatıcı tıkanması, pH yükselmesi</td>
+<td>Sürekli asit enjeksiyonu (hat içi EC/pH bunun için kritik)</td>
+</tr>
+<tr>
+<td>Toprakta veya suda bor yüksek (&gt; 0,7-1 mg/L)</td>
+<td>Böğürtlen için toksik</td>
+<td><strong>Dur:</strong> danışmanla yeniden değerlendir; gerekirse başka parsel</td>
+</tr>
+<tr>
+<td>EC &gt; 2 dS/m (tuzlu)</td>
+<td>Verim kaybı</td>
+<td><strong>Dur:</strong> yıkama/drenaj olmadan dikim yapılmaz</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="10-adim-2-ve-sonras-takvim">10. ADIM 2 ve Sonrası: Takvim</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Dönem</th>
+<th>İş</th>
+<th>Karar kapısı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ekim 2026, 1-2. hafta</strong></td>
+<td>Toprak/su numunesi, profil çukuru, UEDAŞ + DSİ + İlçe Tarım görüşmeleri, satış ortağıyla ön protokol</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Ekim 2026, 3-4. hafta</strong></td>
+<td>Analiz sonuçları → danışmanla son tasarım (sedde, gübre/asit programı); fidanlık teklifleri</td>
+<td><strong>Kapı 1:</strong> Toprak ve su uygun mu? Ortak taban fiyatı kabul etti mi?</td>
+</tr>
+<tr>
+<td><strong>Kasım 2026</strong></td>
+<td>Fidan siparişi (viyol teslimi Aralık-Ocak); dip kazan, gübre, sedde (kış yağmurlarından önce); Ziraat kredi başvurusu</td>
+<td><strong>Kapı 2:</strong> Sermaye/kredi hazır mı?</td>
+</tr>
+<tr>
+<td><strong>Aralık 2026 – Şubat 2027</strong></td>
+<td>Telli sistem, ana sulama hattı; viyol fidanları saksıda alıştırma (Bursa'da korunaklı bir alanda, babanla); sensör prototipleri evde</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Mart 2027</strong></td>
+<td>Damla lateraller, PE malç, sensörler, gateway, kamera</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Nisan 2027</strong></td>
+<td><strong>Dikim</strong> (don riskinden sonra)</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Mayıs-Ağustos 2027</strong></td>
+<td>Kol yönetimi, sulama kalibrasyonu; soğuk oda ve gölge filesi (Faz 1); kendin-topla hazırlığı</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Eylül-Ekim 2027</strong></td>
+<td><strong>İlk hasat</strong> (Prime-Ark + tüplü fidan, ~1,5 t), ortakla ilk teslimat</td>
+<td><strong>Kapı 3:</strong> Fiyat ve kalite hedefte mi?</td>
+</tr>
+<tr>
+<td><strong>Haziran-Ekim 2028</strong></td>
+<td>İlk büyük hasat (~10 t), kendin-topla açılışı</td>
+<td>2028 sonu: 20 da'ya büyüme kararı (v8 seçenek D)</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="11-hala-dogrulanmas-gereken-varsaymlar">11. Hâlâ Doğrulanması Gereken Varsayımlar</h2>
+<ol>
+<li><strong>Satış ortağının fiyatı (300 TL/kg) ve taban fiyatı.</strong> Sonucu en çok etkileyen tek kalem.</li>
+<li><strong>Hal fiyatı:</strong> mevsimsel ağırlıklı 199 TL/kg. Bursa ve İstanbul hal kayıtlarından son 2 sezon kontrol edilmeli.</li>
+<li><strong>Tüplü fidanın toplu fiyatı</strong> (150 TL, tek tek 250 TL) ve viyol fidanın teslim tarihi.</li>
+<li><strong>Elektrik bağlantı bedeli</strong> (40 bin TL tahmini; hat uzaksa çok daha yüksek olabilir).</li>
+<li><strong>Dip kazan/sedde hizmet bedeli</strong> ve <strong>hasat kasası</strong> fiyatı (tahmin).</li>
+<li><strong>Kendin-topla talebi:</strong> 2028'de 0,5 t ile başlayıp yılda 2 t'ya çıkması varsayımı.</li>
+</ol>
+<hr />
+<h3 id="ek-a-kaynaklar-ekim-2026">Ek A — Kaynaklar (Ekim 2026)</h3>
+<ul>
+<li><strong>Kur:</strong> <a href="https://halktv.com.tr/ekonomi/2-ekim-2026-doviz-kurlari-euro-kac-tl-dolar-kac-tl-sterlin-kac-tl-1058876h" target="_blank" rel="noopener">Halk TV, 2 Ekim 2026</a></li>
+<li><strong>Böğürtlen fiyatı:</strong> <a href="https://haldefiyat.com/urun/bogurtlen" target="_blank" rel="noopener">haldefiyat</a>, <a href="https://www.tarimziraat.com/fiyat/bogurtlen_fiyatlari-a97.html" target="_blank" rel="noopener">Tarım Ziraat</a>, <a href="https://www.bursa.bel.tr/hal_fiyatlari" target="_blank" rel="noopener">Bursa hal</a>, <a href="https://www.migros.com.tr/hemen/bogurtlen-125-g-p-19cc015" target="_blank" rel="noopener">Migros 125 g</a></li>
+<li><strong>Fidan:</strong> <a href="https://www.bursatarimmarket.com/doku-kulturu-ile-coklu-satis" target="_blank" rel="noopener">Bursa Tarım Market, doku kültürü çoklu satış</a>, <a href="https://elmatarim.com.tr/urun/doku-kulturuyle-uretilmis-chester-bogurtlen-fidani/" target="_blank" rel="noopener">Elma Tarım, Chester</a></li>
+<li><strong>Yevmiye:</strong> <a href="https://www.bursadabugun.com/haber/bursa-da-tarim-iscilerine-gunluk-ne-kadar-odenecek-yeni-tarife-belli-oldu-1923814.html" target="_blank" rel="noopener">Bursadabugün</a>, <a href="https://sanayigazetesi.com.tr/2026-sezonluk-isciucretleri/" target="_blank" rel="noopener">Sanayi Gazetesi</a></li>
+<li><strong>Damla sulama:</strong> <a href="https://tarimmemleketi.com/1-donum-damla-sulama-maliyeti" target="_blank" rel="noopener">Tarım Memleketi</a></li>
+<li><strong>Direk ve tel:</strong> <a href="https://www.panelcitankara.com/urundetay/boru-direk" target="_blank" rel="noopener">Panel Çit Ankara</a></li>
+<li><strong>Gübre (çiftlik gübresi temin ve serme birim fiyatı):</strong> <a href="https://birimfiyat.com/pdf/52370" target="_blank" rel="noopener">birimfiyat.com</a></li>
+<li><strong>Malç:</strong> <a href="https://www.hepsiburada.com/sef-tarim-malc-naylonu-1-2m-en-500m-uzunluk-20-micron22-5-kg-pm-HBC00003NBFNK" target="_blank" rel="noopener">Hepsiburada, Sef Tarım malç</a>, <a href="https://www.cimri.com/malc-naylonu" target="_blank" rel="noopener">Cimri</a></li>
+<li><strong>Gölge filesi:</strong> <a href="https://www.akakce.com/golgelik-file.html" target="_blank" rel="noopener">Akakçe</a></li>
+<li><strong>Soğuk oda paneli:</strong> <a href="https://yapipanmetal.com/urun/sandvic-panel/sandvic-soguk-oda-paneli-100mm-ral-9002/" target="_blank" rel="noopener">Yapıpan</a></li>
+<li><strong>Klima:</strong> <a href="https://www.cimri.com/klimalar/en-ucuz-siemens-as24ivw32n-24000-btu-inverter-duvar-tipi-klima-fiyatlari,2497594586" target="_blank" rel="noopener">Cimri, 24.000 BTU</a></li>
+<li><strong>Teknoloji bileşenleri:</strong> <a href="https://www.cimri.com/selenoid-vana" target="_blank" rel="noopener">Cimri, selenoid vana</a>, <a href="https://www.e-tartes.com/toprak-nemi-sicakligi-ve-tuzluluguec-sensoru-rs485-4735" target="_blank" rel="noopener">E-Tartes, RS485 toprak sensörü</a>, <a href="https://invibitshop.com/collections/dragino" target="_blank" rel="noopener">Dragino gateway</a>, <a href="https://heltec.org/lora-enable%EF%BC%9Aesp32-series" target="_blank" rel="noopener">Heltec ESP32-LoRa</a>, <a href="https://www.cimri.com/diger-test-ve-olcum-cihazlari/en-ucuz-hanna-hi-98129-dijital-ph-ec-tds-olcum-cihazi-fiyatlari,2423775134" target="_blank" rel="noopener">Cimri, Hanna HI98129</a>, <a href="https://www.idefix.com/venas-sim-kartli-solar-panelli-hareket-sensorlu-guvenlik-kamerasi-p-19837777" target="_blank" rel="noopener">idefix, solar 4G kamera</a></li>
+<li><strong>Toprak analizi:</strong> <a href="https://bilecik.edu.tr/ziraat/Icerik/Toprak_Su_Bitki_Analiz_Laboratuvar%C4%B1_3f7ea" target="_blank" rel="noopener">Bilecik Üniversitesi Ziraat Fakültesi laboratuvar ücretleri</a>, <a href="https://butal.tubitak.gov.tr/wp-content/uploads/sites/115/BUTAL_KATALOG_2025.pdf" target="_blank" rel="noopener">TÜBİTAK BUTAL katalog</a>, <a href="https://www.tarimorman.gov.tr/TRGM/Belgeler/Duyurular/lab_liste.pdf" target="_blank" rel="noopener">Bakanlık yetkili laboratuvar listesi</a>, <a href="https://bursa.tarimorman.gov.tr/Menu/22/Laboratuvar-Hizmetlerimiz" target="_blank" rel="noopener">Bursa İl Tarım laboratuvar hizmetleri</a>, <a href="https://www.nilufer.bel.tr/haber/nilufer-tarimsal-analiz-laboratuvari-ile-ureticiye-destek" target="_blank" rel="noopener">Nilüfer Tarımsal Analiz Laboratuvarı</a></li>
+<li><strong>Sulama suyu analizi:</strong> <a href="https://arastirma.tarimorman.gov.tr/toprakgubre/Belgeler/Analiz%20Fiyatları/Analiz%20Fiyatları%202023/Analiz_Fiyat_2023_Rev.pdf" target="_blank" rel="noopener">Toprak Gübre Araştırma Enstitüsü analiz fiyatları</a></li>
+</ul>
+</main>
+<footer>Tüm rakamlar <code>reports/bogurtlen-fizibilite/model_final.py</code> ve <code>model_final.py</code> hesap modellerinden üretilmiştir. Tutarlar 2026 sabit TL; USD karşılıkları 1 USD = 49,1 TL ile. Fiyatlar Ekim 2026 internet verilerine dayanır; teklifle doğrulanmalıdır.</footer>
+</div>
+</body>
+</html>
