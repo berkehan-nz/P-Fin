@@ -1,11 +1,11 @@
-# Muratlı Böğürtlen — Fizibilite v6: Ek Gelir İçin Yalın Hibrit Plan
+# Muratlı Böğürtlen — Fizibilite v7: 10 Dönüm Ek Gelir Planı (Yalın Hibrit)
 
-**Amaç:** Tesis veya uzun vadeli vizyon değil, kurucuya **ek gelir** üreten bir bahçe. En az yatırım (CAPEX) ve işletme gideriyle (OPEX) en çok kaliteli üretim. Kalite için gereken teknoloji korunuyor ve kurucu tarafından kendisi kuruluyor.
-**Kurgu:** Satışı bir iş ortağı yapıyor (%18 komisyon). Saha işi kurucu (Ankara'dan ziyaret), baba (Bursa) ve yevmiyeli ekiple yürüyor. Traktör hizmeti satın alınıyor. Pakethane yok; ürün tarlada kapaklı kaba toplanıyor.
+**Amaç:** Tesis veya uzun vadeli vizyon değil, kurucuya **ek gelir** üreten **10 dönümlük** bir bahçe. En az yatırım (CAPEX) ve işletme gideriyle (OPEX) en çok kaliteli üretim. Kalite için gereken teknoloji korunuyor ve kurucu tarafından kendisi kuruluyor.
+**Kurgu:** Satışı bir iş ortağı yapıyor (%18 komisyon). Saha işi kurucu (Ankara'dan ziyaret), baba (Bursa) ve yevmiyeli ekiple yürüyor; sabit veya sezonluk saha personeli yok. Traktör hizmeti satın alınıyor. Pakethane yok; ürün tarlada kapaklı kaba toplanıyor.
 **Lokasyon:** Bursa / Karacabey / Muratlı · **Tarih:** 2 Ekim 2026 · **Para birimi:** 2026 sabit USD; 1 USD = 47 TL
 **Hesap modeli:** [`model_v6.py`](model_v6.py) (`--tables` ile bütün tablolar yeniden üretilir)
 
-> Bu rapor v1-v5'teki tarım, risk ve bölge analizlerine dayanıyor; kapsamı bilinçli olarak daraltıyor. Çıkarılanlar: test sahası (living lab), danışmanlık, liyofilize makinesi, pakethane, kalıcı teknisyen, şirket yapısı. Mevsim riski simülasyonu ve TEKNOSAB/imar analizi için v3 ve v4'e bakılabilir.
+> v6'nın 10 dönüme uyarlanmış hâli. 10 dönümün tepe hasat yükü (~300 kg/gün) için soğuk depo 40' yerine **20' reefer** olarak küçültüldü. Rapor v1-v5'teki tarım, risk ve bölge analizlerine dayanıyor; kapsamı bilinçli olarak daraltıyor. Çıkarılanlar: test sahası (living lab), danışmanlık, liyofilize makinesi, pakethane, kalıcı teknisyen, şirket yapısı. Mevsim riski simülasyonu ve TEKNOSAB/imar analizi için v3 ve v4'e bakılabilir.
 
 ---
 
@@ -24,16 +24,20 @@
 | Geri dönüş (Y0'dan) | 4,4 yıl | 4,3 yıl |
 | 10 yıllık IRR / NPV (%12) | %22,6 / $38.478 | %27,4 / $110.045 |
 
-**Önerim: 20 dönüm, hibrit dikim, 2027 ilkbaharı.**
+**Plan: 10 dönüm, hibrit dikim, 2027 ilkbaharı.** 20 dönüm sütunu yalnızca karşılaştırma için.
 
-- **Neden 20 da:** Soğuk depo, sensör ağı, ulaşım ve sabit giderler iki büyüklükte de neredeyse aynı. 20 dönümde ~1,7 kat yatırımla 2031 net kârı ~2,5 kat oluyor.
-- **Hibrit dikim (her 10 dönümün %70'i doku kültürü, %30'u 2 yaşlı saksılı fidan):** Saksılı blok 2027'de ilk ürünü, 2028'de tam verime yakın ürünü veriyor. Böylece 2028'de toplam verim tam verimin yarısına ulaşıyor (20 da'da 20 t). Fidan bütçesi ise tamamen saksılı yapılan plana göre ~$22k daha düşük.
-- **2031'de aylık ortalama ~188 bin TL net ek gelir** (20 da). 4,3 yılda başlangıç sermayesini geri ödüyor.
+- **Başlangıç yatırımı $64.127 (≈3,0 M TL).** Ziraat faiz destekli krediyle cepten çıkan en yüksek tutar $40.347 (≈1,9 M TL).
+- **2028'de 10 t hasat ve başabaş; 2029'dan itibaren yılda ~$15-21k net.** 2031'de aylık ortalama **~76 bin TL** net ek gelir.
+- **4,4 yılda geri dönüş**, 10 yıllık getiri (IRR) %22,6, 10 yılda toplam net kâr $138.682.
+- **Hibrit dikim (%70 doku kültürü, %30 2 yaşlı saksılı fidan):** 2028'de tam verimin yarısı (10 t). Tamamı saksılı fidana göre fidan bütçesi ~$12k düşük.
+- **20 dönüme büyüme seçeneği açık:** 2028 sezonu hedefi tutarsa ikinci 10 dönüm 2029 ilkbaharında ~$45k ek yatırımla dikilebilir (Bölüm 9).
+
+**10 dönümün zayıf yanı: daha kırılgan.** Sabit giderler (ulaşım, soğuk depo, sensörler) küçük alana bölündüğü için fiyat ve emek şoklarına 20 dönümden daha duyarlı (Bölüm 7).
 
 **Bu sonuçlar iki şarta bağlı:**
 
 1. **Satış ortağıyla yazılı ve taahhütlü sözleşme:** minimum yıllık alım tonajı, taban fiyat, komisyon, ürünü soğuk depodan teslim alma, ödeme vadesi.
-2. **Babanın düzenli saha desteği.** Olmazsa yerine ücretli bir saha şefi gerekir (~$9k/yıl): 20 dönümde 2031 net kârı ~%19 düşer.
+2. **Babanın düzenli saha desteği.** Olmazsa yerine ücretli bir saha şefi gerekir (~$9k/yıl). 10 dönümde bu, 2031 net kârının **~%46'sı** demek; ek gelir neredeyse yarıya iner.
 
 ---
 
@@ -45,7 +49,7 @@
 | **Kaliteyi belirlemeyen şeyi erte veya kirala** | Pakethane, traktör, ofis konteyneri, çit, GES, termal kamera, meyve sayım kameraları, liyofilize: hepsi yok ya da kârdan sonra |
 | **Teknolojiyi kendin kur, açık kaynakla çalıştır** | Endüstriyel sensör + ESP32/LoRa; sunucuda açık kaynak yazılım; lisans ve abonelik yok |
 | **Her teknoloji bir kararı beslemeli** | Sulama ne zaman, ilaç ne zaman, hasat ne zaman, soğuk zincir kırıldı mı. Bu dört soruya cevap vermeyen hiçbir şey kurulmuyor |
-| **Giderler değişken olsun** | Hasat, budama, traktör: iş varken ödeniyor. Sabit personel yok (20 da'da yalnızca sezonluk 1 kişi) |
+| **Giderler değişken olsun** | Hasat, budama, traktör: iş varken ödeniyor. Sabit ya da sezonluk personel yok |
 
 ---
 
@@ -71,7 +75,7 @@
 | 2035 | 12,6 t | 5,4 t | 18,0 t | 36,0 t |
 | 2036 | 11,2 t | 4,8 t | 16,0 t | 32,0 t |
 
-Üç çeşitle hasat haziran ortasından ekim sonuna yayılıyor (v3 Bölüm 1-3). Bu, tepe işçi ihtiyacını ve soğuk depo yükünü düşürüyor; küçük bir altyapıyla büyük hacmi taşımanın anahtarı bu.
+Üç çeşitle hasat haziran ortasından ekim sonuna yayılıyor (v3 Bölüm 1-3). Bu, tepe işçi ihtiyacını (4-5 toplayıcı) ve soğuk depo yükünü (~300 kg/gün) düşürüyor; 20' reefer'ın yetmesinin nedeni bu.
 
 ---
 
@@ -81,7 +85,7 @@
 
 | Katman | Bileşen | Neden şart (hangi kararı besliyor) |
 |---|---|---|
-| **Toprak** | 6 (10 da) / 10 (20 da) düğüm. Her düğümde ESP32-LoRa kart, 30 ve 60 cm'de 2 endüstriyel RS485 nem/EC/sıcaklık probu, küçük güneş paneli + akü | **Ne zaman ve ne kadar sulama.** Böğürtlen ağır toprakta kök boğulmasına hassas; hem kuraklık hem fazla su kaliteyi düşürür |
+| **Toprak** | 6 düğüm. Her düğümde ESP32-LoRa kart, 30 ve 60 cm'de 2 endüstriyel RS485 nem/EC/sıcaklık probu, küçük güneş paneli + akü | **Ne zaman ve ne kadar sulama.** Böğürtlen ağır toprakta kök boğulmasına hassas; hem kuraklık hem fazla su kaliteyi düşürür |
 | **Kalibrasyon** | 1 profesyonel referans prob | Kendi sensörlerinin doğru ölçtüğünden emin olmak (sezonda bir kez karşılaştırma) |
 | **İklim** | Hobi-profesyonel meteoroloji istasyonu + yaprak ıslaklığı sensörü | **Ne zaman ilaçlama:** hastalık riski (ıslaklık süresi), don, sıcak dalgası uyarısı |
 | **Fertigasyon** | ESP32/röle kontrolör + selenoid vanalar + venturi gübre emiş + asit pompası + hat içi EC/pH | Gübrenin doğru dozda ve pH'ta verilmesi (nötr-hafif bazik toprakta demir eksikliğini önler) |
@@ -109,52 +113,15 @@
 | Pakethane + top-seal makinesi | Tarlada kapaklı kaba toplama aynı kaliteyi verir | Ortak kendi markanla raf isterse |
 | GES (güneş paneli) | Soğuk oda yalnızca 4-5 ay çalışıyor; tasarruf ~$1.000-1.200/yıl, geri dönüş ~7 yıl | Elektrik fiyatı ikiye katlanırsa |
 | Termal kamera, meyve sayım ve sinek tuzağı kameraları | Kaliteye doğrudan etkisi yok; elle tuzak sayımı yeterli | 2029+ kârından, merak ve verimlilik için |
-| Traktör | Hizmet alımı yılda ~$1.200 (20 da); traktör ~$25k | Hiçbir zaman (bu ölçekte) |
+| Traktör | Hizmet alımı yılda ~$600; traktör ~$25k | Hiçbir zaman (bu ölçekte) |
 | Ofis konteyneri, çit | Konfor ve güvenlik; kaliteyi etkilemiyor | Hırsızlık yaşanırsa çit |
 | Kalıcı teknisyen | Babanın desteği + yevmiyeli ekip | Baba destekleyemezse |
+| Şok dondurucu (IQF) | 10 da'da yılda ~4 t 2. sınıf ürün; ek kazanç ~$3.300/yıl, $24k yatırımın geri dönüşü ~7 yıl | 20 dönüme büyürse |
 | Liyofilize, tünel, living lab | Ek gelir hedefi dışında | İsteğe bağlı, kârdan |
 
 ---
 
 ## 4. Yatırım (CAPEX): Kalem Kalem
-
-### 4.1 20 dönüm (önerilen)
-
-| Faz | Ne zaman | Grup | Kalem | Miktar | USD | TL |
-|---|---|---|---|---|---:|---:|
-| 0 | Q4-2026 / Q1-2027 | Arazi | Toprak analizi, dip kazan, lazer tesviye, 40 t/10 da gübre, sedde | 20 da | 8.316 | 390.852 |
-| 0 | Q4-2026 / Q1-2027 | Arazi | Agrotekstil malç örtü (ot işçiliğini düşürür) | 6800 m² | 2.376 | 111.672 |
-| 0 | Q4-2026 / Q1-2027 | Fidan | Sertifikalı doku kültürü fidan, sık dikim (%70 alan) | 6342 ad × $3,0 | 20.548 | 965.760 |
-| 0 | Q4-2026 / Q1-2027 | Fidan | 2 yaşlı saksılı sertifikalı fidan, sık dikim (%30 alan) | 2718 ad × $6,5 | 19.081 | 896.828 |
-| 0 | Q4-2026 / Q1-2027 | Fidan | Dikim işçiliği + kök uyarıcı |  | 1.296 | 60.912 |
-| 0 | Q4-2026 / Q1-2027 | Telli sistem | Galvaniz direk 8 m aralık, 3 kat tel, ankraj, montaj |  | 15.444 | 725.868 |
-| 0 | Q4-2026 / Q1-2027 | Sulama | Hidrant bağlantısı, disk filtre, ana hat, basınç ayarlı çift damla hattı | 13200 m | 5.292 | 248.724 |
-| 0 | Q4-2026 / Q1-2027 | Teknoloji (kendi yapımın) | Fertigasyon: ESP32/röle kontrolör + selenoid vanalar + venturi + asit pompası + hat içi EC/pH |  | 2.160 | 101.520 |
-| 0 | Q4-2026 / Q1-2027 | Teknoloji (kendi yapımın) | LoRaWAN gateway + 4G router | 1 | 486 | 22.842 |
-| 0 | Q4-2026 / Q1-2027 | Teknoloji (kendi yapımın) | Toprak düğümü: ESP32-LoRa + 2 endüstriyel RS485 nem/EC/sıcaklık probu + solar | 10 × $280 | 3.024 | 142.128 |
-| 0 | Q4-2026 / Q1-2027 | Teknoloji (kendi yapımın) | Referans prob (kendi sensörlerinin kalibrasyonu) | 1 | 972 | 45.684 |
-| 0 | Q4-2026 / Q1-2027 | Teknoloji (kendi yapımın) | Hobi-profesyonel meteoroloji istasyonu + yaprak ıslaklığı sensörü | 1 | 648 | 30.456 |
-| 0 | Q4-2026 / Q1-2027 | Teknoloji (kendi yapımın) | Debimetre + basınç sensörü | 2 | 432 | 20.304 |
-| 0 | Q4-2026 / Q1-2027 | Teknoloji (kendi yapımın) | Mini PC sunucu + UPS (ChirpStack, InfluxDB, Grafana, Node-RED) | 1 | 432 | 20.304 |
-| 0 | Q4-2026 / Q1-2027 | Teknoloji (kendi yapımın) | Solar 4G PTZ güvenlik kamerası | 1 | 702 | 32.994 |
-| 0 | Q4-2026 / Q1-2027 | Diğer | ÇKS, 5403 tarımsal yapı izni, proje |  | 648 | 30.456 |
-| 1 | 2027 sonu | Soğuk zincir | 40' reefer konteyner, yenilenmiş (0/+2 °C) | 1 | 9.180 | 431.460 |
-| 1 | 2027 sonu | Soğuk zincir | Ön soğutma tüneli (fan + branda + termostat, kendi yapımın) | 1 | 1.080 | 50.760 |
-| 1 | 2027 sonu | Soğuk zincir | Trifaze elektrik bağlantısı + pano |  | 3.780 | 177.660 |
-| 1 | 2027 sonu | Soğuk zincir | Stabilize zemin + basit gölgelik |  | 1.620 | 76.140 |
-| 1 | 2027 sonu | Soğuk zincir | NFC kartlı toplayıcı tartısı (kendi yapımın) + terazi + QR etiket yazıcı + 6 logger |  | 972 | 45.684 |
-| 1 | 2027 sonu | Soğuk zincir | Hasat kasaları + el arabaları |  | 1.527 | 71.785 |
-| 1 | 2027 sonu | Soğuk zincir | Gıda işletme kaydı + İyi Tarım belgesi |  | 1.080 | 50.760 |
-| 1 | 2027 sonu | Kalite | %35 gölge filesi (güneş yanığına karşı) + montaj |  | 8.208 | 385.776 |
-| 2 | 2030 sonu (kârdan) | Kârdan | Şok dondurucu + 2. reefer (-20 °C): 2. sınıf ürün IQF |  | 24.300 | 1.142.100 |
-| | | | **Faz 0 — kurulum toplamı** | | **81.858** | **3.847.303** |
-| | | | **Faz 1 — ilk büyük hasattan önce toplamı** | | **27.447** | **1.290.025** |
-| | | | **Faz 2 — kârdan toplamı** | | **24.300** | **1.142.100** |
-| | | | **Başlangıç yatırımı (Faz 0 + 1)** | | **109.305** | **5.137.329** |
-
-*Tutarlar %8 beklenmeyen gider payı dahildir.*
-
-### 4.2 10 dönüm
 
 | Faz | Ne zaman | Grup | Kalem | Miktar | USD | TL |
 |---|---|---|---|---|---:|---:|
@@ -188,36 +155,15 @@
 
 *Tutarlar %8 beklenmeyen gider payı dahildir.*
 
-**20 dönümün başlangıç yatırımı nereye gidiyor:** fidan %37 · soğuk zincir %18 · telli sistem %14 · arazi hazırlığı %10 · teknoloji %8 · gölge filesi %8 · sulama %5.
+**Başlangıç yatırımı nereye gidiyor:** fidan %32 · soğuk zincir %24 · telli sistem %12 · teknoloji %12 · arazi hazırlığı %8 · gölge filesi %6 · sulama %4.
 
-**Şok dondurucu (yalnız 20 da, 2030 kârından):** 20 dönümde yılda ~8 t 2. sınıf ürün çıkıyor. Bu ürün işleme tesisine $1,30/kg yerine IQF olarak $2,80/kg'a satılıyor; yatırım ~3,5 yılda geri dönüyor. 10 dönümde gerek yok.
+**Soğuk zincir, 10 dönümde payı en yüksek ikinci kalem.** Reefer + ön soğutma + trifaze bağlantı ~$15,6k ediyor. Arazide trifaze hat varsa ya da ürünü ortak her gün tarladan teslim alıyorsa bu kalem küçülebilir. Ama ön soğutmasız böğürtlenin raf ömrü 2-3 gün; kaliteyi koruyan en önemli yatırım bu.
 
 ---
 
 ## 5. İşletme Giderleri (OPEX)
 
-### 5.1 Sabit giderler — 20 dönüm
-
-| Sabit gider (USD/yıl) | 2027 | 2028 | 2029 | 2030 | 2031+ |
-|---|---:|---:|---:|---:|---:|
-| Gübre + mücadele (biyolojik öncelikli) | 2.200 | 4.000 | 5.600 | 6.000 | 6.000 |
-| Budama, bağlama, ot (yevmiyeli) | 2.600 | 4.600 | 5.800 | 6.000 | 6.000 |
-| Traktör/ilaçlama hizmet alımı | 800 | 1.200 | 1.200 | 1.200 | 1.200 |
-| DSİ su ücreti | 500 | 800 | 1.000 | 1.000 | 1.000 |
-| Sezonluk saha işçisi (Mart-Ekim, yalnız 20 da) | 3.000 | 6.000 | 6.000 | 6.000 | 6.000 |
-| Sezonluk soğuk oda/etiket yardımcısı | 0 | 1.697 | 2.121 | 2.121 | 2.121 |
-| Elektrik (soğuk oda, pompa) | 100 | 1.000 | 1.200 | 1.200 | 2.100 |
-| Bakım-onarım | 283 | 849 | 1.131 | 1.273 | 1.414 |
-| TARSİM sigortası | 0 | 975 | 1.300 | 1.462 | 1.625 |
-| SIM/4G + bulut yedeği | 150 | 150 | 150 | 150 | 150 |
-| Gıda güvenliği/kalıntı analizi | 0 | 400 | 400 | 400 | 400 |
-| Arı kovanı kiralama | 0 | 600 | 600 | 600 | 600 |
-| Muhasebe (çiftçi) | 400 | 400 | 400 | 400 | 400 |
-| Kurucu ulaşımı (Ankara) | 3.000 | 3.000 | 3.000 | 3.000 | 3.000 |
-| Baba: yakıt/harcırah | 800 | 800 | 800 | 800 | 800 |
-| **Toplam** | **13.833** | **26.470** | **30.702** | **31.606** | **32.810** |
-
-### 5.2 Sabit giderler — 10 dönüm
+### 5.1 Sabit giderler
 
 | Sabit gider (USD/yıl) | 2027 | 2028 | 2029 | 2030 | 2031+ |
 |---|---:|---:|---:|---:|---:|
@@ -237,7 +183,7 @@
 | Baba: yakıt/harcırah | 800 | 800 | 800 | 800 | 800 |
 | **Toplam** | **7.700** | **13.750** | **16.150** | **16.650** | **16.850** |
 
-### 5.3 Değişken giderler (kg başı)
+### 5.2 Değişken giderler (kg başı)
 
 | Kalem | Değer |
 |---|---|
@@ -251,25 +197,6 @@
 ---
 
 ## 6. 10 Yıllık Gelir, Kâr ve Nakit
-
-### 6.1 20 dönüm
-
-| USD | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Rekolte (t) | 2,9 | 20,2 | 35,8 | 40,0 | 40,0 | 40,0 | 40,0 | 40,0 | 36,0 | 32,0 |
-| **Gelir (ortak komisyonu düşülmüş)** | **9.657** | **71.529** | **129.826** | **145.057** | **157.057** | **157.057** | **157.057** | **157.057** | **141.352** | **125.646** |
-| Değişken gider (hasat, kap, teslimat, kanal) | −3.660 | −26.745 | −48.344 | −54.016 | −57.616 | −57.616 | −57.616 | −57.616 | −51.854 | −46.093 |
-| Sabit gider | −13.833 | −26.470 | −30.702 | −31.606 | −32.810 | −32.810 | −32.810 | −32.810 | −32.810 | −32.810 |
-| **FAVÖK** | **−7.835** | **18.314** | **50.780** | **59.435** | **66.631** | **66.631** | **66.631** | **66.631** | **56.687** | **46.743** |
-| Amortisman | −9.395 | −12.832 | −12.832 | −12.832 | −15.424 | −13.134 | −12.702 | −12.702 | −12.230 | −12.230 |
-| **Vergi öncesi kâr** | **−17.231** | **5.482** | **37.948** | **46.603** | **51.207** | **53.497** | **53.929** | **53.929** | **44.457** | **34.513** |
-| Stopaj (%2) | −193 | −1.431 | −2.597 | −2.901 | −3.141 | −3.141 | −3.141 | −3.141 | −2.827 | −2.513 |
-| **Net kâr** | **−17.424** | **4.051** | **35.351** | **43.702** | **48.066** | **50.356** | **50.788** | **50.788** | **41.630** | **32.000** |
-| Aylık ortalama net kâr (TL) | −68.243 | 15.868 | 138.459 | 171.167 | 188.260 | 197.227 | 198.919 | 198.919 | 163.052 | 125.335 |
-| Yatırım / yenileme | −27.447 | 0 | 0 | −24.300 | 0 | −2.500 | 0 | −4.900 | 0 | 0 |
-| **Kümülatif nakit (Y0 dahil)** | **−117.333** | **−100.450** | **−52.267** | **−20.033** | **43.457** | **104.447** | **167.937** | **226.527** | **280.388** | **331.964** |
-
-### 6.2 10 dönüm
 
 | USD | 2027 | 2028 | 2029 | 2030 | 2031 | 2032 | 2033 | 2034 | 2035 | 2036 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -290,36 +217,37 @@
 
 - Vergi: gerçek kişi çiftçi statüsünde ürün satışında %2 stopaj (nihai vergi). Mali müşavirle teyit edilmeli.
 - 2036 sonunda tesisin net defter değerinin yarısı kalıntı değer olarak eklendi.
-- Ziraat Hazine faiz destekli kredi kullanılırsa (Faz 0-1'in %50'si, 2+3 yıl), cepten çıkan en yüksek tutar 20 dönümde $117k'dan $69k'ya iner (Özet tablosu).
+- Ziraat Hazine faiz destekli kredi kullanılırsa (Faz 0-1'in %50'si, 2+3 yıl), cepten çıkan en yüksek tutar $68.925'ten $40.347'ye iner.
 
-### 6.3 Neden v3'ten (%9,5-15) çok daha iyi görünüyor?
+### Neden v3'ten (10 da IRR %9,5) çok daha iyi görünüyor?
 
-| Fark | v3 | v6 | Etki (20 da, yıllık) |
+| Fark | v3 | v7 | Etki (10 da, yıllık) |
 |---|---|---|---:|
-| Kalıcı teknisyen + daimi işçi | Var | Yok (baba + sezonluk 1 kişi) | ~+$12.000 |
-| Pakethane, marka, pazarlama, şirket gideri | Var | Yok (ortak satıyor, çiftçi statüsü) | ~+$8.000 |
+| Kalıcı teknisyen | Var | Yok (baba + yevmiyeli) | ~+$9.000 |
+| Pakethane, marka, pazarlama, şirket gideri | Var | Yok (ortak satıyor, çiftçi statüsü) | ~+$6.000 |
 | Kurumlar vergisi %25 | Var | %2 stopaj | Kâr arttıkça büyür |
 | Satış hızı | Kanal yıllar içinde oluşuyor | Ortak 2028'den olgun karmayla alıyor | Erken gelir |
-| Living lab, danışmanlık, GES, liyofilize, kameralar | Var | Yok | 10 yıllık yatırım ~−%27 |
+| Living lab, danışmanlık, GES, dondurucu, kameralar, 40' reefer | Var | Yok | 10 yıllık yatırım ~−%47 |
 
 **Dürüst uyarı:** Bu farkın büyük kısmı iki varsayımdan geliyor: **satış ortağının ürünü gerçekten alması** ve **babanın emeğinin ücretsiz olması**. İkisi gerçekleşmezse sonuçlar v3'e yaklaşır.
 
 ---
 
-## 7. Stres Testi (20 dönüm)
+## 7. Stres Testi
 
 | Senaryo | 2031 net kâr | Geri dönüş | 10 yıl IRR |
 |---|---:|---:|---:|
-| Baz | $48.066 | 4,3 yıl | %27,4 |
-| Fiyat −%20 | $17.283 | 6,8 yıl | %9,2 |
-| Verim −%25 | $23.991 | 5,9 yıl | %13,9 |
-| Hasat işçiliği +%35 (TEKNOSAB etkisi) | $39.022 | 4,8 yıl | %22,5 |
-| Ortak komisyonu %25 | $38.140 | 4,8 yıl | %22,1 |
-| Fiyat −%20 + verim −%15 + işçilik +%20 | $3.063 | dönmez | −%3,5 |
+| Baz | $19.474 | 4,4 yıl | %22,6 |
+| Fiyat −%20 | $5.259 | 8,1 yıl | %4,4 |
+| Verim −%25 | $8.457 | 6,5 yıl | %9,3 |
+| Hasat işçiliği +%35 (TEKNOSAB etkisi) | $14.952 | 4,9 yıl | %17,7 |
+| Ortak komisyonu %25 | $14.511 | 5,0 yıl | %17,2 |
+| Fiyat −%20 + verim −%15 + işçilik +%20 | −$1.416 | dönmez | −%10,2 |
 
-- **En kritik değişken fiyat.** %20 fiyat düşüşü getiriyi %27'den %9'a indiriyor. Bu yüzden ortak sözleşmesinde **taban fiyat** (örneğin 250 g kap için üretici çıkışında TL taban, yıllık enflasyon endeksli) olmazsa olmaz.
-- **İşçilik ve komisyon artışı yönetilebilir.** TEKNOSAB'ın işgücü baskısı (+%35) getiriyi %22'ye indiriyor, ama proje kârlı kalıyor.
-- **Üçlü şok** (fiyat −%20, verim −%15, işçilik +%20) birlikte gelirse yatırım 10 yılda geri dönmüyor. v3'teki önlemler (gölge filesi, sigorta, 3 çeşit, sık hasat) ve bu plandaki soğuk zincir bu ihtimali düşürüyor.
+- **En kritik değişken fiyat.** %20 fiyat düşüşü getiriyi %22,6'dan %4,4'e indiriyor; geri dönüş 8 yılı buluyor. 10 dönümde ortak sözleşmesindeki **taban fiyat** (örneğin 250 g kap için üretici çıkışında TL taban, yıllık enflasyon endeksli) projenin sigortası.
+- **Verim kaybı da sert:** −%25 verimde IRR %9,3. Gölge filesi, sık hasat, sinek tuzağı ve sigorta (v3 Bölüm 5) bu yüzden bütçeden çıkarılmadı.
+- **İşçilik ve komisyon artışı yönetilebilir:** TEKNOSAB etkisiyle +%35 işçilikte ya da %25 komisyonda IRR %17 civarında kalıyor.
+- **Üçlü şok** (fiyat −%20, verim −%15, işçilik +%20) birlikte gelirse yatırım geri dönmüyor.
 
 ---
 
@@ -327,10 +255,9 @@
 
 | Kişi | Görev | Yıllık zaman (tahmin) |
 |---|---|---|
-| **Sen** | Sistem kurulumu (2027 kışı yoğun), haftalık veri kontrolü, ortakla planlama, sezon kararları, muhasebe | Uzaktan haftada 3-4 saat + ~25 ziyaret (sezonda 3-4 günlük kalışlar). Kurulum yılı ~300 saat, sonraki yıllar ~200-250 saat |
-| **Baban** | Sahada göz: ekip denetimi, sulama/alarm kontrolü, hasat günlerinde soğuk oda ve teslim | Sezon dışı haftada 1 gün, haziran-ekim haftada 3-4 gün |
-| **Dayıbaşı + yevmiyeli ekip** | Budama (ocak-şubat), bağlama, ot, hasat | 20 da tepe hasatta 8-10 kişi, 10 da'da 4-5 kişi |
-| **Sezonluk saha işçisi (20 da)** | Günlük saha işi, sulama kontrolü | Mart-ekim |
+| **Sen** | Sistem kurulumu (2027 kışı yoğun), haftalık veri kontrolü, ortakla planlama, sezon kararları, muhasebe | Uzaktan haftada 2-3 saat + ~20 ziyaret (sezonda 2-3 günlük kalışlar). Kurulum yılı ~250 saat, sonraki yıllar ~150-200 saat |
+| **Baban** | Sahada göz: ekip denetimi, sulama/alarm kontrolü, hasat günlerinde soğuk oda ve teslim | Sezon dışı haftada 1 gün, haziran-ekim haftada 2-3 gün |
+| **Dayıbaşı + yevmiyeli ekip** | Budama (ocak-şubat), bağlama, ot, hasat | Tepe hasatta 4-5 kişi; budamada 2-3 kişi × ~2 hafta |
 | **Sezonluk yardımcı** | Soğuk oda, etiket, koli | Haziran-ekim |
 | **Ziraat danışmanı** | Budama, gübre, hastalık kararlarına ikinci göz | Sezonda ayda 1 (ücreti bakım/gübre bütçesinden) |
 
@@ -342,7 +269,8 @@ Ay ay iş takvimi v3 Bölüm 3'te; bu planda yalnız pakethane ve ofis işleri y
 
 | Ne | Ne zaman | Karar kuralı |
 |---|---|---|
-| Şok dondurucu + -20 °C depo (20 da) | 2030 sonu | 2. sınıf ürün ≥ 6 t/yıl ve IQF alıcısı bulunduysa |
+| **İkinci 10 da (20 dönüme büyüme)** | Fidan siparişi Eylül 2028, dikim Nisan 2029 | 2028'de ≥ 9 t satıldı, ortalama fiyat taban fiyatın üstünde, ortak daha fazla hacim istiyor, baban ve saha düzeni yükü kaldırıyor. Ek yatırım ~$45k; 20 dönümde getiri %27'ye çıkar (v6) |
+| Şok dondurucu + -20 °C depo | Yalnız 20 dönüme büyürse | 2. sınıf ürün ≥ 6 t/yıl ve IQF alıcısı bulunduysa |
 | Sinek tuzağı (SWD) + sıra kameraları | 2029+ | Sinek kaybı %5'i geçtiyse veya rekolte tahmini ortak için kritikse |
 | Tünel (1-2 da pilot) | 2029+ | Ortak eylül-ekim ürününe ≥ %20 prim veriyorsa |
 | Pakethane / kendi marka | 2030+ | Ortak kendi markanla raf istiyorsa ve hacim ≥ 30 t ise |
@@ -366,10 +294,11 @@ Ay ay iş takvimi v3 Bölüm 3'te; bu planda yalnız pakethane ve ofis işleri y
 
 ## 11. Sonuç
 
-1. **Ek gelir hedefi için doğru büyüklük 20 dönüm, doğru dikim hibrit.** Başlangıç yatırımı **$109.305 (≈5,1 M TL)**, cepten çıkan en yüksek tutar $117.333; Ziraat kredisiyle ~$69k.
-2. **2028'de 20 t hasat ve kâra geçiş; 2031'den itibaren yılda ~$48k (≈2,3 M TL) net**, aylık ~188 bin TL. Yatırım 4,3 yılda geri dönüyor.
-3. **Teknoloji kaliteyi belirleyen dört karar için kuruluyor:** sulama, ilaçlama, hasat zamanlaması, soğuk zincir. Toplam teknoloji bütçesi ~$9-10k ve yazılımın tamamı açık kaynak, kendi yapımın.
-4. **Planın ayakta durması için:** ortakla taban fiyatlı yazılı sözleşme ve babanın düzenli desteği.
+1. **10 dönüm, hibrit dikim:** başlangıç yatırımı **$64.127 (≈3,0 M TL)**; cepten çıkan en yüksek tutar $68.925, Ziraat kredisiyle ~$40k.
+2. **2028'de başabaş, 2029'dan itibaren yılda ~$15-21k net**, 2031'de aylık ~76 bin TL ek gelir. Yatırım 4,4 yılda geri dönüyor; 10 yılda toplam net kâr ~$139k.
+3. **Teknoloji kaliteyi belirleyen dört karar için kuruluyor:** sulama, ilaçlama, hasat zamanlaması, soğuk zincir. Bütçe ~$8k ve yazılımın tamamı açık kaynak, kendi yapımın.
+4. **10 dönüm 20 dönümden kırılgan.** Ortakla taban fiyatlı yazılı sözleşme ve babanın düzenli desteği burada daha da kritik.
+5. **Büyüme kapısı açık:** 2028 sezonu hedefi tutarsa 2029'da ikinci 10 dönümle 20 dönüm planına (v6) geçilir.
 
 ---
 
@@ -377,6 +306,7 @@ Ay ay iş takvimi v3 Bölüm 3'te; bu planda yalnız pakethane ve ofis işleri y
 
 | Varsayım | Değer |
 |---|---|
+| Soğuk depo | 20' yenilenmiş reefer (~28 m³), 10 da tepe yükü ~300 kg/gün için yeterli |
 | Fidan fiyatı | Doku kültürü $3,0/ad, 2 yaşlı saksılı $6,5/ad (**tahmin, teklif alınmalı**) |
 | Verim | Doku kültürü 0,6 / 8 / 17 / 20 t; saksılı 3,5 / 15 / 20 / 20 t (10 da başına, sık dikim) |
 | Satış | 1. sınıfın %60 → %80'i ortak üzerinden paketli ($5,65/kg, %18 komisyon), kalanı hal; 2. sınıf işleme ($1,30) veya IQF ($2,80) |

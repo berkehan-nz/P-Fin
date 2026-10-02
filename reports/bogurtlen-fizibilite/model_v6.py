@@ -60,7 +60,8 @@ def capex(area):
         (0, 0, "Teknoloji (kendi yapımın)", "Mini PC sunucu + UPS (ChirpStack, InfluxDB, Grafana, Node-RED)", "1", 400, 4),
         (0, 0, "Teknoloji (kendi yapımın)", "Solar 4G PTZ güvenlik kamerası", "1", 650, 5),
         (0, 0, "Diğer", "ÇKS, 5403 tarımsal yapı izni, proje", "", 600, 5),
-        (1, 1, "Soğuk zincir", "40' reefer konteyner, yenilenmiş (0/+2 °C)", "1", 8500, 10),
+        ((1, 1, "Soğuk zincir", "20' reefer konteyner, yenilenmiş (0/+2 °C; 10 da tepe yükü ~300 kg/gün)", "1", 5500, 10)
+         if area <= 10 else (1, 1, "Soğuk zincir", "40' reefer konteyner, yenilenmiş (0/+2 °C)", "1", 8500, 10)),
         (1, 1, "Soğuk zincir", "Ön soğutma tüneli (fan + branda + termostat, kendi yapımın)", "1", 1000, 5),
         (1, 1, "Soğuk zincir", "Trifaze elektrik bağlantısı + pano", "", 3500, 15),
         (1, 1, "Soğuk zincir", "Stabilize zemin + basit gölgelik", "", 1500, 10),
