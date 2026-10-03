@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Böğürtlen Güçlendirme</title>
+<meta name="description" content="Daha büyük yatırım riski azaltır mı: sözleşme, otel kanalı, agro-turizm, dondurma, tünel ve 20 da seçeneklerinin Monte Carlo karşılaştırması; marka ve online satış önerisi.">
+<style>
+:root {
+  --bg:#f7f6f2; --surface:#ffffff; --text:#1d1f1c; --muted:#5d625a; --line:#e2e0d8;
+  --accent:#5b2a6e; --accent-soft:#f1e9f4; --head:#f0eee7; --neg:#b3261e; --warn-bg:#fff6e0; --warn-line:#e0b44a;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#141513; --surface:#1d1f1c; --text:#e8e7e2; --muted:#a3a79e; --line:#33362f;
+    --accent:#c99be0; --accent-soft:#2b2231; --head:#25271f; --neg:#ff8a80; --warn-bg:#2d2715; --warn-line:#8a6d22;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#141513; --surface:#1d1f1c; --text:#e8e7e2; --muted:#a3a79e; --line:#33362f;
+  --accent:#c99be0; --accent-soft:#2b2231; --head:#25271f; --neg:#ff8a80; --warn-bg:#2d2715; --warn-line:#8a6d22;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.wrap { max-width:1060px; margin:0 auto; padding:32px 16px 64px; }
+header h1 { font-size:clamp(1.5rem,3.4vw,2.2rem); line-height:1.2; margin:0 0 12px; letter-spacing:-.01em; }
+header .eyebrow { color:var(--accent); font-weight:600; font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; }
+nav.toc { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:12px 18px; margin:24px 0; }
+nav.toc ul { margin:0; padding:0; list-style:none; display:flex; flex-wrap:wrap; gap:6px 18px; }
+nav.toc a { color:var(--muted); text-decoration:none; font-size:.92rem; }
+nav.toc a:hover { color:var(--accent); }
+.kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:20px 0; }
+.kpi { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+.kl { font-size:.8rem; color:var(--muted); }
+.kv { font-size:1.45rem; font-weight:700; margin:2px 0; font-variant-numeric:tabular-nums; }
+.ks { font-size:.78rem; color:var(--muted); }
+.verdict { background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; }
+.badge { background:var(--accent); color:var(--bg); font-size:.72rem; font-weight:700; padding:2px 8px; border-radius:999px; letter-spacing:.05em; }
+main h2 { font-size:1.45rem; margin:48px 0 12px; padding-top:12px; border-top:1px solid var(--line); scroll-margin-top:12px; }
+main h3 { font-size:1.12rem; margin:28px 0 8px; color:var(--accent); }
+p, li { max-width:78ch; }
+a { color:var(--accent); }
+code { background:var(--head); padding:1px 5px; border-radius:4px; font-size:.88em; }
+hr { display:none; }
+.tw { overflow-x:auto; margin:14px 0; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+table { border-collapse:collapse; width:100%; font-size:.9rem; font-variant-numeric:tabular-nums; }
+th, td { padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { background:var(--head); text-align:left; font-weight:600; white-space:nowrap; }
+tr:last-child td { border-bottom:none; }
+td[align="right"], th[align="right"], td[style*="right"], th[style*="right"] { white-space:nowrap; }
+.neg { color:var(--neg); }
+aside.note { background:var(--warn-bg); border-left:4px solid var(--warn-line); margin:16px 0; padding:4px 16px; border-radius:8px; }
+footer { margin-top:48px; color:var(--muted); font-size:.85rem; }
+@media print {
+  body { background:#fff; color:#000; font-size:11pt; }
+  nav.toc { display:none; } .tw { overflow:visible; } main h2 { break-before:page; }
+  tr { break-inside:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="eyebrow">Güçlendirme seçenekleri · Ekim 2026</div>
+<h1>Böğürtlen İş Planı — Daha Büyük Yatırım Riski Azaltır mı? VeryBerry, Otel Kanalı, Marka ve Online Satış</h1>
+<div class="verdict"><span class="badge">KARAR</span> <strong>YATIRIMI TESİSE DEĞİL SATIŞA YAP</strong> — VeryBerry ile yazılı ton + taban fiyat + otel + ziyaretçi; tünel ve 20 da ancak 2 sezon veriden sonra.</div>
+<section class="kpis" aria-label="Özet göstergeler"><div class="kpi"><div class="kl">Önerilen yatırım</div><div class="kv">~1,65 M TL</div><div class="ks">Son hâl + ziyaretçi alanı 80 bin TL</div></div><div class="kpi"><div class="kl">Para kaybetme ihtimali</div><div class="kv">%37 → %3-16</div><div class="ks">Sözleşme + otel + agro-turizm ile</div></div><div class="kpi"><div class="kl">Medyan 2031 net</div><div class="kv">0,94 M TL</div><div class="ks">Sözleşmesiz son hâlde 0,50 M TL</div></div><div class="kpi"><div class="kl">Geri dönüş (medyan)</div><div class="kv">3,7 yıl</div><div class="ks">Sözleşmesiz 4,3 yıl</div></div><div class="kpi"><div class="kl">Tamamı tünel</div><div class="kv">%63 kayıp</div><div class="ks">6,5 M TL yatırım · yapma</div></div><div class="kpi"><div class="kl">20 da</div><div class="kv">3,5 M TL</div><div class="ks">Kötü durumda bağlanan para · sonra</div></div></section>
+</header>
+<nav class="toc" aria-label="İçindekiler"><div class="toc">
+<ul>
+<li><a href="#1-secenekler-ayn-5000-olas-gelecekte">1. Seçenekler aynı 5.000 olası gelecekte</a></li>
+<li><a href="#2-bu-butceyle-tavan-bu-mu">2. Bu bütçeyle tavan bu mu?</a></li>
+<li><a href="#3-otel-kanal-varsaymlar-ne-kadar-saglam">3. Otel kanalı varsayımları ne kadar sağlam?</a></li>
+<li><a href="#4-marka-kendi-markanz-m-veryberry-mi">4. Marka: kendi markanız mı, VeryBerry mi?</a></li>
+<li><a href="#5-online-sats-hangisi-mantkl">5. Online satış: hangisi mantıklı?</a></li>
+<li><a href="#6-onerilen-yol">6. Önerilen yol</a></li>
+</ul>
+</div>
+</nav>
+<main>
+<p><em>Ekim 2026 · 10 da böğürtlen (son hâl) üzerine güçlendirme seçenekleri · Ekim 2026 TL, reel · model: <a href="https://github.com/berkehan-nz/P-Fin/blob/claude/thornless-blackberry-feasibility-5kpz6c/reports/bogurtlen-fizibilite/model_guc.py" target="_blank" rel="noopener">model_guc.py</a></em></p>
+<aside class="note">
+<p><strong>Kısa cevap.</strong> Daha büyük yatırım riski azaltmıyor, büyütüyor. Bu işte riski belirleyen tesis ya da üretim değil, <strong>satış</strong>. Tünel, kendi dondurma hattınız veya 20 da, kötü senaryoda cepten çıkacak parayı 2 M TL'den 3,5-6,8 M TL'ye çıkarıyor. Para kaybetme ihtimalini ise ya hiç azaltmıyor ya da çok az azaltıyor. Riski asıl düşüren şey <strong>VeryBerry'nin elindeki kanallar</strong>: yazılı taban fiyatlı sözleşme, otellerine doğrudan satış ve otel misafirleriyle bahçe deneyimi. Bu üçü birlikte, neredeyse ek yatırım olmadan (~80 bin TL), para kaybetme ihtimalini <strong>%37'den ~%3-16'ya</strong> indiriyor. Ama bu sonuç, ortağın <strong>gerçekten</strong> ne kadar alacağına bağlı. Bunu yazılı rakamlarla teyit etmek gerekiyor.</p>
+</aside>
+<hr />
+<h2 id="1-secenekler-ayn-5000-olas-gelecekte">1. Seçenekler aynı 5.000 olası gelecekte</h2>
+<p>Tüm seçenekler, <a href="RAPOR_RISK.html">risk raporundaki</a> aynı 5.000 rastgele 10 yıl üzerinde koşturuldu. Fiyat düşüşü, don, hastalık, işçi bulamama ve ortağın çekilmesi her seçenekte aynı. Yani aradaki fark yalnızca seçeneğin kendisinden geliyor.</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Seçenek</th>
+<th style="text-align: right;">Başlangıç yatırımı</th>
+<th style="text-align: right;">Para kaybetme ihtimali</th>
+<th style="text-align: right;">2031 net (kötü %10)</th>
+<th style="text-align: right;">2031 net (medyan)</th>
+<th style="text-align: right;">2031 net (iyi %10)</th>
+<th style="text-align: right;">Medyan geri dönüş</th>
+<th style="text-align: right;">Kötü durumda cepten (%90)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0.</strong> Son hâl (sözleşmesiz)</td>
+<td style="text-align: right;">1,57 M TL</td>
+<td style="text-align: right;">%37</td>
+<td style="text-align: right;"><span class="neg">−0,09 M TL</span></td>
+<td style="text-align: right;">0,50 M TL</td>
+<td style="text-align: right;">1,29 M TL</td>
+<td style="text-align: right;">4,3 yıl</td>
+<td style="text-align: right;">2,15 M TL</td>
+</tr>
+<tr>
+<td><strong>1.</strong> + VeryBerry ile yazılı taban fiyatlı sözleşme</td>
+<td style="text-align: right;">1,57 M TL</td>
+<td style="text-align: right;">%30</td>
+<td style="text-align: right;">0,03 M TL</td>
+<td style="text-align: right;">0,57 M TL</td>
+<td style="text-align: right;">1,39 M TL</td>
+<td style="text-align: right;">4,3 yıl</td>
+<td style="text-align: right;">2,06 M TL</td>
+</tr>
+<tr>
+<td><strong>2.</strong> 1 + otel kanalı + agro-turizm</td>
+<td style="text-align: right;">1,65 M TL</td>
+<td style="text-align: right;">%3</td>
+<td style="text-align: right;">0,40 M TL</td>
+<td style="text-align: right;">0,94 M TL</td>
+<td style="text-align: right;">1,70 M TL</td>
+<td style="text-align: right;">3,7 yıl</td>
+<td style="text-align: right;">1,97 M TL</td>
+</tr>
+<tr>
+<td><strong>3.</strong> 2 + kendi dondurma hattı</td>
+<td style="text-align: right;">2,08 M TL</td>
+<td style="text-align: right;">%8</td>
+<td style="text-align: right;">0,32 M TL</td>
+<td style="text-align: right;">0,88 M TL</td>
+<td style="text-align: right;">1,68 M TL</td>
+<td style="text-align: right;">4,2 yıl</td>
+<td style="text-align: right;">2,46 M TL</td>
+</tr>
+<tr>
+<td><strong>4.</strong> 2 + 3 da yağmur örtülü tünel</td>
+<td style="text-align: right;">3,11 M TL</td>
+<td style="text-align: right;">%9</td>
+<td style="text-align: right;">0,51 M TL</td>
+<td style="text-align: right;">1,10 M TL</td>
+<td style="text-align: right;">2,00 M TL</td>
+<td style="text-align: right;">4,4 yıl</td>
+<td style="text-align: right;">3,37 M TL</td>
+</tr>
+<tr>
+<td><strong>5.</strong> 2 + 10 da'nın tamamı tünelde</td>
+<td style="text-align: right;">6,51 M TL</td>
+<td style="text-align: right;">%63</td>
+<td style="text-align: right;">0,08 M TL</td>
+<td style="text-align: right;">0,71 M TL</td>
+<td style="text-align: right;">1,77 M TL</td>
+<td style="text-align: right;">6,0 yıl</td>
+<td style="text-align: right;">6,82 M TL</td>
+</tr>
+<tr>
+<td><strong>6.</strong> 20 da + 2</td>
+<td style="text-align: right;">2,96 M TL</td>
+<td style="text-align: right;">%10</td>
+<td style="text-align: right;">0,49 M TL</td>
+<td style="text-align: right;">1,38 M TL</td>
+<td style="text-align: right;">2,69 M TL</td>
+<td style="text-align: right;">4,0 yıl</td>
+<td style="text-align: right;">3,52 M TL</td>
+</tr>
+</tbody>
+</table></div>
+<p><em>"Kötü durumda cepten (%90)": 10 kötü gelecekten birinde kümülatif nakdin dibe vurduğu nokta. Yani en kötü %10'luk dilimde ne kadar para bağlanacağı.</em></p>
+<p><strong>Ne anlatıyor?</strong></p>
+<ul>
+<li><strong>Sözleşme (1)</strong> sıfır yatırımla kaybetme ihtimalini %37'den %30'a indiriyor. Taban fiyat kötü fiyat yıllarını kesiyor.</li>
+<li><strong>Otel kanalı + agro-turizm (2)</strong> asıl sıçramayı yapıyor. Oteller yıllık sabit fiyatla alıyor (fiyat dalgalanmasının bir kısmı ortadan kalkıyor). 2. sınıf meyve reçel/tatlıya 45-55 yerine ~100 TL/kg'den gidiyor. Misafirler kendin-topla hacmini artırıyor. Ek yatırım yalnızca ziyaretçi alanı (~80 bin TL).</li>
+<li><strong>Kendi dondurma hattı (3)</strong> ~430 bin TL ek yatırım istiyor ve hiçbir göstergeyi iyileştirmiyor. Donuk böğürtlenin net fiyatı (~135 TL/kg) halin ortalama net fiyatına çok yakın. Ancak hal çöktüğünde işe yarar. Bu bir sigorta, kâr kaynağı değil. Şimdilik gerek yok.</li>
+<li><strong>3 da tünel (4)</strong> kâr potansiyelini artırıyor: medyan 2031 net 0,94 M TL'den 1,10 M TL'ye çıkıyor ve meyve 2-3 hafta erken olgunlaşıyor. Ama 1,5 M TL ek yatırım istiyor, geri dönüş uzuyor ve kötü durumdaki bağlanan para 3,4 M TL'ye çıkıyor. <strong>Doğru zaman: 2 sezon gerçek fiyat verisi toplandıktan sonra.</strong></li>
+<li><strong>Tamamı tünel (5)</strong> en kötü seçenek: 6,5 M TL yatırım ve %63 kaybetme ihtimali. Satış kanalı tonajı alamıyorsa üretimi artırmak para yakar.</li>
+<li><strong>20 da (6)</strong> iyi senaryoda en çok kazandıran seçenek (iyi %10'da 2,7 M TL/yıl). Ama işçi riski ikiye katlanıyor, kötü durumda bağlanan para 3,5 M TL'ye çıkıyor ve kaybetme ihtimali %3'ten %10'a yükseliyor. <strong>Doğru zaman: VeryBerry'nin talebi 10 da'nın üretimini aştığı kanıtlandığında.</strong></li>
+</ul>
+<h2 id="2-bu-butceyle-tavan-bu-mu">2. Bu bütçeyle tavan bu mu?</h2>
+<p><strong>Üretim tavanı değil, satış tavanı var.</strong> 10 da tam verimde 15-20 ton üretiyor. VeryBerry'nin taze paketli alabileceğini 10 t/yıl, otellerin alabileceğini 3 t/yıl varsaydım. Bu rakamları onlara sormanız gerekiyor. Üretim, satış kapasitesini aştığı anda fazlası hale gidiyor. Hal fiyatı da bu işin en zayıf halkası. Yani:</p>
+<ul>
+<li><strong>Kanal tonajı &lt; üretim</strong> ise yatırım satışa yapılmalı: sözleşme, otel, kendin-topla, marka.</li>
+<li><strong>Kanal tonajı &gt; üretim</strong> ise o zaman tünel ya da 20 da mantıklı hale gelir.</li>
+</ul>
+<p>Bugün hangisinin geçerli olduğunu bilmiyoruz. İlk 2 sezonun asıl amacı bunu ölçmek.</p>
+<h2 id="3-otel-kanal-varsaymlar-ne-kadar-saglam">3. Otel kanalı varsayımları ne kadar sağlam?</h2>
+<p>Seçenek 2'nin rakamları tamamen benim tahminlerime dayanıyor:</p>
+<ul>
+<li>Otel fiyatı 250 TL/kg ve 3 t/yıl</li>
+<li>
+<ol start="2">
+<li>sınıf meyve otellere 100 TL/kg, 2 t/yıl</li>
+</ol>
+</li>
+<li>Agro-turizm kendin-topla hacmini 1,5 katına çıkarıyor, fiyat 450 TL/kg</li>
+</ul>
+<p>Bunları tek tek kötüleştirdim:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Seçenek 2'de değişen varsayım</th>
+<th style="text-align: right;">Para kaybetme ihtimali</th>
+<th style="text-align: right;">2031 net (medyan)</th>
+<th style="text-align: right;">2031 net (kötü %10)</th>
+<th style="text-align: right;">Geri dönüş</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baz (yukarıdaki gibi)</td>
+<td style="text-align: right;">%3</td>
+<td style="text-align: right;">0,94 M TL</td>
+<td style="text-align: right;">0,40 M TL</td>
+<td style="text-align: right;">3,7 yıl</td>
+</tr>
+<tr>
+<td>Otel fiyatı 250 → 180 TL/kg</td>
+<td style="text-align: right;">%7</td>
+<td style="text-align: right;">0,82 M TL</td>
+<td style="text-align: right;">0,31 M TL</td>
+<td style="text-align: right;">4,0 yıl</td>
+</tr>
+<tr>
+<td>Otel hacmi 3 → 1,5 t</td>
+<td style="text-align: right;">%4</td>
+<td style="text-align: right;">0,90 M TL</td>
+<td style="text-align: right;">0,38 M TL</td>
+<td style="text-align: right;">3,8 yıl</td>
+</tr>
+<tr>
+<td>Agro-turizm yok (kendin-topla rapordaki gibi)</td>
+<td style="text-align: right;">%16</td>
+<td style="text-align: right;">0,70 M TL</td>
+<td style="text-align: right;">0,17 M TL</td>
+<td style="text-align: right;">4,1 yıl</td>
+</tr>
+<tr>
+<td>Hepsi birden kötü</td>
+<td style="text-align: right;">%31</td>
+<td style="text-align: right;">0,55 M TL</td>
+<td style="text-align: right;">0,05 M TL</td>
+<td style="text-align: right;">4,5 yıl</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Otel kanalı fiyat ve hacim değişikliklerine karşı dayanıklı. Agro-turizm ise çok önemli.</strong> Turizmi bilen bir ortağın asıl katkısı bu olabilir. Misafiri bahçeye getirmek, tezgâhta kilosunu 450 TL'den satmak ve deneyimi paketlemek, Bursa'da tek başına kendin-topla ilanı vermekten çok farklı bir iş. Hepsi kötü giderse ortak yalnızca normal bir alıcıya dönüşüyor ve risk raporundaki tabloya geri dönülüyor.</p>
+<p><strong>VeryBerry'ye sorulacaklar:</strong></p>
+<ol>
+<li>Yılda kaç ton taze böğürtlen alabilirsiniz? Hangi aylarda, hangi fiyattan ve kaç gün vadeyle?</li>
+<li>Otelleriniz kahvaltı ve pastane için kaç kilo kullanıyor? Yıllık sabit fiyat verebilir misiniz?</li>
+<li>Otel misafirleri için bahçe ziyareti/hasat deneyimi yapar mısınız? Kaç kişi, hangi günler? Otellerin bahçeye uzaklığı ne?</li>
+<li>
+<ol start="2">
+<li>sınıf meyveyi reçel, tatlı veya smoothie için alır mısınız?</li>
+</ol>
+</li>
+<li>Taban fiyatı ve en az alım miktarını yazılı hale getirebilir miyiz?</li>
+</ol>
+<h2 id="4-marka-kendi-markanz-m-veryberry-mi">4. Marka: kendi markanız mı, VeryBerry mi?</h2>
+<p><strong>Taze üründe VeryBerry markasıyla gidin. Ama çiftliğin adı sizin olsun.</strong></p>
+<ul>
+<li>Sıfırdan marka kurmak para ve zaman istiyor: fotoğraf, ambalaj tasarımı, sosyal medya ve satış ekibi. Asıl maliyet emek ve reklam. Siz Ankara'dasınız, babanız tarlada. Bu işi yürütecek zamanınız yok.</li>
+<li>VeryBerry'nin halihazırda güveni, kanalı ve otelleri var. Yeni bir taze meyve markasının raf bulması yıllar sürer. Onların bunu yapmasına gerek yok.</li>
+<li><strong>Risk:</strong> müşteri VeryBerry'yi tanır, sizi tanımaz. Ortaklık biterse marka değeri onlarda kalır. Bunun önlemi:<br />
+  1. Etikette <strong>ortak marka</strong>: "VeryBerry · [Çiftlik adı] böğürtleni, Karacabey". Menşe bilgisi ürüne değer de katar.<br />
+  2. Çiftlik adını <strong>TÜRKPATENT'te tescil ettirin</strong>. Maliyeti düşük, ileride kendi ürününüz için hazır olur.<br />
+  3. <strong>Kendin-topla müşteri listesi</strong> (WhatsApp/Instagram) sözleşmede sizde kalsın.<br />
+  4. Sözleşmeye bir <strong>çıkış maddesi</strong> ekleyin: ortaklık biterse ortak marka kullanımı ne olacak?</li>
+</ul>
+<h2 id="5-online-sats-hangisi-mantkl">5. Online satış: hangisi mantıklı?</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>Yol</th>
+<th style="text-align: center;">Taze böğürtlen için</th>
+<th>Yorum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Türkiye geneline kargo (Trendyol, kendi siteniz)</td>
+<td style="text-align: center;">✗</td>
+<td>Raf ömrü 3-5 gün. Soğuk kutu, buz aküsü, kargo ve ezilme/iade maliyeti kilo fiyatını yiyor. Pazaryeri komisyonu da ekleniyor. Şikâyet riski yüksek</td>
+</tr>
+<tr>
+<td>Bursa içi ön sipariş / haftalık sepet (WhatsApp, Instagram)</td>
+<td style="text-align: center;">✓</td>
+<td>Aynı gün teslimat, toplu dağıtım. VeryBerry'nin müşteri tabanına ek ürün olarak sunulabilir</td>
+</tr>
+<tr>
+<td>Kendin-topla rezervasyon (form, takvim)</td>
+<td style="text-align: center;">✓</td>
+<td>En değerli online işlev. Hafta sonu kalabalığını düzenler, boş gün bırakmaz</td>
+</tr>
+<tr>
+<td>Raf ömrü uzun ürünler: reçel, dondurularak kurutulmuş, donuk</td>
+<td style="text-align: center;">Sonra</td>
+<td>Kargoya uygun. Ama gıda işletme kaydı, etiket ve üretim gerekiyor. 2-3. yılda, VeryBerry'nin online kanalı varsa onunla değerlendirilebilir</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Öneri:</strong> online satış için ayrı bir e-ticaret kurmayın. Online araçları <strong>rezervasyon ve Bursa içi ön sipariş</strong> için kullanın. Kargo ancak raf ömrü uzun ürünler için anlamlı. Bu da üretim oturduktan sonraki bir adım.</p>
+<h2 id="6-onerilen-yol">6. Önerilen yol</h2>
+<ol>
+<li><strong>Şimdi (Ekim-Aralık 2026):</strong><br />
+   - Toprak ve su analizi.<br />
+   - VeryBerry ile yukarıdaki 5 soruyu yazılı olarak netleştirin. Bir niyet mektubu yeterli: ton, taban fiyat, otel hacmi, ziyaretçi.<br />
+   - Çiftlik adını belirleyin ve tescil başvurusunu yapın.</li>
+<li><strong>2027:</strong> son hâldeki 10 da kurulumu + ziyaretçi alanı (~80 bin TL). Toplam ~1,65 M TL.</li>
+<li><strong>2028-2029 (ilk iki sezon):</strong> her kanalın gerçek fiyatını ve tonajını kaydedin.<br />
+   - Talep üretimi aşıyorsa → önce 3 da tünel (erken sezon fiyatı), sonra 20 da.<br />
+   - Hal payı %30'un üstündeyse → büyüme yok. Önce kanal geliştirilmeli.</li>
+<li><strong>Kendi dondurma hattı:</strong> yalnızca hal fiyatı arka arkaya iki sezon çökerse, bir sigorta olarak.</li>
+</ol>
+<hr />
+<p><em>T: Otel fiyatı/hacmi, agro-turizm çarpanı, tünel maliyeti (450 bin TL/da) ve dondurma hattı maliyeti (400 bin TL) tahmindir; VeryBerry görüşmesi ve tekliflerle güncellenmelidir. VeryBerry hakkında kamuya açık kaynakta bilgi bulunamadı; kanal bilgileri size aittir.</em></p>
+</main>
+<footer>Tüm rakamlar <code>model_guc.py</code>, <code>model_risk.py</code> ve <code>model_final.py</code> hesap modellerinden üretilmiştir. Tutarlar Ekim 2026 sabit TL. Otel, agro-turizm, tünel ve dondurma parametreleri tahmindir; VeryBerry görüşmesiyle teyit edilmelidir.</footer>
+</div>
+</body>
+</html>
