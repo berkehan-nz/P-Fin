@@ -1,65 +1,65 @@
 {
-  "as_of": "2026-10-02",
+  "as_of": "2026-10-05",
   "log": {
     "kill_codes": {
       "ALTMAN_LOW": 5,
       "BENEISH_HIGH": 10,
       "BIOTECH_NO_REVENUE": 44,
       "BIOTECH_REV_UNKNOWN": 56,
-      "EXCHANGE_BAD": 543,
-      "FCF_NEG_NO_EXEMPTION": 229,
-      "GM_LOW": 391,
+      "EXCHANGE_BAD": 557,
+      "FCF_NEG_NO_EXEMPTION": 227,
+      "GM_LOW": 392,
       "IPO_LOCKUP": 3,
-      "LEVERAGE_HIGH": 114,
-      "MCAP_HIGH": 205,
-      "MCAP_LOW": 1053,
-      "MCAP_UNKNOWN": 33,
+      "LEVERAGE_HIGH": 113,
+      "MCAP_HIGH": 204,
+      "MCAP_LOW": 1043,
+      "MCAP_UNKNOWN": 29,
       "PIOTROSKI_LOW": 5,
-      "PRICE_LOW": 143,
+      "PRICE_LOW": 144,
       "REV_AND_GM_FALLING": 1,
-      "REV_GROWTH_LOW": 350,
-      "SBC_HIGH": 27,
-      "SIC_EXCLUDED": 10,
-      "UNCODED": 82,
-      "VOLUME_LOW": 156
+      "REV_GROWTH_LOW": 351,
+      "SBC_HIGH": 28,
+      "SIC_EXCLUDED": 11,
+      "UNCODED": 83,
+      "VOLUME_LOW": 154
     },
     "kill_kinds": {
-      "ELENDI": 3212,
-      "VERI_YOK": 248
+      "ELENDI": 3217,
+      "VERI_YOK": 243
     },
     "kill_reasons": {
-      "30 gunluk ortalama dolar hacmi < 5M USD": 156,
+      "30 gunluk ortalama dolar hacmi < 5M USD": 154,
       "Biyoteknoloji; hasilat bilinmiyor": 56,
-      "Borsa disi/uygunsuz kotasyon (OTC)": 543,
+      "Borsa disi/uygunsuz kotasyon (OTC)": 557,
       "Brut marj %12.9 <= %30": 5,
       "Brut marj %20.9 <= %30": 6,
       "Brut marj %23.3 <= %30": 5,
       "Brut marj %28.8 <= %30": 5,
       "FCF negatif ve yuksek buyume istisnasi saglanmadi (brut marj bilinmiyor)": 7,
       "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; 40 Kurali hesaplanamadi)": 6,
-      "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; brut marj bilinmiyor; 40 Kurali hesaplanamadi)": 86,
-      "Fiyat < 5 USD": 143,
+      "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; brut marj bilinmiyor; 40 Kurali hesaplanamadi)": 85,
+      "Fiyat < 5 USD": 144,
       "Hasilat buyumesi %-2.5 <= %5": 5,
       "Hasilat buyumesi %0.3 <= %5": 6,
       "Hasilat buyumesi %0.4 <= %5": 5,
       "Hasilat buyumesi %0.7 <= %5": 6,
-      "Hasilat buyumesi %1.1 <= %5": 5,
       "Hasilat buyumesi %1.5 <= %5": 7,
       "Hasilat buyumesi %1.6 <= %5": 6,
+      "Hasilat buyumesi %2.4 <= %5": 6,
       "Hasilat buyumesi %3.6 <= %5": 6,
-      "Hasilat buyumesi %3.7 <= %5": 6,
+      "Hasilat buyumesi %3.7 <= %5": 7,
       "Hasilatsiz biyoteknoloji": 44,
       "Net borc/FAVOK 3.1 >= 3.0": 8,
       "Net borc/FAVOK 3.4 >= 3.0": 8,
       "Net borc/FAVOK 3.5 >= 3.0": 6,
       "Net borc/FAVOK 4.2 >= 3.0": 6,
       "Net borc/FAVOK 4.4 >= 3.0": 6,
-      "Piyasa degeri < 300M USD": 1053,
-      "Piyasa degeri > 50000M USD": 205,
-      "Piyasa degeri hesaplanamadi": 33,
-      "SIC 6000-6799 (finans/gayrimenkul) haric": 10
+      "Piyasa degeri < 300M USD": 1043,
+      "Piyasa degeri > 50000M USD": 204,
+      "Piyasa degeri hesaplanamadi": 29,
+      "SIC 6000-6799 (finans/gayrimenkul) haric": 11
     },
-    "retry_queue_size": 248,
+    "retry_queue_size": 243,
     "sector_distribution": {
       "Diger is hizmetleri": 2,
       "Egitim": 3,
@@ -68,7 +68,7 @@
       "Iletisim": 1,
       "Is hizmetleri": 2,
       "Kaucuk, plastik, cam": 2,
-      "Kimya ve ilac": 5,
+      "Kimya ve ilac": 4,
       "Madencilik": 3,
       "Makine ve bilgisayar donanimi": 2,
       "Metal": 1,
@@ -79,12 +79,12 @@
       "Toptan ticaret": 1,
       "Ulasim ekipmani": 1,
       "Veri isleme ve sistem entegrasyonu": 2,
-      "Yazilim ve programlama": 9
+      "Yazilim ve programlama": 10
     },
     "sector_quota_overflow": 0,
     "stages": [
       {
-        "input": 3815,
+        "input": 3814,
         "name": "Evren",
         "output": 1572,
         "stage": 0
@@ -92,23 +92,23 @@
       {
         "input": 1572,
         "name": "Sert filtreler",
-        "output": 380,
+        "output": 379,
         "stage": 1
       },
       {
-        "input": 380,
+        "input": 379,
         "name": "Tuzak eleme",
-        "output": 355,
+        "output": 354,
         "stage": 2
       },
       {
-        "input": 355,
+        "input": 354,
         "name": "Goreli ucuzluk",
-        "output": 136,
+        "output": 135,
         "stage": 3
       },
       {
-        "input": 136,
+        "input": 135,
         "name": "Puanlama",
         "output": 50,
         "stage": 4
@@ -117,7 +117,7 @@
   },
   "sectors": {
     "Basim ve yayin": 2,
-    "Bilinmiyor": 8,
+    "Bilinmiyor": 9,
     "Cesitli hizmetler": 3,
     "Cesitli imalat": 4,
     "Diger is hizmetleri": 12,
@@ -131,11 +131,11 @@
     "Kaucuk, plastik, cam": 12,
     "Kimya ve ilac": 25,
     "Konaklama ve kisisel hizmet": 4,
-    "Madencilik": 15,
+    "Madencilik": 14,
     "Makine ve bilgisayar donanimi": 28,
     "Metal": 10,
     "Muhendislik ve arastirma": 8,
-    "Olcum ve tibbi cihaz": 31,
+    "Olcum ve tibbi cihaz": 30,
     "Orman urunleri ve kagit": 1,
     "Perakende": 25,
     "Saglik hizmetleri": 11,
@@ -147,5 +147,5 @@
     "Yazilim ve programlama": 56
   },
   "source": "funnel",
-  "total_evaluated": 355
+  "total_evaluated": 354
 }
