@@ -1,7 +1,23 @@
 {
-  "as_of": "2026-10-05",
+  "as_of": "2026-10-06",
   "calendar": {
     "recent": [
+      {
+        "date": "2026-10-05",
+        "detail": "Onemli olay bildirimi",
+        "kind": "sec",
+        "ticker": "PINS",
+        "title": "PINS · 8-K",
+        "url": "https://www.sec.gov/Archives/edgar/data/1506293/000150629326000139/pins-20261001.htm"
+      },
+      {
+        "date": "2026-10-02",
+        "detail": "Onemli olay bildirimi",
+        "kind": "sec",
+        "ticker": "PINS",
+        "title": "PINS · 8-K",
+        "url": "https://www.sec.gov/Archives/edgar/data/1506293/000150629326000136/pins-20260930.htm"
+      },
       {
         "date": "2026-10-01",
         "detail": "Genel kurul cagrisi",
@@ -25,22 +41,6 @@
         "ticker": "KFY",
         "title": "KFY · 8-K",
         "url": "https://www.sec.gov/Archives/edgar/data/56679/000119312526405763/d170608d8k.htm"
-      },
-      {
-        "date": "2026-09-25",
-        "detail": "Genel kurul cagrisi",
-        "kind": "sec",
-        "ticker": "EAT",
-        "title": "EAT · DEF 14A",
-        "url": "https://www.sec.gov/Archives/edgar/data/703351/000119312526402857/d86754ddef14a.htm"
-      },
-      {
-        "date": "2026-09-25",
-        "detail": "Onemli olay bildirimi",
-        "kind": "sec",
-        "ticker": "CART",
-        "title": "CART · 8-K",
-        "url": "https://www.sec.gov/Archives/edgar/data/1579091/000157909126000047/cart-20260921.htm"
       }
     ],
     "source": "fred+finnhub+sec",
@@ -109,20 +109,6 @@
         "title": "Sanayi uretimi"
       },
       {
-        "date": "2026-12-02",
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "DOCU",
-        "title": "DOCU bilanco"
-      },
-      {
-        "date": "2026-12-07",
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "KFY",
-        "title": "KFY bilanco"
-      },
-      {
         "date": "2027-01-26",
         "detail": null,
         "kind": "bilanco",
@@ -156,10 +142,24 @@
         "kind": "bilanco",
         "ticker": "NSSC",
         "title": "NSSC bilanco"
+      },
+      {
+        "date": "2027-02-03",
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "GFF",
+        "title": "GFF bilanco"
+      },
+      {
+        "date": "2027-02-03",
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "MITK",
+        "title": "MITK bilanco"
       }
     ]
   },
-  "generated_at": "2026-10-05T22:34:17+00:00",
+  "generated_at": "2026-10-06T02:55:14+00:00",
   "market": [
     {
       "as_of": "2026-10-05",
@@ -288,13 +288,12 @@
       "value": 2847.1357
     },
     {
-      "as_of": "2026-10-02",
-      "change_1d_pct": 1.02,
-      "change_5d_pct": -1.02,
+      "as_of": "2026-10-05",
+      "change_1d_pct": 0.06,
+      "change_5d_pct": -0.94,
       "group": "Hisse",
       "label": "Euro Stoxx 50",
       "series": [
-        6447.98,
         6455.6299,
         6470.7402,
         6424.73,
@@ -323,21 +322,20 @@
         6320.2598,
         6269.02,
         6175.4502,
-        6238.5
+        6238.5,
+        6242.1401
       ],
       "symbol": "^STOXX50E",
       "unit": "puan",
-      "value": 6238.5
+      "value": 6242.1401
     },
     {
-      "as_of": "2026-10-05",
-      "change_1d_pct": -0.94,
-      "change_5d_pct": 2.93,
+      "as_of": "2026-10-06",
+      "change_1d_pct": 0.19,
+      "change_5d_pct": 7.03,
       "group": "Hisse",
       "label": "Nikkei 225",
       "series": [
-        65326.4219,
-        66216.7891,
         66016.3594,
         65528.0898,
         65856.4297,
@@ -365,20 +363,21 @@
         65481.2695,
         66753.7188,
         68956.7188,
-        68309.4609
+        68309.4609,
+        69946.8594,
+        70081.5312
       ],
       "symbol": "^N225",
       "unit": "puan",
-      "value": 68309.4609
+      "value": 70081.5312
     },
     {
       "as_of": "2026-10-05",
-      "change_1d_pct": 0.17,
-      "change_5d_pct": -4.88,
+      "change_1d_pct": 1.42,
+      "change_5d_pct": -1.18,
       "group": "Hisse",
       "label": "BIST 100",
       "series": [
-        14501.5,
         14473.4004,
         14610.9004,
         14575.5,
@@ -407,11 +406,12 @@
         12290.5996,
         11947.2002,
         12249.0,
-        12270.2002
+        12270.2002,
+        12443.9004
       ],
       "symbol": "XU100.IS",
       "unit": "puan",
-      "value": 12270.2002
+      "value": 12443.9004
     },
     {
       "as_of": "2026-10-05",
@@ -499,8 +499,8 @@
     },
     {
       "as_of": "2026-10-05",
-      "change_1d_pct": 0.17,
-      "change_5d_pct": 0.89,
+      "change_1d_pct": 0.26,
+      "change_5d_pct": 0.98,
       "group": "Kur",
       "label": "Dolar endeksi",
       "series": [
@@ -533,20 +533,19 @@
         101.45,
         102.1,
         101.93,
-        102.102
+        102.19
       ],
       "symbol": "DX-Y.NYB",
       "unit": "puan",
-      "value": 102.102
+      "value": 102.19
     },
     {
-      "as_of": "2026-10-05",
-      "change_1d_pct": -0.22,
-      "change_5d_pct": -1.35,
+      "as_of": "2026-10-06",
+      "change_1d_pct": -0.33,
+      "change_5d_pct": -1.37,
       "group": "Kur",
       "label": "EUR/USD",
       "series": [
-        1.1668,
         1.1675,
         1.1655,
         1.1656,
@@ -575,16 +574,17 @@
         1.1341,
         1.1327,
         1.125,
-        1.1225
+        1.1255,
+        1.1217
       ],
       "symbol": "EURUSD=X",
       "unit": "kur",
-      "value": 1.1225
+      "value": 1.1217
     },
     {
-      "as_of": "2026-10-05",
-      "change_1d_pct": -0.01,
-      "change_5d_pct": 0.29,
+      "as_of": "2026-10-06",
+      "change_1d_pct": 0.07,
+      "change_5d_pct": 0.37,
       "group": "Kur",
       "label": "USD/TRY",
       "series": [
@@ -617,16 +617,16 @@
         49.0081,
         49.028,
         49.1186,
-        49.1156
+        49.1549
       ],
       "symbol": "TRY=X",
       "unit": "kur",
-      "value": 49.1156
+      "value": 49.1549
     },
     {
       "as_of": "2026-10-05",
-      "change_1d_pct": -2.03,
-      "change_5d_pct": -3.61,
+      "change_1d_pct": -1.58,
+      "change_5d_pct": -3.16,
       "group": "Emtia",
       "label": "Brent/WTI ham",
       "series": [
@@ -659,16 +659,16 @@
         90.42,
         92.87,
         91.11,
-        89.26
+        89.67
       ],
       "symbol": "CL=F",
       "unit": "USD",
-      "value": 89.26
+      "value": 89.67
     },
     {
       "as_of": "2026-10-05",
-      "change_1d_pct": 0.18,
-      "change_5d_pct": 0.03,
+      "change_1d_pct": -0.32,
+      "change_5d_pct": -0.47,
       "group": "Emtia",
       "label": "Altin",
       "series": [
@@ -701,16 +701,16 @@
         4186.7002,
         4202.2998,
         4162.2998,
-        4169.7002
+        4148.7998
       ],
       "symbol": "GC=F",
       "unit": "USD",
-      "value": 4169.7002
+      "value": 4148.7998
     },
     {
-      "as_of": "2026-10-05",
-      "change_1d_pct": -0.63,
-      "change_5d_pct": 2.85,
+      "as_of": "2026-10-06",
+      "change_1d_pct": -1.09,
+      "change_5d_pct": 2.37,
       "group": "Kripto",
       "label": "Bitcoin",
       "series": [
@@ -743,20 +743,34 @@
         84497.2109,
         84763.5781,
         86480.3047,
-        85931.8438
+        85533.5781
       ],
       "symbol": "BTC-USD",
       "unit": "USD",
-      "value": 85931.8438
+      "value": 85533.5781
     }
   ],
   "news": [
+    {
+      "date": "2026-10-06",
+      "headline": "Why Instacart (CART) Stock Is Trading Up Today",
+      "source": "Yahoo",
+      "ticker": "CART",
+      "url": "https://finnhub.io/api/news?id=f2da8a70ce99c4170d49de71ac04bad2928995387dd447496d9ef8b235887bd7"
+    },
     {
       "date": "2026-10-05",
       "headline": "Mizuho Maintains Outperform on Chord Energy, Raises Price Target to $179",
       "source": "Benzinga",
       "ticker": "CHRD",
       "url": "https://finnhub.io/api/news?id=f8e54c6e2f46ba5ff4e034204215ed1ebe0f29fcccc6cbb5be5c77f6efe75b2d"
+    },
+    {
+      "date": "2026-10-05",
+      "headline": "Deckers Outdoor (DECK) Could Be 33% Below Fair Value Following UGG Brand Push",
+      "source": "Yahoo",
+      "ticker": "DECK",
+      "url": "https://finnhub.io/api/news?id=5384fc855e64ec38c93926f7968695cb79019824180583f2ae951e89adc2d99e"
     },
     {
       "date": "2026-10-05",
@@ -775,9 +789,16 @@
     {
       "date": "2026-10-05",
       "headline": "DoubleVerify Wants to Show Advertisers What ChatGPT Ads Are Really Worth",
-      "source": "Benzinga",
+      "source": "Yahoo",
       "ticker": "DV",
-      "url": "https://finnhub.io/api/news?id=2ee1fe998382d99c09f15ce7edabb0a2379d47f0255094d2cf0e5a9877bd41e8"
+      "url": "https://finnhub.io/api/news?id=802c9ad86f74afec5a9d88e2956568bb30446664147fde6faaf98d3a8122a821"
+    },
+    {
+      "date": "2026-10-05",
+      "headline": "DV Launches Attribution Measurement and Advances Brand Suitability for ChatGPT Ads",
+      "source": "Yahoo",
+      "ticker": "DV",
+      "url": "https://finnhub.io/api/news?id=f5924e712a95fdfe745f8fe64a8b3a592d41f1653b7607d59184116ecaf87aa5"
     },
     {
       "date": "2026-10-05",
@@ -806,6 +827,20 @@
       "source": "Yahoo",
       "ticker": "EAT",
       "url": "https://finnhub.io/api/news?id=e573edb99f951c723e7448fe2af9916ee4c13e4d3a10873bf426f1eb26d2c9fc"
+    },
+    {
+      "date": "2026-10-05",
+      "headline": "Hunter Fan Company Expands Jasmine Roth Lighting Collection",
+      "source": "Yahoo",
+      "ticker": "GFF",
+      "url": "https://finnhub.io/api/news?id=51237e8ceffa4eab474b82487c81a6508e6fb3679531af4909a1a4c50f0f3bb3"
+    },
+    {
+      "date": "2026-10-05",
+      "headline": "1 Small-Cap Stock to Own for Decades and 2 Facing Challenges",
+      "source": "Yahoo",
+      "ticker": "GFF",
+      "url": "https://finnhub.io/api/news?id=d4da6fec7c609d4c76e472246d4f1a3b4c261ef22c097a16453ecf2a84b8cf60"
     },
     {
       "date": "2026-10-05",
@@ -886,10 +921,10 @@
     },
     {
       "date": "2026-10-05",
-      "headline": "The Stock Market Is Not Ignoring The Bond Bear Market",
-      "source": "SeekingAlpha",
+      "headline": "Which Pays More for Life: A $665,000 Annuity or a $665,000 Dividend Portfolio?",
+      "source": "Yahoo",
       "ticker": "SGOV",
-      "url": "https://finnhub.io/api/news?id=7d0f014760e76ad8e500adc2ce1577d187dfae7baccd0cd4f30b96c7ab7f0ff6"
+      "url": "https://finnhub.io/api/news?id=7c7fc04dc3bc163d5ccc1888420b3fce89c600ab582057d3355dd17e0bbc91bc"
     },
     {
       "date": "2026-10-05",
@@ -946,62 +981,6 @@
       "source": "SeekingAlpha",
       "ticker": "QQQM",
       "url": "https://finnhub.io/api/news?id=32f3d5748bcecbe962f07e4f291082025d34de1c1609e1945654a1ced6f719e3"
-    },
-    {
-      "date": "2026-10-02",
-      "headline": "Does VINMax’s AI Inventory Boost Change The Bull Case For CarGurus’ Dealer Model (CARG)?",
-      "source": "Yahoo",
-      "ticker": "CARG",
-      "url": "https://finnhub.io/api/news?id=5a740572c1439fdf7b36afa11347a7be440c393779282475185df054d9bcc13e"
-    },
-    {
-      "date": "2026-10-02",
-      "headline": "Gig Workers Are Feeling the Squeeze From Higher Gas Prices And Cash-Strapped Customers. One Says, 'I Can't Wait To Find Real Employment'",
-      "source": "Yahoo",
-      "ticker": "CART",
-      "url": "https://finnhub.io/api/news?id=f17d6bef939f49418f55970641a55ec25c1c7ecb7c2fb41e418ed189b230fa6f"
-    },
-    {
-      "date": "2026-10-02",
-      "headline": "Chord Energy Releases 2025 Sustainability Report",
-      "source": "Yahoo",
-      "ticker": "CHRD",
-      "url": "https://finnhub.io/api/news?id=2283f1d6479772b9f9cab6db423ca42000ee5dbf6014acce37c69c0e581d799e"
-    },
-    {
-      "date": "2026-10-02",
-      "headline": "Nike Is Burning Cash to Pay a 5% Dividend. How Long Can It Last?",
-      "source": "Yahoo",
-      "ticker": "DECK",
-      "url": "https://finnhub.io/api/news?id=55689735986e3841e584b13321efbad532b76db33a5458fe1355623da70c2321"
-    },
-    {
-      "date": "2026-10-02",
-      "headline": "3 Reasons GFF is Risky and 1 Stock to Buy Instead",
-      "source": "Yahoo",
-      "ticker": "GFF",
-      "url": "https://finnhub.io/api/news?id=5fe3991cd594314f136898fbffb81e8e89ebcda64e3a3ee7152ff4731c23011b"
-    },
-    {
-      "date": "2026-10-02",
-      "headline": "Korn/Ferry (KFY) Could Be a Great Choice",
-      "source": "Yahoo",
-      "ticker": "KFY",
-      "url": "https://finnhub.io/api/news?id=55c8f22a3276a29dcb434eeca9700506b2dcab62e811809cfe337a69414d40bc"
-    },
-    {
-      "date": "2026-10-02",
-      "headline": "2 Cash-Producing Stocks with Promising Prospects and 1 We Brush Off",
-      "source": "Yahoo",
-      "ticker": "RMD",
-      "url": "https://finnhub.io/api/news?id=168f9badca7040d68c74b634cf09d64a780542e9820e53c97d9382a9a8b775c0"
-    },
-    {
-      "date": "2026-10-02",
-      "headline": "5 High-Yield Dividends That Pay You Soon (But You Must Act Now)",
-      "source": "Yahoo",
-      "ticker": "UPBD",
-      "url": "https://finnhub.io/api/news?id=e07c36ca88a31686e59d04c446f77dc84111f0eee54d6e6cbd4fcb231d22e44d"
     }
   ],
   "risk_note": "VIX 16 — normal aralikta.",
