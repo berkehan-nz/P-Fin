@@ -1,518 +1,215 @@
-/* 5. HUNI — 3831 sirketten 50'ye giden yolun tamami.
+/* HUNİ — evrenden adaya giden yol, tek bakışta.
  *
- * VERI KAYNAGI: canli tarama durumu (scan_state.json). Onceki surum
- * universe.json ve funnel_log.json'a bakiyordu; onlari yalnizca TAM huni
- * kosusu (run_funnel) yaziyor ve o hic calismadi. Sonuc: 1500 sirket
- * islenmis, 1400'u elenmisken sayfa "Huni henuz calismadi" diyordu.
- * Kademeli tarama calisiyorsa sayfa onu gosterir; tam kosu varsa onu tercih eder.
+ * Üstte tek satır durum ("Tur 9 · %24 · bitiş ~11 Eki") ve aşama şeridi.
+ * Eleme sebepleri, Aşama 2'yi geçenler, tur geçmişi ve eşik simülasyonu
+ * katlanır; varsayılan kapalı.
  */
 window.ViewFunnel = (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
-
+  const F = Fmt;
   let survivors = [];
   let killGroups = [];
 
   async function render() {
-    const [uni, log, scan, surv, cand] = await Promise.all([
-      DataLayer.universe(), DataLayer.funnelLog(), DataLayer.scanState(),
-      DataLayer.survivors(), DataLayer.candidates(),
+    const [log, scan, surv] = await Promise.all([
+      DataLayer.funnelLog(), DataLayer.scanState(), DataLayer.survivors(),
     ]);
-
     survivors = (surv && surv.survivors) || [];
-    killGroups = (App.thresholds.kill_reason_groups || []).map((g) => ({
-      ...g, re: new RegExp(g.pattern),
-    }));
-
+    killGroups = (App.thresholds.kill_reason_groups || []).map((g) => ({ ...g, re: new RegExp(g.pattern) }));
     const runs = log.runs || [];
     const latest = runs.length ? runs[runs.length - 1] : null;
+    const fromRun = latest && (latest.stages || []).length;
+    const stages = fromRun ? latest.stages : stagesFromScan(scan);
+    const kills = fromRun ? (latest.kill_reasons || {}) : ((scan && scan.kill_counts) || {});
 
-    // Tam kosu varsa onu, yoksa canli taramayi kaynak al.
-    const fromFullRun = latest && (latest.stages || []).length;
-    const stages = fromFullRun ? latest.stages : stagesFromScan(scan);
-    const kills = fromFullRun ? (latest.kill_reasons || {})
-                              : ((scan && scan.kill_counts) || {});
-
-    $('funnelSubtitle').innerHTML = subtitle(scan, fromFullRun, latest, uni);
-
-    renderScan(scan, runs);
-    renderPipeline(stages, kills, scan, cand);
-    renderKindSplit(fromFullRun ? latest : scan);
-    renderKills(kills);
-    renderSurvivors();
-    renderSim(stages);
+    $('funnelBody').innerHTML = `
+      <div class="page-head"><h1>Huni</h1></div>
+      ${status(scan)}
+      ${strip(stages, fromRun && latest.partial)}
+      ${kinds(scan)}
+      ${reasons(kills)}
+      ${survivorsFold()}
+      ${historyFold(scan, runs)}
+      ${simFold(stages)}`;
+    wireSurvivors();
+    wireSim();
   }
 
-  /* PAYDA TUR ICINDE DEGISMEMELI.
+  function total(scan) { return scan ? (scan.universe_size_at_cycle_start || (scan.queue || []).length || 0) : 0; }
 
-     Evren toplami turlar arasinda 4.551 -> 4.671 -> 6.227 -> 3.825 diye
-     oynadi (SEC sembol listesi her senkronda degisiyor). Kuyruk uzunlugunu
-     dogrudan kullanmak, "%58" derken paydanin altindan kaymasi demek.
-     Tur basinda dondurulan deger varsa o kullanilir. */
-  function scanTotal(scan) {
-    if (!scan) return 0;
-    return scan.universe_size_at_cycle_start || (scan.queue || []).length || 0;
-  }
-
-  function subtitle(scan, fromFullRun, latest, uni) {
-    if (fromFullRun && latest.partial) {
-      return `Tur ${latest.cycle || '?'} devam ediyor · ${latest.scanned || 0} sirket tarandi · `
-        + `asama 3-4 sayilari su anki havuza gore, tur sonunda degisebilir`;
-    }
-    if (fromFullRun) {
-      return `Tam evren taramasi · ${Fmt.date(latest.date)} · `
-        + `${uni.total_evaluated || 0} sirket degerlendirildi`;
-    }
-    if (!scan || !scan.queue) return 'Tarama henuz baslamadi.';
-    const toplam = scanTotal(scan);
-    const done = Math.min(scan.cursor || 0, toplam);
-    return `Kademeli tarama · Tur ${scan.cycle} · ${done} / ${toplam} sirket islendi`
-      + ` · <b>${scan.survivor_count || 0}</b> tanesi Asama 2'yi gecti`;
-  }
-
-  /* scan_state'teki sayaclari huni asamalari bicimine cevirir. */
   function stagesFromScan(scan) {
     const sc = (scan && scan.stage_counts) || {};
-    const info = App.thresholds.stage_info || {};
-    const out = [];
-    for (const n of [0, 1, 2]) {
-      const c = sc[String(n)];
-      if (!c) continue;
-      out.push({
-        stage: n, name: (info[n] || {}).name || `Asama ${n}`,
-        input: c.in, output: c.out,
-      });
-    }
-    return out;
+    return [0, 1, 2].filter((n) => sc[String(n)]).map((n) => ({ stage: n, input: sc[n].in, output: sc[n].out }));
   }
 
-  /* Kademeli tarama: evren bir kuyruktur, her parti bir dilim isler. */
-  function renderScan(scan, runs) {
-    const el = $('scanProgress');
+  /* ------------------------------------------------------ durum satırı */
+  function status(scan) {
     if (!scan || !scan.queue || !scan.queue.length) {
-      el.innerHTML = `<div class="card muted small">Tarama turu henuz baslamadi.
-        Saatlik <b>Scan</b> is akisi calistiginda ilerleme burada gorunur.</div>`;
-      return;
+      return '<div class="card"><span class="pending">Tarama turu henüz başlamadı.</span></div>';
     }
-    const total = scanTotal(scan);
-    const done = Math.min(scan.cursor || 0, total);
-    const pct = total ? (done / total) * 100 : 0;
-    // GERCEK parti boyu. Dosyadaki "batch_size" eski bir deger (120)
-    // tasiyabiliyor; her parti aslinda 300 sirket.
-    const perBatch = scan.effective_batch_size || scan.batch_size || 300;
+    const all = total(scan);
+    const done = Math.min(scan.cursor || 0, all);
+    const pct = all ? (done / all) * 100 : 0;
     const eta = scan.eta || {};
-
-    const bitis = eta.eta_at
-      ? `${tarihSaat(eta.eta_at)} civari`
-      : 'hesaplaniyor';
-    const bitisAlt = eta.per_day
-      ? `olculen hiz gunde ~${Number(eta.per_day).toLocaleString('tr-TR')} sirket`
-      : 'birkac parti sonra hesaplanir';
-
-    /* Tamamlanan turlar: "Tur 5" tek basina bir sey anlatmiyor. Onceki
-       turlarin ne zaman bittigini ve kac aday cikardigini gormek, "tur"un
-       ne oldugunu kendiliginden aciklar. */
-    const bitenler = (runs || []).filter((r) => !r.partial && r.cycle)
-      .slice(-6).reverse().map((r) => {
-        const s4 = (r.stages || []).find((x) => x.stage === 4);
-        const s0 = (r.stages || []).find((x) => x.stage === 0);
-        return `<li>Tur ${r.cycle} · ${Fmt.date(r.date)} bitti ·
-          ${s0 ? Number(s0.input).toLocaleString('tr-TR') : '?'} sirket tarandi
-          &rarr; <b>${s4 ? s4.output : '?'}</b> aday</li>`;
-      }).join('');
-
-    el.innerHTML = `<div class="card">
-      <div class="spread">
-        <span><b>Tur ${scan.cycle}</b>
-          <span class="tiny dim">${scan.cycle_started ? Fmt.date(scan.cycle_started) + ' tarihinde basladi' : ''}</span></span>
-        <span class="num">${done.toLocaleString('tr-TR')} / ${total.toLocaleString('tr-TR')}
-          <span class="dim">(%${Fmt.num(pct, 1)})</span></span>
-      </div>
-      <span class="bar green" style="display:block;height:8px;margin:10px 0">
-        <i style="width:${pct}%"></i></span>
-      <div class="grid g-summary" style="margin-top:12px">
-        ${miniStat("ASAMA 2'YI GECEN", scan.survivor_count || 0)}
-        ${miniStat('KALAN', (total - done).toLocaleString('tr-TR'))}
-        ${miniStat('KALAN PARTI', `${Math.ceil((total - done) / perBatch)} (x${perBatch})`)}
-        ${miniStat('BU TUR BITER', bitis)}
-      </div>
-      <div class="tiny dim" style="margin-top:6px">${Fmt.esc(bitisAlt)}</div>
-
-      <div class="card" style="margin-top:12px;background:var(--bg-3)">
-        <b>Turlar bitmez — bu bir dongu.</b>
-        <p class="small" style="margin:6px 0 0">Bir tur, ABD'deki ~${total.toLocaleString('tr-TR')}
-          sirketin <b>tamaminin bir kez</b> taranmasidir. Tur bitince Asama 3-4
-          calisir, nihai aday listesi cikar ve <b>hemen yeni tur baslar</b> —
-          cunku sirketler her ceyrek yeni bilanco aciklar, fiyatlar degisir;
-          dunku liste yarin bayatlar. "Tur ${scan.cycle}", sistem kuruldugundan
-          beri yapilan ${scan.cycle}. tam tarama demektir; "5 turdan 5.'si"
-          degil. Bir tur su an yaklasik 2 gun suruyor.</p>
-        ${bitenler ? `<p class="small" style="margin:10px 0 4px"><b>Tamamlanan turlar</b></p>
-          <ul class="plain small">${bitenler}</ul>` : ''}
-      </div>
-
-      <div class="tiny dim" style="margin-top:10px">
-        Son parti: ${scan.last_batch_at ? tarihSaat(scan.last_batch_at) : '—'} ·
-        Son tur sonu: ${scan.last_finalized ? Fmt.date(scan.last_finalized) : 'henuz yok'}
-        ${(scan.failed || []).length ? ` · yuklenemeyen ${scan.failed.length}` : ''}
-      </div>
-      ${done < total ? `<p class="tiny dim" style="margin:8px 0 0">
-        Is akisi saatlik kurulu ama GitHub zamanlanmis kosulari yogunlukta
-        atliyor; pratikte 3-5 saatte bir calisiyor. Tahmini bitis bu yuzden
-        sabit bir varsayimla degil, olculen hizla hesaplanir.</p>` : ''}
+    const h = F.hoursSince(scan.last_batch_at);
+    const stalled = h !== null && h >= 6;
+    return `<div class="card">
+      <div class="spread"><b style="font-size:18px">Tur ${F.esc(scan.cycle)} · ${F.esc(F.share(pct, 0))}${
+        eta.eta_at ? ` · bitiş ~${F.esc(F.date(eta.eta_at))}` : ''}</b>
+        <span class="small muted">${F.esc(F.int(done))} / ${F.esc(F.int(all))} şirket · Aşama 2'yi geçen ${F.esc(F.int(scan.survivor_count))}</span></div>
+      <div class="progress"><i style="width:${Math.round(pct * 10) / 10}%"></i></div>
+      ${stalled ? `<div class="small warn-text">Son parti ${F.esc(F.sinceLabel(scan.last_batch_at))} işlendi — tarama duraklamış olabilir.</div>` : ''}
     </div>`;
   }
 
-  /* "28 Eyl 22:15" — tur bitisinde gun yetmez, saat de lazim. */
-  function tarihSaat(iso) {
-    try {
-      return new Date(iso).toLocaleString('tr-TR', {
-        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
-      });
-    } catch (_) { return iso; }
-  }
-
-  function miniStat(label, value) {
-    return `<div><div class="tiny dim">${Fmt.esc(label)}</div>
-      <div class="num" style="font-size:18px">${value}</div></div>`;
-  }
-
-  /* -------------------------------------------------------- huni akisi */
-  /* Sayfanin kalbi: 3831 -> 50 yolunun her adimi, ne kadar daraldigi ve
-     NEDEN daraldigi tek gorunumde. */
-  function renderPipeline(stages, kills, scan, cand) {
+  /* ------------------------------------------------------- aşama şeridi */
+  function strip(stages, partial) {
     const info = App.thresholds.stage_info || {};
-    const grouped = groupKills(kills);
-    const byStage = {};
-    grouped.forEach((g) => { (byStage[g.stage] = byStage[g.stage] || []).push(g); });
-
-    const queueTotal = scan ? (scanTotal(scan) || null) : null;
-    const maxIn = Math.max(...stages.map((s) => s.input), 1);
-    const interimCount = ((cand && cand.candidates) || []).length;
-    const finalized = scan && scan.last_finalized;
-
-    const rows = [0, 1, 2, 3, 4].map((n) => {
+    const tiles = [0, 1, 2, 3, 4].map((n) => {
       const st = stages.find((s) => s.stage === n);
-      const meta = info[n] || {};
-      const reasons = (byStage[n] || []).sort((a, b) => b.count - a.count);
-
-      // Asama 3-4 tur sonunda calisir; tur bitmeden sayisi YOKTUR.
-      if (!st) {
-        const pending = n >= 3;
-        return stageRow({
-          n, name: meta.name, plain: meta.plain, pending,
-          note: pending
-            ? (finalized
-                ? 'Tur sonunda calisti'
-                : `Tur bitince calisir${interimCount ? ` · su an ${interimCount} gecici aday var` : ''}`)
-            : 'Bu turda veri yok',
-          reasons,
-        });
-      }
-      return stageRow({
-        n, name: meta.name, plain: meta.plain,
-        input: st.input, output: st.output, maxIn, reasons,
-      });
-    });
-
-    $('funnelStages').innerHTML = `
-      <p class="small muted" style="margin:-4px 0 12px">
-        ${queueTotal ? `Bu turda <b>${queueTotal}</b> sirketlik kuyruk taraniyor. ` : ''}
-        Her asama bir oncekinden gelenleri suzer; asagidaki her cubuk
-        <b>o asamadan GECEN</b> sirket sayisidir.</p>
-      <div class="pipeline">${rows.join('')}</div>`;
-
-    $('funnelStages').querySelectorAll('.stage-toggle').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const box = document.getElementById(`why-${btn.dataset.stage}`);
-        if (!box) return;
-        const open = box.hidden;
-        box.hidden = !open;
-        btn.setAttribute('aria-expanded', String(open));
-        btn.textContent = open ? 'gizle' : 'neden elendiler?';
-      });
-    });
+      const name = F.tr((info[n] || {}).name || `Aşama ${n}`);
+      return `<div class="st" title="${F.esc(F.tr((info[n] || {}).plain || ''))}">
+        <div class="k">${n}. ${F.esc(name)}</div>
+        ${st ? `<div class="v">${F.esc(F.int(st.output))}</div><div class="s">geçti · ${F.esc(F.int(st.input))} girdi</div>`
+             : '<div class="s">tur sonunda çalışır</div>'}</div>`;
+    }).join('');
+    return `<h2>Aşamalar</h2><div class="strip">${tiles}</div>
+      ${partial ? '<p class="small muted" style="margin-top:6px">Aşama 3–4 şu anki havuza göre; tur bitince değişebilir.</p>' : ''}`;
   }
 
-  function stageRow({ n, name, plain, input, output, maxIn, pending, note, reasons }) {
-    const dropped = (input != null && output != null) ? input - output : null;
-    const width = (output != null && maxIn) ? Math.max((output / maxIn) * 100, 2) : 0;
-    const dropPct = (dropped != null && input) ? (dropped / input) * 100 : null;
-
-    return `<div class="stage ${pending ? 'stage-pending' : ''}">
-      <div class="stage-head">
-        <span class="stage-no">${n}</span>
-        <div style="min-width:0">
-          <div class="stage-name">${Fmt.esc(name || '')}</div>
-          <div class="tiny dim" style="white-space:normal;line-height:1.4">${Fmt.esc(plain || '')}</div>
-        </div>
-        <div class="stage-count">
-          ${output != null
-            ? `<span class="num">${output}</span><span class="tiny dim">gecti</span>`
-            : `<span class="tiny dim" style="text-align:right">${Fmt.esc(note || '')}</span>`}
-        </div>
-      </div>
-      ${output != null ? `
-        <div class="stage-bar"><i style="width:${width}%"></i></div>
-        <div class="stage-foot">
-          <span class="tiny dim">${input} girdi · <b class="c-red">${dropped} elendi</b>
-            ${dropPct != null ? `(%${Fmt.num(dropPct, 0)})` : ''}</span>
-          ${reasons.length ? `<button class="ghost tiny stage-toggle" data-stage="${n}"
-            aria-expanded="false">neden elendiler?</button>` : ''}
-        </div>
-        ${reasons.length ? `<div class="stage-why" id="why-${n}" hidden>
-          ${reasons.map((g) => `<div class="why-row">
-            <span class="why-bar"><i style="width:${Math.max((g.count / reasons[0].count) * 100, 3)}%"></i></span>
-            <span class="why-label">${Fmt.esc(g.label)}</span>
-            <span class="num tiny">${g.count}</span>
-            <span class="tiny dim why-plain">${Fmt.esc(g.plain)}</span>
-          </div>`).join('')}
-        </div>` : ''}
-      ` : ''}
-    </div>`;
+  /* Elenen ile verisi eksik olan ayrı: biri şirket hakkında yargı, diğeri bizim eksiğimiz. */
+  function kinds(scan) {
+    const k = (scan && scan.kill_kinds) || {};
+    if (!k.ELENDI && !k.VERI_YOK) return '';
+    const retry = (scan.retry_queue || []).length;
+    return `<p class="small muted" style="margin-top:8px">Bu turda ${F.esc(F.int(k.ELENDI || 0))} şirket bir kurala takılarak elendi;
+      ${F.esc(F.int(k.VERI_YOK || 0))} şirketin verisi eksik olduğu için karar verilemedi${retry ? ` (${retry} tanesi yeniden denenecek)` : ''}.</p>`;
   }
 
-  /* Ham eleme metinleri esik degerlerini iceriyor ("Brut marj %20.3 <= %30"),
-     bu yuzden yuzlerce farkli metin olusuyor. Gruplama kurallari config.py'de
-     tanimli ve thresholds.json ile geliyor — kural bilgisi burada yok. */
-  function groupKills(kills) {
+  /* ---------------------------------------------------- eleme sebepleri */
+  function group(kills) {
     const acc = {};
     Object.entries(kills || {}).forEach(([reason, count]) => {
       const g = killGroups.find((x) => x.re.test(reason));
-      const key = g ? g.label : 'Siniflandirilmamis';
-      if (!acc[key]) {
-        acc[key] = { label: key, stage: g ? g.stage : 9,
-                     plain: g ? g.plain : '', count: 0, raw: [] };
-      }
+      const key = g ? g.label : 'Sınıflandırılmamış';
+      if (!acc[key]) acc[key] = { label: key, stage: g ? g.stage : 9, plain: g ? g.plain : '', count: 0 };
       acc[key].count += count;
-      acc[key].raw.push([reason, count]);
     });
-    return Object.values(acc);
+    return Object.values(acc).sort((a, b) => b.count - a.count);
   }
 
-  /* ELENDI ile VERI_YOK ayrimi.
-
-     Bu ikisi eskiden ayni sepetteydi ve tehlikeliydi: "FCF negatif ve yuksek
-     buyume istisnasi saglanmadi (buyume bilinmiyor; brut marj bilinmiyor)"
-     diyen 175 sirket, kotu olduklari icin degil BAKAMADIGIMIZ icin listeden
-     dusuyordu. Sessizce kaybolan aday, elenmis adaydan farklidir; ayri
-     gosterilmeli ki tekrar denendigi gorunsun. */
-  function renderKindSplit(src) {
-    const el = $('funnelKindSplit');
-    if (!el) return;
-    const kinds = (src && src.kill_kinds) || {};
-    const elendi = kinds.ELENDI || 0;
-    const veriYok = kinds.VERI_YOK || 0;
-    if (!elendi && !veriYok) { el.innerHTML = ''; return; }
-
-    const kuyruk = (src && (src.retry_queue_size ?? src.retry_queue)) || 0;
-    const kuyrukN = typeof kuyruk === 'number' ? kuyruk : (kuyruk.length || 0);
-    const toplam = elendi + veriYok;
-    const pay = (n) => toplam ? Math.round((n / toplam) * 100) : 0;
-
-    el.innerHTML = `
-      <div class="card">
-        <h3>Listeden dusenler neden dustu?</h3>
-        <div class="split-row">
-          <div class="split-cell">
-            <div class="split-num">${elendi.toLocaleString('tr-TR')}</div>
-            <div class="split-label"><b>Elendi</b> — bir kurali ihlal etti</div>
-            <div class="split-bar"><span style="width:${pay(elendi)}%"></span></div>
-            <div class="muted">Piyasa degeri cok kucuk, marj dusuk, borc yuksek gibi
-              BILINEN ve kotu bir deger yuzunden.</div>
-          </div>
-          <div class="split-cell warn">
-            <div class="split-num">${veriYok.toLocaleString('tr-TR')}</div>
-            <div class="split-label"><b>Veri yok</b> — karar verilemedi</div>
-            <div class="split-bar warn"><span style="width:${pay(veriYok)}%"></span></div>
-            <div class="muted">Sirket kotu oldugu icin degil, gerekli sayiyi
-              hesaplayamadigimiz icin dustu. <b>Eleme sayilmaz.</b>
-              ${kuyrukN ? `${kuyrukN} tanesi onumuzdeki turda onbellek atlanarak
-                yeniden denenecek.` : ''}</div>
-          </div>
-        </div>
-      </div>`;
-  }
-
-  function renderKills(kills) {
-    const grouped = groupKills(kills).sort((a, b) => b.count - a.count);
-    if (!grouped.length) {
-      $('killReasons').innerHTML = '<div class="card muted small">Henuz eleme kaydi yok.</div>';
-      return;
-    }
-    const total = grouped.reduce((n, g) => n + g.count, 0);
+  function reasons(kills) {
+    const groups = group(kills);
+    if (!groups.length) return '';
     const info = App.thresholds.stage_info || {};
-    $('killReasons').innerHTML = `<table>
-      <thead><tr>
-        <th style="min-width:180px">Sebep</th><th>Asama</th><th>Sirket</th><th>Pay</th>
-        <th style="min-width:280px;text-align:left">Ne demek</th>
-      </tr></thead>
-      <tbody>${grouped.map((g) => `<tr>
-        <td><b>${Fmt.esc(g.label)}</b></td>
-        <td class="tiny dim">${g.stage === 9 ? '—' : `${g.stage}. ${Fmt.esc((info[g.stage] || {}).name || '')}`}</td>
-        <td class="num">${g.count}</td>
-        <td class="num">${Fmt.pct(g.count / total * 100, 0)}</td>
-        <td style="text-align:left;white-space:normal;line-height:1.45">${Fmt.esc(g.plain)}</td>
-      </tr>`).join('')}</tbody></table>
-      <div class="tiny dim" style="padding:8px 10px">Toplam ${total} eleme.
-        Ayni sirket birden fazla kurala takilsa bile ILK takildigi yerde durur.</div>`;
+    const by = {};
+    groups.forEach((g) => { (by[g.stage] = by[g.stage] || []).push(g); });
+    return `<h2>Eleme sebepleri</h2>${Object.keys(by).sort().map((s) => {
+      const list = by[s];
+      const sum = list.reduce((n, g) => n + g.count, 0);
+      const name = s === '9' ? 'Diğer' : `${s}. ${F.tr((info[s] || {}).name || '')}`;
+      return `<details class="fold"><summary>${F.esc(name)}<span class="count">${F.esc(F.int(sum))} şirket</span></summary>
+        <div class="fold-body"><ul class="why-list">${list.map((g) => `<li><b>${F.esc(F.tr(g.label))}</b>
+          <span class="num">${F.esc(F.int(g.count))}</span><span class="p">${F.esc(F.tr(g.plain))}</span></li>`).join('')}</ul></div></details>`;
+    }).join('')}`;
   }
 
-  /* --------------------------------------------- Asama 2'yi gecenler */
-  function renderSurvivors() {
-    const el = $('survivorList');
-    if (!el) return;
-    if (!survivors.length) {
-      el.innerHTML = `<div class="card muted small">Bu turda henuz Asama 2'yi
-        gecen sirket yok.</div>`;
-      return;
-    }
-
-    const sectors = [...new Set(survivors.map((s) => s.sector).filter(Boolean))].sort();
-    el.innerHTML = `
-      <div class="card" style="margin-bottom:12px">
-        <div class="row">
-          <label class="tiny dim">Sektor
-            <select id="svSector"><option value="">Hepsi (${survivors.length})</option>
-              ${sectors.map((s) => `<option value="${Fmt.esc(s)}">${Fmt.esc(s)}</option>`).join('')}
-            </select></label>
-          <label class="tiny dim">Kol
-            <select id="svTrack"><option value="">Hepsi</option>
-              <option value="A">Kol A (karli)</option>
-              <option value="B">Kol B (buyume)</option></select></label>
-          <label class="tiny dim">Sirala
-            <select id="svSort">
-              <option value="ticker">Sembol</option>
-              <option value="growth">Buyume</option>
-              <option value="fcf">FCF verimi</option>
-              <option value="mcap">Piyasa degeri</option>
-            </select></label>
-        </div>
-      </div>
-      <div id="svTable" class="table-wrap"></div>`;
-
-    ['svSector', 'svTrack', 'svSort'].forEach((id) =>
-      $(id).addEventListener('input', drawSurvivors));
-    drawSurvivors();
+  /* ---------------------------------------------- Aşama 2'yi geçenler */
+  function survivorsFold() {
+    if (!survivors.length) return '';
+    return `<details class="fold" id="survFold"><summary>Aşama 2'yi geçenler<span class="count">${survivors.length} şirket</span></summary>
+      <div class="fold-body">
+        <div class="toolbar"><label class="small muted">Sırala
+          <select id="svSort"><option value="ticker">Sembol</option><option value="growth">Büyüme</option>
+          <option value="fcf">FCF verimi</option><option value="mcap">Piyasa değeri</option></select></label></div>
+        <div id="svTable"></div>
+        <p class="small muted">Bu şirketlerin puanı yok — puanlama tur sonunda, sektör yüzdelikleriyle yapılır.</p></div></details>`;
   }
 
   function drawSurvivors() {
-    const sector = $('svSector').value;
-    const track = $('svTrack').value;
     const sort = $('svSort').value;
-    const mv = (r, k) => {
-      const v = (r.metrics || {})[k];
-      return Fmt.isNum(v) ? v : -Infinity;
-    };
-
-    let rows = survivors.filter((r) =>
-      (!sector || r.sector === sector) && (!track || r.track === track));
-    rows.sort(({
+    const mv = (r, k) => { const v = (r.metrics || {})[k]; return F.isNum(v) ? v : -Infinity; };
+    const rows = survivors.slice().sort({
       ticker: (a, b) => String(a.ticker).localeCompare(String(b.ticker)),
       growth: (a, b) => mv(b, 'rev_growth_ttm') - mv(a, 'rev_growth_ttm'),
       fcf: (a, b) => mv(b, 'fcf_yield_ev') - mv(a, 'fcf_yield_ev'),
       mcap: (a, b) => (b.market_cap_musd || 0) - (a.market_cap_musd || 0),
-    })[sort]);
-
-    const cols = [['rev_growth_ttm', 'Buyume'], ['gross_margin', 'Brut marj'],
-                  ['fcf_yield_ev', 'FCF verimi'], ['ev_ebit', 'EV/FVOK'],
-                  ['roic', 'ROIC'], ['rule_of_40', '40 Kurali'],
-                  ['piotroski_f', 'Piotroski']];
-
-    $('svTable').innerHTML = `<table>
-      <thead><tr><th>Sembol</th><th>Kol</th><th>Sektor</th><th>Piyasa degeri</th>
-        ${cols.map(([k, l]) => `<th title="${Fmt.esc((Fmt.spec(k) || {}).plain || '')}">${Fmt.esc(l)}</th>`).join('')}
-      </tr></thead>
-      <tbody>${rows.map((r) => `<tr data-ticker="${Fmt.esc(r.ticker)}" style="cursor:pointer">
-        <td><b>${Fmt.esc(r.ticker)}</b>
-          <div class="tiny dim">${Fmt.esc((r.name || '').slice(0, 24))}</div></td>
-        <td>${Fmt.trackBadge(r.track)}</td>
-        <td class="tiny">${Fmt.esc(r.sector || '')}</td>
-        <td class="num">${Fmt.money(r.market_cap_musd, { musd: true })}</td>
-        ${cols.map(([k]) => {
-          const v = (r.metrics || {})[k];
-          return `<td class="num ${Fmt.isNum(v) ? 'c-' + Fmt.colorFor(k, v) : 'c-gray'}">${
-            Fmt.isNum(v) ? Fmt.esc(Fmt.metricValue(k, v)) : '<span class="dim">·</span>'}</td>`;
-        }).join('')}
-      </tr>`).join('')}</tbody></table>
-      <div class="tiny dim" style="padding:8px 10px">
-        ${rows.length} sirket. <b>Bu sirketlerin PUANI YOKTUR</b> — puanlama
-        (Asama 4) sektor yuzdeligi ister, o da havuzun tamami bitmeden
-        hesaplanamaz. Buradaki sayilar ham metriklerdir.
-        Karti uretilmis olanlara tiklayip detayina gecebilirsin.</div>`;
-
+    }[sort]);
+    const cols = [['rev_growth_ttm', 'Büyüme'], ['gross_margin', 'Brüt marj'], ['fcf_yield_ev', 'FCF verimi'], ['roic', 'ROIC']];
+    $('svTable').innerHTML = `<div class="table-wrap"><table class="tbl stackable"><thead><tr><th>Şirket</th>
+      <th class="r">Piyasa değeri</th>${cols.map(([, l]) => `<th class="r">${l}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map((r) => `<tr class="click" data-ticker="${F.esc(r.ticker)}">
+        <td class="lead" data-label=""><b>${F.esc(r.ticker)}</b><span class="sub">${F.esc((r.name || '').slice(0, 32))} · ${F.esc(F.tr(r.sector || ''))}</span></td>
+        <td class="r" data-label="Piyasa değeri">${F.esc(F.money(r.market_cap_musd, { musd: true }))}</td>
+        ${cols.map(([k, l]) => `<td class="r" data-label="${l}">${F.esc(F.metricValue(k, (r.metrics || {})[k]))}</td>`).join('')}
+      </tr>`).join('')}</tbody></table></div>`;
     $('svTable').querySelectorAll('[data-ticker]').forEach((el) =>
-      el.addEventListener('click', () => {
-        location.hash = `#/company/${el.dataset.ticker}`;
-      }));
+      el.addEventListener('click', () => App.go(`sirket/${el.dataset.ticker}`)));
   }
 
-  /* Esik simulasyonu — SADECE GORSEL. Veriyi degistirmez; bir esigi
-     gevsetmenin/sikilastirmanin kabaca kac sirketi etkileyecegini gosterir. */
-  function renderSim(stages) {
-    const th = App.thresholds || {};
-    const s1 = th.stage1 || {};
-    const controls = [
-      ['gross_margin_min_pct', 'Brut marj alt siniri', 0, 70, 5, '%'],
-      ['rev_growth_ttm_min_pct', 'Hasilat buyumesi alt siniri', 0, 40, 1, '%'],
-      ['net_debt_to_ebitda_max', 'Net borc/FAVOK ust siniri', 0, 6, 0.5, 'x'],
-      ['share_count_growth_max_pct', 'Hisse artisi ust siniri', 0, 15, 1, '%'],
-      ['sbc_to_fcf_max', 'SBC/FCF ust siniri', 0, 3, 0.1, 'x'],
-    ];
+  function wireSurvivors() {
+    const fold = $('survFold');
+    if (!fold) return;
+    let drawn = false;
+    fold.addEventListener('toggle', () => { if (fold.open && !drawn) { drawn = true; drawSurvivors(); } });
+    $('svSort').addEventListener('input', drawSurvivors);
+  }
 
-    const stage1 = stages.find((s) => s.stage === 1);
-    const baseIn = stage1 ? stage1.input : 0;
-    const baseOut = stage1 ? stage1.output : 0;
+  /* ------------------------------------------------------ tur geçmişi */
+  function historyFold(scan, runs) {
+    const done = (runs || []).filter((r) => !r.partial && r.cycle).slice(-6).reverse();
+    return `<details class="fold"><summary>Turlar nasıl işler<span class="count">${done.length} tamamlanan</span></summary>
+      <div class="fold-body small">
+        <p>Bir tur, ABD'deki ~${F.esc(F.int(total(scan)))} şirketin tamamının bir kez taranmasıdır. Tur bitince Aşama 3–4
+          çalışır, aday listesi kurulur ve hemen yeni tur başlar: şirketler her çeyrek yeni bilanço açıklar, fiyatlar
+          değişir. "Tur ${F.esc(scan ? scan.cycle : '')}" sistemin ${F.esc(scan ? scan.cycle : '')}. tam taraması demektir.</p>
+        ${done.length ? `<ul class="agenda compact">${done.map((r) => {
+          const s4 = (r.stages || []).find((x) => x.stage === 4);
+          const s0 = (r.stages || []).find((x) => x.stage === 0);
+          return `<li><span class="when">Tur ${F.esc(r.cycle)}</span>
+            <span class="what">${s0 ? F.esc(F.int(s0.input)) : ''} şirket → ${s4 ? F.esc(F.int(s4.output)) : ''} aday</span>
+            <span class="date">${F.esc(F.date(r.date))}</span></li>`; }).join('')}</ul>` : ''}
+      </div></details>`;
+  }
 
-    $('thresholdSim').innerHTML = `
-      <p class="small">Asama 1 su an <b>${baseIn}</b> sirketten
-        <b>${baseOut}</b> tanesini geciriyor.</p>
-      ${controls.map(([key, label, min, max, step, unit]) => {
-        const cur = s1[key];
-        return `<div style="margin-bottom:14px">
-          <div class="spread"><span class="small">${Fmt.esc(label)}</span>
-            <span class="num small" id="sim-${key}">${unit === '%' ? '%' : ''}${cur}${unit === 'x' ? 'x' : ''}</span></div>
-          <input type="range" data-sim="${key}" data-base="${cur}" data-unit="${unit}"
-                 min="${min}" max="${max}" step="${step}" value="${cur}" style="width:100%">
-        </div>`;
-      }).join('')}
-      <div class="card" id="simResult" style="background:var(--bg-3)"></div>`;
+  /* ---------------------------------------------------- eşik simülasyonu */
+  const SIM = [
+    ['gross_margin_min_pct', 'Brüt marj alt sınırı', 0, 70, 5, '%'],
+    ['rev_growth_ttm_min_pct', 'Hasılat büyümesi alt sınırı', 0, 40, 1, '%'],
+    ['net_debt_to_ebitda_max', 'Net borç/FAVÖK üst sınırı', 0, 6, 0.5, 'x'],
+    ['share_count_growth_max_pct', 'Hisse artışı üst sınırı', 0, 15, 1, '%'],
+    ['sbc_to_fcf_max', 'SBC/FCF üst sınırı', 0, 3, 0.1, 'x'],
+  ];
+  const simText = (v, unit) => (unit === '%' ? F.share(v, Number.isInteger(v) ? 0 : 1) : `${F.num(v, 1)}x`);
 
+  function simFold(stages) {
+    const s1 = (App.thresholds || {}).stage1 || {};
+    const st = stages.find((s) => s.stage === 1);
+    return `<details class="fold"><summary>Eşik simülasyonu</summary><div class="fold-body">
+      <p class="small muted">Yalnızca tahmin; veriyi değiştirmez. Aşama 1 şu an ${st ? `${F.esc(F.int(st.input))} şirketten ${F.esc(F.int(st.output))}` : ''} tanesini geçiriyor.</p>
+      ${SIM.map(([key, label, min, max, step, unit]) => `<div style="margin-bottom:12px">
+        <div class="spread small"><span>${F.esc(label)}</span><span class="num" id="sim-${key}">${F.esc(simText(s1[key], unit))}</span></div>
+        <input type="range" data-sim="${key}" data-base="${s1[key]}" data-unit="${unit}" min="${min}" max="${max}" step="${step}" value="${s1[key]}" style="width:100%"></div>`).join('')}
+      <div id="simResult" class="small"></div></div></details>`;
+  }
+
+  function wireSim() {
+    const inputs = [...document.querySelectorAll('#funnelBody [data-sim]')];
     const update = () => {
-      const changed = [...$('thresholdSim').querySelectorAll('[data-sim]')]
-        .map((el) => {
-          const base = parseFloat(el.dataset.base);
-          const now = parseFloat(el.value);
-          const unit = el.dataset.unit;
-          $(`sim-${el.dataset.sim}`).textContent =
-            `${unit === '%' ? '%' : ''}${now}${unit === 'x' ? 'x' : ''}`;
-          if (now === base) return null;
-          const looser = el.dataset.sim.includes('min') ? now < base : now > base;
-          return { key: el.dataset.sim, base, now, looser };
-        }).filter(Boolean);
-
-      if (!changed.length) {
-        $('simResult').innerHTML =
-          '<p class="small muted" style="margin:0">Esikleri oynatinca tahmini etki burada gorunur.</p>';
-        return;
-      }
-      const looserCount = changed.filter((c) => c.looser).length;
-      const direction = looserCount > changed.length / 2 ? 'gevsetildi' : 'sikilastirildi';
-      $('simResult').innerHTML = `
-        <p class="small" style="margin:0 0 6px"><b>${changed.length} esik ${direction}.</b></p>
-        <ul class="small" style="margin:0;padding-left:18px">
-          ${changed.map((c) => `<li>${Fmt.esc(c.key)}: ${c.base} → ${c.now}
-            <span class="${c.looser ? 'c-yellow' : 'c-green'}">
-              (${c.looser ? 'daha fazla sirket gecer' : 'daha az sirket gecer'})</span></li>`).join('')}
-        </ul>
-        <p class="tiny dim" style="margin:8px 0 0">Bu bir TAHMINDIR — gercek etki
-          icin <code>src/config.py</code> icindeki <code>STAGE1</code> degerlerini
-          degistirip taramayi yeniden calistir.</p>`;
+      const changed = inputs.map((el) => {
+        const base = parseFloat(el.dataset.base), now = parseFloat(el.value);
+        $(`sim-${el.dataset.sim}`).textContent = simText(now, el.dataset.unit);
+        if (now === base) return null;
+        const looser = el.dataset.sim.includes('min') ? now < base : now > base;
+        return { label: SIM.find((s) => s[0] === el.dataset.sim)[1], base, now, looser, unit: el.dataset.unit };
+      }).filter(Boolean);
+      $('simResult').innerHTML = changed.length ? `<ul class="agenda compact">${changed.map((c) => `<li>
+        <span class="when">${c.looser ? 'gevşek' : 'sıkı'}</span><span class="what">${F.esc(c.label)}: ${F.esc(simText(c.base, c.unit))} → ${F.esc(simText(c.now, c.unit))}</span>
+        <span class="date">${c.looser ? 'daha çok şirket geçer' : 'daha az şirket geçer'}</span></li>`).join('')}</ul>` : '';
     };
-
-    $('thresholdSim').querySelectorAll('[data-sim]')
-      .forEach((el) => el.addEventListener('input', update));
-    update();
+    inputs.forEach((el) => el.addEventListener('input', update));
+    if (inputs.length) update();
   }
 
   return { render };

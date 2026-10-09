@@ -1,9 +1,9 @@
-/* Veri katmani — data/*.json okuma, yol tespiti, onbellek.
+/* Veri katmanı — data/*.json okuma, yol tespiti, önbellek.
  *
- * Dashboard bir JSON OKUYUCUDUR, veritabani degildir. localStorage'da
- * KALICI VERI TUTULMAZ; yalnizca gorunum tercihi (tema, aktif sekme)
- * saklanir. Tum durum repodaki dosyalarda yasar; boylece Claude da ayni
- * veriyi raw.githubusercontent.com uzerinden okuyabilir.
+ * Pano bir JSON OKUYUCUSUDUR, veritabanı değildir. localStorage'da
+ * KALICI VERİ TUTULMAZ; yalnızca görünüm tercihi (tema, aktif sekme)
+ * saklanır. Tüm durum repodaki dosyalarda yaşar; böylece Claude da aynı
+ * veriyi raw.githubusercontent.com üzerinden okuyabilir.
  */
 window.DataLayer = (function () {
   'use strict';
@@ -11,9 +11,9 @@ window.DataLayer = (function () {
   const REPO = 'berkehan-nz/P-Fin';
   const BRANCH = 'main';
 
-  // Sirayla denenir. GitHub Pages'in kokten mi /docs'tan mi servis edildigi
-  // depoya gore degisir; ayrica repoyu klonlayip yerel sunucuyla acmak da
-  // calismali. Son care olarak raw.githubusercontent her durumda calisir.
+  // Sırayla denenir. GitHub Pages'in kökten mi /docs'tan mı servis edildiği
+  // depoya göre değişir; repoyu klonlayıp yerel sunucuyla açmak da
+  // çalışmalı. Son çare olarak raw.githubusercontent her durumda çalışır.
   const BASES = [
     '../data',
     './data',
@@ -32,8 +32,8 @@ window.DataLayer = (function () {
       } catch (_) { /* sonrakini dene */ }
     }
     throw new Error(
-      'data/ klasoru bulunamadi. Yerelde calistiriyorsan repo kokunde ' +
-      '`python3 -m http.server` ile ac ve docs/ adresine git.'
+      'data/ klasörü bulunamadı. Yerelde çalıştırıyorsan repo kökünde ' +
+      '`python3 -m http.server` ile aç ve docs/ adresine git.'
     );
   }
 
@@ -48,7 +48,7 @@ window.DataLayer = (function () {
       return json;
     } catch (err) {
       if (fallback !== undefined) { cache.set(name, fallback); return fallback; }
-      throw new Error(`${name} okunamadi: ${err.message}`);
+      throw new Error(`${name} okunamadı: ${err.message}`);
     }
   }
 
@@ -60,7 +60,7 @@ window.DataLayer = (function () {
     return `https://github.com/${REPO}/edit/${BRANCH}/${path}`;
   }
 
-  // Gorunum tercihi — VERI DEGIL. Kaybolursa hicbir sey kaybolmaz.
+  // Görünüm tercihi — VERİ DEĞİL. Kaybolursa hiçbir şey kaybolmaz.
   const prefs = {
     get(key, dflt) {
       try { const v = localStorage.getItem(`nx.${key}`); return v === null ? dflt : JSON.parse(v); }
@@ -87,6 +87,7 @@ window.DataLayer = (function () {
     overview:      () => get('overview.json', { movers: [], news: [] }),
     portfolio:     () => get('portfolio_state.json', { positions: [], summary: {}, warnings: [] }),
     portfolioHistory: () => get('portfolio_history.json', { rows: [] }),
+    portfolioRaw:  () => get('portfolio.json', { positions: [], closed: [], planned_tranches: [] }),
     watchlist:     () => get('watchlist.json', { entries: [] }),
     card:          (t) => get(`cards/${String(t).toUpperCase()}.json`, null),
     cardRawUrl:    (t) => rawUrl(`data/cards/${String(t).toUpperCase()}.json`),

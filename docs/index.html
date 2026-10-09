@@ -2,206 +2,44 @@
 <html lang="tr" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Berkehan Finansal Takip Sistemi</title>
-<meta name="description" content="Berkehan Finansal Takip Sistemi — yatirim tarama, analiz ve portfoy takibi">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>P-Fin</title>
+<meta name="description" content="P-Fin — portföy, aday tarama ve piyasa takibi">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
 <link rel="stylesheet" href="css/style.css">
-<!-- Parola ekrani: <head>'de, icerik cizilmeden once kilitler. -->
-<script src="js/auth.js"></script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<!-- Parola ekranı: <head>'de, içerik çizilmeden önce kilitler. -->
+<script src="js/auth.js"></script>
 </head>
 <body>
 
 <header class="topbar">
   <div class="topbar-inner">
-    <div class="brand">Berkehan <small>finansal takip sistemi</small></div>
-    <nav class="tabs" id="tabs" aria-label="Ana bolumler">
-      <a href="#/overview"><span class="lbl-long">Genel bakis</span><span class="lbl-short">Genel</span></a>
-      <a href="#/candidates"><span class="lbl-long">Adaylar</span><span class="lbl-short">Adaylar</span></a>
-      <a href="#/portfolio"><span class="lbl-long">Portfoy</span><span class="lbl-short">Portfoy</span></a>
-      <a href="#/funnel"><span class="lbl-long">Huni</span><span class="lbl-short">Huni</span></a>
-      <a href="#/weekly"><span class="lbl-long">Cuma raporu</span><span class="lbl-short">Cuma</span></a>
+    <div class="brand">P-Fin</div>
+    <nav class="tabs" id="tabs" aria-label="Ana bölümler">
+      <a href="#/bugun" data-screen="today">Bugün</a>
+      <a href="#/portfoy" data-screen="portfolio">Portföy</a>
+      <a href="#/adaylar" data-screen="candidates">Adaylar</a>
+      <a href="#/piyasa" data-screen="market">Piyasa</a>
+      <a href="#/huni" data-screen="funnel">Huni</a>
     </nav>
-    <div class="row" style="gap:6px">
-      <span class="tiny dim" id="asOf"></span>
-      <button id="lockBtn" class="ghost" title="Kilitle" aria-label="Kilitle" hidden>🔒</button>
-      <button id="themeToggle" class="ghost" title="Tema degistir" aria-label="Tema degistir">◐</button>
+    <div class="topbar-tools">
+      <button id="lockBtn" class="ghost icon-btn" title="Kilitle" aria-label="Kilitle" hidden>🔒</button>
+      <button id="themeToggle" class="ghost icon-btn" title="Tema değiştir" aria-label="Tema değiştir">◐</button>
     </div>
   </div>
 </header>
 
 <main>
   <div id="loadError"></div>
-
-  <!-- 1. GENEL BAKIS — once portfoy ("bugun nasil gitti"), sonra piyasa -->
-  <section class="screen" id="screen-overview">
-    <h1>Genel bakis</h1>
-    <p class="muted small" id="overviewSubtitle"></p>
-    <div id="freshnessBanner"></div>
-
-    <div id="ovHero"></div>
-    <div id="ovChart" style="margin-top:var(--gap)"></div>
-    <div id="ovWarnings"></div>
-
-    <h2>Pozisyonlar</h2>
-    <div id="ovPositions"></div>
-
-    <div class="ov-2col">
-      <div><h2>Dilimler: hedef ve gercek</h2><div id="ovSlices"></div></div>
-      <div><h2>Kur</h2><div id="ovFx"></div></div>
-    </div>
-    <div class="ov-2col">
-      <div><h2>Siradaki isler</h2><div id="ovActions"></div></div>
-      <div><h2>Makro takvim</h2><div id="ovMacroCal"></div></div>
-    </div>
-
-    <h2>Kuresel piyasa</h2>
-    <div id="marketStrip"></div>
-
-    <div class="grid" id="pulseGrid"
-         style="grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));margin-top:22px">
-      <div>
-        <h2 style="margin-top:0">Bilanco ve veri takvimi</h2>
-        <div id="calendarBox"></div>
-      </div>
-      <div>
-        <h2 style="margin-top:0">Haberler</h2>
-        <div id="newsBox"></div>
-      </div>
-    </div>
-
-    <h2>Takip listesinde fiyat hareketleri</h2>
-    <div id="todayStrip"></div>
-
-    <h2>Makro seriler</h2>
-    <div class="grid g-summary" id="macroStrip"></div>
-
-    <h2>Tarama ve adaylar</h2>
-    <div id="ovSystem"></div>
-  </section>
-
-  <!-- 2. ADAYLAR -->
-  <section class="screen" id="screen-candidates">
-    <div class="spread">
-      <div>
-        <h1>Adaylar</h1>
-        <p class="muted small" id="candidateCount"></p>
-      </div>
-      <div class="row" style="gap:6px">
-        <button id="viewGrid" aria-pressed="true">Izgara</button>
-        <button id="viewTable" aria-pressed="false">Yogun tablo</button>
-        <button id="addCompany" class="primary">+ Sirket ekle</button>
-      </div>
-    </div>
-
-    <div class="card filters" style="margin:12px 0">
-      <details id="filterBox">
-        <summary>Filtreler &amp; siralama<span class="tiny dim" id="filterHint"></span></summary>
-        <div class="filter-grid">
-          <label class="tiny dim">Sektor
-            <select id="fSector"><option value="">Hepsi</option></select></label>
-          <label class="tiny dim">Kol
-            <select id="fTrack">
-              <option value="">Hepsi</option>
-              <option value="A">Kol A (karli)</option>
-              <option value="B">Kol B (buyume)</option>
-              <option value="both">Her ikisi</option>
-            </select></label>
-          <label class="tiny dim">Kaynak
-            <select id="fSource">
-              <option value="">Hepsi</option>
-              <option value="seed">Tohum listesi</option>
-              <option value="funnel">Huni</option>
-              <option value="manual">Elle eklenen</option>
-            </select></label>
-          <label class="tiny dim">Karar
-            <select id="fDecision">
-              <option value="">Hepsi</option>
-              <option value="AL">AL</option>
-              <option value="BEKLE">BEKLE</option>
-              <option value="ELE">ELE</option>
-              <option value="__none__">Karar verilmemis</option>
-            </select></label>
-          <label class="tiny dim">Min puan
-            <input type="number" id="fMinScore" min="0" max="100" step="5"
-                   inputmode="numeric" placeholder="0"></label>
-          <label class="tiny dim">Sirala
-            <select id="fSort">
-              <option value="total">Puan</option>
-              <option value="value">Ucuzluk</option>
-              <option value="growth">Buyume</option>
-              <option value="momentum">Momentum</option>
-              <option value="updated">Guncellenme</option>
-              <option value="ticker">Sembol</option>
-            </select></label>
-          <label class="tiny dim inline">
-            <input type="checkbox" id="fWatchOnly"> Sadece izleme listesi</label>
-          <label class="tiny dim inline">
-            <input type="checkbox" id="fPortfolioOnly"> Sadece portfoy</label>
-          <label class="tiny dim inline">
-            <button id="fReset" class="ghost">Sifirla</button></label>
-        </div>
-      </details>
-    </div>
-
-    <div id="candidateGrid" class="grid g-cards"></div>
-    <div id="candidateTable" class="table-wrap" hidden></div>
-  </section>
-
-  <!-- 3. SIRKET DETAYI -->
-  <section class="screen" id="screen-company">
-    <div id="companyBody"></div>
-  </section>
-
-  <!-- 4. PORTFOY -->
-  <section class="screen" id="screen-portfolio">
-    <div class="spread">
-      <div><h1>Portfoy</h1><p class="muted small" id="portfolioSubtitle"></p></div>
-      <button id="addTrade" class="primary">+ Islem ekle</button>
-    </div>
-    <div class="grid g-summary" id="portfolioSummary" style="margin:12px 0"></div>
-    <div id="portfolioWarnings"></div>
-    <div id="portfolioSlices"></div>
-    <h2>Pozisyonlar</h2>
-    <div id="positionsTable" class="table-wrap"></div>
-    <h2>Sektor dagilimi</h2>
-    <div id="sectorMix" class="card"></div>
-  </section>
-
-  <!-- 6. CUMA RAPORU -->
-  <section class="screen" id="screen-weekly">
-    <h1>Cuma raporu</h1>
-    <p class="muted small" id="weeklySubtitle"></p>
-    <p class="muted small" style="margin:-4px 0 12px">Sistem her gun veri
-      uretir ama her gun bakilmasi gerekmez. Bolumler EYLEM SIRASINA gore:
-      en uste karar gerektiren, en alta yalnizca bilgi olan.</p>
-    <div id="weeklyBody"></div>
-  </section>
-
-  <!-- 5. HUNI -->
-  <section class="screen" id="screen-funnel">
-    <h1>Huni</h1>
-    <p class="muted small" id="funnelSubtitle"></p>
-    <h2>Tarama ilerlemesi</h2>
-    <div id="scanProgress"></div>
-    <h2>Huni akisi</h2>
-    <div id="funnelStages"></div>
-    <div id="funnelKindSplit"></div>
-    <h2>Eleme sebepleri</h2>
-    <p class="muted small" style="margin:-4px 0 8px">Ham metinler esik degerini
-      icerdigi icin yuzlerce farkli sebep olusuyor; burada kural turune gore
-      gruplanir.</p>
-    <div id="killReasons" class="table-wrap"></div>
-    <h2>Asama 2'yi gecenler</h2>
-    <p class="muted small" style="margin:-4px 0 8px">Tuzak elemesinden sagi
-      cikanlar. Puanlari tur bitince olusur.</p>
-    <div id="survivorList"></div>
-    <h2>Esik simulasyonu</h2>
-    <p class="muted small">Yalnizca gorsel — kaydiricilar veriyi degistirmez,
-      esikleri degistirmenin kac sirketi etkileyecegini tahmin eder.
-      Kalici degisiklik icin <code>src/config.py</code> duzenlenmeli.</p>
-    <div class="card" id="thresholdSim"></div>
-  </section>
+  <section class="screen" id="screen-today"><div id="todayBody"></div></section>
+  <section class="screen" id="screen-portfolio"><div id="portfolioBody"></div></section>
+  <section class="screen" id="screen-candidates"><div id="candidatesBody"></div></section>
+  <section class="screen" id="screen-market"><div id="marketBody"></div></section>
+  <section class="screen" id="screen-funnel"><div id="funnelBody"></div></section>
+  <section class="screen" id="screen-company"><div id="companyBody"></div></section>
 </main>
 
 <div id="modalRoot"></div>
@@ -210,12 +48,13 @@
 <script src="js/data.js"></script>
 <script src="js/format.js"></script>
 <script src="js/charts.js"></script>
-<script src="js/views/overview.js"></script>
+<script src="js/views/today.js"></script>
+<script src="js/views/portfolio.js"></script>
+<script src="js/views/weekly.js"></script>
 <script src="js/views/candidates.js"></script>
 <script src="js/views/company.js"></script>
-<script src="js/views/portfolio.js"></script>
+<script src="js/views/market.js"></script>
 <script src="js/views/funnel.js"></script>
-<script src="js/views/weekly.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

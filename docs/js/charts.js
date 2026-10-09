@@ -1,191 +1,143 @@
-/* SVG grafikler — kutuphane yok.
- * Hepsi tema degiskenlerini (currentColor / CSS var) kullanir ki koyu ve
- * acik temada ayni sekilde okunsun. */
+/* SVG grafikler — kütüphane yok.
+ *
+ * Renkler CSS değişkenlerinden gelir; koyu ve açık temada aynı okunur.
+ * Renk sözlüğü: veri çizgileri ve çubuklar --neutral; yalnızca portföy
+ * çizgisi --accent. Yazılar veri rengini giymez. */
 window.Charts = (function () {
   'use strict';
   const isNum = (v) => typeof v === 'number' && isFinite(v);
+  const esc = (s) => Fmt.esc(s);
+  const f1 = (x) => (Math.round(x * 10) / 10).toString();
 
-  function sparkline(values, { w = 110, h = 28, color = 'var(--accent)' } = {}) {
+  /* Küçük eğilim çizgisi. Renk yön bildirmez — yönü sayı söyler. */
+  function sparkline(values, { w = 100, h = 26, accent = false, label = 'fiyat eğilimi' } = {}) {
     const pts = (values || []).filter(isNum);
-    if (pts.length < 2) return `<span class="dim tiny">grafik yok</span>`;
+    if (pts.length < 2) return '';
     const min = Math.min(...pts), max = Math.max(...pts);
     const span = (max - min) || 1;
     const step = w / (pts.length - 1);
     const d = pts.map((v, i) =>
-      `${i === 0 ? 'M' : 'L'}${(i * step).toFixed(1)},${(h - ((v - min) / span) * h).toFixed(1)}`
-    ).join(' ');
-    const up = pts[pts.length - 1] >= pts[0];
-    const stroke = color === 'auto' ? (up ? 'var(--green)' : 'var(--red)') : color;
-    return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}"
-      preserveAspectRatio="none" role="img" aria-label="fiyat grafigi">
-      <path d="${d}" fill="none" stroke="${stroke}" stroke-width="1.4"
-            stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+      `${i === 0 ? 'M' : 'L'}${f1(i * step)},${f1(h - ((v - min) / span) * (h - 2) - 1)}`).join(' ');
+    return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" preserveAspectRatio="none"
+      role="img" aria-label="${esc(label)}"><path d="${d}" fill="none"
+      stroke="var(${accent ? '--accent' : '--neutral'})" stroke-width="1.5"
+      stroke-linejoin="round" stroke-linecap="round"/></svg>`;
   }
 
-  /* Ceyreklik cubuk grafik — hasilat, FCF gibi seriler icin.
-     Negatif degerler sifir cizgisinin altina cizilir. */
-  function bars(values, labels, { w = 460, h = 110, fmt = (v) => v,
-                                  title = '' } = {}) {
+  /* Dönemlik çubuklar (hasılat, FCF). Negatifler sıfır çizgisinin altında. */
+  function bars(values, labels, { w = 460, h = 120, fmt = (v) => v, title = '' } = {}) {
     const vals = values || [];
     const present = vals.filter(isNum);
-    if (!present.length) return `<div class="dim tiny">${Fmt.esc(title)}: veri yok</div>`;
-
-    const max = Math.max(...present, 0);
-    const min = Math.min(...present, 0);
+    if (!present.length) return '';
+    const max = Math.max(...present, 0), min = Math.min(...present, 0);
     const span = (max - min) || 1;
-    const pad = 18;
-    const chartH = h - pad;
+    const chartH = h - 20;
     const zeroY = chartH * (max / span);
     const bw = w / vals.length;
-
     const rects = vals.map((v, i) => {
       if (!isNum(v)) return '';
       const y = chartH * ((max - v) / span);
       const top = Math.min(y, zeroY);
       const height = Math.max(Math.abs(zeroY - y), 1);
-      const fill = v < 0 ? 'var(--red)' : 'var(--accent)';
       const lab = labels && labels[i] ? labels[i] : '';
-      return `<rect x="${(i * bw + bw * 0.16).toFixed(1)}" y="${top.toFixed(1)}"
-        width="${(bw * 0.68).toFixed(1)}" height="${height.toFixed(1)}"
-        fill="${fill}" rx="1.5"><title>${Fmt.esc(lab)}: ${Fmt.esc(fmt(v))}</title></rect>`;
+      return `<rect x="${f1(i * bw + bw * 0.18)}" y="${f1(top)}" width="${f1(Math.min(bw * 0.64, 24))}"
+        height="${f1(height)}" fill="var(--neutral)" rx="2"><title>${esc(lab)}: ${esc(fmt(v))}</title></rect>`;
     }).join('');
-
     const first = labels && labels[0] ? labels[0] : '';
     const last = labels && labels[labels.length - 1] ? labels[labels.length - 1] : '';
-
-    return `<div>
-      <div class="spread tiny dim"><span>${Fmt.esc(title)}</span>
-        <span class="num">${Fmt.esc(fmt(present[present.length - 1]))}</span></div>
-      <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" role="img"
-           aria-label="${Fmt.esc(title)}">
+    return `<div><div class="spread small"><span class="muted">${esc(title)}</span>
+        <b class="num">${esc(fmt(present[present.length - 1]))}</b></div>
+      <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" role="img" aria-label="${esc(title)}">
         ${rects}
-        <line x1="0" y1="${zeroY.toFixed(1)}" x2="${w}" y2="${zeroY.toFixed(1)}"
-              stroke="var(--line)" stroke-width="1"/>
-        <text x="0" y="${h - 4}" font-size="9" fill="var(--text-3)">${Fmt.esc(first)}</text>
-        <text x="${w}" y="${h - 4}" font-size="9" fill="var(--text-3)"
-              text-anchor="end">${Fmt.esc(last)}</text>
+        <line x1="0" y1="${f1(zeroY)}" x2="${w}" y2="${f1(zeroY)}" stroke="var(--line)" stroke-width="1"/>
+        <text x="0" y="${h - 3}" font-size="12" fill="var(--text-3)">${esc(first)}</text>
+        <text x="${w}" y="${h - 3}" font-size="12" fill="var(--text-3)" text-anchor="end">${esc(last)}</text>
       </svg></div>`;
   }
 
-  /* Cizgi grafik — brut marj, hisse sayisi gibi seviye serileri */
-  function line(values, labels, { w = 460, h = 110, fmt = (v) => v,
-                                  title = '', color = 'var(--accent)' } = {}) {
+  /* Seviye serisi (brüt marj, hisse sayısı). */
+  function line(values, labels, { w = 460, h = 120, fmt = (v) => v, title = '' } = {}) {
     const vals = values || [];
     const present = vals.filter(isNum);
-    if (present.length < 2) return `<div class="dim tiny">${Fmt.esc(title)}: veri yok</div>`;
-
+    if (present.length < 2) return '';
     const max = Math.max(...present), min = Math.min(...present);
     const span = (max - min) || 1;
-    const pad = 18;
-    const chartH = h - pad;
+    const chartH = h - 24;
     const step = w / Math.max(vals.length - 1, 1);
-
-    let d = '', started = false;
-    const dots = [];
+    let d = '', pen = false, lastPt = null;
     vals.forEach((v, i) => {
-      if (!isNum(v)) return;
-      const x = i * step, y = chartH * (1 - (v - min) / span);
-      d += `${started ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`;
-      started = true;
-      const lab = labels && labels[i] ? labels[i] : '';
-      dots.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2" fill="${color}">
-        <title>${Fmt.esc(lab)}: ${Fmt.esc(fmt(v))}</title></circle>`);
+      if (!isNum(v)) { pen = false; return; }
+      const x = i * step, y = 4 + (chartH - 4) * (1 - (v - min) / span);
+      d += `${pen ? 'L' : 'M'}${f1(x)},${f1(y)}`;
+      pen = true; lastPt = [x, y];
     });
-
     const first = labels && labels[0] ? labels[0] : '';
     const last = labels && labels[labels.length - 1] ? labels[labels.length - 1] : '';
-
-    return `<div>
-      <div class="spread tiny dim"><span>${Fmt.esc(title)}</span>
-        <span class="num">${Fmt.esc(fmt(present[present.length - 1]))}</span></div>
-      <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" role="img"
-           aria-label="${Fmt.esc(title)}">
-        <path d="${d}" fill="none" stroke="${color}" stroke-width="1.6"
-              stroke-linejoin="round"/>
-        ${dots.join('')}
-        <text x="0" y="${h - 4}" font-size="9" fill="var(--text-3)">${Fmt.esc(first)}</text>
-        <text x="${w}" y="${h - 4}" font-size="9" fill="var(--text-3)"
-              text-anchor="end">${Fmt.esc(last)}</text>
+    return `<div><div class="spread small"><span class="muted">${esc(title)}</span>
+        <b class="num">${esc(fmt(present[present.length - 1]))}</b></div>
+      <svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" role="img" aria-label="${esc(title)}">
+        <path d="${d}" fill="none" stroke="var(--neutral)" stroke-width="2" stroke-linejoin="round"/>
+        ${lastPt ? `<circle cx="${f1(lastPt[0])}" cy="${f1(lastPt[1])}" r="4" fill="var(--neutral)"
+          stroke="var(--surface)" stroke-width="2"/>` : ''}
+        <text x="0" y="${h - 3}" font-size="12" fill="var(--text-3)">${esc(first)}</text>
+        <text x="${w}" y="${h - 3}" font-size="12" fill="var(--text-3)" text-anchor="end">${esc(last)}</text>
       </svg></div>`;
   }
 
-  /* Puan halkasi — 0-100 */
-  function scoreRing(score, { size = 52 } = {}) {
-    const r = (size - 7) / 2;
+  /* Puan halkası — 0-100, tek renk. İyi/kötü rengi taşımaz; sayı konuşur. */
+  function scoreRing(score, { size = 48 } = {}) {
+    const r = (size - 6) / 2;
     const c = 2 * Math.PI * r;
     const v = isNum(score) ? Math.max(0, Math.min(100, score)) : 0;
-    const color = !isNum(score) ? 'var(--gray)'
-                : v >= 70 ? 'var(--green)' : v >= 45 ? 'var(--yellow)' : 'var(--red)';
-    return `<div class="score-ring" style="width:${size}px;height:${size}px">
+    return `<div class="ring" style="width:${size}px;height:${size}px" role="img"
+      aria-label="Genel puan ${isNum(score) ? Math.round(score) : 'yok'}">
       <svg width="${size}" height="${size}">
-        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none"
-                stroke="var(--line)" stroke-width="4"/>
-        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none"
-                stroke="${color}" stroke-width="4" stroke-linecap="round"
-                stroke-dasharray="${(c * v / 100).toFixed(1)} ${c.toFixed(1)}"/>
+        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="4"/>
+        <circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="var(--neutral)" stroke-width="4"
+          stroke-linecap="round" stroke-dasharray="${f1(c * v / 100)} ${f1(c)}"/>
       </svg>
-      <span class="n" style="color:${color}">${isNum(score) ? Math.round(score) : '—'}</span>
-    </div>`;
+      <span class="n">${isNum(score) ? Math.round(score) : ''}</span></div>`;
   }
 
-  /* Alt puan mini cubugu */
-  function miniBar(score) {
-    const v = isNum(score) ? Math.max(0, Math.min(100, score)) : 0;
-    const color = !isNum(score) ? 'gray' : v >= 70 ? 'green' : v >= 45 ? 'yellow' : 'red';
-    return `<span class="bar ${color}" style="display:block"><i style="width:${v}%"></i></span>`;
-  }
-
-  /* Analist al/tut/sat dagilim cubugu */
+  /* Analist dağılımı: gri tonlar + yazıyla; renk değil sayı anlatır. */
   function ratingBar(buy, hold, sell) {
     const b = buy || 0, h = hold || 0, s = sell || 0;
     const total = b + h + s;
-    if (!total) return '<span class="dim tiny">analist verisi yok</span>';
-    const seg = (n, color) => n ? `<span style="flex:${n};background:${color};height:100%"></span>` : '';
-    return `<div style="display:flex;height:16px;border-radius:3px;overflow:hidden;
-                        border:1px solid var(--line)">
-      ${seg(b, 'var(--green)')}${seg(h, 'var(--yellow)')}${seg(s, 'var(--red)')}
-    </div>
-    <div class="tiny dim" style="margin-top:4px">
-      <span class="c-green">${b} al</span> · <span class="c-yellow">${h} tut</span>
-      · <span class="c-red">${s} sat</span></div>`;
+    if (!total) return '';
+    const seg = (n, tone) => n ? `<span style="flex:${n};background:var(${tone})"></span>` : '';
+    return `<div style="display:flex;gap:2px;height:10px;border-radius:3px;overflow:hidden">
+      ${seg(b, '--tone-4')}${seg(h, '--tone-3')}${seg(s, '--tone-1')}</div>
+      <div class="small muted" style="margin-top:6px">${b} al · ${h} tut · ${s} sat</div>`;
   }
 
-  /* Hedef fiyat araligi — dusuk / medyan / yuksek + mevcut fiyat */
+  /* Hedef fiyat aralığı — düşük / medyan / yüksek + mevcut fiyat. */
   function targetRange(low, median, high, price) {
-    if (!isNum(low) || !isNum(high) || high <= low) {
-      return '<span class="dim tiny">hedef fiyat verisi yok</span>';
-    }
+    if (!isNum(low) || !isNum(high) || high <= low) return '';
     const pos = (v) => Math.max(0, Math.min(100, ((v - low) / (high - low)) * 100));
-    const marks = [];
-    if (isNum(median)) marks.push(`<span style="position:absolute;left:${pos(median)}%;
-      top:-3px;width:2px;height:14px;background:var(--text-2)" title="Medyan"></span>`);
-    if (isNum(price)) marks.push(`<span style="position:absolute;left:${pos(price)}%;
-      top:-5px;width:2px;height:18px;background:var(--accent)" title="Mevcut fiyat"></span>`);
-    return `<div style="position:relative;height:8px;background:var(--bg-3);
-                        border-radius:4px;margin:10px 0 6px">
-      <div style="position:absolute;inset:0;background:linear-gradient(90deg,
-        var(--red-bg),var(--yellow-bg),var(--green-bg));border-radius:4px"></div>
-      ${marks.join('')}</div>
-    <div class="spread tiny dim"><span class="num">${Fmt.money(low, { digits: 2 })}</span>
-      <span class="num">medyan ${Fmt.money(median, { digits: 2 })}</span>
-      <span class="num">${Fmt.money(high, { digits: 2 })}</span></div>`;
+    return `<div style="position:relative;height:6px;background:var(--surface-2);border-radius:3px;margin:14px 0 8px">
+      ${isNum(median) ? `<span title="Medyan" style="position:absolute;left:${f1(pos(median))}%;top:-4px;
+        width:2px;height:14px;background:var(--neutral)"></span>` : ''}
+      ${isNum(price) ? `<span title="Bugünkü fiyat" style="position:absolute;left:${f1(pos(price))}%;top:-6px;
+        width:2px;height:18px;background:var(--accent)"></span>` : ''}</div>
+      <div class="spread small muted"><span class="num">${Fmt.money(low)}</span>
+        <span class="num">medyan ${Fmt.money(median)}</span><span class="num">${Fmt.money(high)}</span></div>`;
   }
 
-  /* KIYAS CIZGISI — portfoy degeri (vurgulu) + tek bir kiyas (gri).
-
-     Tek eksen (USD). Iki seri ayni sermayeyle ayni gun basladigi icin ilk
-     gunlerde ust uste biner; bu yuzden kiyaslar AYNI ANDA degil, birer
-     birer cizilir (secici grafigin ustunde). Kimlik renge birakilmaz:
-     lejant her zaman var, uc noktada kisa ad + deger yazar.
-
-     Ipucu (tooltip) yalnizca kolaylik: her deger alttaki tabloda da var.
-     Etiketler textContent ile yazilir — seri adlari veriden gelir. */
+  /* KIYAS ÇİZGİSİ — portföy (vurgulu) + tek bir kıyas (gri).
+   *
+   * Tek eksen (USD). Eksen en az ±%2'lik bant gösterir: 10 günlük %0,1'lik
+   * kıpırtı bütün yüksekliği kaplayıp dağ gibi görünüyordu. Veri banttan
+   * taşarsa eksen genişler.
+   *
+   * Lejant her zaman var; uç noktada kısa ad. İpucu klavyeyle de açılır
+   * (ok tuşları). Etiketler textContent ile yazılır. */
   function compare(host, cfg) {
     const { dates, focus, context } = cfg;
     const fmt = cfg.fmt || ((v) => String(v));
     const fmtTick = cfg.fmtTick || fmt;
     const fmtDate = cfg.fmtDate || ((d) => d);
-    const H = cfg.height || 190;
+    const H = cfg.height || 160;
+    const band = cfg.bandPct == null ? 2 : cfg.bandPct;
     const series = [focus, context].filter(Boolean);
     const n = dates.length;
 
@@ -201,14 +153,13 @@ window.Charts = (function () {
       return -1;
     };
 
-    // Lejant: cizgi anahtari + ad + son deger (deger vurgulu, ad ikincil).
     const legend = make('div', 'cmp-legend');
     series.forEach((s) => {
       const k = make('span', 'cmp-key');
       k.append(make('i', s.role === 'focus' ? 'k-focus' : 'k-context'));
-      k.append(make('span', 'muted', s.label));
+      k.append(make('span', null, s.label));
       const li = lastOf(s.values);
-      k.append(make('b', null, li >= 0 ? fmt(s.values[li]) : '—'));
+      if (li >= 0) k.append(make('b', null, fmt(s.values[li])));
       legend.append(k);
     });
     const plot = make('div', 'cmp-plot');
@@ -218,73 +169,65 @@ window.Charts = (function () {
 
     let lastW = 0;
     function draw() {
-      const W = Math.max(Math.round(plot.clientWidth), 260);
+      const W = Math.max(Math.round(plot.clientWidth), 240);
       if (W === lastW) return;
       lastW = W;
-      const padL = 46, padR = 10, padT = 14, padB = 22;
+      const padL = 60, padR = 44, padT = 10, padB = 22;
       const all = series.flatMap((s) => s.values.filter(isNum));
-      let lo = Math.min(...all), hi = Math.max(...all);
-      // Duz seride (ilk gunler) eksen 0,5 dolarlik kipirtiyi ucurum gibi
-      // gostermesin: aralik en az degerin %1'i.
-      const minSpan = Math.max(Math.abs(hi) * 0.01, 1);
-      if (hi - lo < minSpan) { const m = (hi + lo) / 2; lo = m - minSpan / 2; hi = m + minSpan / 2; }
-      const pad = (hi - lo) * 0.15;
-      lo -= pad; hi += pad;
+      const ref = focus.values[lastOf(focus.values)] || all[all.length - 1] || 1;
+      let lo = Math.min(...all, ref * (1 - band / 100));
+      let hi = Math.max(...all, ref * (1 + band / 100));
       const step = niceStep((hi - lo) / 3);
+      lo = Math.floor(lo / step) * step;
+      hi = Math.ceil(hi / step) * step;
       const ticks = [];
-      for (let t = Math.ceil(lo / step) * step; t <= hi; t += step) ticks.push(t);
+      for (let t = lo; t <= hi + step / 2; t += step) ticks.push(t);
 
       const x = (i) => padL + (n === 1 ? 0 : i * (W - padL - padR) / (n - 1));
       const y = (v) => padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB);
 
-      const grid = ticks.map((t) => `<line x1="${padL}" x2="${W - padR}" y1="${y(t).toFixed(1)}"
-          y2="${y(t).toFixed(1)}" class="cmp-grid"/>
-        <text x="${padL - 6}" y="${(y(t) + 3.5).toFixed(1)}" text-anchor="end"
+      const grid = ticks.map((t) => `<line x1="${padL}" x2="${W - padR}" y1="${f1(y(t))}" y2="${f1(y(t))}"
+          class="cmp-grid"/><text x="${padL - 8}" y="${f1(y(t) + 4)}" text-anchor="end"
           class="cmp-tick">${esc(fmtTick(t))}</text>`).join('');
 
       const path = (vals) => {
         let d = '', pen = false;
         vals.forEach((v, i) => {
           if (!isNum(v)) { pen = false; return; }
-          d += `${pen ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`;
+          d += `${pen ? 'L' : 'M'}${f1(x(i))},${f1(y(v))}`;
           pen = true;
         });
         return d;
       };
-
-      // Arkadaki seri once cizilir; vurgulu seri ustte kalir.
       const lines = [...series].reverse().map((s) => `<path d="${path(s.values)}"
           class="${s.role === 'focus' ? 'cmp-focus' : 'cmp-context'}"/>`).join('');
 
-      // Uc noktalar + kisa ad. Ustteki serinin etiketi yukari, alttakinin
-      // asagi — yakinsayan serilerde bile carpismazlar.
       const ends = series.map((s) => ({ s, i: lastOf(s.values) })).filter((e) => e.i >= 0);
       const topKey = ends.length === 2
         ? (ends[0].s.values[ends[0].i] >= ends[1].s.values[ends[1].i] ? 0 : 1) : 0;
+      const gap = ends.length === 2
+        ? Math.abs(y(ends[0].s.values[ends[0].i]) - y(ends[1].s.values[ends[1].i])) : 99;
       const endMarks = ends.map((e, k) => {
         const cx = x(e.i), cy = y(e.s.values[e.i]);
-        const above = k === topKey;
-        const ly = Math.max(padT + 2, Math.min(H - padB - 4, above ? cy - 9 : cy + 17));
-        return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="4"
+        // Uçlar birbirine çok yakınsa etiketleri dikeyde ayır.
+        const ly = gap < 14 ? cy + (k === topKey ? -7 : 11) : cy + 4;
+        return `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="4"
             class="${e.s.role === 'focus' ? 'cmp-dot-focus' : 'cmp-dot-context'}"/>
-          <text x="${(cx - 7).toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="end"
-            class="cmp-end">${esc(e.s.short || e.s.label)}</text>`;
+          <text x="${f1(cx + 8)}" y="${f1(ly)}" class="cmp-end">${esc(e.s.short || e.s.label)}</text>`;
       }).join('');
 
-      const xl = `<text x="${padL}" y="${H - 5}" class="cmp-tick">${esc(fmtDate(dates[0]))}</text>
-        <text x="${W - padR}" y="${H - 5}" text-anchor="end" class="cmp-tick">${
-          esc(fmtDate(dates[n - 1]))}</text>`;
+      const xl = `<text x="${padL}" y="${H - 4}" class="cmp-tick">${esc(fmtDate(dates[0]))}</text>
+        <text x="${W - padR}" y="${H - 4}" text-anchor="end" class="cmp-tick">${esc(fmtDate(dates[n - 1]))}</text>`;
 
       plot.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" tabindex="0"
-          role="img" aria-label="${esc(cfg.aria || 'Portfoy degeri grafigi')}">
+          role="img" aria-label="${esc(cfg.aria || 'Portföy değeri grafiği')}">
         ${grid}${lines}${endMarks}${xl}
         <g class="cmp-hover" visibility="hidden">
           <line class="cmp-cross" y1="${padT}" y2="${H - padB}"/>
           ${series.map((s) => `<circle r="4" class="${s.role === 'focus'
             ? 'cmp-dot-focus' : 'cmp-dot-context'}"/>`).join('')}
         </g>
-        <rect x="${padL}" y="0" width="${W - padL - padR}" height="${H}" fill="transparent"
-          class="cmp-hit"/>
+        <rect x="${padL}" y="0" width="${W - padL - padR}" height="${H}" fill="transparent" class="cmp-hit"/>
       </svg>`;
       plot.append(tip);
 
@@ -304,13 +247,12 @@ window.Charts = (function () {
           if (isNum(v)) { dots[k].setAttribute('cx', cx); dots[k].setAttribute('cy', y(v)); }
         });
         hover.setAttribute('visibility', 'visible');
-
         tip.textContent = '';
         tip.append(make('div', 'cmp-tip-date', fmtDate(dates[cur])));
         series.forEach((s) => {
           const row = make('div', 'cmp-tip-row');
           row.append(make('i', s.role === 'focus' ? 'k-focus' : 'k-context'));
-          row.append(make('b', null, isNum(s.values[cur]) ? fmt(s.values[cur]) : '—'));
+          row.append(make('b', null, isNum(s.values[cur]) ? fmt(s.values[cur]) : ''));
           row.append(make('span', 'dim', s.label));
           tip.append(row);
         });
@@ -326,10 +268,8 @@ window.Charts = (function () {
       function hide() { hover.setAttribute('visibility', 'hidden'); tip.hidden = true; cur = -1; }
       function at(ev) {
         const r = svg.getBoundingClientRect();
-        const px = ev.clientX - r.left;
-        return n === 1 ? 0 : Math.round((px - padL) / ((W - padL - padR) / (n - 1)));
+        return n === 1 ? 0 : Math.round((ev.clientX - r.left - padL) / ((W - padL - padR) / (n - 1)));
       }
-
       const hit = svg.querySelector('.cmp-hit');
       hit.addEventListener('pointermove', (ev) => show(at(ev)));
       hit.addEventListener('pointerdown', (ev) => show(at(ev)));
@@ -354,7 +294,5 @@ window.Charts = (function () {
     return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p;
   }
 
-  function esc(s) { return Fmt.esc(s); }
-
-  return { sparkline, bars, line, scoreRing, miniBar, ratingBar, targetRange, compare };
+  return { sparkline, bars, line, scoreRing, ratingBar, targetRange, compare };
 })();

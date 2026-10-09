@@ -1,257 +1,339 @@
-/* Bicimlendirme ve renk sistemi.
+/* Biçimlendirme — panodaki her sayının TEK kaynağı.
  *
- * Renk esikleri KODA GOMULU DEGILDIR — data/thresholds.json'dan gelir,
- * o da src/config.py'den uretilir. Tek dogru kaynak config.py'dir.
+ * Hiçbir görünüm dosyası kendi sayı biçimini yazmaz. Aynı getiri bir
+ * ekranda "+%1,4", diğerinde "+%1,31" görünüyordu; sebep her ekranın
+ * kendi yuvarlamasını yapmasıydı.
  *
- * Renk korlugu icin her hucre renge EK OLARAK yon oku (▲▼) ve ince bir
- * doluluk cubugu tasir; bilgi yalnizca renkle tasinmaz.
+ *   money(2421.68)     → "$2.421,68"     (≥ 100.000 → "$123,4K")
+ *   moneyTry(119489)   → "₺119.489"
+ *   pct(1.31)          → "+%1,31"         (değişim: işaretli, 2 ondalık)
+ *   share(22.4)        → "%22,4"          (pay/ağırlık: işaretsiz)
+ *   delta(31.33, 1.31) → "+$31,33 · +%1,31"
+ *   date("2026-10-09") → "9 Eki"          (başka yıl → "9 Eki 2025")
+ *   days(21)           → "21 gün" / "yarın" / "bugün" / "3 gün önce"
+ *   changeClass(-0.09) → ""               (|%| < 0,5 → renk yok)
+ *
+ * Eksi işareti gerçek eksi (U+2212): kısa çizgi rakamlara yapışık
+ * okunuyor ve sütunlarda hizayı bozuyordu.
+ *
+ * Metrik renk eşikleri koda gömülü değildir — data/thresholds.json'dan gelir.
  */
 window.Fmt = (function () {
   'use strict';
 
-  let TH = {};   // thresholds.json -> thresholds
+  const MINUS = '−';
+  // Günlük hareketin bu eşiğin altında kalanı "gürültü" sayılır ve renk almaz.
+  // 2 dolarlık bir gün kırmızı alarm gibi parlıyordu.
+  const NOISE_PCT = 0.5;
+
+  let TH = {};
   function setThresholds(t) { TH = t || {}; }
   function spec(metric) { return TH[metric] || null; }
 
   const isNum = (v) => v !== null && v !== undefined && typeof v === 'number' && isFinite(v);
 
   function num(v, digits = 2) {
-    if (!isNum(v)) return '—';
-    return v.toLocaleString('tr-TR', { minimumFractionDigits: digits,
-                                       maximumFractionDigits: digits });
+    if (!isNum(v)) return '';
+    const s = Math.abs(v).toLocaleString('tr-TR', { minimumFractionDigits: digits,
+                                                    maximumFractionDigits: digits });
+    return v < 0 && Number(s.replace(/\./g, '').replace(',', '.')) !== 0 ? MINUS + s : s;
   }
 
-  /* Turkcede yuzde isareti sayinin ONUNDE durur; eksi de yuzdenin onunde.
-     "%-8,2" degil "-%8,2". Isaret hicbir kosulda dusurulmez. */
+  function int(v) { return isNum(v) ? num(Math.round(v), 0) : ''; }
+
+  function sign(v) {
+    if (!isNum(v)) return '';
+    const r = Math.round(v * 100) / 100;
+    return r > 0 ? '+' : r < 0 ? MINUS : '';
+  }
+
+  /* Para. Varsayılan 2 ondalık. musd: milyon $ cinsinden gelen kart değerleri. */
+  function money(v, { musd = false, digits = 2 } = {}) {
+    if (!isNum(v)) return '';
+    const neg = v < 0 ? MINUS : '';
+    const a = Math.abs(v);
+    if (musd) {
+      if (a >= 1000) return `${neg}$${num(a / 1000, 1)} mr`;
+      return `${neg}$${num(a, 0)} mn`;
+    }
+    if (a >= 100000) return `${neg}$${num(a / 1000, 1)}K`;
+    const s = num(a, digits);
+    return Number(s.replace(/\./g, '').replace(',', '.')) === 0 ? `$${s}` : `${neg}$${s}`;
+  }
+
+  function moneyTry(v) {
+    if (!isNum(v)) return '';
+    return `${v < 0 ? MINUS : ''}₺${num(Math.abs(v), 0)}`;
+  }
+
+  function signedMoney(v, digits = 2) {
+    if (!isNum(v)) return '';
+    const r = Math.abs(v) < 0.5 * Math.pow(10, -digits) ? 0 : v;
+    return `${digits === 0 ? (Math.round(r) > 0 ? '+' : Math.round(r) < 0 ? MINUS : '') : sign(r)}${money(Math.abs(r), { digits })}`;
+  }
+
+  /* Değişim yüzdesi: işaret önde, yüzde işareti sayıdan önce. */
+  function pct(v, digits = 2) {
+    if (!isNum(v)) return '';
+    return `${sign(v)}%${num(Math.abs(v), digits)}`;
+  }
+
+  /* Pay / ağırlık: işaretsiz. */
+  function share(v, digits = 1) {
+    if (!isNum(v)) return '';
+    return `${v < 0 ? MINUS : ''}%${num(Math.abs(v), digits)}`;
+  }
+
+  function delta(usd, p) {
+    const parts = [signedMoney(usd), pct(p)].filter(Boolean);
+    return parts.join(' · ');
+  }
+
+  function changeClass(p) {
+    if (!isNum(p) || Math.abs(p) < NOISE_PCT) return '';
+    return p > 0 ? 'up' : 'down';
+  }
+
+  /* K/Z rengi tutar için: yüzde biliniyorsa onun eşiği kullanılır. */
+  function pnlClass(p) { return changeClass(p); }
+
+  function parseDay(d) {
+    if (!d) return null;
+    const s = String(d);
+    const x = new Date(s.length <= 10 ? `${s}T12:00:00` : s);
+    return isNaN(x) ? null : x;
+  }
+
+  function date(d) {
+    const x = parseDay(d);
+    if (!x) return '';
+    const same = x.getFullYear() === new Date().getFullYear();
+    return x.toLocaleDateString('tr-TR', same
+      ? { day: 'numeric', month: 'short' }
+      : { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function dateTime(iso) {
+    const x = parseDay(iso);
+    if (!x) return '';
+    return `${date(iso)} ${x.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`;
+  }
+
+  function daysUntil(d) {
+    const x = parseDay(d);
+    if (!x) return null;
+    const t = new Date(); t.setHours(12, 0, 0, 0);
+    x.setHours(12, 0, 0, 0);
+    return Math.round((x - t) / 86400000);
+  }
+
+  function days(n) {
+    if (!isNum(n)) return '';
+    if (n === 0) return 'bugün';
+    if (n === 1) return 'yarın';
+    if (n === -1) return 'dün';
+    if (n < 0) return `${Math.abs(n)} gün önce`;
+    return `${n} gün`;
+  }
+
+  function hoursSince(iso) {
+    const x = parseDay(iso);
+    return x ? (Date.now() - x.getTime()) / 36e5 : null;
+  }
+
+  function sinceLabel(iso) {
+    const h = hoursSince(iso);
+    if (h === null) return '';
+    if (h < 1) return `${Math.max(1, Math.round(h * 60))} dakika önce`;
+    if (h < 24) return `${Math.round(h)} saat önce`;
+    return `${Math.round(h / 24)} gün önce`;
+  }
+
+  /* VERİDEN GELEN METİN. Python tarafı (sistem ayarları ve mesajlar) henüz
+     Türkçe karakter kullanmıyor ("çekirdek" yerine c ile, "toplantısı"
+     yerine ı'sız). Kalıcı çözüm orada; bu sözlük yalnızca panoda sık görünen
+     kelimeleri düzeltir. Sözlük doğru yazımdan TÜRETİLİR (aksanlar atılarak),
+     bilinmeyen kelimeye dokunulmaz — yanlış düzeltmektense olduğu gibi bırakır. */
+  const DEACCENT = { ç: 'c', ğ: 'g', ı: 'i', İ: 'I', ö: 'o', ş: 's', ü: 'u', â: 'a',
+                     Ç: 'C', Ğ: 'G', Ö: 'O', Ş: 'S', Ü: 'U' };
+  const plainOf = (w) => w.replace(/[çğıİöşüâÇĞÖŞÜ]/g, (c) => DEACCENT[c]);
+  const TR_WORDS = (
+    'Altın Bilanço Borç Brüt Büyük Büyüme Cari Değerleme Düşük Elendi FAVÖK FVÖK Faaliyet'
+    + ' '
+    + 'Faiz GEÇTİ Göreli Hasılat Kalite Katalizör Kayıt Kazanç Kuralı Kâr Kârlılık Küçük'
+    + ' '
+    + 'Nakit Net Perakende Piyasa Sanayi Sağlamlık Serbest Sert Seyrelme Tuzak TÜFE Ucuzluk'
+    + ' '
+    + 'Yüksek Yıllık akışı altı altında alım alımlar alımı aralıkta artışı açılan ağırlık'
+    + ' '
+    + 'ağırlığı başa başlangıç başlıyor bilanço bilgi borç brüt büyüme büyümesi değeri'
+    + ' '
+    + 'değerleme doğru doğrudan dönüşüm dönüşümü düşük eksik eleme endeksi getirisi geçirme'
+    + ' '
+    + 'geçti giriş göreli görünür gözden gün günde günü hasılat hazırlık hesabına hisse için'
+    + ' '
+    + 'işgücü işletme kararı karşılama kazanç kesinleşmemiş kuralı kâr kârlı kârlılığı küçük'
+    + ' '
+    + 'kırıcı kırıcılar marj marjı mevduat olarak oran pahalı parça parçası planlı sapma'
+    + ' '
+    + 'satışlar satışları sağlamlık sermaye seçim seçimi tahvil tarihi toplantısı ucuz ve'
+    + ' '
+    + 'verimi yenileme yüksek yıllık Çekirdek Önemli Özkaynak çapası çeyrekte önce üretim'
+    + ' '
+    + 'üretimi üstü üstünde İstihdam İşletme İşsizlik Şirket Şirketin şirket şirketin'
+    + ' '
+    + 'şirketler'
+  ).split(/\s+/).filter(Boolean);
+  const WORDS = {};
+  TR_WORDS.forEach((w) => { WORDS[plainOf(w)] = w; });
+  WORDS.URFE = 'ÜFE';
+  const PHRASES = {};
+  [
+    'Basım ve yayın',
+    'Diğer iş hizmetleri',
+    'Eğitim',
+    'Gıda ve tütün',
+    'Kauçuk, plastik, cam',
+    'Kimya ve ilaç',
+    'Makine ve bilgisayar donanımı',
+    'Motor (tek hisse)',
+    'Mühendislik ve araştırma',
+    'Nakit (USD)',
+    'SGOV (nakit çapası)',
+    'Sağlık hizmetleri',
+    'Ulaştırma',
+    'Ulaşım ekipmanı',
+    'Veri işleme ve sistem entegrasyonu',
+    'Yazılım ve programlama',
+    'Çeşitli imalat',
+    'Ölçüm ve tıbbi cihaz',
+    'İletişim',
+    'İş hizmetleri'
+  ].forEach((t) => { PHRASES[plainOf(t)] = t; });
+  function tr(s) {
+    if (s === null || s === undefined) return '';
+    const str = String(s);
+    if (PHRASES[str]) return PHRASES[str];
+    return str.replace(/[A-Za-z]+/g, (w) => (Object.prototype.hasOwnProperty.call(WORDS, w) ? WORDS[w] : w));
+  }
+
+  /* Dilim ve faz adları: anahtardan, veriden bağımsız. */
+  const SLICE = {
+    motor: 'Motor (tek hisse)', cekirdek_etf: 'Çekirdek ETF', sgov: 'SGOV',
+    tl: 'TL mevduat', nakit: 'Nakit',
+  };
+  function sliceLabel(key, fallback) { return SLICE[key] || tr(fallback || key); }
+
+  const PHASE = { faz0: 'Faz 0 · hazırlık', faz1: 'Faz 1 · ilk hisseler', faz2: 'Faz 2 · tam motor' };
+  function phaseLabel(ph) { return (ph && PHASE[ph.key]) || tr((ph && ph.label) || ''); }
+
+  /* ---------------------------------------------------------- metrikler */
   function pctText(v, digits = 1) {
-    return `${v < 0 ? '-' : ''}%${num(Math.abs(v), digits)}`;
+    return `${v < 0 ? MINUS : ''}%${num(Math.abs(v), digits)}`;
   }
 
   function metricValue(metric, v) {
-    if (!isNum(v)) return '—';
+    if (!isNum(v)) return '';
     const s = spec(metric);
     const unit = s ? s.unit : '';
     if (unit === '%') return pctText(v, 1);
-    if (unit === 'x') return `${num(v, Math.abs(v) >= 100 ? 0 : 2)}x`;
+    if (unit === 'x') return `${num(v, Math.abs(v) >= 100 ? 0 : 1)}x`;
     if (unit === '/9') return `${Math.round(v)}/9`;
     return num(v, Math.abs(v) >= 100 ? 0 : 2);
   }
 
-  /* Eksi isareti para biriminin ONUNDE: "-$959M". "$-959M" para birimini
-     negatif gosteriyormus gibi okunuyor. */
-  function money(v, { musd = false, digits = 0 } = {}) {
-    if (!isNum(v)) return '—';
-    const sign = v < 0 ? '-' : '';
-    const a = Math.abs(v);
-    if (musd) {
-      if (a >= 1000) return `${sign}$${num(a / 1000, 2)}B`;
-      return `${sign}$${num(a, 0)}M`;
-    }
-    return `${sign}$${a.toLocaleString('tr-TR', { minimumFractionDigits: digits,
-                                                  maximumFractionDigits: digits })}`;
-  }
-
-  function pct(v, digits = 1) { return isNum(v) ? pctText(v, digits) : '—'; }
-
-  /* Isaret HER ZAMAN yazilir (+ ve -), yuzde isareti onde. */
-  function signedPct(v, digits = 1) {
-    if (!isNum(v)) return '—';
-    return `${v >= 0 ? '+' : '-'}%${num(Math.abs(v), digits)}`;
-  }
-
-  function pnlClass(v) {
-    if (!isNum(v) || v === 0) return 'c-gray';
-    return v > 0 ? 'c-green' : 'c-red';
-  }
-
-  /* Bir metrik degeri icin renk — config.py'deki color_for ile AYNI mantik. */
   function colorFor(metric, v) {
-    if (!isNum(v)) return 'gray';
+    if (!isNum(v)) return 'na';
     const s = spec(metric);
-    if (!s) return 'gray';
+    if (!s) return 'na';
     if (s.direction === 'low_good') {
-      if (v <= s.green_max) return 'green';
-      if (v <= s.yellow_max) return 'yellow';
-      return 'red';
+      if (v <= s.green_max) return 'good';
+      if (v <= s.yellow_max) return 'warn';
+      return 'bad';
     }
-    if (v >= s.green_min) return 'green';
-    if (v >= s.yellow_min) return 'yellow';
-    return 'red';
+    if (v >= s.green_min) return 'good';
+    if (v >= s.yellow_min) return 'warn';
+    return 'bad';
   }
 
-  /* Yon oku: metrigin "iyi" tarafina gore. Renk korlugu destegi. */
-  function arrow(metric, color) {
-    if (color === 'gray') return '';
-    const s = spec(metric);
-    if (!s) return '';
-    if (color === 'green') return s.direction === 'low_good' ? '▼' : '▲';
-    if (color === 'red') return s.direction === 'low_good' ? '▲' : '▼';
-    return '◆';
+  /* Kartlardaki renk adları (green/yellow/red/gray) → anlam adları. */
+  function status(color) {
+    return { green: 'good', yellow: 'warn', red: 'bad', gray: 'na' }[color] || color || 'na';
   }
 
-  /* Esik araligindaki konumu 0-1 arasi doluluk olarak verir. */
-  function fillRatio(metric, v) {
-    if (!isNum(v)) return 0;
-    const s = spec(metric);
-    if (!s) return 0;
-    // Esikler negatif olabiliyor (orn. Beneish M yellow_max = -1,78).
-    // Mutlak deger alinmazsa span 1'e kirpiliyor ve cubuk hep dolu cikiyordu.
-    if (s.direction === 'low_good') {
-      const span = Math.max(Math.abs(s.yellow_max) * 2, 1);
-      return Math.max(0, Math.min(1, 1 - (v - Math.min(s.yellow_max, 0)) / span));
-    }
-    const span = Math.max(Math.abs(s.green_min) * 1.6, 1);
-    return Math.max(0, Math.min(1, (v - Math.min(s.green_min, 0)) / span));
+  function statusText(st) {
+    return { good: 'iyi', warn: 'sınırda', bad: 'zayıf', na: '' }[st] || '';
   }
 
   function label(metric) {
     const s = spec(metric);
-    return s ? s.label : metric;
-  }
-
-  /* Renk + ok + cubuk tasiyan tam hucre. */
-  function cell(metric, cellData) {
-    const v = cellData && cellData.value;
-    const color = (cellData && cellData.color) || colorFor(metric, v);
-    const a = arrow(metric, color);
-    const fill = Math.round(fillRatio(metric, v) * 100);
-    return `<span class="chip ${color}" title="${esc(label(metric))}">
-      <span class="arrow">${a}</span>${esc(metricValue(metric, v))}</span>
-      <span class="bar ${color}" style="width:34px;display:inline-block;vertical-align:middle;margin-left:5px"><i style="width:${fill}%"></i></span>`;
-  }
-
-  /* SIRALAMA ICIN KIRPILDI rozeti.
-
-     Kartta ham deger gorunmeye devam eder — CVLT'nin ROIC'i gercekten
-     %1.263 hesaplaniyor ve bunu gizlemek veriyi saklamak olurdu. Ama
-     okuyan, o sayinin puana %60 olarak girdigini BILMELI; yoksa "bu sirket
-     neden ilk sirada degil" sorusunun cevabi hicbir yerde yazmiyor. */
-  function cappedBadge(metric, cappedMap) {
-    const c = cappedMap && cappedMap[metric];
-    if (!c) return '';
-    const kirpilan = metricValue(metric, c.used);
-    return `<span class="chip gray tiny capped"
-      title="Bu deger uc noktada. Siralamada ${esc(kirpilan)} olarak kullanildi; ustteki sayi gercek hesap sonucudur.">
-      siralamada ${esc(kirpilan)}</span>`;
-  }
-
-  function chip(metric, v, color) {
-    const c = color || colorFor(metric, v);
-    return `<span class="chip ${c}"><span class="arrow">${arrow(metric, c)}</span>${esc(metricValue(metric, v))}</span>`;
-  }
-
-  /* Yuzdelik cubugu — 0 en ucuz/en dusuk, 100 en pahali/en yuksek */
-  function percentileBar(p, basis) {
-    if (!isNum(p)) return '<span class="dim tiny">—</span>';
-    const title = basis === 'universe' ? 'Sektorde yeterli sirket yok — tum evrene gore'
-                : basis === 'sector' ? 'Sektor ici yuzdelik' : 'Yuzdelik';
-    return `<span class="pctbar" title="${esc(title)}${basis === 'universe' ? ' ⚠' : ''}">
-      <span class="track"><i style="left:${Math.max(0, Math.min(100, p))}%"></i></span>
-      <span class="tiny dim num">${Math.round(p)}${basis === 'universe' ? '*' : ''}</span></span>`;
-  }
-
-  /* Bir metrik degerini SADE TURKCE cumleye cevirir.
-     "1,00x" hicbir sey anlatmaz; "Her 1 dolar karin 1,00 dolari nakde
-     donuyor" anlatir. */
-  function sentence(metric, v) {
-    const s = spec(metric);
-    if (!s || !s.sentence || !isNum(v)) return '';
-    const unit = s.unit;
-    // Negatif sablonlar yonu KELIMEYLE tasidigi icin mutlak deger alir.
-    const shown = (unit === '%' || (v < 0 && s.sentence_neg))
-                ? num(Math.abs(v), unit === '%' ? 1 : 2)
-                : unit === '/9' ? String(Math.round(v))
-                : num(v, Math.abs(v) >= 100 ? 0 : 2);
-    // NEGATIF DEGER. Onceki surum mutlak degeri yazip yon bilgisini
-    // dusuruyordu: nakit YAKAN sirket "8,2 dolar serbest nakit kaliyor",
-    // kuculme varsayan fiyat "%2,9 buyume varsayiyor" diye okunuyordu.
-    // Once metrige ozel negatif sablon aranir; yoksa isaret sayida KALIR.
-    if (v < 0) {
-      if (s.sentence_neg) return s.sentence_neg.replace('{v}', shown);
-      const signed = unit === '%' ? num(v, 1) : shown;
-      return s.sentence.replace('{v}', signed);
-    }
-    return s.sentence.replace('{v}', shown);
+    return tr(s ? s.label : metric);
   }
 
   function plain(metric) {
     const s = spec(metric);
-    return s && s.plain ? s.plain : '';
+    return s && s.plain ? tr(s.plain) : '';
   }
 
-  function unitName(metric) {
+  function sentence(metric, v) {
     const s = spec(metric);
-    return s && s.unit_name ? s.unit_name : '';
+    if (!s || !s.sentence || !isNum(v)) return '';
+    const unit = s.unit;
+    const shown = (unit === '%' || (v < 0 && s.sentence_neg))
+                ? num(Math.abs(v), unit === '%' ? 1 : 2)
+                : unit === '/9' ? String(Math.round(v))
+                : num(v, Math.abs(v) >= 100 ? 0 : 2);
+    if (v < 0) {
+      if (s.sentence_neg) return tr(s.sentence_neg.replace('{v}', shown));
+      return tr(s.sentence.replace('{v}', unit === '%' ? num(v, 1) : shown));
+    }
+    return tr(s.sentence.replace('{v}', shown));
   }
 
-  /* Ucuz/pahali dili yalnizca DEGERLEME carpanlari icin anlamlidir.
-     "Beneish M en ucuz %9'luk dilimde" gibi bir cumle sacmadir; orada
-     "en iyi %9'luk dilimde" denmeli. */
   const VALUATION_METRICS = ['ev_ebit', 'ev_ebitda', 'ev_gross_profit', 'ev_sales',
                              'pe', 'peg', 'implied_growth', 'implied_vs_actual_growth'];
 
-  /* Sektor yuzdeligini cumleye cevirir.
-     0 = en dusuk deger, 100 = en yuksek deger. "Iyi" tarafi metrige gore
-     degistigi icin burada YON de dikkate alinir. */
   function percentileSentence(metric, p, basis) {
     if (!isNum(p)) return '';
     const s = spec(metric);
-    const where = basis === 'universe' ? 'tum sirketler icinde' : 'ayni sektorde';
-    if (!s) return `${where} yuzde ${Math.round(p)}'lik dilimde`;
-
-    const lowIsGood = s.direction === 'low_good';
-    const isValuation = VALUATION_METRICS.indexOf(metric) !== -1;
+    const where = basis === 'universe' ? 'tüm şirketler içinde' : 'sektöründe';
     const rank = Math.round(p);
-
-    if (lowIsGood && isValuation) {
-      // Degerleme carpaninda DUSUK yuzdelik = ucuz
-      if (rank <= 25) return `${where} en ucuz %${rank}'lik dilimde`;
+    const lowIsGood = s && s.direction === 'low_good';
+    if (lowIsGood && VALUATION_METRICS.indexOf(metric) !== -1) {
+      if (rank <= 25) return `${where} en ucuz %${rank}`;
       if (rank <= 50) return `${where} ortalamadan ucuz`;
-      if (rank <= 75) return `${where} ortalamadan pahali`;
-      return `${where} en pahali %${100 - rank}'lik dilimde`;
+      if (rank <= 75) return `${where} ortalamadan pahalı`;
+      return `${where} en pahalı %${100 - rank}`;
     }
     if (lowIsGood) {
-      // Degerleme disi metrikte dusuk deger IYIDIR (borc, tahakkuk, SBC...)
-      if (rank <= 25) return `${where} en iyi %${rank}'lik dilimde`;
+      if (rank <= 25) return `${where} en iyi %${rank}`;
       if (rank <= 50) return `${where} ortalamadan iyi`;
-      if (rank <= 75) return `${where} ortalamadan zayif`;
-      return `${where} en zayif %${100 - rank}'lik dilimde`;
+      if (rank <= 75) return `${where} ortalamadan zayıf`;
+      return `${where} en zayıf %${100 - rank}`;
     }
-    if (rank >= 75) return `${where} en iyi %${100 - rank}'lik dilimde`;
+    if (rank >= 75) return `${where} en iyi %${100 - rank}`;
     if (rank >= 50) return `${where} ortalamadan iyi`;
-    if (rank >= 25) return `${where} ortalamadan zayif`;
-    return `${where} en zayif %${rank}'lik dilimde`;
+    if (rank >= 25) return `${where} ortalamadan zayıf`;
+    return `${where} en zayıf %${rank}`;
   }
 
-  /* Sirketin KENDI gecmisine gore konumu — "kendi 5y %" bunu demek. */
   function ownHistorySentence(metric, p) {
     if (!isNum(p)) return '';
     const s = spec(metric);
     const lowIsGood = s && s.direction === 'low_good';
     const rank = Math.round(p);
     if (lowIsGood && VALUATION_METRICS.indexOf(metric) !== -1) {
-      if (rank <= 20) return `Son 5 yilinin en ucuz %${rank}'inde`;
-      if (rank <= 45) return 'Kendi gecmisine gore ucuz';
-      if (rank <= 55) return 'Kendi 5 yillik ortalamasi civarinda';
-      if (rank <= 80) return 'Kendi gecmisine gore pahali';
-      return `Son 5 yilinin en pahali %${100 - rank}'inde`;
+      if (rank <= 20) return `son 5 yılının en ucuz %${rank}'inde`;
+      if (rank <= 45) return 'kendi geçmişine göre ucuz';
+      if (rank <= 55) return '5 yıllık ortalaması civarında';
+      if (rank <= 80) return 'kendi geçmişine göre pahalı';
+      return `son 5 yılının en pahalı %${100 - rank}'inde`;
     }
-    if (rank >= 80) return `Son 5 yilinin en iyi %${100 - rank}'inde`;
-    if (rank >= 55) return 'Kendi gecmisine gore iyi';
-    if (rank >= 45) return 'Kendi 5 yillik ortalamasi civarinda';
-    if (rank >= 20) return 'Kendi gecmisine gore zayif';
-    return `Son 5 yilinin en zayif %${rank}'inde`;
-  }
-
-  /* Kendi tarihsel dagilimi yalnizca DEGERLEME carpanlari icin hesaplanir;
-     digerlerinde "veri yok" degil, "bu metrik icin hesaplanmiyor" denmeli. */
-  const OWN_HISTORY_METRICS = ['ev_ebit', 'ev_sales', 'ev_gross_profit', 'fcf_yield_ev'];
-  function hasOwnHistory(metric) {
-    return OWN_HISTORY_METRICS.indexOf(metric) !== -1;
-  }
-
-  function colorMeaning(color) {
-    return { green: 'iyi', yellow: 'sinirda', red: 'kotu', gray: 'veri yok' }[color] || '';
+    if (rank >= 80) return `son 5 yılının en iyi %${100 - rank}'inde`;
+    if (rank >= 55) return 'kendi geçmişine göre iyi';
+    if (rank >= 45) return '5 yıllık ortalaması civarında';
+    if (rank >= 20) return 'kendi geçmişine göre zayıf';
+    return `son 5 yılının en zayıf %${rank}'inde`;
   }
 
   function esc(s) {
@@ -260,54 +342,25 @@ window.Fmt = (function () {
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
-  function date(s) {
-    if (!s) return '—';
-    try {
-      return new Date(s).toLocaleDateString('tr-TR',
-        { day: '2-digit', month: 'short', year: 'numeric' });
-    } catch (_) { return s; }
-  }
-
-  /* Tarama saatte bir ilerler. "Ne zaman guncellendi" yazmazsak bir
-     duraklama fark edilmeden gunlerce surebilir — 22 Eylul'de oyle oldu. */
-  function sinceLabel(iso) {
-    if (!iso) return '—';
-    const t = new Date(iso).getTime();
-    if (!t) return '—';
-    const h = (Date.now() - t) / 36e5;
-    if (h < 1) return `${Math.max(1, Math.round(h * 60))} dakika once`;
-    if (h < 24) return `${Math.round(h)} saat once`;
-    return `${Math.round(h / 24)} gun once`;
-  }
-
-  function hoursSince(iso) {
-    if (!iso) return null;
-    const t = new Date(iso).getTime();
-    return t ? (Date.now() - t) / 36e5 : null;
-  }
-
-  function daysLabel(n) {
-    if (!isNum(n)) return '—';
-    if (n < 0) return `${Math.abs(Math.round(n))} gun gecti`;
-    return `${Math.round(n)} gun`;
-  }
-
-  function trackBadge(track) {
-    const map = { A: ['accent', 'Kol A'], B: ['yellow', 'Kol B'], both: ['green', 'A+B'] };
-    const [cls, text] = map[track] || ['gray', track || '—'];
-    return `<span class="chip ${cls}">${esc(text)}</span>`;
+  /* Rozetler — tek stil, gri. Renk yalnızca uyarı (warn/bad). */
+  function badge(text, kind) {
+    return `<span class="badge${kind ? ' ' + kind : ''}">${esc(text)}</span>`;
   }
 
   function decisionBadge(action) {
     if (!action) return '';
-    const map = { AL: 'green', BEKLE: 'yellow', ELE: 'red' };
-    return `<span class="chip ${map[action] || 'gray'}">${esc(action)}</span>`;
+    return badge(action, 'decision');
   }
 
-  return { setThresholds, spec, isNum, num, metricValue, money, pct, pctText, signedPct,
-           pnlClass, colorFor, arrow, fillRatio, label, cell, chip,
-           percentileBar, esc, date, daysLabel, sinceLabel, hoursSince, cappedBadge,
-           trackBadge, decisionBadge,
-           sentence, plain, unitName, percentileSentence, ownHistorySentence,
-           colorMeaning, hasOwnHistory };
+  function trackLabel(track) {
+    return { A: 'Kârlı', B: 'Büyüyen', both: 'Kârlı ve büyüyen' }[track] || '';
+  }
+
+  return {
+    MINUS, NOISE_PCT, setThresholds, spec, isNum, num, int, money, moneyTry, signedMoney,
+    pct, share, delta, changeClass, pnlClass, date, dateTime, days, daysUntil, hoursSince,
+    sinceLabel, tr, sliceLabel, phaseLabel, pctText, metricValue, colorFor, status,
+    statusText, label, plain, sentence, percentileSentence, ownHistorySentence, esc, badge,
+    decisionBadge, trackLabel,
+  };
 })();

@@ -1,795 +1,438 @@
-/* 3. SIRKET DETAYI — tek uzun sayfa, solda yapiskan icindekiler.
+/* ŞİRKET — sabit başlık + dört sekme.
  *
- * Bolumler: baslik · puan seridi · ne yapar/hendek (Claude) · metrik tablosu
- * (4 blok) · 12 ceyreklik grafikler · ters DCF + g kaydirici · tez bolumleri
- * (Claude) · analist konsensusu · haberler · karar kutusu · veri kaynaklari.
+ *   Özet         6 anahtar metrik, Claude'un kararı, tez kırıcılar,
+ *                katalizör, sonraki bilanço, puan dağılımı, huni şeridi
+ *   Tez ve Karar iş modeli, hendek, boğa/ayı, analist, karar formu
+ *   Metrikler    gruplu tablo; grafikler, ters DCF ve kaynaklar katlanır
+ *   Haberler
+ *
+ * Eskiden 7.000 px'lik tek sayfaydı ve boş hücreler için aynı açıklama
+ * kırk kez tekrarlanıyordu. Hesaplanamayan metrikler artık satır olarak
+ * çizilmez; blok sonunda tek satırda adları geçer. İç hesap ayrıntıları
+ * (ağırlık, kapsama, yüzdelik havuzu) üzerine gelince görünür.
  */
 window.ViewCompany = (function () {
   'use strict';
-
-  const SECTIONS = [
-    ['ozet', 'Ozet'],
-    ['ne-yapar', 'Ne yapar'],
-    ['metrikler', 'Metrikler'],
-    ['grafikler', 'Grafikler'],
-    ['dcf', 'Ters DCF'],
-    ['tez', 'Tez'],
-    ['analist', 'Analist'],
-    ['haber', 'Haberler'],
-    ['karar', 'Karar'],
-    ['kaynak', 'Kaynaklar'],
+  const F = Fmt;
+  const TABS = [['ozet', 'Özet'], ['tez', 'Tez ve Karar'], ['metrikler', 'Metrikler'], ['haberler', 'Haberler']];
+  const KEY_METRICS = [
+    ['ev_ebitda', 'EV/FAVÖK'], ['fcf_yield_ev', 'FCF verimi'], ['roic', 'ROIC'],
+    ['rev_cagr_3y', 'Büyüme (3 yıl)'], ['gross_margin', 'Brüt marj'], ['net_debt_to_ebitda', 'Net borç/FAVÖK'],
   ];
+  const BLOCK = {
+    Degerleme: ['Değerleme', 'Şirket kaç paraya satılıyor ve bu fiyat ucuz mu?'],
+    Buyume: ['Büyüme', 'İş büyüyor mu, ne kadar kârlı büyüyor?'],
+    Kalite: ['Kalite', 'İşin kendisi iyi mi? Kâr gerçek mi, sermaye verimli mi kullanılıyor?'],
+    'Saglamlik ve Tuzak': ['Sağlamlık ve tuzak', 'Bilanço dayanıklı mı? Muhasebede oynama işareti var mı?'],
+  };
 
   let card = null;
+  let tab = 'ozet';
 
   async function render(ticker) {
     const body = document.getElementById('companyBody');
-    body.innerHTML = '<p class="muted">Yukleniyor…</p>';
-
+    body.innerHTML = '<p class="muted">Yükleniyor…</p>';
     card = await DataLayer.card(ticker);
+    tab = 'ozet';
     if (!card) {
-      body.innerHTML = `<div class="empty-state">
-        <h2>${Fmt.esc(ticker)} karti bulunamadi</h2>
-        <p>Bu sembol icin <code>data/cards/${Fmt.esc(ticker)}.json</code> yok.
-           Izleme listesine ekleyip veri hattini calistirman gerekiyor.</p>
-        <p><a href="#/candidates">← Adaylara don</a></p></div>`;
+      body.innerHTML = `<div class="empty-state"><h2>${F.esc(ticker)} için kart yok</h2>
+        <p>Bu sembol henüz izleme listesinde ya da aday havuzunda değil.</p>
+        <p><a href="#/adaylar">← Adaylar</a></p></div>`;
       return;
     }
-
-    body.innerHTML = `<div class="detail-layout">
-      <nav class="toc" id="toc">${SECTIONS.map(([id, label]) =>
-        `<a href="#${id}" data-sec="${id}">${Fmt.esc(label)}</a>`).join('')}</nav>
-      <div>
-        ${headSection()}
-        ${storySection()}
-        ${metricsSection()}
-        ${chartsSection()}
-        ${dcfSection()}
-        ${thesisSection()}
-        ${analystSection()}
-        ${newsSection()}
-        ${decisionSection()}
-        ${sourcesSection()}
-      </div></div>`;
-
-    wire();
+    body.innerHTML = `${header()}<div id="coTab"></div>
+      <div class="co-foot"><a href="#/adaylar">← Adaylar</a> · kart ${F.esc(F.date(card.as_of))} ·
+        <a href="${DataLayer.cardRawUrl(card.ticker)}" target="_blank" rel="noopener">ham JSON</a></div>`;
+    body.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => show(b.dataset.tab)));
+    document.getElementById('askClaude').addEventListener('click', askClaude);
+    show('ozet');
   }
 
-  /* ------------------------------------------------------------- baslik */
-  function headSection() {
-    const s = card.scores || {};
-    const warnings = (card.flags || {}).warnings || [];
+  function show(t) {
+    tab = t;
+    document.querySelectorAll('#companyBody [data-tab]').forEach((b) =>
+      b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+    const el = document.getElementById('coTab');
+    el.innerHTML = { ozet: summary, tez: thesis, metrikler: metrics, haberler: news }[t]();
+    wireTab();
+  }
+
+  /* ------------------------------------------------------------ başlık */
+  function header() {
     const chg = card.change_1d_pct;
-
-    return `<section id="ozet">
-      <div class="detail-head">
-        <div>
-          <h1 style="margin-bottom:2px">${Fmt.esc(card.ticker)}
-            ${Fmt.trackBadge(card.track)}
-            ${(card.flags || {}).is_manual ? '<span class="chip gray">elle eklendi</span>' : ''}
-            ${card.source === 'seed_20260909' ? '<span class="chip gray">tohum listesi</span>' : ''}
-          </h1>
-          <div class="muted">${Fmt.esc(card.name)} · ${Fmt.esc(card.exchange)} ·
-            ${Fmt.esc(card.sector)} <span class="tiny dim">(SIC ${Fmt.esc(card.sic)})</span></div>
-        </div>
-        <div>
-          <div class="tiny dim">${card.price_as_of ? `${Fmt.date(card.price_as_of)} kapanisi` : 'fiyat tarihi yok'}</div>
-          <div class="price">${Fmt.money(card.price, { digits: 2 })}
-            ${Fmt.isNum(chg) ? `<span class="${Fmt.pnlClass(chg)}" style="font-size:15px">
-              ${Fmt.signedPct(chg)}</span>` : ''}</div>
-        </div>
-        ${Charts.scoreRing(s.total, { size: 62 })}
-      </div>
-
-      <div class="grid g-summary" style="margin:14px 0">
-        ${stat('Piyasa degeri', Fmt.money(card.market_cap_musd, { musd: true }),
-               'Tum hisselerin toplam degeri')}
-        ${stat('Isletme degeri', Fmt.money(card.enterprise_value_musd, { musd: true }),
-               'Hisseler + borc - nakit. Sirketi tamamen almanin maliyeti')}
-        ${stat('Net borc', Fmt.money(card.net_debt_musd, { musd: true }),
-               Fmt.isNum(card.net_debt_musd) && card.net_debt_musd < 0
-                 ? 'Negatif: borctan cok nakdi var' : 'Borc eksi nakit')}
-        ${stat('Sonraki bilanco', Fmt.date((card.calendar || {}).next_earnings),
-               (card.calendar || {}).estimated
-                 ? 'TAHMINI — son SEC raporu + 13 hafta; kesin tarih henuz aciklanmadi'
-                 : 'Kazanc aciklamasi tarihi')}
-      </div>
-
-      <h3>Puan dagilimi</h3>
-      <p class="small muted" style="margin:-2px 0 8px">Her puan 0-100 arasidir ve
-        <b>ayni sektordeki diger sirketlere gore</b> hesaplanir — 70 puan
-        "sektorun en iyi %30'unda" demektir, mutlak bir not degildir.
-        Yanindaki sayi o basligin genel puandaki agirligi.</p>
-      ${poolNote()}
-      <div class="grid score-blocks" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr))">
-        ${['value', 'quality', 'safety', 'momentum', 'earnings_quality', 'catalyst']
-          .map((k) => {
-          const info = (App.thresholds.score_plain || {})[k] || [k, ''];
-          // Agirliklar config.py'den gelir. Elle yazildiginda pano ile motor
-          // ayri fikirde oluyordu (momentum panoda 15, motorda 5).
-          const w = (App.thresholds.score_weights || {})[k];
-          return `
-          <div class="card" style="padding:10px">
-            <div class="tiny dim">${Fmt.esc(info[0])}
-              <span class="dim">· ${weightLabel(k, w)}</span></div>
-            <div class="num" style="font-size:19px;font-weight:600;margin:3px 0">
-              ${Fmt.isNum(s[k]) ? Math.round(s[k]) : '—'}
-              <span class="tiny dim" style="font-weight:400">/100</span></div>
-            ${Charts.miniBar(s[k])}
-            ${lowCoverage(k)}
-            <div class="tiny dim block-help" title="${Fmt.esc(info[1])}">
-              ${Fmt.esc(info[1])}</div>
-            ${k === 'catalyst' && !Fmt.isNum(s[k])
-              ? '<div class="tiny c-yellow" style="margin-top:4px">Henuz girilmedi</div>' : ''}
-          </div>`; }).join('')}
-      </div>
-      ${Fmt.isNum(s.weight_coverage) && s.weight_coverage < 1 ? `
-        <p class="tiny dim" style="margin-top:6px">Puanin %${Math.round(s.weight_coverage * 100)}'i
-        hesaplanabildi; eksik bilesenler agirlik havuzundan cikarildi.</p>` : ''}
-
-      ${dataQualityBlock()}
-
-      ${warnings.length ? `<h3>Uyarilar</h3>${warnings.map((w) =>
-        `<div class="warn ${w.startsWith('VERI KALITESI') ? 'high' : 'medium'}">
-          <span>${w.startsWith('VERI KALITESI') ? '⛔' : '⚠'}</span>
-          <span>${Fmt.esc(w)}</span></div>`).join('')}` : ''}
-
-      ${funnelStatus()}
-
-      <div class="row" style="margin-top:12px">
+    const d = (card.decision || {}).action;
+    return `<div class="co-header">
+      <div class="line">
+        <div class="name"><h1>${F.esc(card.ticker)}</h1>
+          <div class="sub">${F.esc(card.name || '')} · ${F.esc(F.tr(card.sector || ''))}</div></div>
+        <div><div class="price">${F.esc(F.money(card.price))}</div>
+          <div class="small ${F.changeClass(chg)}">${F.esc(F.pct(chg))}${card.price_as_of ? ` <span class="dim">· ${F.esc(F.date(card.price_as_of))}</span>` : ''}</div></div>
+        ${Charts.scoreRing((card.scores || {}).total)}
+        ${d ? F.decisionBadge(d) : '<span class="pending">karar bekliyor</span>'}
         <button id="askClaude" class="primary">Claude'a sor</button>
-        <a href="${DataLayer.cardRawUrl(card.ticker)}" target="_blank" rel="noopener">
-          <button class="ghost">Ham JSON</button></a>
-        <a href="#/candidates"><button class="ghost">← Adaylar</button></a>
       </div>
-    </section>`;
+      <div class="subtabs" role="tablist">${TABS.map(([k, l]) =>
+        `<button role="tab" data-tab="${k}" aria-selected="${k === tab}">${l}</button>`).join('')}</div>
+    </div>`;
   }
 
-  /* Veri kalitesi — sessizce yanlis sayi gostermektense acikca soyle. */
-  function dataQualityBlock() {
-    const dq = card.data_quality;
-    if (!dq || dq.status === 'iyi') return '';
-    const label = dq.status === 'kotu'
-      ? ['red', 'Bu kartin sayilarina guvenme']
-      : ['yellow', 'Bazi alanlar eksik'];
-    return `<h3>Veri kalitesi</h3>
-      <div class="warn ${dq.status === 'kotu' ? 'high' : 'medium'}">
-        <span>${dq.status === 'kotu' ? '⛔' : '⚠'}</span>
-        <span><b>${Fmt.esc(label[1])}.</b> ${dq.issue_count} sorun bulundu:
-          <ul style="margin:6px 0 0;padding-left:18px">
-            ${(dq.issues || []).map((i) =>
-              `<li>${Fmt.esc(i.message)}</li>`).join('')}
-          </ul>
-          <span class="tiny dim">Bu denetim kart yayimlanmadan once calisir;
-            imkansiz degerler silinir, supheli olanlar burada listelenir.</span>
-        </span></div>`;
+  /* --------------------------------------------------------------- özet */
+  function mval(key) {
+    const cell = (card.metrics || {})[key] || {};
+    if (!F.isNum(cell.value)) return '';
+    const st = F.status(cell.color);
+    return `<span class="mval ${st}"><span class="v">${F.esc(F.metricValue(key, cell.value))}</span>${
+      F.statusText(st) ? `<span class="s">${F.esc(F.statusText(st))}</span>` : ''}</span>`;
   }
 
-  function funnelStatus() {
+  function summary() {
+    const st = card.story || {};
+    const dec = card.decision || {};
+    const facts = KEY_METRICS.filter(([k]) => F.isNum(((card.metrics || {})[k] || {}).value)).map(([k, l]) =>
+      `<div title="${F.esc(F.plain(k))}"><div class="k">${F.esc(l)}</div>${mval(k)}</div>`).join('');
+    const cal = card.calendar || {};
+    const cat = st.catalyst || {};
+    const breakers = (st.thesis_breakers || []).map((x) => (typeof x === 'string' ? x : x.description || '')).filter(Boolean);
+
+    return `
+      ${warnings()}
+      ${facts ? `<div class="card"><div class="keyfacts">${facts}</div></div>` : ''}
+      <h2>Claude'un görüşü</h2>
+      <div class="card prose">
+        ${dec.action ? `<p>${F.decisionBadge(dec.action)} <span class="small muted">${F.esc(F.date(dec.date))}</span>
+          ${dec.rationale ? ` ${F.esc(dec.rationale)}` : ''}</p>` : ''}
+        ${st.claude_verdict ? `<p>${F.esc(st.claude_verdict)}</p>` : '<span class="pending">Claude notu bekliyor</span>'}
+        ${breakers.length ? `<p class="small muted" style="margin:10px 0 2px">Tezi ne bozar</p>
+          <ul class="small">${breakers.map((b) => `<li>${F.esc(b)}</li>`).join('')}</ul>` : ''}
+        <dl class="facts" style="margin-top:12px">
+          ${cat.type ? `<div><dt>Katalizör</dt><dd>${F.esc(cat.type)}<span class="sub">${F.esc([cat.expected_date, cat.confidence && `güven: ${cat.confidence}`].filter(Boolean).join(' · '))}</span></dd></div>` : ''}
+          ${cal.next_earnings ? `<div><dt>Sonraki bilanço</dt><dd>${F.esc(F.date(cal.next_earnings))}<span class="sub">${F.esc(F.days(F.daysUntil(cal.next_earnings)))}${cal.estimated ? ' · tahmini tarih' : ''}</span></dd></div>` : ''}
+          ${F.isNum(card.market_cap_musd) ? `<div><dt>Piyasa değeri</dt><dd>${F.esc(F.money(card.market_cap_musd, { musd: true }))}<span class="sub">işletme değeri ${F.esc(F.money(card.enterprise_value_musd, { musd: true }))}</span></dd></div>` : ''}
+        </dl>
+      </div>
+      <h2>Puan dağılımı</h2>
+      <div class="card">${scoreBars()}</div>
+      ${funnelLine()}`;
+  }
+
+  const FIELD = { cfo: 'işletme nakit akışı', capex: 'yatırım harcaması', operating_income: 'faaliyet kârı',
+    revenue: 'hasılat', cost_of_revenue: 'satış maliyeti', net_income: 'net kâr', gross_profit: 'brüt kâr',
+    interest_expense: 'faiz gideri' };
+
+  /* Teknik uyarıyı insan diline çevir; özgün metin üzerine gelince görünür. */
+  function humanWarn(w) {
+    if (w === 'bilesen eksik') return "İflas riski ölçüsü (Altman Z'') hesaplanamadı — gereken bilanço kalemlerinden biri eksik.";
+    const m = /^Bazi kalemler ceyreklerden degil YILLIK tablodan geldi \(([^)]+)\)/.exec(w);
+    if (m) {
+      const f = m[1].split(',').map((x) => FIELD[x.trim()] || x.trim()).join(', ');
+      return `${f.charAt(0).toLocaleUpperCase('tr')}${f.slice(1)} çeyreklik değil yıllık tablodan geldi; bunlara dayanan metrikler daha eski veriye bakıyor.`;
+    }
+    return F.tr(w);
+  }
+
+  function warnings() {
+    const dq = card.data_quality || {};
+    const list = [
+      ...(dq.status === 'kotu' ? [{ bad: true, text: 'Bu kartın sayılarına güvenme: veri denetimi ciddi sorun buldu.', raw: '' }] : []),
+      ...((card.flags || {}).warnings || []).map((w) => ({ bad: /^VERI KALITESI|^BORC/.test(w), text: humanWarn(w), raw: w })),
+      ...((dq.issues || []).map((i) => ({ bad: false, text: F.tr(i.message), raw: i.message }))),
+    ];
+    if (!list.length) return '';
+    const first = list.slice(0, 2).map((w) => `<div class="band ${w.bad ? 'bad' : 'warn'}"${w.raw ? ` title="${F.esc(w.raw)}"` : ''}>
+      <span class="ico">!</span><span>${F.esc(w.text)}</span></div>`).join('');
+    const rest = list.slice(2);
+    return first + (rest.length ? `<details class="fold" style="margin:-4px 0 12px"><summary>Diğer veri notları<span class="count">${rest.length}</span></summary>
+      <div class="fold-body"><ul class="small">${rest.map((w) => `<li${w.raw ? ` title="${F.esc(w.raw)}"` : ''}>${F.esc(w.text)}</li>`).join('')}</ul></div></details>` : '');
+  }
+
+  function scoreBars() {
+    const s = card.scores || {};
+    const plainMap = App.thresholds.score_plain || {};
+    const weights = App.thresholds.score_weights || {};
+    const cov = s.coverage_factors || {};
+    const pool = card.percentile_pool || {};
+    return `<div class="scorebars">${['value', 'quality', 'safety', 'momentum', 'earnings_quality', 'catalyst'].map((k) => {
+      const info = plainMap[k] || [k, ''];
+      const w = weights[k];
+      const f = cov[k];
+      const tip = [F.tr(info[1]), F.isNum(w) ? `ağırlık ${w}${F.isNum(f) && f < 0.999 ? ` → ${F.num(w * f, 1)} (kapsama ×${F.num(f, 2)})` : ''}` : '',
+        pool.universe ? `yüzdelik havuzu ${pool.universe} şirket (sektörde ${pool.sector})` : ''].filter(Boolean).join(' · ');
+      const v = s[k];
+      const low = ((card.score_detail || {})[k] || {}).coverage;
+      return `<div class="scorebar" title="${F.esc(tip)}">
+        <div class="top"><span>${F.esc(F.tr(info[0]))}${F.isNum(low) && low < 0.6 ? ' <span class="badge">veri kısmi</span>' : ''}</span>
+          <b>${F.isNum(v) ? F.esc(F.int(v)) : '<span class="pending">girilmedi</span>'}</b></div>
+        <div class="track"><i style="width:${F.isNum(v) ? Math.max(0, Math.min(100, v)) : 0}%"></i></div></div>`;
+    }).join('')}</div>
+    <p class="small muted" style="margin-top:10px">Puanlar 0–100 ve aynı sektördeki şirketlere göre: 70 "sektörün en iyi %30'unda" demek.</p>`;
+  }
+
+  function funnelLine() {
     const f = card.flags || {};
     const passed = f.passed_stages || [];
-    if (!passed.length && f.would_fail_at === null && !f.kill_reason) return '';
-    const stageName = ['Evren', 'Sert filtreler', 'Tuzak eleme', 'Goreli ucuzluk', 'Puanlama'];
-    const chips = stageName.map((n, i) => {
-      const ok = passed.includes(i);
-      const failed = f.would_fail_at === i;
-      return `<span class="chip ${ok ? 'green' : failed ? 'red' : 'gray'}">
-        ${i}. ${Fmt.esc(n)}</span>`;
-    }).join(' ');
-    return `<h3>Huni durumu</h3><div class="row" style="gap:5px">${chips}</div>
-      ${f.kill_reason ? `<p class="small muted" style="margin-top:6px">
-        <b>Elenme sebebi:</b> ${Fmt.esc(f.kill_reason)}</p>` : ''}
-      ${f.would_fail_at === null && passed.length >= 3
-        ? '<p class="small c-green" style="margin-top:6px">Huninin tum asamalarini geciyor.</p>' : ''}
-      ${(f.stage1_missing || []).length ? `<p class="small c-yellow" style="margin-top:6px">
-        <b>Not:</b> Asama 1'de su girdiler hesaplanamadi:
-        ${Fmt.esc(f.stage1_missing.map((k) => Fmt.label(k)).join(', '))}.
-        Eksik veri eleme sebebi SAYILMAZ — etiketleme bicimine gore eleme
-        yapmak gorunmez bir yanlilik yaratirdi. Bu alanlari dogrulamadan
-        sirketi degerlendirme.</p>` : ''}`;
+    if (!passed.length && f.would_fail_at == null && !f.kill_reason) return '';
+    const info = App.thresholds.stage_info || {};
+    const parts = [0, 1, 2, 3, 4].map((i) => {
+      const name = F.tr((info[i] || {}).name || `Aşama ${i}`);
+      if (passed.includes(i)) return `<span class="ok">✓ ${F.esc(name)}</span>`;
+      if (f.would_fail_at === i) return `<span class="no">✗ ${F.esc(name)}</span>`;
+      return `<span class="na">${F.esc(name)}</span>`;
+    }).join('<span class="dim">›</span>');
+    return `<h2>Huni</h2><div class="card"><div class="stages-line">${parts}</div>
+      ${f.kill_reason ? `<p class="small muted" style="margin-top:6px">Takıldığı yer: ${F.esc(F.tr(f.kill_reason))}</p>` : ''}</div>`;
   }
 
-  /* Bir blogun alt metriklerinin ancak bir kismi hesaplanabildiyse, o puan
-     az sayida metrige dayaniyor demektir. Puani cezalandirmiyoruz ama
-     toplamdaki agirligini azaltiyoruz — ve bunu SOYLUYORUZ. */
-  /* Kapsama carpani uygulandiginda blogun toplam puandaki GERCEK agirligi
-     nominal agirliktan dusuktur. Kartta yalnizca nominal agirlik yazarsa
-     "veri yetersiz" rozeti ile puanin cezalandirilmis olmasi arasindaki bag
-     gorunmez kaliyor. */
-  function weightLabel(block, w) {
-    if (!Fmt.isNum(w)) return '';
-    const f = ((card.scores || {}).coverage_factors || {})[block];
-    if (!Fmt.isNum(f) || f >= 0.999) return `agirlik ${w}`;
-    return `agirlik ${w} → ${Fmt.num(w * f, 1)} (kapsama ×${Fmt.num(f, 2)})`;
-  }
-
-  /* Yuzdelik HAVUZU. Tarama bitene kadar havuz kucuk: 70 puan 60 sirketlik
-     havuzda "en iyi %30" demek, 3.000 sirketlik havuzda baska bir sey. */
-  function poolNote() {
-    const pool = card.percentile_pool || {};
-    if (!pool.universe) return '';
-    const small = pool.universe < 300;
-    return `<p class="tiny ${small ? 'c-yellow' : 'dim'}" style="margin:-4px 0 8px">
-      Yuzdelik tabani: <b>${pool.universe}</b> sirket
-      (${Fmt.esc(card.sector || 'sektor')} icinde ${pool.sector}).
-      ${small ? 'Havuz kucuk — tarama tamamlaninca puanlar degisebilir.' : ''}</p>`;
-  }
-
-  function lowCoverage(block) {
-    const d = (card.score_detail || {})[block];
-    if (!d || d.coverage === undefined || d.coverage === null) return '';
-    if (d.coverage >= 0.6) return '';
-    const known = Object.entries(d.components || {})
-      .filter(([, v]) => v && v.percentile !== null).map(([k]) => Fmt.label(k));
-    return `<div class="tiny c-yellow" style="margin-top:5px;line-height:1.35;white-space:normal"
-      title="${Fmt.esc(known.join(', '))}">
-      ⚠ Alt metriklerin yalnizca %${Math.round(d.coverage * 100)}'i hesaplanabildi —
-      bu puan az veriye dayaniyor, toplamdaki agirligi azaltildi.</div>`;
-  }
-
-  function stat(label, value, sub) {
-    return `<div class="card stat"><div class="label">${Fmt.esc(label)}</div>
-      <div class="value" style="font-size:19px">${value}</div>
-      ${sub ? `<div class="sub">${Fmt.esc(sub)}</div>` : ''}</div>`;
-  }
-
-  /* ------------------------------------------------ ne yapar / hendek */
-  function storySection() {
+  /* ------------------------------------------------------- tez ve karar */
+  function thesis() {
     const st = card.story || {};
-    return `<section id="ne-yapar"><h2>Ne yapar ve hendegi ne</h2>
-      ${st.business_model || st.moat ? `
-        <div class="card">
-          ${st.business_model ? `<h3 style="margin-top:0">Is modeli</h3>
-            <p>${Fmt.esc(st.business_model)}</p>` : ''}
-          ${st.moat ? `<h3>Hendek</h3><p>${Fmt.esc(st.moat)}</p>` : ''}
-          ${storyStamp()}
-        </div>`
-        : emptyStory('Is modeli ve hendek analizi henuz yazilmadi.')}
-    </section>`;
+    const a = card.analyst || {};
+    const cat = st.catalyst || {};
+    const has = st.business_model || st.moat || st.why_cheap_diagnosis || (st.bull_case || []).length;
+    const stamp = st.updated_at ? `<p class="small muted">Claude notu · ${F.esc(F.date(st.updated_at))}${
+      F.isNum(card.story_age_days) && card.story_age_days > 30 ? ` · ${card.story_age_days} gün önce, tazelenmeli` : ''}</p>` : '';
+    const list = (xs) => `<ul>${xs.map((x) => `<li>${F.esc(x)}</li>`).join('')}</ul>`;
+    return `
+      ${has ? `<div class="card prose">
+        ${st.business_model ? `<h3 style="margin-top:0">İş modeli</h3><p>${F.esc(st.business_model)}</p>` : ''}
+        ${st.moat ? `<h3>Hendek</h3><p>${F.esc(st.moat)}</p>` : ''}
+        ${st.why_cheap_diagnosis ? `<h3>Neden ucuz</h3><p><b>${F.esc(st.why_cheap_diagnosis)}</b></p>
+          ${st.why_cheap_rationale ? `<p>${F.esc(st.why_cheap_rationale)}</p>` : ''}` : ''}
+        ${cat.type ? `<h3>Katalizör</h3><p>${F.esc(cat.type)}${cat.expected_date ? ` · ${F.esc(cat.expected_date)}` : ''}${cat.confidence ? ` · güven: ${F.esc(cat.confidence)}` : ''}</p>` : ''}
+        ${stamp}</div>` : '<div class="card"><span class="pending">Claude notu bekliyor — sohbette "bu şirketi incele" demen yeterli.</span></div>'}
+      ${(st.bull_case || []).length || (st.bear_case || []).length ? `<h2>Boğa ve ayı</h2><div class="thesis">
+        ${(st.bull_case || []).length ? `<div class="card prose"><h3 style="margin-top:0">Boğa</h3>${list(st.bull_case)}</div>` : ''}
+        ${(st.bear_case || []).length ? `<div class="card prose"><h3 style="margin-top:0">Ayı</h3>${list(st.bear_case)}</div>` : ''}</div>` : ''}
+      ${a.buy || a.hold || a.sell || F.isNum(a.target_median) ? `<h2>Analist</h2><div class="card">
+        ${Charts.ratingBar(a.buy, a.hold, a.sell)}
+        ${Charts.targetRange(a.target_low, a.target_median, a.target_high, card.price)}
+        ${F.isNum(a.upside_to_median) ? `<p class="small">Medyan hedefe ${F.esc(F.pct(a.upside_to_median, 1))}</p>` : ''}
+        ${st.analyst_narrative ? `<p class="small muted">${F.esc(st.analyst_narrative)}</p>` : ''}
+        <p class="small dim">Bilgi alanı: hedef fiyatlar sistematik olarak iyimser ve puana girmez.</p></div>` : ''}
+      ${decisionForm()}`;
   }
 
-  function storyStamp() {
-    const st = card.story || {};
-    if (!st.updated_at) return '';
-    const stale = Fmt.isNum(card.story_age_days) && card.story_age_days > 30;
-    return `<div class="tiny ${stale ? 'dim' : 'muted'}" style="margin-top:8px">
-      <span class="chip ${stale ? 'gray' : 'accent'}">Claude notu</span>
-      ${Fmt.date(st.updated_at)}${stale ? ` · ${card.story_age_days} gun once, tazelenmeli` : ''}</div>`;
-  }
-
-  function emptyStory(msg) {
-    return `<div class="empty-story">${Fmt.esc(msg)}<br>
-      <span class="tiny">Sohbetteki Claude <code>claude_inbox/${Fmt.esc(card.ticker)}.json</code>
-      dosyasina yazdiginda burada gorunur.</span></div>`;
-  }
-
-  /* ------------------------------------------------------- metrik tablo */
-  /* Her satir SAYI DEGIL, CUMLE gosterir. "1,00x" kimseye bir sey anlatmaz;
-     "Her 1 dolar karin 1,00 dolari nakde donuyor" anlatir. Sayi yine
-     durur ama yaninda ne demek oldugu yazar. */
-  function metricsSection() {
-    const blocks = (App.thresholds.metric_blocks) || {};
-    const order = ['Degerleme', 'Buyume', 'Kalite', 'Saglamlik ve Tuzak'];
-    const blockIntro = {
-      'Degerleme': 'Sirket kac paraya satiliyor ve bu fiyat ucuz mu?',
-      'Buyume': 'Is buyuyor mu, ne kadar karli buyuyor?',
-      'Kalite': 'Isin kendisi iyi mi? Kar gercek mi, sermaye verimli mi kullaniliyor?',
-      'Saglamlik ve Tuzak': 'Bilanco dayanikli mi? Muhasebede oynama isareti var mi?',
-    };
-    return `<section id="metrikler"><h2>Metrikler</h2>
-      <div class="card" style="margin-bottom:14px;background:var(--bg-3)">
-        <b class="small">Nasil okunur</b>
-        <ul class="small" style="margin:6px 0 0;padding-left:18px;line-height:1.7">
-          <li><span class="chip green">yesil</span> iyi ·
-              <span class="chip yellow">sari</span> sinirda ·
-              <span class="chip red">kirmizi</span> kotu ·
-              <span class="chip gray">gri</span> veri yok</li>
-          <li><b>Sektorde nerede:</b> ayni sektordeki diger sirketlere gore siralamasi.</li>
-          <li><b>Kendi gecmisine gore:</b> bu sirketin son 5 yildaki kendi
-              degerlerine gore bugun nerede durdugu. Sektorde ucuz ama kendi
-              gecmisine gore pahaliysa, sektorun tamami ucuzlamis demektir.</li>
-          <li>Renk esikleri <code>src/config.py</code> dosyasindan gelir, panoya gomulu degildir.</li>
-        </ul>
+  function decisionForm() {
+    const d = card.decision || {};
+    return `<h2>Karar</h2><div class="card">
+      ${d.action ? `<p>Mevcut: ${F.decisionBadge(d.action)} <span class="small muted">${F.esc(F.date(d.date))}</span>
+        ${d.rationale ? `<br><span class="small">${F.esc(d.rationale)}</span>` : ''}</p>` : ''}
+      <p class="small muted">Kararı sohbette Claude'a söylemek en kolayı. Elle kaydetmek için bu parçayı
+        <code>claude_inbox/${F.esc(card.ticker)}.json</code> dosyasına ekle.</p>
+      <div class="form-grid">
+        <label>Karar<select id="dcAction"><option value="">seç</option><option>AL</option><option>BEKLE</option><option>ELE</option></select></label>
+        <label>Tarih<input type="date" id="dcDate" value="${new Date().toISOString().slice(0, 10)}"></label>
+        <label class="full">Gerekçe<textarea id="dcWhy" rows="3"></textarea></label>
+        <label class="full">JSON parçası<textarea id="dcOut" rows="8" readonly></textarea></label>
       </div>
-      ${order.filter((b) => blocks[b]).map((block) => `
-        <h3>${Fmt.esc(block)}</h3>
-        <p class="small muted" style="margin:-4px 0 8px">${Fmt.esc(blockIntro[block] || '')}</p>
-        <div class="table-wrap"><table>
-          <thead><tr>
-            <th style="min-width:190px">Metrik</th>
-            <th style="min-width:110px">Deger</th>
-            <th style="min-width:300px;text-align:left">Ne anlama geliyor</th>
-            <th style="min-width:170px;text-align:left">Sektorde nerede</th>
-            <th style="min-width:170px;text-align:left">Kendi gecmisine gore
-              <div class="tiny dim" style="font-weight:400;text-transform:none">
-                yalnizca degerleme carpanlari</div></th>
-          </tr></thead>
-          <tbody>${blocks[block].map((key) => metricRow(key)).join('')}</tbody>
-        </table></div>`).join('')}
-    </section>`;
+      <div class="row" style="margin-top:10px"><button id="dcCopy" class="primary">Kopyala</button>
+        <a href="${DataLayer.editUrl(`claude_inbox/${card.ticker}.json`)}" target="_blank" rel="noopener"><button>GitHub'da aç</button></a></div>
+    </div>`;
   }
 
-  /* Bos hucrenin sebebi HER ZAMAN eksik veri degil.
-     Faaliyet kari negatifse EV/FVOK hesaplanabilir ama ANLAMSIZDIR; kasitli
-     olarak bos birakilir. "SEC dosyasinda kalem bulunamadi" demek yanlis
-     teshis koyar: okuyan kisi veri hatasi sanir, oysa sirket zarar ediyor. */
-  const NEGATIVE_DENOMINATOR = {
-    ev_ebit: ['ebit_musd', 'Faaliyet kari (EBIT)'],
-    ev_ebitda: ['ebitda_musd', 'FAVOK'],
-    ev_gross_profit: ['gross_profit_musd', 'Brut kar'],
-    pe: ['net_income_musd', 'Net kar'],
-    peg: ['net_income_musd', 'Net kar'],
-    implied_growth: ['fcf_musd', 'Serbest nakit akisi'],
-    implied_vs_actual_growth: ['fcf_musd', 'Serbest nakit akisi'],
+  /* ---------------------------------------------------------- metrikler */
+  const NEG_DENOM = {
+    ev_ebit: ['ebit_musd', 'faaliyet kârı'], ev_ebitda: ['ebitda_musd', 'FAVÖK'],
+    ev_gross_profit: ['gross_profit_musd', 'brüt kâr'], pe: ['net_income_musd', 'net kâr'],
+    peg: ['net_income_musd', 'net kâr'], implied_growth: ['fcf_musd', 'serbest nakit akışı'],
+    implied_vs_actual_growth: ['fcf_musd', 'serbest nakit akışı'],
   };
-
   function missingReason(key) {
-    const rule = NEGATIVE_DENOMINATOR[key];
+    const rule = NEG_DENOM[key];
     if (rule) {
       const v = (card.ttm || {})[rule[0]];
-      if (Fmt.isNum(v) && v <= 0) {
-        return `${rule[1]} negatif (${Fmt.money(v, { musd: true })}) — bu carpan `
-          + `matematiksel olarak hesaplanir ama ANLAMSIZ olur, kasitli olarak bos birakildi. `
-          + `Zarar eden sirkette EV/Hasilat ve EV/Brut kar carpanlarina bak.`;
-      }
+      if (F.isNum(v) && v <= 0) return `${rule[1]} negatif; bu çarpan anlamsız`;
     }
-    if (key === 'peg') {
-      const g = ((card.metrics || {}).rev_growth_ttm || {}).value;
-      if (Fmt.isNum(g) && g <= 0) {
-        return 'Satislar buyumuyor — buyumeye bolunen bir carpan negatif tabanda anlamsiz.';
-      }
-    }
-    return 'Bu sirket icin hesaplanamadi — SEC dosyasinda ilgili kalem bulunamadi.';
+    return 'SEC dosyasında ilgili kalem bulunamadı';
   }
 
-  function metricRow(key) {
+  function metrics() {
+    const blocks = App.thresholds.metric_blocks || {};
+    const order = ['Degerleme', 'Buyume', 'Kalite', 'Saglamlik ve Tuzak'];
+    const how = `<details class="fold" style="margin-top:0"><summary>Nasıl okunur</summary><div class="fold-body small">
+      <p><b>Değer</b> yanında iyi / sınırda / zayıf yazar; eşikler sistem ayarlarından gelir.</p>
+      <p><b>Sektöründe:</b> aynı sektördeki şirketlere göre sırası. <b>Kendi geçmişine göre:</b> yalnızca değerleme
+        çarpanlarında, son 5 yılına göre bugün nerede. Sektörde ucuz ama kendi geçmişine göre pahalıysa sektörün tamamı ucuzlamış demektir.</p>
+      <p>Metrik adındaki <b>?</b> tanımı ve formülü açar.</p></div></details>`;
+    return how + order.filter((b) => blocks[b]).map((b) => metricBlock(b, blocks[b])).join('') + `
+      ${chartsFold()}${dcfFold()}${sourcesFold()}`;
+  }
+
+  function metricBlock(block, keys) {
+    const m = card.metrics || {};
+    const present = keys.filter((k) => F.isNum((m[k] || {}).value));
+    const missing = keys.filter((k) => !F.isNum((m[k] || {}).value));
+    const hasOwn = present.some((k) => F.isNum((m[k] || {}).own_5y_pct));
+    const [title, intro] = BLOCK[block] || [F.tr(block), ''];
+    if (!present.length && !missing.length) return '';
+    return `<h2>${F.esc(title)}</h2><p class="small muted" style="margin-top:-4px">${F.esc(intro)}</p>
+      ${present.length ? `<div class="card flush"><div class="table-wrap"><table class="tbl stackable">
+        <thead><tr><th>Metrik</th><th>Değer</th><th>Sektöründe</th>${hasOwn ? '<th>Kendi geçmişine göre</th>' : ''}</tr></thead>
+        <tbody>${present.map((k) => metricRow(k, hasOwn)).join('')}</tbody></table></div></div>` : ''}
+      ${missing.length ? `<p class="small dim" style="margin-top:6px">Bu şirkette hesaplanamayan: ${missing.map((k) =>
+        `<span title="${F.esc(missingReason(k))}">${F.esc(F.label(k))}</span>`).join(', ')}</p>` : ''}`;
+  }
+
+  function metricRow(key, hasOwn) {
     const cell = (card.metrics || {})[key] || {};
-    const spec = Fmt.spec(key) || {};
-    const v = cell.value;
-    const color = cell.color || 'gray';
-
-    const meaning = Fmt.isNum(v)
-      ? Fmt.sentence(key, v)
-      : `<span class="dim">${Fmt.esc(missingReason(key))}</span>`;
-
-    const sektorNerede = Fmt.percentileSentence(key, cell.sector_pct, cell.pct_basis);
-    const own = Fmt.ownHistorySentence(key, cell.own_5y_pct);
-
-    return `<tr data-metric="${Fmt.esc(key)}">
-      <td>
-        <div><b>${Fmt.esc(spec.label || key)}</b>
-          <button class="help-btn" data-help="${Fmt.esc(key)}"
-                  aria-label="${Fmt.esc(spec.label || key)} formulu">?</button></div>
-        <div class="tiny dim" style="white-space:normal;max-width:230px;line-height:1.4">
-          ${Fmt.esc(spec.plain || '')}</div>
-      </td>
-      <td>${Fmt.cell(key, cell)}
-        ${Fmt.cappedBadge(key, card.capped_for_scoring)}
-        ${Fmt.isNum(v) ? `<div class="tiny dim">${Fmt.esc(Fmt.colorMeaning(color))}</div>` : ''}</td>
-      <td style="text-align:left;white-space:normal;line-height:1.45">${meaning}</td>
-      <td style="text-align:left;white-space:normal">
-        ${sektorNerede ? `<span class="small">${Fmt.esc(sektorNerede)}</span>
-          ${Fmt.percentileBar(cell.sector_pct, cell.pct_basis)}`
-        : '<span class="tiny dim">karsilastirma icin yeterli sirket yok</span>'}</td>
-      <td style="text-align:left;white-space:normal">
-        ${own ? `<span class="small">${Fmt.esc(own)}</span>
-          ${Fmt.percentileBar(cell.own_5y_pct, 'own')}`
-        : Fmt.hasOwnHistory(key)
-        ? '<span class="tiny dim">yeterli gecmis fiyat/bilanco verisi yok</span>'
-        : '<span class="tiny dim">bu metrik icin hesaplanmiyor</span>'}</td>
+    const sentence = F.sentence(key, cell.value);
+    const sec = F.percentileSentence(key, cell.sector_pct, cell.pct_basis);
+    const own = F.ownHistorySentence(key, cell.own_5y_pct);
+    const capped = (card.capped_for_scoring || {})[key];
+    return `<tr data-metric="${F.esc(key)}">
+      <td class="lead" data-label=""><b>${F.esc(F.label(key))}</b>
+        <button class="help-btn link" data-help="${F.esc(key)}" aria-label="${F.esc(F.label(key))} tanımı">?</button>
+        <span class="sub" style="white-space:normal">${F.esc(sentence || F.plain(key))}</span></td>
+      <td data-label="Değer">${mval(key)}${capped ? `<span class="sub" title="Uç değer: puana ${F.esc(F.metricValue(key, capped.used))} olarak girdi">puanda ${F.esc(F.metricValue(key, capped.used))}</span>` : ''}</td>
+      <td data-label="Sektöründe">${sec ? `<span class="pctline">${F.esc(sec)}</span>` : ''}</td>
+      ${hasOwn ? `<td data-label="Kendi geçmişi">${own ? `<span class="pctline">${F.esc(own)}</span>` : ''}</td>` : ''}
     </tr>`;
   }
 
-  /* --------------------------------------------------------- grafikler */
-  function chartsSection() {
+  function chartsFold() {
     const s = card.series || {};
     const labels = s.quarters || [];
-    const basis = s.basis === 'annual' ? 'yillik' : 'ceyreklik';
-    return `<section id="grafikler"><h2>Son 12 ${basis} donem</h2>
-      <p class="small muted">Isin yonu buradan okunur: satis buyuyor mu, marj
-        korunuyor mu, uretilen nakit artiyor mu, hisse sayisi seyreliyor mu.
-        Bosluklar SEC dosyasinda o kalemin bulunamadigi ceyreklerdir.</p>
-      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
-        <div class="card">${Charts.bars(s.revenue, labels,
-          { title: 'Satislar (milyon $)', fmt: (v) => Fmt.money(v, { musd: true }) })}
-          <div class="tiny dim" style="margin-top:6px">Her cubuk bir ceyregin satisi.
-            Cubuklar yukseliyorsa is buyuyor.</div></div>
-        <div class="card">${Charts.line(s.gross_margin, labels,
-          { title: 'Brut marj (%)', fmt: (v) => Fmt.pct(v), color: 'var(--green)' })}
-          <div class="tiny dim" style="margin-top:6px">100 dolarlik satistan urun
-            maliyeti sonrasi kalan. Duserse rekabet baskisi var demektir.</div></div>
-        <div class="card">${Charts.bars(s.fcf, labels,
-          { title: 'Serbest nakit akisi (milyon $)', fmt: (v) => Fmt.money(v, { musd: true }) })}
-          <div class="tiny dim" style="margin-top:6px">Isten gercekten arta kalan
-            nakit. Muhasebe karindan daha zor manipule edilir.</div></div>
-        <div class="card">${Charts.line(s.share_count, labels,
-          { title: 'Hisse sayisi (milyon adet)', fmt: (v) => Fmt.num(v, 1),
-            color: 'var(--yellow)' })}
-          <div class="tiny dim" style="margin-top:6px">Artiyorsa senin ortaklik
-            payin eriyor; azaliyorsa sirket kendi hissesini geri aliyor.</div></div>
-      </div></section>`;
+    const charts = [
+      Charts.bars(s.revenue, labels, { title: 'Hasılat', fmt: (v) => F.money(v, { musd: true }) }),
+      Charts.line(s.gross_margin, labels, { title: 'Brüt marj', fmt: (v) => F.pctText(v, 1) }),
+      Charts.bars(s.fcf, labels, { title: 'Serbest nakit akışı', fmt: (v) => F.money(v, { musd: true }) }),
+      Charts.line(s.share_count, labels, { title: 'Hisse sayısı (milyon)', fmt: (v) => F.num(v, 1) }),
+    ].filter(Boolean);
+    if (!charts.length) return '';
+    return `<details class="fold"><summary>Son 12 ${s.basis === 'annual' ? 'yıllık' : 'çeyreklik'} dönem<span class="count">${charts.length} grafik</span></summary>
+      <div class="fold-body"><div class="qcharts">${charts.map((c) => `<div>${c}</div>`).join('')}</div>
+      <p class="small muted" style="margin-top:8px">Satış büyüyor mu, marj korunuyor mu, nakit artıyor mu, hisse sayısı seyreliyor mu.</p></div></details>`;
   }
 
-  /* ---------------------------------------------------------- ters DCF */
-  function dcfSection() {
+  function dcfFold() {
     const d = card.reverse_dcf || {};
+    if (!F.isNum(d.fcf_ttm_musd) || d.fcf_ttm_musd <= 0) return '';
     const implied = d.implied_growth_pct;
     const actual = d.actual_growth_pct;
-
-    if (!Fmt.isNum(d.fcf_ttm_musd) || d.fcf_ttm_musd <= 0) {
-      return `<section id="dcf"><h2>Ters DCF</h2>
-        <div class="card muted small">Serbest nakit akisi pozitif olmadigi icin
-          ters DCF anlamsiz. Kol B sirketlerinde EV/Brut kar ve EV/Hasilat
-          carpanlarina bak.</div></section>`;
-    }
-
-    // Sirket kuculuyorsa (actual <= 0) ima edilen/gerceklesen orani anlamsizdir:
-    // negatif tabana bolmek her ima edilen buyumeyi "cok yuksek" gosterir.
-    // Bu durumda ima edilen buyume MUTLAK olarak degerlendirilir.
-    let verdict = ['gray', ''];
-    if (Fmt.isNum(implied) && Fmt.isNum(actual) && actual > 0) {
-      verdict = implied > actual * 1.5
-        ? ['red', 'Fiyat, sirketin gerceklesen buyumesinin cok uzerini varsayiyor.']
-        : implied > actual
-        ? ['yellow', 'Fiyat, gerceklesen buyumenin biraz uzerini varsayiyor.']
-        : ['green', 'Fiyat, sirketin mevcut buyumesini bile tam fiyatlamamis.'];
-    } else if (Fmt.isNum(implied) && implied <= 0 && Fmt.isNum(actual) && actual > 0) {
-      verdict = ['green', 'Fiyat, nakit akisinin AZALACAGINI varsayiyor — ama sirket '
-        + 'buyuyor. Piyasa bu sirketten hicbir sey beklemiyor demektir; '
-        + 'tezin dogruysa yeniden fiyatlanma potansiyeli en yuksek durum budur.'];
-    } else if (Fmt.isNum(implied) && Fmt.isNum(actual) && actual <= 0) {
-      verdict = implied <= 0
-        ? ['green', 'Sirket kuculuyor ve fiyat da dususu varsayiyor — oran degil, '
-            + 'nakit akisinin kaliciligina bak.']
-        : ['yellow', 'Sirket kuculuyor ama fiyat buyume varsayiyor. Oran anlamsiz '
-            + '(negatif taban); ima edilen buyumeyi mutlak olarak degerlendir.'];
-    }
-
-    return `<section id="dcf"><h2>Ters DCF</h2>
-      <div class="card">
-        <p style="font-size:15px;margin-top:0">Bu fiyat
-          <b class="c-${verdict[0]}">${Fmt.pctText(Math.abs(implied || 0), 1)}</b> yillik FCF
-          ${Fmt.isNum(implied) && implied < 0 ? 'KUCULMESI' : 'buyumesi'} varsayiyor;
-          sirket son 3 yilda <b>${Fmt.pctText(Math.abs(actual || 0), 1)}</b>
-          ${Fmt.isNum(actual) && actual < 0 ? 'KUCULDU' : 'buyudu'}.</p>
-        ${verdict[1] ? `<p class="small c-${verdict[0]}">${Fmt.esc(verdict[1])}</p>` : ''}
-
-        <div class="kv" style="margin:12px 0">
-          <dt>TTM serbest nakit akisi</dt><dd>${Fmt.money(d.fcf_ttm_musd, { musd: true })}</dd>
-          <dt>Isletme degeri</dt><dd>${Fmt.money(d.enterprise_value_musd, { musd: true })}</dd>
-          <dt>Iskonto orani</dt><dd>%${Fmt.num((d.discount_rate || 0) * 100, 0)}</dd>
-          <dt>Terminal buyume</dt><dd>%${Fmt.num((d.terminal_growth || 0) * 100, 0)}</dd>
-          <dt>Projeksiyon</dt><dd>${d.projection_years || 10} yil</dd>
-        </div>
-
-        <h3>Kendi varsayiminla dene</h3>
-        <div class="row">
-          <input type="range" id="gSlider" min="-20" max="60" step="1"
-                 value="${Fmt.isNum(actual) ? Math.round(actual) : 10}" style="flex:1;min-width:180px">
-          <span class="num" id="gLabel" style="min-width:56px"></span>
-        </div>
-        <p class="small" id="gResult" style="margin-top:8px"></p>
-        <p class="tiny dim">Kaydirici yalnizca gorsel bir hesap yapar; kartta
-          saklanan degerleri degistirmez.</p>
-      </div></section>`;
+    return `<details class="fold"><summary>Ters DCF<span class="count">${F.isNum(implied) ? `fiyat ${F.esc(F.pctText(implied, 1))} büyüme varsayıyor` : ''}</span></summary>
+      <div class="fold-body">
+        <p>Bu fiyat yıllık <b>${F.esc(F.pctText(implied || 0, 1))}</b> serbest nakit akışı büyümesi varsayıyor;
+          şirket son 3 yılda <b>${F.esc(F.pctText(actual || 0, 1))}</b> ${F.isNum(actual) && actual < 0 ? 'küçüldü' : 'büyüdü'}.</p>
+        <dl class="facts">
+          <div><dt>Son 12 ay FCF</dt><dd>${F.esc(F.money(d.fcf_ttm_musd, { musd: true }))}</dd></div>
+          <div><dt>İşletme değeri</dt><dd>${F.esc(F.money(d.enterprise_value_musd, { musd: true }))}</dd></div>
+          <div><dt>İskonto / terminal</dt><dd>${F.esc(F.share((d.discount_rate || 0) * 100, 0))} / ${F.esc(F.share((d.terminal_growth || 0) * 100, 0))}</dd></div>
+        </dl>
+        <label class="small muted" for="gSlider" style="display:block;margin-top:12px">Kendi büyüme varsayımın</label>
+        <div class="row"><input type="range" id="gSlider" min="-20" max="60" step="1"
+          value="${F.isNum(actual) ? Math.round(actual) : 10}" style="flex:1;min-width:180px"><span class="num" id="gLabel"></span></div>
+        <p class="small" id="gResult"></p></div></details>`;
   }
 
-  /* -------------------------------------------------------------- tez */
-  function thesisSection() {
-    const st = card.story || {};
-    const has = st.why_cheap_diagnosis || (st.bull_case || []).length ||
-                (st.bear_case || []).length || (st.catalyst || {}).type ||
-                (st.thesis_breakers || []).length;
-    if (!has) {
-      return `<section id="tez"><h2>Tez</h2>
-        ${emptyStory('Neden ucuz, boga/ayi tezi, katalizor ve tez kiricilar henuz yazilmadi.')}
-      </section>`;
-    }
-    const cat = st.catalyst || {};
-    return `<section id="tez"><h2>Tez</h2>
-      ${st.why_cheap_diagnosis ? `<div class="card" style="margin-bottom:12px">
-        <h3 style="margin-top:0">Neden ucuz</h3>
-        <p><span class="chip accent">${Fmt.esc(st.why_cheap_diagnosis)}</span></p>
-        ${st.why_cheap_rationale ? `<p>${Fmt.esc(st.why_cheap_rationale)}</p>` : ''}
-      </div>` : ''}
-      <div class="thesis">
-        <div class="card"><h3 style="margin-top:0" class="c-green">Boga tezi</h3>
-          ${(st.bull_case || []).length
-            ? `<ul>${st.bull_case.map((x) => `<li>${Fmt.esc(x)}</li>`).join('')}</ul>`
-            : '<p class="dim small">yazilmadi</p>'}</div>
-        <div class="card"><h3 style="margin-top:0" class="c-red">Ayi tezi</h3>
-          ${(st.bear_case || []).length
-            ? `<ul>${st.bear_case.map((x) => `<li>${Fmt.esc(x)}</li>`).join('')}</ul>`
-            : '<p class="dim small">yazilmadi</p>'}</div>
-      </div>
-      ${cat.type ? `<div class="card" style="margin-top:12px">
-        <h3 style="margin-top:0">Katalizor</h3>
-        <p><b>${Fmt.esc(cat.type)}</b>
-          ${cat.expected_date ? ` · beklenen: ${Fmt.esc(cat.expected_date)}` : ''}
-          ${cat.confidence ? ` · guven: ${Fmt.esc(cat.confidence)}` : ''}</p></div>` : ''}
-      ${(st.thesis_breakers || []).length ? `<div class="card" style="margin-top:12px">
-        <h3 style="margin-top:0">Tezi ne bozar</h3>
-        <ul>${st.thesis_breakers.map((x) =>
-          `<li>${Fmt.esc(typeof x === 'string' ? x : x.description || '')}</li>`).join('')}</ul>
-      </div>` : ''}
-      ${storyStamp()}
-    </section>`;
-  }
-
-  /* --------------------------------------------------------- analist */
-  function analystSection() {
-    const a = card.analyst || {};
-    return `<section id="analist"><h2>Analist konsensusu</h2>
-      <div class="card">
-        <p class="tiny dim" style="margin-top:0">Bu bir BILGI alanidir, karar alani degil.
-          Hedef fiyatlar sistematik olarak iyimserdir ve puanlamaya girmez.</p>
-        ${Charts.ratingBar(a.buy, a.hold, a.sell)}
-        ${Charts.targetRange(a.target_low, a.target_median, a.target_high, card.price)}
-        ${Fmt.isNum(a.upside_to_median) ? `<p class="small">Medyan hedefe potansiyel:
-          <b class="${Fmt.pnlClass(a.upside_to_median)}">${Fmt.signedPct(a.upside_to_median)}</b></p>` : ''}
-        ${(card.story || {}).analyst_narrative
-          ? `<p class="small">${Fmt.esc(card.story.analyst_narrative)}</p>` : ''}
-      </div>
-      ${shortInterest()}
-    </section>`;
-  }
-
-  function shortInterest() {
-    const si = card.short_interest || {};
-    const ins = card.insider || {};
-    if (!Fmt.isNum(si.short_interest) && !Fmt.isNum(ins.form4_count)) return '';
-    return `<div class="card" style="margin-top:12px">
-      <h3 style="margin-top:0">Diger sinyaller</h3>
-      <div class="kv">
-        ${Fmt.isNum(si.short_interest) ? `<dt>Kisa pozisyon</dt>
-          <dd>${Fmt.num(si.short_interest / 1e6, 2)}M hisse
-          ${Fmt.isNum(si.days_to_cover) ? ` · ${Fmt.num(si.days_to_cover, 1)} gunluk hacim` : ''}</dd>` : ''}
-        ${Fmt.isNum(ins.form4_count) ? `<dt>Form 4 (${ins.window_days} gun)</dt>
-          <dd>${ins.form4_count} dosyalama${ins.last_form4 ? ` · son ${Fmt.date(ins.last_form4)}` : ''}</dd>` : ''}
-      </div>
-      <p class="tiny dim">Form 4 sayisi tutar degil dosyalama adedidir; yon
-        bilgisi tasimaz. Baglam icin, karar icin degil.</p></div>`;
-  }
-
-  /* --------------------------------------------------------- haberler */
-  function newsSection() {
-    const news = card.news || [];
-    const summary = (card.story || {}).news_summary;
-    return `<section id="haber"><h2>Haberler</h2>
-      ${summary ? `<div class="card" style="margin-bottom:12px">
-        <h3 style="margin-top:0">Claude'un haber ozeti</h3>
-        <p>${Fmt.esc(summary)}</p>${storyStamp()}</div>` : ''}
-      ${news.length ? `<div class="card">${news.map((n) => `
-        <div style="padding:7px 0;border-bottom:1px solid var(--line-soft)">
-          <a href="${Fmt.esc(n.url)}" target="_blank" rel="noopener">${Fmt.esc(n.headline)}</a>
-          <div class="tiny dim">${Fmt.esc(n.source)} · ${Fmt.date(n.date)}</div>
-        </div>`).join('')}</div>`
-        : `<div class="card muted small">Haber yok. Finnhub anahtari tanimli
-           degilse haber cekilmez.</div>`}
-    </section>`;
-  }
-
-  /* ----------------------------------------------------------- karar */
-  function decisionSection() {
-    const d = card.decision || {};
-    return `<section id="karar"><h2>Karar</h2>
-      <div class="card">
-        ${d.action ? `<p>Mevcut karar: ${Fmt.decisionBadge(d.action)}
-          <span class="tiny dim">${Fmt.date(d.date)}</span></p>
-          ${d.rationale ? `<p class="small">${Fmt.esc(d.rationale)}</p>` : ''}
-          <hr style="border:none;border-top:1px solid var(--line-soft);margin:12px 0">` : ''}
-        <p class="muted small" style="margin-top:0">Dashboard dosyaya yazamaz.
-          Karari kaydetmek icin asagidaki JSON parcasini
-          <code>claude_inbox/${Fmt.esc(card.ticker)}.json</code> dosyasina ekle
-          (Claude Code'a yapistir ya da GitHub'da ac).</p>
-        <div class="form-grid">
-          <label>Karar<select id="dcAction">
-            <option value="">— sec —</option><option>AL</option>
-            <option>BEKLE</option><option>ELE</option></select></label>
-          <label>Tarih<input type="date" id="dcDate"
-            value="${new Date().toISOString().slice(0, 10)}"></label>
-          <label class="full">Gerekce<textarea id="dcWhy" rows="3"
-            placeholder="Neden bu karar?"></textarea></label>
-          <label class="full">JSON parcasi<textarea id="dcOut" rows="9" readonly></textarea></label>
-        </div>
-        <div class="row" style="margin-top:10px">
-          <button id="dcCopy" class="primary">Kopyala</button>
-          <a href="${DataLayer.editUrl(`claude_inbox/${card.ticker}.json`)}"
-             target="_blank" rel="noopener"><button>GitHub'da ac</button></a>
-        </div>
-      </div></section>`;
-  }
-
-  /* ------------------------------------------------------- kaynaklar */
-  function sourcesSection() {
+  function sourcesFold() {
     const ds = card.data_sources || {};
-    const internals = card.score_internals || {};
-    const p = internals.piotroski || {};
-    const testNames = {
-      roa_positive: 'ROA > 0', cfo_positive: 'CFO > 0',
-      roa_improving: 'ROA artiyor', accruals: 'CFO > net kar',
-      leverage_down: 'Borc/varlik dusuyor', liquidity_up: 'Cari oran artiyor',
-      no_dilution: 'Seyrelme yok', margin_up: 'Brut marj artiyor',
-      turnover_up: 'Varlik devir hizi artiyor',
-    };
-
-    return `<section id="kaynak"><h2>Veri kaynagi ve hesap detayi</h2>
-      <div class="card">
-        <div class="kv">
-          <dt>Temel veri</dt><dd>${Fmt.esc(ds.fundamentals || '—')}</dd>
-          <dt>Fiyat</dt><dd>${Fmt.esc(ds.price || '—')}</dd>
-          <dt>Haber</dt><dd>${Fmt.esc(ds.news || '—')}</dd>
-          <dt>Analist</dt><dd>${Fmt.esc(ds.analyst || '—')}</dd>
-          <dt>Son mali donem</dt><dd>${Fmt.esc(ds.period_end || '—')}</dd>
-          <dt>Hesap tabani</dt><dd>${(card.flags || {}).data_basis === 'annual'
-            ? 'yillik tablo (ceyreklik veri yetersiz)' : 'ceyreklik TTM'}</dd>
-          <dt>ROIC yontemi</dt><dd>${(card.flags || {}).roic_method === 'b'
-            ? '(b) net isletme varliklari — ozkaynak negatif'
-            : '(a) ozkaynak + borc - nakit'}</dd>
-          <dt>Kart tarihi</dt><dd>${Fmt.esc(card.as_of)}</dd>
-        </div>
-
-        ${p.tests ? `<h3>Piotroski F alt testleri (${p.score ?? '—'}/${p.max_possible ?? 9})</h3>
-          <div class="row" style="gap:5px">${Object.entries(p.tests).map(([k, v]) =>
-            `<span class="chip ${v === true ? 'green' : v === false ? 'red' : 'gray'}">
-              ${Fmt.esc(testNames[k] || k)}</span>`).join('')}</div>` : ''}
-
-        ${internals.altman && internals.altman.unreliable ? `
-          <div class="warn medium" style="margin-top:12px"><span>⚠</span><span>
-            Altman Z'' guvenilmez: ${Fmt.esc(internals.altman.reason || '')}.
-            ${internals.solvency_fallback ? `Yerine faiz karsilama
-              <b>${Fmt.num(internals.solvency_fallback.interest_coverage, 1)}x</b> ve
-              FCF/toplam borc
-              <b>${Fmt.num(internals.solvency_fallback.fcf_to_total_debt, 2)}</b>.` : ''}
-          </span></div>` : ''}
-
-        ${(internals.beneish || {}).missing && internals.beneish.missing.length ? `
-          <p class="tiny dim" style="margin-top:10px">Beneish M hesaplanamadi;
-            eksik bilesenler: ${Fmt.esc(internals.beneish.missing.join(', '))}</p>` : ''}
-      </div></section>`;
+    const p = (card.score_internals || {}).piotroski || {};
+    const names = { roa_positive: 'ROA > 0', cfo_positive: 'CFO > 0', roa_improving: 'ROA artıyor',
+      accruals: 'CFO > net kâr', leverage_down: 'Borç/varlık düşüyor', liquidity_up: 'Cari oran artıyor',
+      no_dilution: 'Seyrelme yok', margin_up: 'Brüt marj artıyor', turnover_up: 'Varlık devir hızı artıyor' };
+    const rows = [['Temel veri', ds.fundamentals], ['Fiyat', ds.price], ['Haber', ds.news], ['Analist', ds.analyst],
+      ['Son mali dönem', ds.period_end],
+      ['Hesap tabanı', (card.flags || {}).data_basis === 'annual' ? 'yıllık tablo' : 'çeyreklik, son 12 ay']]
+      .filter(([, v]) => v);
+    return `<details class="fold"><summary>Veri kaynağı ve hesap ayrıntısı</summary><div class="fold-body">
+      <dl class="facts">${rows.map(([k, v]) => `<div><dt>${F.esc(k)}</dt><dd>${F.esc(v)}</dd></div>`).join('')}</dl>
+      ${p.tests ? `<p class="small muted" style="margin:12px 0 6px">Piotroski F alt testleri (${F.esc(p.score)}/${F.esc(p.max_possible || 9)})</p>
+        <div class="row" style="gap:6px">${Object.entries(p.tests).map(([k, v]) =>
+          F.badge(`${v === true ? '✓' : v === false ? '✗' : '?'} ${names[k] || k}`)).join('')}</div>` : ''}
+    </div></details>`;
   }
 
-  /* -------------------------------------------------------------- olay */
-  function wire() {
-    // icindekiler vurgusu
-    const links = [...document.querySelectorAll('#toc a')];
+  /* ----------------------------------------------------------- haberler */
+  function news() {
+    const list = card.news || [];
+    const sum = (card.story || {}).news_summary;
+    if (!list.length && !sum) return '<div class="card"><span class="pending">Bu şirket için haber gelmedi.</span></div>';
+    return `${sum ? `<div class="card prose"><p class="small muted">Claude'un özeti</p><p>${F.esc(sum)}</p></div>` : ''}
+      ${list.length ? `<div class="card" style="margin-top:12px"><ul class="news">${list.map((n) => `<li><span></span>
+        <span><a href="${F.esc(n.url)}" target="_blank" rel="noopener">${F.esc(n.headline)}</a>
+        <span class="meta">${F.esc(n.source)} · ${F.esc(F.date(n.date))}</span></span></li>`).join('')}</ul></div>` : ''}`;
+  }
 
-    // Icindekiler tiklamasi: hash'i DEGISTIRMEDEN kaydir. href yerinde
-    // duruyor ki klavye ve orta tik calissin, ama varsayilan davranis
-    // location.hash'i '#metrikler' yapip yonlendiriciyi tetikliyordu.
-    links.forEach((a) => {
-      a.addEventListener('click', (ev) => {
-        const el = document.getElementById(a.dataset.sec);
-        if (!el) return;
-        ev.preventDefault();
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        links.forEach((l) => l.classList.toggle('active', l === a));
-      });
-    });
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        links.forEach((l) => l.classList.toggle('active', l.dataset.sec === e.target.id));
-      });
-    }, { rootMargin: '-70px 0px -70% 0px' });
-    SECTIONS.forEach(([id]) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
+  /* ------------------------------------------------------------- olaylar */
+  function wireTab() {
+    document.querySelectorAll('#coTab .help-btn').forEach((btn) => btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const row = btn.closest('tr');
+      const next = row.nextElementSibling;
+      if (next && next.classList.contains('help-row')) { next.remove(); return; }
+      const sp = F.spec(btn.dataset.help) || {};
+      const tr = document.createElement('tr');
+      tr.className = 'help-row';
+      tr.innerHTML = `<td colspan="4">${F.esc(F.tr(sp.help || ''))}
+        ${sp.formula ? `<br><span class="formula">${F.esc(sp.formula)}</span>` : ''}
+        ${sp.direction ? `<br><span class="dim">Eşikler: ${sp.direction === 'low_good'
+          ? `iyi ≤ ${F.esc(sp.green_max)} · sınırda ≤ ${F.esc(sp.yellow_max)}`
+          : `iyi ≥ ${F.esc(sp.green_min)} · sınırda ≥ ${F.esc(sp.yellow_min)}`}</span>` : ''}</td>`;
+      row.after(tr);
+    }));
 
-    // "?" ikonlari — tanim + formul + tuzak aciklamasi
-    document.querySelectorAll('.help-btn').forEach((btn) => {
-      btn.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        const key = btn.dataset.help;
-        const row = btn.closest('tr');
-        const next = row.nextElementSibling;
-        if (next && next.classList.contains('help-row')) { next.remove(); return; }
-        const spec = Fmt.spec(key) || {};
-        const tr = document.createElement('tr');
-        tr.className = 'help-row';
-        tr.innerHTML = `<td colspan="4">${Fmt.esc(spec.help || 'Aciklama yok.')}
-          ${spec.formula ? `<br><span class="formula">${Fmt.esc(spec.formula)}</span>` : ''}
-          ${spec.direction ? `<br><span class="tiny dim">Esikler:
-            ${spec.direction === 'low_good'
-              ? `yesil ≤ ${spec.green_max} · sari ≤ ${spec.yellow_max} · ustu kirmizi`
-              : `yesil ≥ ${spec.green_min} · sari ≥ ${spec.yellow_min} · alti kirmizi`}
-          </span>` : ''}</td>`;
-        row.after(tr);
-      });
-    });
-
-    // ters DCF kaydirici
     const slider = document.getElementById('gSlider');
     if (slider) {
       const d = card.reverse_dcf || {};
       const update = () => {
         const g = parseFloat(slider.value) / 100;
-        const value = dcfValue(d.fcf_ttm_musd, g, d.discount_rate || 0.10,
-                               d.terminal_growth || 0.03, d.projection_years || 10);
+        const value = dcfValue(d.fcf_ttm_musd, g, d.discount_rate || 0.10, d.terminal_growth || 0.03, d.projection_years || 10);
         const ev = d.enterprise_value_musd;
-        const diff = Fmt.isNum(ev) && ev > 0 ? (value / ev - 1) * 100 : null;
-        document.getElementById('gLabel').textContent = `%${slider.value}`;
-        document.getElementById('gResult').innerHTML =
-          `%${slider.value} buyume ile hesaplanan isletme degeri
-           <b class="num">${Fmt.money(value, { musd: true })}</b> —
-           bugunku EV'ye gore
-           <b class="${Fmt.pnlClass(diff)}">${Fmt.signedPct(diff)}</b>`;
+        const diff = F.isNum(ev) && ev > 0 ? (value / ev - 1) * 100 : null;
+        document.getElementById('gLabel').textContent = F.share(parseFloat(slider.value), 0);
+        document.getElementById('gResult').textContent =
+          `${F.share(parseFloat(slider.value), 0)} büyümeyle işletme değeri ${F.money(value, { musd: true })} — bugünkü değere göre ${F.pct(diff, 1)}`;
       };
       slider.addEventListener('input', update);
       update();
     }
 
-    // karar formu
     const out = document.getElementById('dcOut');
     if (out) {
       const upd = () => {
-        out.value = JSON.stringify({
-          ticker: card.ticker,
-          decision: {
-            action: document.getElementById('dcAction').value,
-            date: document.getElementById('dcDate').value,
-            rationale: document.getElementById('dcWhy').value.trim(),
-            author: 'berke',
-          },
-        }, null, 2);
+        out.value = JSON.stringify({ ticker: card.ticker, decision: {
+          action: document.getElementById('dcAction').value, date: document.getElementById('dcDate').value,
+          rationale: document.getElementById('dcWhy').value.trim(), author: 'berke' } }, null, 2);
       };
-      ['dcAction', 'dcDate', 'dcWhy'].forEach((id) =>
-        document.getElementById(id).addEventListener('input', upd));
+      ['dcAction', 'dcDate', 'dcWhy'].forEach((id) => document.getElementById(id).addEventListener('input', upd));
       upd();
-      document.getElementById('dcCopy').addEventListener('click', () =>
-        App.copy(out.value, 'Karar JSON parcasi kopyalandi'));
+      document.getElementById('dcCopy').addEventListener('click', () => App.copy(out.value, 'Karar JSON parçası kopyalandı'));
     }
+  }
 
-    // "Claude'a sor"
-    document.getElementById('askClaude').addEventListener('click', () => {
-      const m = card.metrics || {};
-      const pick = (k) => (m[k] || {}).value;
-      const summary = {
-        ticker: card.ticker, name: card.name, sector: card.sector,
-        track: card.track, price: card.price,
-        market_cap_musd: card.market_cap_musd,
-        enterprise_value_musd: card.enterprise_value_musd,
-        scores: card.scores,
-        key_metrics: {
-          ev_ebit: pick('ev_ebit'), ev_sales: pick('ev_sales'),
-          ev_gross_profit: pick('ev_gross_profit'),
-          fcf_yield_ev: pick('fcf_yield_ev'), roic: pick('roic'),
-          rev_growth_ttm: pick('rev_growth_ttm'), gross_margin: pick('gross_margin'),
-          rule_of_40: pick('rule_of_40'), piotroski_f: pick('piotroski_f'),
-          altman_z: pick('altman_z'), beneish_m: pick('beneish_m'),
-          implied_growth: pick('implied_growth'), sbc_to_fcf: pick('sbc_to_fcf'),
-        },
-        flags: card.flags,
-        reverse_dcf: card.reverse_dcf,
-        as_of: card.as_of,
-      };
-      const text =
-`${card.ticker} (${card.name}) analizi icin ozet veri asagida.
+  function askClaude() {
+    const m = card.metrics || {};
+    const pick = (k) => (m[k] || {}).value;
+    const keys = ['ev_ebit', 'ev_sales', 'ev_gross_profit', 'fcf_yield_ev', 'roic', 'rev_growth_ttm', 'gross_margin',
+      'rule_of_40', 'piotroski_f', 'altman_z', 'beneish_m', 'implied_growth', 'sbc_to_fcf'];
+    const summaryJson = {
+      ticker: card.ticker, name: card.name, sector: card.sector, track: card.track, price: card.price,
+      market_cap_musd: card.market_cap_musd, enterprise_value_musd: card.enterprise_value_musd,
+      scores: card.scores, key_metrics: Object.fromEntries(keys.map((k) => [k, pick(k)])),
+      flags: card.flags, reverse_dcf: card.reverse_dcf, as_of: card.as_of,
+    };
+    const text = `${card.ticker} (${card.name}) için özet veri aşağıda.
 Tam kart: ${DataLayer.cardRawUrl(card.ticker)}
 
-Lutfen su alanlari doldurup claude_inbox/${card.ticker}.json olarak yaz:
+Lütfen şu alanları doldurup claude_inbox/${card.ticker}.json olarak yaz:
 business_model, moat, why_cheap_diagnosis, why_cheap_rationale,
 bull_case[], bear_case[], catalyst{type,expected_date,confidence},
 thesis_breakers[], news_summary, claude_verdict
 
 \`\`\`json
-${JSON.stringify(summary, null, 2)}
+${JSON.stringify(summaryJson, null, 2)}
 \`\`\``;
-      App.copy(text, 'Ozet + raw link panoya kopyalandi');
-    });
+    App.copy(text, 'Özet ve bağlantı panoya kopyalandı');
   }
 
-  /* Ters DCF degerleme — scores.py'deki dcf_value ile AYNI formul. */
+  /* Ters DCF — puanlama motorundaki dcf_value ile aynı formül. */
   function dcfValue(fcf0, growth, r, terminalG, years) {
-    if (!Fmt.isNum(fcf0) || fcf0 <= 0) return NaN;
+    if (!F.isNum(fcf0) || fcf0 <= 0) return NaN;
     let pv = 0, fcf = fcf0;
     for (let t = 1; t <= years; t++) {
-      fcf = fcf * (1 + growth);
+      fcf *= (1 + growth);
       pv += fcf / Math.pow(1 + r, t);
     }
-    const terminal = (fcf * (1 + terminalG)) / (r - terminalG);
-    return pv + terminal / Math.pow(1 + r, years);
+    return pv + ((fcf * (1 + terminalG)) / (r - terminalG)) / Math.pow(1 + r, years);
   }
 
   return { render };

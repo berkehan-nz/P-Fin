@@ -1,388 +1,223 @@
-/* 2. ADAYLAR — kart izgarasi + yogun tablo, filtreler, siralama. */
+/* ADAYLAR — kompakt liste, hızlı sekmeler, arama.
+ *
+ * Eskiden 139 kart alt alta diziliyordu (telefonda ~59.000 px) ve her
+ * kartta 8-12 renkli öğe vardı. Şimdi varsayılan bir LİSTE: satır başına
+ * sembol, ad, sektör, puan, karar ve tek satırlık "neden ucuz". Ayrıntı
+ * şirket sayfasında. Kart görünümü isteğe bağlı ve sade.
+ */
 window.ViewCandidates = (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
+  const F = Fmt;
+  const PAGE = 30;
 
-  let rows = [];          // tum adaylar (tohum + huni + elle)
+  let rows = [];
   let watchSet = new Set();
   let portSet = new Set();
-  let mode = DataLayer.prefs.get('candidateView', 'grid');
+  let shown = PAGE;
+  const state = {
+    quick: DataLayer.prefs.get('candQuick', 'all'),
+    mode: DataLayer.prefs.get('candMode', 'list'),
+    q: '', sector: '', track: '', minScore: '', sort: 'total', watchOnly: false, portOnly: false,
+  };
 
   async function render() {
     const [cand, wl, port] = await Promise.all([
       DataLayer.candidates(), DataLayer.watchlist(), DataLayer.portfolio(),
     ]);
-
-    rows = [
-      ...(cand.seed || []).map((r) => ({ ...r, group: 'seed' })),
-      ...(cand.candidates || []).map((r) => ({ ...r, group: 'funnel' })),
-      ...(cand.manual || []).map((r) => ({ ...r, group: 'manual' })),
-    ];
-    // Ayni sembol iki listede olabilir (tohum + huni) — bir kez goster
     const seen = new Set();
-    rows = rows.filter((r) => {
-      const key = String(r.ticker).toUpperCase();
-      if (seen.has(key)) return false;
-      seen.add(key); return true;
+    rows = [...(cand.seed || []), ...(cand.candidates || []), ...(cand.manual || [])].filter((r) => {
+      const k = String(r.ticker).toUpperCase();
+      if (seen.has(k)) return false;
+      seen.add(k); return true;
     });
-
-    watchSet = new Set((wl.entries || []).filter((e) => e.active !== false)
-                                          .map((e) => String(e.ticker).toUpperCase()));
+    watchSet = new Set((wl.entries || []).filter((e) => e.active !== false).map((e) => String(e.ticker).toUpperCase()));
     portSet = new Set((port.positions || []).map((p) => String(p.ticker).toUpperCase()));
+    shown = PAGE;
 
-    renderPartialBanner(cand.partial);
-    fillSectorFilter();
-    bindOnce();
+    const sectors = [...new Set(rows.map((r) => r.sector).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'tr'));
+    $('candidatesBody').innerHTML = `
+      <div class="page-head"><h1>Adaylar</h1><span class="sub" id="candCount"></span></div>
+      ${partialBand(cand.partial)}
+      <div class="toolbar">
+        <input type="search" id="cSearch" placeholder="Sembol ya da şirket ara" aria-label="Ara" value="${F.esc(state.q)}">
+        <div class="seg" role="group" aria-label="Hızlı filtre">
+          ${[['decided', 'Kararım'], ['claude', 'Claude notu var'], ['all', 'Hepsi']].map(([k, l]) =>
+            `<button data-quick="${k}" aria-pressed="${state.quick === k}">${l}</button>`).join('')}
+        </div>
+        <div class="seg" role="group" aria-label="Görünüm">
+          <button data-mode="list" aria-pressed="${state.mode === 'list'}">Liste</button>
+          <button data-mode="cards" aria-pressed="${state.mode === 'cards'}">Kart</button>
+        </div>
+        <button id="addCompany" class="ghost">+ Şirket ekle</button>
+      </div>
+      <details class="fold" id="filterBox" style="margin:0 0 12px"><summary>Ayrıntılı filtre<span class="count" id="filterHint"></span></summary>
+        <div class="fold-body"><div class="filter-grid">
+          <label>Sektör<select id="fSector"><option value="">Hepsi</option>${sectors.map((s) =>
+            `<option value="${F.esc(s)}"${state.sector === s ? ' selected' : ''}>${F.esc(F.tr(s))}</option>`).join('')}</select></label>
+          <label>Tür<select id="fTrack"><option value="">Hepsi</option>
+            <option value="A">Kârlı</option><option value="B">Büyüyen</option><option value="both">İkisi de</option></select></label>
+          <label>En düşük puan<input type="number" id="fMin" min="0" max="100" step="5" inputmode="numeric" placeholder="0"></label>
+          <label>Sırala<select id="fSort">
+            <option value="total">Puan</option><option value="value">Ucuzluk</option>
+            <option value="momentum">Momentum</option><option value="updated">Güncellenme</option>
+            <option value="ticker">Sembol</option></select></label>
+          <label class="inline"><input type="checkbox" id="fWatch"> Yalnızca izleme listesi</label>
+          <label class="inline"><input type="checkbox" id="fPort"> Yalnızca portföy</label>
+        </div></div></details>
+      <div id="candList"></div>`;
+
+    $('fTrack').value = state.track;
+    $('fMin').value = state.minScore;
+    $('fSort').value = state.sort;
+    $('fWatch').checked = state.watchOnly;
+    $('fPort').checked = state.portOnly;
+    wire();
     apply();
   }
 
-  /* Tarama surerken yazilan liste GECICIDIR. Havuz buyudukce sektor
-     yuzdelikleri ve dolayisiyla siralama degisir. Bunu soylemezsek
-     kullanici yarim veriye gore karar verir. */
-  function renderPartialBanner(partial) {
-    const el = $('partialBanner');
-    if (!el) return;
-    if (!partial || !partial.is_partial) { el.innerHTML = ''; return; }
-    el.innerHTML = `<div class="banner">
-      <b>Bu liste geçici.</b> Evren taramasi surüyor:
-      <b>${partial.scanned}/${partial.universe}</b> sirket islendi
-      (%${Fmt.num(partial.pct, 1)}), ${partial.survivors} tanesi sert
-      filtreleri gecti ve ${partial.ranked} tanesi aday olarak siralandi.
-      <br>
-      Puanlar <b>ayni sektordeki digerlerine gore</b> hesaplandigi icin havuz
-      buyudukce siralama DEGISECEK. Tarama bitince liste yeniden kurulur.
-      Tohum listesindeki 36 sirket bundan etkilenmez.
-      ${progressLine(partial)}
-    </div>`;
+  /* Tarama sürerken liste geçicidir — tek satırda söylenir. */
+  function partialBand(partial) {
+    if (!partial || !partial.is_partial) return '';
+    const h = F.hoursSince(partial.last_batch_at);
+    const stalled = h !== null && h >= 6;
+    return `<div class="band ${stalled ? 'warn' : 'info'}"><span class="ico">${stalled ? '!' : 'i'}</span><span>
+      Liste geçici: evren taraması ${F.esc(F.share(partial.pct, 0))}'de. Puanlar havuz büyüdükçe değişebilir.
+      ${stalled ? ` Son parti ${F.esc(F.sinceLabel(partial.last_batch_at))} işlendi.` : ''}</span></div>`;
   }
 
-  /* Tarama saatte bir parti isler. Kac saattir ilerlemedigi YAZILI olmali:
-     22 Eylul 2026'da tarama iki gun boyunca durdu ve panoda bunu gosteren
-     hicbir sey olmadigi icin fark edilmedi. */
-  function progressLine(partial) {
-    const h = Fmt.hoursSince(partial.last_batch_at);
-    if (h === null) return '';
-    const kalan = partial.remaining != null
-      ? ` Kalan ${partial.remaining} sirket.` : '';
-    if (h >= 3) {
-      return `<br><b class="neg">Dikkat: tarama ${Fmt.sinceLabel(partial.last_batch_at)}
-        ilerledi.</b> Saatlik kosu normalde her saat bir parti isler;
-        bu kadar beklemek bir aksaklik anlamina gelir.${kalan}`;
-    }
-    return `<br>Son parti: <b>${Fmt.sinceLabel(partial.last_batch_at)}</b>.${kalan}`;
-  }
-
-  function fillSectorFilter() {
-    const sectors = [...new Set(rows.map((r) => r.sector).filter(Boolean))].sort();
-    const sel = $('fSector');
-    const current = sel.value;
-    sel.innerHTML = '<option value="">Hepsi</option>' +
-      sectors.map((s) => `<option value="${Fmt.esc(s)}">${Fmt.esc(s)}</option>`).join('');
-    sel.value = current;
-  }
-
-  let bound = false;
-  function bindOnce() {
-    if (bound) return;
-    bound = true;
-    ['fSector', 'fTrack', 'fSource', 'fDecision', 'fMinScore', 'fSort',
-     'fWatchOnly', 'fPortfolioOnly'].forEach((id) =>
-      $(id).addEventListener('input', apply));
-    $('fReset').addEventListener('click', () => {
-      ['fSector', 'fTrack', 'fSource', 'fDecision', 'fMinScore'].forEach((id) => $(id).value = '');
-      $('fWatchOnly').checked = false; $('fPortfolioOnly').checked = false;
-      $('fSort').value = 'total';
+  function wire() {
+    $('cSearch').addEventListener('input', (e) => { state.q = e.target.value.trim(); shown = PAGE; apply(); });
+    document.querySelectorAll('[data-quick]').forEach((b) => b.addEventListener('click', () => {
+      state.quick = b.dataset.quick;
+      DataLayer.prefs.set('candQuick', state.quick);
+      document.querySelectorAll('[data-quick]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      shown = PAGE; apply();
+    }));
+    document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
+      state.mode = b.dataset.mode;
+      DataLayer.prefs.set('candMode', state.mode);
+      document.querySelectorAll('[data-mode]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       apply();
-    });
-    $('viewGrid').addEventListener('click', () => setMode('grid'));
-    $('viewTable').addEventListener('click', () => setMode('table'));
+    }));
+    const bind = (id, key, read) => $(id).addEventListener('input', () => { state[key] = read($(id)); shown = PAGE; apply(); });
+    bind('fSector', 'sector', (e) => e.value);
+    bind('fTrack', 'track', (e) => e.value);
+    bind('fMin', 'minScore', (e) => e.value);
+    bind('fSort', 'sort', (e) => e.value);
+    bind('fWatch', 'watchOnly', (e) => e.checked);
+    bind('fPort', 'portOnly', (e) => e.checked);
     $('addCompany').addEventListener('click', openAddCompany);
-    initFilterPanel();
-    setMode(mode, true);
   }
 
-  /* Filtre paneli genis ekranda hep acik, dar ekranda varsayilan KAPALI durur:
-     dokuz kontrol telefonda ilk ekranin tamamini yiyordu. Kullanici bir kez
-     acar/kapatirsa tercihi korunur; kendiliginden geri kapanmaz. */
-  const NARROW = '(max-width: 760px)';
-  let filterTouched = false;
-
-  function initFilterPanel() {
-    const box = $('filterBox');
-    const mq = window.matchMedia(NARROW);
-    const saved = DataLayer.prefs.get('filtersOpen', null);
-    const sync = () => { if (!filterTouched) box.open = !mq.matches; };
-
-    if (saved === null) sync(); else { box.open = saved === '1'; filterTouched = true; }
-    mq.addEventListener('change', sync);
-
-    box.addEventListener('toggle', () => {
-      filterTouched = true;
-      DataLayer.prefs.set('filtersOpen', box.open ? '1' : '0');
-    });
-  }
-
-  /* Panel kapaliyken kac filtre acik oldugu gorunmezdi — bos gelen bir listenin
-     sebebi anlasilmiyordu. */
-  function updateFilterHint(f) {
-    const active = [
-      f.sector && f.sector, f.track && 'kol', f.source && 'kaynak',
-      f.decision && 'karar', !isNaN(f.minScore) && 'min puan',
-      f.watchOnly && 'izleme', f.portfolioOnly && 'portfoy',
-    ].filter(Boolean).length;
-    const el = $('filterHint');
-    if (el) el.textContent = active ? ` · ${active} filtre acik` : '';
-  }
-
-  function setMode(m, silent) {
-    mode = m;
-    DataLayer.prefs.set('candidateView', m);
-    $('viewGrid').setAttribute('aria-pressed', String(m === 'grid'));
-    $('viewTable').setAttribute('aria-pressed', String(m === 'table'));
-    $('candidateGrid').hidden = m !== 'grid';
-    $('candidateTable').hidden = m !== 'table';
-    if (!silent) apply();
-  }
-
-  function apply() {
-    const f = {
-      sector: $('fSector').value,
-      track: $('fTrack').value,
-      source: $('fSource').value,
-      decision: $('fDecision').value,
-      minScore: parseFloat($('fMinScore').value),
-      sort: $('fSort').value,
-      watchOnly: $('fWatchOnly').checked,
-      portfolioOnly: $('fPortfolioOnly').checked,
-    };
-
-    let out = rows.filter((r) => {
+  function filtered() {
+    const q = state.q.toLocaleLowerCase('tr');
+    const min = parseFloat(state.minScore);
+    return rows.filter((r) => {
       const t = String(r.ticker).toUpperCase();
-      if (f.sector && r.sector !== f.sector) return false;
-      if (f.track && r.track !== f.track) return false;
-      if (f.source === 'seed' && r.group !== 'seed') return false;
-      if (f.source === 'funnel' && r.group !== 'funnel') return false;
-      if (f.source === 'manual' && r.group !== 'manual') return false;
-      if (f.decision === '__none__' && r.decision) return false;
-      if (f.decision && f.decision !== '__none__' && r.decision !== f.decision) return false;
-      if (!isNaN(f.minScore) && !((r.scores || {}).total >= f.minScore)) return false;
-      if (f.watchOnly && !watchSet.has(t)) return false;
-      if (f.portfolioOnly && !portSet.has(t)) return false;
+      if (state.quick === 'decided' && !r.decision) return false;
+      if (state.quick === 'claude' && !r.claude_verdict) return false;
+      if (q && !(t.toLocaleLowerCase('tr').includes(q) || String(r.name || '').toLocaleLowerCase('tr').includes(q))) return false;
+      if (state.sector && r.sector !== state.sector) return false;
+      if (state.track && r.track !== state.track) return false;
+      if (!isNaN(min) && !(((r.scores || {}).total) >= min)) return false;
+      if (state.watchOnly && !watchSet.has(t)) return false;
+      if (state.portOnly && !portSet.has(t)) return false;
       return true;
-    });
-
-    out.sort(sorter(f.sort));
-    updateFilterHint(f);
-
-    $('candidateCount').innerHTML =
-      `${out.length} / ${rows.length} sirket gosteriliyor` +
-      (rows.length ? ' · <span class="dim">Karta tikla, tum metrikleri ve '
-        + 'her birinin ne anlama geldigini gor.</span>'
-        : ' — veri hatti henuz calismadi');
-
-    if (mode === 'grid') renderGrid(out); else renderTable(out);
+    }).sort(sorter(state.sort));
   }
 
   function sorter(key) {
-    const sc = (r, k) => { const v = (r.scores || {})[k]; return Fmt.isNum(v) ? v : -1; };
-    const hm = (r, k) => { const c = (r.headline || {})[k]; return c && Fmt.isNum(c.value) ? c.value : -Infinity; };
-    switch (key) {
-      case 'value':    return (a, b) => sc(b, 'value') - sc(a, 'value');
-      case 'growth':   return (a, b) => hm(b, 'rev_growth_ttm') - hm(a, 'rev_growth_ttm');
-      case 'momentum': return (a, b) => sc(b, 'momentum') - sc(a, 'momentum');
-      case 'updated':  return (a, b) => String(b.as_of || '').localeCompare(String(a.as_of || ''));
-      case 'ticker':   return (a, b) => String(a.ticker).localeCompare(String(b.ticker));
-      default:         return (a, b) => sc(b, 'total') - sc(a, 'total');
-    }
+    const sc = (r, k) => { const v = (r.scores || {})[k]; return F.isNum(v) ? v : -1; };
+    if (key === 'value') return (a, b) => sc(b, 'value') - sc(a, 'value');
+    if (key === 'momentum') return (a, b) => sc(b, 'momentum') - sc(a, 'momentum');
+    if (key === 'updated') return (a, b) => String(b.as_of || '').localeCompare(String(a.as_of || ''));
+    if (key === 'ticker') return (a, b) => String(a.ticker).localeCompare(String(b.ticker));
+    return (a, b) => sc(b, 'total') - sc(a, 'total');
   }
 
-  /* ------------------------------------------------------------ izgara */
-  function renderGrid(list) {
-    if (!list.length) { $('candidateGrid').innerHTML = emptyState(); return; }
-    $('candidateGrid').innerHTML = list.map(cardHtml).join('');
-    $('candidateGrid').querySelectorAll('[data-ticker]').forEach((el) =>
-      el.addEventListener('click', () => { location.hash = `#/company/${el.dataset.ticker}`; }));
+  function apply() {
+    const list = filtered();
+    const active = [state.sector, state.track, state.minScore, state.watchOnly, state.portOnly].filter(Boolean).length;
+    $('filterHint').textContent = active ? `${active} filtre açık` : '';
+    $('candCount').textContent = `${list.length} / ${rows.length} şirket`;
+    const page = list.slice(0, shown);
+    const body = state.mode === 'cards' ? cards(page) : listHtml(page);
+    const more = list.length > page.length
+      ? `<div class="more"><button id="moreRows">${Math.min(PAGE, list.length - page.length)} daha göster</button></div>` : '';
+    $('candList').innerHTML = list.length ? body + more
+      : `<div class="card muted">Bu filtrelere uyan şirket yok.</div>`;
+    $('candList').querySelectorAll('[data-ticker]').forEach((el) => {
+      const go = () => App.go(`sirket/${el.dataset.ticker}`);
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+    });
+    const m = $('moreRows');
+    if (m) m.addEventListener('click', () => { shown += PAGE; apply(); });
   }
 
-  /* Kart uzerinde yer az; tam cumle sigmaz. Kisa ama ANLAMLI bir ozet. */
-  function shortMeaning(key, v) {
-    if (!Fmt.isNum(v)) return 'veri yok';
-    const map = {
-      ev_ebit: (x) => `${Fmt.num(x, 1)} yilda kendini oder`,
-      ev_sales: (x) => `1$ satis icin ${Fmt.num(x, 1)}$`,
-      ev_gross_profit: (x) => `brut karin ${Fmt.num(x, 1)} kati`,
-      // Negatifte hem isaret yeri hem de fiil degisir: nakit "getiri" degil
-      // "yakim"dir, sermaye "getiri" degil "zarar" uretir.
-      fcf_yield_ev: (x) => x < 0
-        ? `yilda ${Fmt.pctText(Math.abs(x), 1)} nakit yakiyor`
-        : `yilda ${Fmt.pctText(x, 1)} nakit getiri`,
-      roic: (x) => x < 0
-        ? `sermaye ${Fmt.pctText(Math.abs(x), 0)} zarar uretiyor`
-        : `sermaye getirisi ${Fmt.pctText(x, 0)}`,
-      rev_growth_ttm: (x) => `satislar ${Fmt.pctText(Math.abs(x), 1)} ${x < 0 ? 'dustu' : 'artti'}`,
-      rule_of_40: (x) => `buyume+nakit = ${Fmt.num(x, 0)}`,
-    };
-    return map[key] ? map[key](v) : '';
+  function why(r) { return F.tr(r.why_cheap || ''); }
+
+  function marks(r) {
+    const t = String(r.ticker).toUpperCase();
+    return [portSet.has(t) && 'portföyde', watchSet.has(t) && 'izleniyor', r.claude_verdict && 'Claude notu']
+      .filter(Boolean).join(' · ');
   }
 
-  function cardHtml(r) {
-    const s = r.scores || {};
-    const stale = Fmt.isNum(r.story_age_days) && r.story_age_days > 30;
-    const verdict = r.claude_verdict
-      ? `<div class="verdict ${stale ? 'stale' : ''}">${Fmt.esc(r.claude_verdict)}
-         ${stale ? `<span class="tiny dim"> · ${r.story_age_days} gun once</span>` : ''}</div>`
-      : `<div class="verdict stale">Claude notu yok</div>`;
-
-    const headline = Object.entries(r.headline || {}).map(([k, cell]) => {
-      const v = cell && cell.value;
-      return `
-      <div class="hm" title="${Fmt.esc(Fmt.plain(k))}${
-        Fmt.isNum(v) ? ' — ' + Fmt.sentence(k, v) : ''}">
-        <div class="k">${Fmt.esc(Fmt.label(k))}</div>
-        <div class="v ${cell ? 'c-' + (cell.color || 'gray') : 'c-gray'}">
-          <span class="arrow">${Fmt.arrow(k, cell && cell.color)}</span>
-          ${Fmt.esc(Fmt.metricValue(k, v))}</div>
-        <div class="tiny dim" style="margin-top:2px;line-height:1.25;white-space:normal">
-          ${Fmt.esc(shortMeaning(k, v))}</div></div>`; }).join('');
-
-    const subLabels = { value: 'Ucuzluk', quality: 'Kalite', safety: 'Saglamlik',
-                        momentum: 'Momentum', earnings_quality: 'Kazanc kalitesi' };
-    const subs = ['value', 'quality', 'safety', 'momentum', 'earnings_quality']
-      .map((k) => {
-        const info = (App.thresholds.score_plain || {})[k] || [subLabels[k], ''];
-        const val = Fmt.isNum(s[k]) ? Math.round(s[k]) : null;
-        return `<div class="subscore"
-          title="${Fmt.esc(info[0])}: ${Fmt.esc(info[1])}${
-            val !== null ? ' — su an ' + val + '/100' : ''}">
-          <div class="k">${Fmt.esc(subLabels[k])}</div>
-          ${Charts.miniBar(s[k])}</div>`; }).join('');
-
-    const badges = [
-      Fmt.trackBadge(r.track),
-      r.group === 'seed' ? '<span class="chip gray">tohum</span>' : '',
-      r.group === 'manual' ? '<span class="chip gray">elle</span>' : '',
-      watchSet.has(String(r.ticker).toUpperCase()) ? '<span class="chip accent">izliyor</span>' : '',
-      portSet.has(String(r.ticker).toUpperCase()) ? '<span class="chip green">portfoy</span>' : '',
-      Fmt.decisionBadge(r.decision),
-      r.warning_count ? `<span class="chip yellow" title="${Fmt.esc((r.warnings || []).join(' | '))}">⚠ ${r.warning_count}</span>` : '',
-      r.data_quality === 'kotu'
-        ? '<span class="chip red" title="Veri kalitesi dusuk — sayilara guvenme, detaya bak">veri şüpheli</span>'
-        : r.data_quality === 'sinirli'
-        ? '<span class="chip gray" title="Bazi alanlar eksik veya dogrulanmali">veri sınırlı</span>' : '',
-    ].filter(Boolean).join(' ');
-
-    return `<article class="co-card" data-ticker="${Fmt.esc(r.ticker)}" tabindex="0">
-      <div class="co-head">
-        <div style="min-width:0">
-          <div class="co-ticker">${Fmt.esc(r.ticker)}</div>
-          <div class="co-name">${Fmt.esc(r.name)}</div>
-          <div class="tiny dim" style="margin-top:3px">${Fmt.esc(r.sector)} ·
-            ${Fmt.money(r.market_cap_musd, { musd: true })}</div>
-        </div>
-        <div style="text-align:center">
-          ${Charts.scoreRing(s.total)}
-          <div class="tiny dim" style="margin-top:2px">genel puan</div>
-        </div>
-      </div>
-      <div class="subscores">${subs}</div>
-      <div class="headline-metrics">${headline}</div>
-      <div class="spread">
-        <span class="num" style="font-size:15px;font-weight:600">
-          ${Fmt.money(r.price, { digits: 2 })}</span>
-        ${Charts.sparkline(r.sparkline, { w: 100, h: 26, color: 'auto' })}
-      </div>
-      ${r.why_cheap ? `<span class="chip gray">${Fmt.esc(r.why_cheap)}</span>` : ''}
-      ${verdict}
-      <div class="row" style="gap:4px">${badges}</div>
-    </article>`;
+  function listHtml(list) {
+    return `<div class="card flush">
+      <div class="list-head"><span>Şirket</span><span class="sec">Sektör</span><span class="r">Puan</span><span>Karar</span><span class="whyh">Neden ucuz</span></div>
+      <ul class="clist">${list.map((r) => {
+        const m = marks(r);
+        return `<li data-ticker="${F.esc(r.ticker)}" tabindex="0">
+          <span class="t"><b>${F.esc(r.ticker)}</b><span class="sub">${F.esc(r.name || '')}${m ? ` · ${F.esc(m)}` : ''}</span></span>
+          <span class="sec">${F.esc(F.tr(r.sector || ''))}</span>
+          <span class="score">${F.isNum((r.scores || {}).total) ? F.esc(F.int(r.scores.total)) : ''}</span>
+          <span>${F.decisionBadge(r.decision)}</span>
+          <span class="why">${F.esc(why(r))}</span></li>`;
+      }).join('')}</ul></div>`;
   }
 
-  /* ------------------------------------------------------- yogun tablo */
-  function renderTable(list) {
-    if (!list.length) { $('candidateTable').innerHTML = emptyState(); return; }
-    const cols = ['ev_ebit', 'ev_sales', 'fcf_yield_ev', 'rev_growth_ttm',
-                  'gross_margin', 'roic', 'rule_of_40', 'piotroski_f',
-                  'altman_z', 'beneish_m', 'net_debt_to_ebitda', 'sbc_to_fcf'];
-
-    $('candidateTable').innerHTML = `<table>
-      <thead><tr>
-        <th>Sembol</th><th>Puan</th><th>Kol</th><th>Sektor</th><th>Fiyat</th>
-        ${cols.map((c) => `<th title="${Fmt.esc((Fmt.spec(c) || {}).help || '')}">${Fmt.esc(Fmt.label(c))}</th>`).join('')}
-        <th>Karar</th>
-      </tr></thead>
-      <tbody>${list.map((r) => `<tr data-ticker="${Fmt.esc(r.ticker)}" style="cursor:pointer">
-        <td><b>${Fmt.esc(r.ticker)}</b><div class="tiny dim">${Fmt.esc((r.name || '').slice(0, 26))}</div></td>
-        <td class="num">${Fmt.isNum((r.scores || {}).total) ? Math.round(r.scores.total) : '—'}</td>
-        <td>${Fmt.trackBadge(r.track)}</td>
-        <td class="tiny">${Fmt.esc(r.sector)}</td>
-        <td class="num">${Fmt.money(r.price, { digits: 2 })}</td>
-        ${cols.map((c) => {
-          const cell = (r.headline || {})[c];
-          return `<td class="num ${cell ? 'c-' + (cell.color || 'gray') : 'c-gray'}">${
-            cell ? Fmt.esc(Fmt.metricValue(c, cell.value)) : '<span class="dim">·</span>'}</td>`;
-        }).join('')}
-        <td>${Fmt.decisionBadge(r.decision) || '<span class="dim">—</span>'}</td>
-      </tr>`).join('')}</tbody></table>
-      <div class="tiny dim" style="padding:8px 10px">
-        Yogun tabloda yalnizca kol basina ozet metrikler dolu gelir;
-        tum metrikler icin sirket detayina gec.</div>`;
-
-    $('candidateTable').querySelectorAll('[data-ticker]').forEach((el) =>
-      el.addEventListener('click', () => { location.hash = `#/company/${el.dataset.ticker}`; }));
+  function cards(list) {
+    return `<div class="cgrid">${list.map((r) => `<article class="card ccard" data-ticker="${F.esc(r.ticker)}" tabindex="0">
+      <div class="top"><div style="min-width:0"><b style="font-size:17px">${F.esc(r.ticker)}</b>
+        <div class="small muted">${F.esc(r.name || '')}</div></div>${Charts.scoreRing((r.scores || {}).total)}</div>
+      <div class="spread"><span class="num">${F.esc(F.money(r.price))}</span>
+        ${Charts.sparkline(r.sparkline, { w: 100, h: 24, accent: portSet.has(String(r.ticker).toUpperCase()) })}</div>
+      ${why(r) ? `<div class="why">${F.esc(why(r))}</div>` : ''}
+      ${r.decision ? `<div>${F.decisionBadge(r.decision)}</div>` : ''}
+    </article>`).join('')}</div>`;
   }
 
-  function emptyState() {
-    return `<div class="empty-state">
-      <h2>Henuz aday yok</h2>
-      <p>Veri hatti bu ortamda calismadi. Kartlari doldurmak icin:</p>
-      <ol>
-        <li>GitHub'da <b>Actions</b> sekmesine gec</li>
-        <li><b>Bootstrap (tohum listesi)</b> is akisini sec</li>
-        <li><b>Run workflow</b> ile calistir — 36 tohum sirket icin kart uretir</li>
-      </ol>
-      <p class="tiny">Yerelde: <code>python -m src.run_seed</code></p>
-    </div>`;
-  }
-
-  /* ------------------------------------------------- sirket ekleme formu */
+  /* ------------------------------------------------ şirket ekleme formu */
   function openAddCompany() {
     App.modal(`
-      <h2>Sirket ekle</h2>
-      <p class="muted small">Dashboard statik oldugu icin dosyaya dogrudan yazamaz.
-        Asagidaki JSON parcasini ya Claude Code'a yapistir, ya da GitHub
-        duzenleyicisinde <code>data/watchlist.json</code> icindeki
-        <code>entries</code> dizisine ekle.</p>
+      <h2>Şirket ekle</h2>
+      <p class="muted small">Pano dosyaya yazamaz. Bu parçayı sohbette Claude'a ver ya da
+        <code>data/watchlist.json</code> içindeki <code>entries</code> dizisine ekle.</p>
       <div class="form-grid">
         <label>Sembol<input id="wlTicker" placeholder="NVDA" autocomplete="off"></label>
-        <label>Etiket<input id="wlTags" placeholder="yari-iletken, izle"></label>
-        <label class="full">Neden izliyoruz?
-          <input id="wlReason" placeholder="Ornegin: veri merkezi buyumesi yavasliyor mu"></label>
-        <label class="full">JSON parcasi
-          <textarea id="wlOut" rows="9" readonly></textarea></label>
+        <label>Etiketler<input id="wlTags" placeholder="yarı iletken, izle"></label>
+        <label class="full">Neden izliyoruz?<input id="wlReason"></label>
+        <label class="full">JSON parçası<textarea id="wlOut" rows="8" readonly></textarea></label>
       </div>
       <div class="row" style="margin-top:12px">
         <button id="wlCopy" class="primary">Kopyala</button>
-        <a href="${DataLayer.editUrl('data/watchlist.json')}" target="_blank"
-           rel="noopener"><button>GitHub'da ac</button></a>
+        <a href="${DataLayer.editUrl('data/watchlist.json')}" target="_blank" rel="noopener"><button>GitHub'da aç</button></a>
         <button id="wlClose" class="ghost" style="margin-left:auto">Kapat</button>
       </div>`, (root) => {
       const upd = () => {
-        const tags = root.querySelector('#wlTags').value
-          .split(',').map((s) => s.trim()).filter(Boolean);
         root.querySelector('#wlOut').value = JSON.stringify({
           ticker: (root.querySelector('#wlTicker').value || '').toUpperCase().trim(),
-          added_date: new Date().toISOString().slice(0, 10),
-          added_by: 'berke',
+          added_date: new Date().toISOString().slice(0, 10), added_by: 'berke',
           reason: root.querySelector('#wlReason').value.trim(),
-          tags,
+          tags: root.querySelector('#wlTags').value.split(',').map((s) => s.trim()).filter(Boolean),
           active: true,
         }, null, 2);
       };
-      ['wlTicker', 'wlReason', 'wlTags'].forEach((id) =>
-        root.querySelector('#' + id).addEventListener('input', upd));
+      ['wlTicker', 'wlReason', 'wlTags'].forEach((id) => root.querySelector('#' + id).addEventListener('input', upd));
       upd();
-      root.querySelector('#wlCopy').addEventListener('click', () =>
-        App.copy(root.querySelector('#wlOut').value, 'JSON parcasi kopyalandi'));
+      root.querySelector('#wlCopy').addEventListener('click', () => App.copy(root.querySelector('#wlOut').value, 'JSON parçası kopyalandı'));
       root.querySelector('#wlClose').addEventListener('click', App.closeModal);
     });
   }
