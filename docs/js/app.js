@@ -1,72 +1,85 @@
-/* Uygulama kabugu — yonlendirme, tema, modal, panoya kopyalama.
+/* Uygulama kabuğu — yönlendirme, tema, modal, panoya kopyalama.
  *
- * localStorage yalnizca GORUNUM TERCIHI tutar (tema, izgara/tablo).
- * Veri asla burada saklanmaz; tek dogru kaynak repodaki JSON dosyalaridir.
+ * localStorage yalnızca GÖRÜNÜM TERCİHİ tutar (tema, liste/kart, seçili
+ * kıyas). Veri asla burada saklanmaz; tek doğru kaynak repodaki JSON'lardır.
+ *
+ * Rotalar: #/bugun · #/portfoy[/plan|pozisyonlar|islemler|haftalik] ·
+ * #/adaylar · #/piyasa · #/huni · #/sirket/<SEMBOL>. Eski bağlantılar
+ * (#/overview, #/company/X, #/weekly ...) aynı yere gider.
  */
 window.App = (function () {
   'use strict';
 
   const ROUTES = {
-    '/overview':   { screen: 'overview',   view: () => ViewOverview.render() },
-    '/candidates': { screen: 'candidates', view: () => ViewCandidates.render() },
-    '/portfolio':  { screen: 'portfolio',  view: () => ViewPortfolio.render() },
-    '/funnel':     { screen: 'funnel',     view: () => ViewFunnel.render() },
-    '/weekly':     { screen: 'weekly',     view: () => ViewWeekly.render() },
+    bugun:   { screen: 'today',      view: () => ViewToday.render() },
+    portfoy: { screen: 'portfolio',  view: (arg) => ViewPortfolio.render(arg) },
+    adaylar: { screen: 'candidates', view: () => ViewCandidates.render() },
+    piyasa:  { screen: 'market',     view: () => ViewMarket.render() },
+    huni:    { screen: 'funnel',     view: () => ViewFunnel.render() },
+    sirket:  { screen: 'company',    view: (arg) => ViewCompany.render(String(arg || '').toUpperCase()) },
+  };
+  const ALIASES = {
+    overview: ['bugun'], portfolio: ['portfoy'], candidates: ['adaylar'],
+    funnel: ['huni'], market: ['piyasa'], weekly: ['portfoy', 'haftalik'], company: ['sirket'],
   };
 
   const api = { thresholds: {} };
 
   /* ------------------------------------------------------------- tema */
   function initTheme() {
-    // Sartname: koyu tema VARSAYILAN, acik tema bir anahtar.
-    // Sistem tercihi varsayilani ezmez; kullanici acikca sectiyse o kalir.
+    // Koyu tema varsayılan; açık tema bir anahtar. Seçim hatırlanır.
     const theme = DataLayer.prefs.get('theme', null) || 'dark';
     document.documentElement.setAttribute('data-theme', theme);
-
     document.getElementById('themeToggle').addEventListener('click', () => {
-      const next = document.documentElement.getAttribute('data-theme') === 'dark'
-        ? 'light' : 'dark';
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       DataLayer.prefs.set('theme', next);
+      // Grafikler renkleri CSS değişkeninden alır; yeniden çizmeye gerek yok.
     });
   }
 
-  /* ------------------------------------------------------- yonlendirme */
-  function show(screenId) {
+  /* ------------------------------------------------------- yönlendirme */
+  function show(screen) {
     document.querySelectorAll('.screen').forEach((el) =>
-      el.classList.toggle('active', el.id === `screen-${screenId}`));
+      el.classList.toggle('active', el.id === `screen-${screen}`));
     document.querySelectorAll('#tabs a').forEach((a) =>
-      a.classList.toggle('active', a.getAttribute('href') === `#/${screenId}`));
+      a.classList.toggle('active', a.dataset.screen === screen));
   }
 
-  async function route() {
-    const hash = location.hash.replace(/^#/, '') || '/overview';
-
-    // SAYFA ICI CAPA. Rotalar '/' ile baslar; '#metrikler' gibi bir capa
-    // rota DEGILDIR. Eskiden buraya dusuyor, bilinmeyen rota sayilip
-    // genel bakisa yonlendiriyordu — sirket sayfasindaki icindekiler
-    // menusu bu yuzden kullaniciyi disari atiyordu.
-    if (hash && hash[0] !== '/') return;
-
-    const company = hash.match(/^\/company\/([A-Za-z0-9.\-]+)$/);
-    if (company) {
-      show('company');
-      document.querySelectorAll('#tabs a').forEach((a) => a.classList.remove('active'));
-      try { await ViewCompany.render(company[1].toUpperCase()); }
-      catch (err) { fail(err); }
-      window.scrollTo(0, 0);
-      return;
+  function parse() {
+    const hash = location.hash.replace(/^#/, '');
+    // Sayfa içi çapa ('#metrikler') rota değildir.
+    if (hash && hash[0] !== '/') return null;
+    let [name, arg] = hash.replace(/^\//, '').split('/');
+    if (ALIASES[name]) {
+      const [n, a] = ALIASES[name];
+      name = n;
+      arg = arg || a;
     }
-
-    const route = ROUTES[hash] || ROUTES['/overview'];
-    show(route.screen);
-    try { await route.view(); } catch (err) { fail(err); }
+    if (!ROUTES[name]) name = 'bugun';
+    return { name, arg };
   }
+
+  let current = null;
+  async function route() {
+    const r = parse();
+    if (!r) return;
+    const key = `${r.name}/${r.arg || ''}`;
+    const screenChanged = !current || current.split('/')[0] !== r.name;
+    current = key;
+    show(ROUTES[r.name].screen);
+    document.getElementById('loadError').innerHTML = '';
+    try { await ROUTES[r.name].view(r.arg); } catch (err) { fail(err); }
+    if (screenChanged) window.scrollTo(0, 0);
+  }
+
+  function go(path) { location.hash = `#/${path}`; }
 
   function fail(err) {
     console.error(err);
     document.getElementById('loadError').innerHTML =
-      `<div class="banner"><b>Veri yuklenemedi.</b> ${Fmt.esc(err.message || err)}</div>`;
+      `<div class="band bad"><span class="ico">!</span><span><b>Veri yüklenemedi.</b>
+       ${Fmt.esc(err.message || err)}</span></div>`;
   }
 
   /* ------------------------------------------------------------ modal */
@@ -82,9 +95,7 @@ window.App = (function () {
     const first = back.querySelector('input, select, textarea, button');
     if (first) first.focus();
   }
-
   function escClose(e) { if (e.key === 'Escape') closeModal(); }
-
   function closeModal() {
     document.getElementById('modalRoot').innerHTML = '';
     document.removeEventListener('keydown', escClose);
@@ -94,16 +105,15 @@ window.App = (function () {
   async function copy(text, message) {
     try {
       await navigator.clipboard.writeText(text);
-      toast(message || 'Kopyalandi');
+      toast(message || 'Kopyalandı');
     } catch (_) {
-      // Clipboard API kapaliysa (http, izin yok) elle secim yolu
       const ta = document.createElement('textarea');
       ta.value = text;
       ta.style.cssText = 'position:fixed;opacity:0';
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand('copy'); toast(message || 'Kopyalandi'); }
-      catch (__) { toast('Kopyalanamadi — metni elle sec'); }
+      try { document.execCommand('copy'); toast(message || 'Kopyalandı'); }
+      catch (__) { toast('Kopyalanamadı — metni elle seç'); }
       ta.remove();
     }
   }
@@ -114,10 +124,10 @@ window.App = (function () {
     setTimeout(() => { root.innerHTML = ''; }, 2600);
   }
 
-  /* ------------------------------------------------------------ baslat */
+  /* ------------------------------------------------------------ başlat */
   async function start() {
     initTheme();
-    // Parola dogrulanmadan data/ klasorune tek istek atilmaz.
+    // Parola doğrulanmadan data/ klasörüne tek istek atılmaz.
     await Auth.gate();
     if (Auth.configured()) {
       const lock = document.getElementById('lockBtn');
@@ -128,8 +138,6 @@ window.App = (function () {
       const th = await DataLayer.thresholds();
       api.thresholds = th;
       Fmt.setThresholds(th.thresholds);
-      const stamp = th.as_of ? `esikler ${Fmt.date(th.as_of)}` : '';
-      document.getElementById('asOf').textContent = stamp;
     } catch (err) {
       fail(err);
       return;
@@ -143,6 +151,7 @@ window.App = (function () {
   api.copy = copy;
   api.toast = toast;
   api.route = route;
+  api.go = go;
 
   document.addEventListener('DOMContentLoaded', start);
   return api;
