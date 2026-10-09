@@ -1,43 +1,35 @@
 {
   "action_required": 0,
-  "as_of": "2026-10-02",
+  "as_of": "2026-10-09",
   "fx": {
-    "as_of": "2026-10-02",
-    "change_1w_pct": 0.39,
+    "as_of": "2026-10-09",
+    "change_1w_pct": 0.45,
     "deposits": [
       {
         "breakeven_headroom_pct": 7.71,
-        "days_to_maturity": 89,
-        "net_interest_try": 150.9,
+        "days_to_maturity": 82,
+        "net_interest_try": 503.01,
         "ticker": "TL-ISBANK",
         "usdtry_at_entry": 50.3,
         "usdtry_breakeven": 54.1796,
-        "usdtry_used_pct": -29.9,
-        "value_try": 60150.9,
-        "value_usd": 1224.08
+        "usdtry_used_pct": -24.7,
+        "value_try": 60503.01,
+        "value_usd": 1226.21
       }
     ],
-    "usdtry": 49.139801025390625
+    "usdtry": 49.34148025512695
   },
   "macro": {
     "key_rates": {
       "cpi_yoy": 3.35,
       "fed_funds": 3.88,
-      "us10y": 5.29
+      "us10y": 5.28
     },
-    "risk_note": "VIX 16 — normal aralikta.",
+    "risk_note": "VIX 15 — normal aralikta.",
     "upcoming": [
       {
-        "date": "2026-10-02",
-        "days": 0,
-        "detail": "isgucu",
-        "kind": "makro",
-        "ticker": null,
-        "title": "Istihdam raporu"
-      },
-      {
         "date": "2026-10-14",
-        "days": 12,
+        "days": 5,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -45,7 +37,7 @@
       },
       {
         "date": "2026-10-15",
-        "days": 13,
+        "days": 6,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -53,7 +45,7 @@
       },
       {
         "date": "2026-10-16",
-        "days": 14,
+        "days": 7,
         "detail": "uretim",
         "kind": "makro",
         "ticker": null,
@@ -61,7 +53,7 @@
       },
       {
         "date": "2026-10-27",
-        "days": 25,
+        "days": 18,
         "detail": "talep",
         "kind": "makro",
         "ticker": null,
@@ -69,7 +61,7 @@
       },
       {
         "date": "2026-10-29",
-        "days": 27,
+        "days": 20,
         "detail": "buyume",
         "kind": "makro",
         "ticker": null,
@@ -77,7 +69,7 @@
       },
       {
         "date": "2026-11-06",
-        "days": 35,
+        "days": 28,
         "detail": "isgucu",
         "kind": "makro",
         "ticker": null,
@@ -85,7 +77,7 @@
       },
       {
         "date": "2026-11-10",
-        "days": 39,
+        "days": 32,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -93,7 +85,7 @@
       },
       {
         "date": "2026-11-13",
-        "days": 42,
+        "days": 35,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -101,27 +93,35 @@
       },
       {
         "date": "2026-11-17",
-        "days": 46,
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "GFF",
-        "title": "GFF bilanco"
+        "days": 39,
+        "detail": "uretim",
+        "kind": "makro",
+        "ticker": null,
+        "title": "Sanayi uretimi"
       },
       {
-        "date": "2026-11-19",
-        "days": 48,
+        "date": "2027-01-26",
+        "days": 109,
         "detail": null,
         "kind": "bilanco",
-        "ticker": "BKE",
-        "title": "BKE bilanco"
+        "ticker": "EAT",
+        "title": "EAT bilanco"
       },
       {
-        "date": "2026-12-02",
-        "days": 61,
+        "date": "2027-01-27",
+        "days": 110,
         "detail": null,
         "kind": "bilanco",
-        "ticker": "DOCU",
-        "title": "DOCU bilanco"
+        "ticker": "DECK",
+        "title": "DECK bilanco"
+      },
+      {
+        "date": "2027-02-01",
+        "days": 115,
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "CRUS",
+        "title": "CRUS bilanco"
       }
     ]
   },
@@ -226,6 +226,7 @@
       "TTD",
       "UPBD",
       "URBN",
+      "VCYT",
       "WWW",
       "YUMC",
       "ZD"
@@ -234,110 +235,54 @@
       {
         "headline": {
           "ev_ebit": {
-            "color": "yellow",
-            "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 27.8,
-            "value": 14.69
-          },
-          "fcf_yield_ev": {
-            "color": "yellow",
+            "color": "red",
             "own_5y_pct": 0.0,
-            "pct_basis": "universe",
-            "sector_pct": 43.2,
-            "value": 3.82
-          },
-          "roic": {
-            "color": "green",
-            "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 87.1,
-            "value": 56.59
-          }
-        },
-        "name": "IDT CORP",
-        "score": 59.0,
-        "ticker": "IDT"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "green",
-            "own_5y_pct": 16.7,
             "pct_basis": "sector",
-            "sector_pct": 4.5,
-            "value": 5.26
+            "sector_pct": 72.2,
+            "value": 55.46
           },
           "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 25.0,
-            "pct_basis": "sector",
-            "sector_pct": 25.0,
-            "value": 10.91
-          },
-          "roic": {
             "color": "yellow",
             "own_5y_pct": null,
             "pct_basis": "sector",
-            "sector_pct": 62.5,
-            "value": 13.28
-          }
-        },
-        "name": "SANDRIDGE ENERGY INC",
-        "score": 58.5,
-        "ticker": "SD"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "yellow",
-            "own_5y_pct": 37.5,
-            "pct_basis": "universe",
-            "sector_pct": 26.8,
-            "value": 13.53
-          },
-          "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 83.3,
-            "pct_basis": "universe",
-            "sector_pct": 83.3,
-            "value": 9.54
+            "sector_pct": 68.2,
+            "value": 5.18
           },
           "roic": {
-            "color": "yellow",
+            "color": "red",
             "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 43.1,
-            "value": 14.96
+            "pct_basis": "sector",
+            "sector_pct": 27.8,
+            "value": 5.19
           }
         },
-        "name": "Kontoor Brands, Inc.",
-        "score": 55.5,
-        "ticker": "KTB"
+        "name": "VERACYTE, INC.",
+        "score": 59.1,
+        "ticker": "VCYT"
       }
     ],
     "first_report": false,
     "left": []
   },
   "portfolio": {
-    "pnl_pct": 0.99,
+    "pnl_pct": 1.4,
     "position_count": 4,
-    "value_usd": 2412.52
+    "value_usd": 2421.68
   },
   "scan": {
-    "cycle": 6,
-    "data_missing": 218,
-    "done": 3300,
-    "eliminated": 2784,
-    "last_finalized": "2026-09-29",
-    "pct": 86.5,
-    "retry_queue": 218,
-    "survivors": 298,
-    "total": 3815
+    "cycle": 9,
+    "data_missing": 66,
+    "done": 900,
+    "eliminated": 759,
+    "last_finalized": "2026-10-08",
+    "pct": 23.6,
+    "retry_queue": 66,
+    "survivors": 75,
+    "total": 3812
   },
   "slice_drift": [],
   "source": "weekly",
   "triggered_breakers": [],
   "upcoming_earnings": [],
-  "week_of": "2026-09-28"
+  "week_of": "2026-10-05"
 }
