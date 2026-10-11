@@ -25,7 +25,7 @@
           "status": "gray"
         },
         {
-          "detail": "son 91 gunde %4.9",
+          "detail": "son 91 gunde %5.0",
           "key": "kur_temposu",
           "label": "Kur temposu ceyrekte %7'nin altinda",
           "status": "green"
@@ -138,8 +138,8 @@
       "maturity_date": "2026-12-30",
       "next_earnings": null,
       "notes": "Berke'nin tezi: kur tutuluyor, faiz inmiyor. USD->TRY cevrimi Midas'ta 50,3 kurundan. Stopaj orani teyit edilecek.",
-      "pnl_pct": 3.14,
-      "pnl_usd": 37.44,
+      "pnl_pct": 3.02,
+      "pnl_usd": 35.97,
       "price": null,
       "price_as_of": null,
       "principal_try": 60000.0,
@@ -167,7 +167,7 @@
         "matured": false,
         "maturity_date": "2026-12-30",
         "net_interest_try": 603.62,
-        "net_interest_usd": 12.25,
+        "net_interest_usd": 12.24,
         "principal_try": 60000.0,
         "start_date": "2026-09-29",
         "tbill_pct_used": 4.05,
@@ -176,18 +176,18 @@
         "usdtry_breakeven": 54.1796,
         "usdtry_breakeven_vs_sgov": 53.6321,
         "usdtry_market_at_start": 48.9962,
-        "usdtry_now": 49.2599983215332,
-        "usdtry_used_pct": -26.8,
+        "usdtry_now": 49.31880187988281,
+        "usdtry_used_pct": -25.3,
         "value_try": 60603.62,
         "value_try_at_maturity": 64627.73,
-        "value_usd": 1230.28,
+        "value_usd": 1228.81,
         "withholding_pct": 15.0,
         "withholding_try": 106.52
       },
       "type": "GERCEK",
       "upside_to_target_pct": null,
       "usdtry_at_entry": 50.3,
-      "value_usd": 1230.28,
+      "value_usd": 1228.81,
       "vs_benchmark": {
         "kucuk_deger": {
           "benchmark_return_pct": null,
@@ -195,14 +195,14 @@
         },
         "nasdaq100": {
           "benchmark_return_pct": 1.81,
-          "excess_pct": 1.33
+          "excess_pct": 1.21
         },
         "sp500": {
           "benchmark_return_pct": 1.88,
-          "excess_pct": 1.26
+          "excess_pct": 1.14
         }
       },
-      "weight_pct": 50.65,
+      "weight_pct": 50.62,
       "withholding_confirmed": false,
       "withholding_pct": 15.0
     },
@@ -249,7 +249,7 @@
           "excess_pct": -2.32
         }
       },
-      "weight_pct": 20.75
+      "weight_pct": 20.77
     },
     {
       "asset_class": "ETF",
@@ -294,7 +294,7 @@
           "excess_pct": -0.92
         }
       },
-      "weight_pct": 12.74
+      "weight_pct": 12.75
     },
     {
       "asset_class": "ETF",
@@ -339,28 +339,28 @@
           "excess_pct": -1.7
         }
       },
-      "weight_pct": 9.72
+      "weight_pct": 9.73
     }
   ],
-  "priced_at": "2026-10-11T15:35:49+00:00",
+  "priced_at": "2026-10-11T20:11:53+00:00",
   "source": "manual+prices",
   "summary": {
     "cash_usd": 149.04,
     "cost_usd": 2241.31,
-    "equity_value_usd": 2279.87,
+    "equity_value_usd": 2278.4,
     "fx": {
       "as_of": "2026-10-11",
-      "change_1w_pct": 0.21,
+      "change_1w_pct": 0.33,
       "pair": "USDTRY",
-      "rate": 49.2599983215332,
+      "rate": 49.31880187988281,
       "source": "stooq/yfinance"
     },
     "fx_pace": {
       "as_of": "2026-10-11",
-      "change_quarter_pct": 4.93,
-      "change_since_entry_pct": -2.07,
+      "change_quarter_pct": 5.05,
+      "change_since_entry_pct": -1.95,
       "color": "yellow",
-      "rate": 49.2599983215332,
+      "rate": 49.31880187988281,
       "window_days": 91
     },
     "largest_position_pct": null,
@@ -371,10 +371,10 @@
       "label": "Faz 0 — hazirlik",
       "start": "2026-09-01"
     },
-    "pnl_pct": 1.72,
-    "pnl_usd": 38.56,
-    "portfolio_value_try": 119648.09,
-    "portfolio_value_usd": 2428.91,
+    "pnl_pct": 1.65,
+    "pnl_usd": 37.09,
+    "portfolio_value_try": 119718.42,
+    "portfolio_value_usd": 2427.44,
     "position_count": 4,
     "sector_mix_pct": {},
     "slices": [
@@ -388,8 +388,8 @@
         "value_usd": 0.0
       },
       {
-        "actual_pct": 22.46,
-        "drift_pp": -4.54,
+        "actual_pct": 22.47,
+        "drift_pp": -4.53,
         "label": "Cekirdek ETF",
         "off_target": false,
         "slice": "cekirdek_etf",
@@ -397,8 +397,8 @@
         "value_usd": 545.53
       },
       {
-        "actual_pct": 20.75,
-        "drift_pp": -2.25,
+        "actual_pct": 20.77,
+        "drift_pp": -2.23,
         "label": "SGOV (nakit capasi)",
         "off_target": false,
         "slice": "sgov",
@@ -406,13 +406,13 @@
         "value_usd": 504.06
       },
       {
-        "actual_pct": 50.65,
-        "drift_pp": 0.65,
+        "actual_pct": 50.62,
+        "drift_pp": 0.62,
         "label": "TL mevduat",
         "off_target": false,
         "slice": "tl",
         "target_pct": 50.0,
-        "value_usd": 1230.28
+        "value_usd": 1228.81
       },
       {
         "actual_pct": 6.14,
@@ -429,8 +429,8 @@
     "tbill_pct": 4.05,
     "vs_benchmark": {
       "kucuk_deger": null,
-      "nasdaq100": -0.06,
-      "sp500": -0.13
+      "nasdaq100": -0.13,
+      "sp500": -0.2
     }
   },
   "tl_renewal": {
@@ -442,7 +442,7 @@
         "status": "gray"
       },
       {
-        "detail": "son 91 gunde %4.9",
+        "detail": "son 91 gunde %5.0",
         "key": "kur_temposu",
         "label": "Kur temposu ceyrekte %7'nin altinda",
         "status": "green"
