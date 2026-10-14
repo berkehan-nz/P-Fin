@@ -9,7 +9,7 @@
     "target_high": 25.0,
     "target_low": 18.0,
     "target_median": 22.0,
-    "upside_to_median": 20.48192771084336
+    "upside_to_median": 20.48192620065037
   },
   "as_of": "2026-10-14",
   "calendar": {
@@ -17,7 +17,6 @@
     "next_earnings": "2026-11-04"
   },
   "capped_for_scoring": {},
-  "change_1d_pct": -0.87,
   "data_quality": {
     "issue_count": 1,
     "issues": [
@@ -55,7 +54,7 @@
     ],
     "data_basis": "mixed",
     "is_manual": false,
-    "kill_reason": "Kol A ucuzluk testi: EV/EBIT sektor yuzdeligi 91 > 40 ve FCF verimi 2 <= %4",
+    "kill_reason": "Kol A ucuzluk testi: EV/EBIT sektor yuzdeligi 82 > 40 ve FCF verimi 2 <= %4",
     "one_off_earnings": false,
     "passed_stages": [
       0,
@@ -74,7 +73,7 @@
     "z_unreliable": false,
     "z_unreliable_reason": null
   },
-  "generated_at": "2026-10-11T15:53:53+00:00",
+  "generated_at": "2026-10-14T18:47:08+00:00",
   "insider": {
     "form4_count": 45,
     "last_form4": "2026-09-24",
@@ -114,7 +113,7 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 9.1,
+      "sector_pct": 18.2,
       "value": 0.95
     },
     "ebitda_margin": {
@@ -128,15 +127,15 @@
       "color": "red",
       "own_5y_pct": 50.0,
       "pct_basis": "sector",
-      "sector_pct": 90.9,
-      "value": 104.81
+      "sector_pct": 81.8,
+      "value": 104.82
     },
     "ev_ebitda": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 100.0,
-      "value": 60.22
+      "sector_pct": 90.9,
+      "value": 60.23
     },
     "ev_gross_profit": {
       "color": "gray",
@@ -149,7 +148,7 @@
       "color": "yellow",
       "own_5y_pct": 54.5,
       "pct_basis": "sector",
-      "sector_pct": 81.8,
+      "sector_pct": 72.7,
       "value": 5.77
     },
     "fcf_margin": {
@@ -170,14 +169,14 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 0.0,
+      "sector_pct": 18.2,
       "value": 2.4
     },
     "fcf_yield_mcap": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 0.0,
+      "sector_pct": 9.1,
       "value": 2.24
     },
     "gross_margin": {
@@ -261,15 +260,15 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 18.2,
+      "sector_pct": 27.3,
       "value": 7.45
     },
     "pe": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 90.9,
-      "value": 129.8
+      "sector_pct": 81.8,
+      "value": 129.67
     },
     "peg": {
       "color": "red",
@@ -290,27 +289,27 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 19.13
+      "value": 23.89
     },
     "rel_strength_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 90.9,
-      "value": 31.02
+      "value": 34.67
     },
     "return_12m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 72.7,
+      "sector_pct": 81.8,
       "value": 45.27
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 90.9,
+      "sector_pct": 81.8,
       "value": 49.3
     },
     "rev_cagr_3y": {
@@ -439,7 +438,7 @@
   "overrides": [],
   "percentile_pool": {
     "sector": 11,
-    "universe": 356
+    "universe": 353
   },
   "price": 18.26,
   "price_as_of": "2026-10-13",
@@ -448,7 +447,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 4119.2,
     "fcf_ttm_musd": 98.8,
-    "implied_growth_pct": 17.05267727940152,
+    "implied_growth_pct": 17.05,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -481,8 +480,8 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 54.5,
-          "scaled": 54.5,
+          "percentile": 27.3,
+          "scaled": 27.3,
           "weight": 0.6
         },
         "rel_strength_6m": {
@@ -552,13 +551,13 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 9.1,
-          "scaled": 9.1,
+          "percentile": 18.2,
+          "scaled": 18.2,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 90.9,
-          "scaled": 9.1,
+          "percentile": 81.8,
+          "scaled": 18.2,
           "weight": 0.3
         },
         "ev_gross_profit": {
@@ -566,13 +565,13 @@
           "percentile": null
         },
         "ev_sales": {
-          "percentile": 81.8,
-          "scaled": 18.2,
+          "percentile": 72.7,
+          "scaled": 27.3,
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 0.0,
-          "scaled": 0.0,
+          "percentile": 18.2,
+          "scaled": 18.2,
           "weight": 0.25
         }
       },
@@ -625,11 +624,11 @@
       "value": 0.8
     },
     "earnings_quality": 70.2,
-    "momentum": 69.1,
+    "momentum": 52.7,
     "quality": 38.6,
     "safety": 62.1,
-    "total": 37.8,
-    "value": 8.0,
+    "total": 39.6,
+    "value": 19.9,
     "weight_coverage": 0.85
   },
   "sector": "Diger is hizmetleri",
