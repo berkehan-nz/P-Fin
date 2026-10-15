@@ -396,18 +396,49 @@ def renewal_criteria(pace: dict, tr_macro: dict) -> list[dict]:
     return out
 
 
-def upcoming_actions(data: dict, tl_rows: list[dict], criteria: list[dict]) -> list[dict]:
-    """Siradaki isler: planli alimlar, faz gecisleri, mevduat vadeleri."""
+def tranche_amount_usd(tr: dict, usdtry: float | None) -> tuple[float | None, bool]:
+    """Planli parcanin dolar tutari ve TAHMINI olup olmadigi.
+
+    TL tutarli parca (mevduat vadesi -> Midas) dosyaya sabit dolar olarak
+    yazilmaz; dolar karsiligi her kosuda guncel kurla hesaplanir.
+    """
+    usd = num(tr.get("amount_usd"))
+    if usd is not None:
+        return usd, False
+    amount_try = num(tr.get("amount_try"))
+    if amount_try is not None and usdtry:
+        return round(amount_try / usdtry, 2), True
+    return None, False
+
+
+def tl_label(tl: dict) -> str:
+    """Iki mevduat ayni bankada olabilir; satirlar anapara ile ayrilir."""
+    bank = tl.get("bank") or "banka"
+    principal = num(tl.get("principal_try"))
+    return f"{bank}, {f'{principal:,.0f}'.replace(',', '.')} TL" if principal else bank
+
+
+def upcoming_actions(data: dict, tl_rows: list[dict], criteria: list[dict],
+                     usdtry: float | None = None) -> list[dict]:
+    """Siradaki isler: planli alimlar, faz gecisleri, mevduat vadeleri.
+
+    Her mevduat vadesi AYRI satirdir. Yenileme olcutleri yalnizca vadeye
+    ``TL_RENEWAL["show_criteria_days"]`` gun kala satira eklenir.
+    """
     today = today_iso()
     out = []
     for tr in data.get("planned_tranches") or []:
         if not isinstance(tr, dict) or tr.get("done"):
             continue
-        tutar = num(tr.get("amount_usd"))
-        out.append({"date": tr.get("date"), "kind": "alim",
-                    "title": f"{tr.get('ticker', '')} parcasi"
-                             + (f" — ${tutar:,.0f}" if tutar is not None else ""),
-                    "amount_usd": tutar, "ticker": tr.get("ticker"),
+        tutar, tahmini = tranche_amount_usd(tr, usdtry)
+        amount_try = num(tr.get("amount_try"))
+        if amount_try is not None:
+            baslik = f"{tr.get('ticker', '')} parcasi — {amount_try:,.0f} TL".replace(",", ".")
+        else:
+            baslik = f"{tr.get('ticker', '')} parcasi" + (f" — ${tutar:,.0f}" if tutar is not None else "")
+        out.append({"date": tr.get("date"), "kind": "alim", "title": baslik,
+                    "amount_usd": tutar, "amount_usd_estimated": tahmini,
+                    "amount_try": amount_try, "ticker": tr.get("ticker"),
                     "note": tr.get("note", "")})
     for ph in PORTFOLIO["phases"]:
         if ph["start"] > today:
@@ -418,12 +449,64 @@ def upcoming_actions(data: dict, tl_rows: list[dict], criteria: list[dict]) -> l
     for tl in tl_rows:
         if tl.get("maturity_date"):
             out.append({"date": tl["maturity_date"], "kind": "vade",
-                        "title": f"TL mevduat vadesi ({tl.get('bank') or 'banka'})",
+                        "title": f"TL mevduat vadesi ({tl_label(tl)})",
+                        "ticker": tl.get("ticker"),
                         "note": "yenileme karari", "criteria": criteria})
     out = [a for a in out if a.get("date") and a["date"] >= today]
     for a in out:
         a["days"] = _days_between(today, a["date"])
-    return sorted(out, key=lambda a: a["date"])
+        if a["kind"] == "vade" and (a["days"] is None
+                                    or a["days"] > TL_RENEWAL["show_criteria_days"]):
+            a["criteria"] = []
+    return sorted(out, key=lambda a: (a["date"], a["kind"] != "vade"))
+
+
+def tl_renewal_summary(tl_rows: list[dict], criteria: list[dict]) -> dict:
+    """Yenileme ozeti: her vade ayri; olcutler en yakin vadeye 14 gun kala.
+
+    ``criteria`` en yakin vade pencere icindeyse doludur (pano onu gosterir);
+    ``criteria_all`` her zaman dolu (sohbet ve rapor icin).
+    """
+    today = today_iso()
+    window = TL_RENEWAL["show_criteria_days"]
+    maturities = []
+    for tl in tl_rows:
+        md = tl.get("maturity_date")
+        if not md or md < today:
+            continue
+        gun = _days_between(today, md)
+        maturities.append({
+            "ticker": tl.get("ticker"), "bank": tl.get("bank"),
+            "principal_try": tl.get("principal_try"), "maturity_date": md, "days": gun,
+            "value_try_at_maturity": tl.get("value_try_at_maturity"),
+            "usdtry_breakeven": tl.get("usdtry_breakeven"),
+            "usdtry_breakeven_vs_sgov": tl.get("usdtry_breakeven_vs_sgov"),
+            "show_criteria": gun is not None and gun <= window,
+        })
+    maturities.sort(key=lambda m: m["maturity_date"])
+    nearest = maturities[0] if maturities else None
+    return {
+        "criteria": criteria if nearest and nearest["show_criteria"] else [],
+        "criteria_all": criteria,
+        "show_criteria_days": window,
+        "maturity_date": nearest["maturity_date"] if nearest else None,
+        "maturities": maturities,
+    }
+
+
+def effective_entry_rate(tl_rows: list[dict]) -> float | None:
+    """Tum TL mevduatin ortak giris kuru: toplam anapara / toplam dolar maliyeti.
+
+    Iki mevduat farkli kurlardan (50,30 ve 49,41) girildi; "giris kuruna
+    gore kur ne kadar degisti" sorusu toplam TL pozisyonu icin sorulur.
+    """
+    total_try = total_usd = 0.0
+    for t in tl_rows:
+        p, fx = num(t.get("principal_try")), num(t.get("usdtry_at_entry"))
+        if p and fx:
+            total_try += p
+            total_usd += p / fx
+    return round(total_try / total_usd, 4) if total_usd else None
 
 
 def macro_calendar(tr_macro: dict) -> list[dict]:
@@ -597,8 +680,8 @@ def compute(quotes: dict[str, dict],
 
     unvalued = sorted(p["ticker"] for p in positions if p.get("value_usd") is None)
 
-    tl_rows = [p["tl_deposit"] for p in positions if p.get("tl_deposit")]
-    entry_fx = next((t.get("usdtry_at_entry") for t in tl_rows if t.get("usdtry_at_entry")), None)
+    tl_rows = [{**p["tl_deposit"], "ticker": p["ticker"]} for p in positions if p.get("tl_deposit")]
+    entry_fx = effective_entry_rate(tl_rows)
     pace = fx_pace(fx, entry_fx)
     tr_macro = load_tr_macro()
     criteria = renewal_criteria(pace, tr_macro)
@@ -641,9 +724,8 @@ def compute(quotes: dict[str, dict],
         "positions": sorted(positions, key=lambda p: p.get("value_usd") or 0, reverse=True),
         "closed": data.get("closed", []),
         "summary": summary,
-        "tl_renewal": {"criteria": criteria,
-                       "maturity_date": next((t.get("maturity_date") for t in tl_rows), None)},
-        "actions": upcoming_actions(data, tl_rows, criteria),
+        "tl_renewal": tl_renewal_summary(tl_rows, criteria),
+        "actions": upcoming_actions(data, tl_rows, criteria, usdtry),
         "calendar": macro_calendar(tr_macro),
         "warnings": warnings_for(positions, summary, drawdown=drawdown,
                                  planned=data.get("planned_tranches")),
@@ -773,12 +855,15 @@ def warnings_for(positions: list[dict], summary: dict, *,
             continue
         ne_zaman = f"{gun} gun sonra" if gun > 0 else (
             "bugun" if gun == 0 else f"{abs(gun)} gun GECTI")
+        if num(tr.get("amount_try")) is not None:
+            tutar = f"{num(tr.get('amount_try')):,.2f} TL".replace(",", "_").replace(".", ",").replace("_", ".")
+        else:
+            tutar = f"{tr.get('amount_usd', '?')} USD"
         out.append({
             "ticker": tr.get("ticker", ""), "level": "medium",
             "type": "kademeli_alim",
             "message": f"Siradaki parca {ne_zaman} ({tr.get('date')}): "
-                       f"{tr.get('amount_usd', '?')} USD "
-                       f"{tr.get('ticker', '')}".strip(),
+                       f"{tutar} {tr.get('ticker', '')}".strip(),
         })
 
     if drawdown:

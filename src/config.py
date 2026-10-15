@@ -744,12 +744,19 @@ PORTFOLIO = {
     # secilir; "active_phase" doldurulursa tarih yok sayilip o faz kullanilir
     # (ornegin Faz 1 alimlari gecikirse faz0'da kalmak icin).
     # Kaynak: Berke'nin 29 Eylul 2026 plani.
+    #
+    # 15 Eki 2026: Berke 100k TL daha mevduata koydu; TL %73. Faz 1 dolar
+    # tarafi insasi 30 Ara ve 15 Oca vadelerinde yenileme kararlariyla
+    # yapilacak. Faz 0 hedefi buna gore guncellendi (secenek A) ve bitisi
+    # ikinci vadeye (15 Oca 2027) kaydi. Faz 1 BASLANGICI da ayni gune
+    # alindi — fazlar ust uste binerse tarih iki fazla eslesirdi; Faz 1 ve
+    # Faz 2 hedefleri degismedi.
     "phases": [
         {"key": "faz0", "label": "Faz 0 — hazirlik",
-         "start": "2026-09-01", "end": "2026-11-16",
-         "targets": {"motor": 0, "cekirdek_etf": 27, "sgov": 23, "tl": 50}},
+         "start": "2026-09-01", "end": "2027-01-15",
+         "targets": {"motor": 0, "cekirdek_etf": 15, "sgov": 10, "tl": 70}},
         {"key": "faz1", "label": "Faz 1 — ilk hisseler",
-         "start": "2026-11-16", "end": "2027-03-01",
+         "start": "2027-01-15", "end": "2027-03-01",
          "targets": {"motor": 25, "cekirdek_etf": 30, "sgov": 10, "tl": 35}},
         {"key": "faz2", "label": "Faz 2 — tam motor",
          "start": "2027-03-01", "end": None,
@@ -790,6 +797,9 @@ FX_PACE = {"window_days": 91, "green_max_pct": 4.0, "yellow_max_pct": 7.0}
 TL_RENEWAL = {
     "fx_pace_max_pct": 7.0,
     "stale_after_days": 45,     # elle girilen makro verisi bu kadar eskiyse gri
+    # Yenileme olcutleri her vadeye bu kadar gun kala gosterilir; daha
+    # erken gostermek karar anindan aylar once gurultu uretir.
+    "show_criteria_days": 14,
 }
 
 # Kalici makro takvim. TCMB toplantilari data/tr_macro.json'dan gelir.
@@ -838,7 +848,9 @@ BREAKER_OPS = {"<", "<=", ">", ">=" }
 # ve 365 gun uzerinden isler.
 TL_DEPOSIT = {
     "day_count": 365,
-    "default_withholding_pct": 15.0,   # stopaj; vadeye gore degisir
+    # Stopaj: 6 ay ve alti vadeli TL mevduat icin %17,5 (kaynak: banka
+    # ekrani 15 Eki 2026). Pozisyonda withholding_pct yazmiyorsa bu kullanilir.
+    "default_withholding_pct": 17.5,
 }
 
 # --------------------------------------------------------------------------
