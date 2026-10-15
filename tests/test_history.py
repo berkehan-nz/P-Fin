@@ -225,3 +225,41 @@ class TestFxDayBeforeUsOpen:
         rows = H.rebuild(base_data(), price_series=ps, dividends=divs,
                          fx_series=fx, upto="2026-10-03")
         assert rows[-1]["date"] == DAYS[-1]
+
+
+class TestTryInjection:
+    """Bankadan dogrudan TL ile acilan mevduat portfoy disi yeni sermayedir."""
+
+    def _with_second_deposit(self):
+        d = base_data()
+        d["positions"].append({
+            "ticker": "TL-Y", "asset_class": "TL_DEPOSIT", "entry_date": DAYS[2],
+            "start_date": DAYS[2], "maturity_date": "2027-01-02", "principal_try": 50000.0,
+            "annual_rate_pct": 36.5, "withholding_pct": 0.0, "usdtry_at_entry": 50.0,
+            "status": "OPEN"})
+        d["cash_flows"] = [{"date": DAYS[2], "amount_try": 50000.0, "usdtry": 50.0}]
+        return d
+
+    def test_earlier_rows_are_not_inflated(self):
+        ps, divs, fx = series()
+        a = H.rebuild(base_data(), price_series=ps, dividends=divs, fx_series=fx)
+        b = H.rebuild(self._with_second_deposit(), price_series=ps, dividends=divs, fx_series=fx)
+        assert b[0]["total_usd"] == a[0]["total_usd"]
+        assert b[1]["total_usd"] == a[1]["total_usd"]
+        assert b[2]["total_usd"] == pytest.approx(a[2]["total_usd"] + 1000.0, abs=0.01)
+
+    def test_injection_is_not_a_gain(self):
+        ps, divs, fx = series()
+        d = self._with_second_deposit()
+        rows = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
+        perf = H.performance(rows[:3], d)
+        assert perf["invested_usd"] == pytest.approx(2600.0)
+        assert perf["day_change_usd"] == pytest.approx(1.0, abs=0.01)   # yalnizca faiz
+
+    def test_return_ignores_capital_not_yet_priced(self):
+        """Bugun gelen para, satiri olmayan bir gunde sahte kayip yaratmamali."""
+        ps, divs, fx = series()
+        d = self._with_second_deposit()
+        rows = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
+        perf = H.performance(rows[:2], d)
+        assert perf["invested_usd"] == pytest.approx(1600.0)
