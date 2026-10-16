@@ -1,51 +1,35 @@
 {
   "action_required": 0,
-  "as_of": "2026-10-09",
+  "as_of": "2026-10-16",
   "fx": {
-    "as_of": "2026-10-09",
-    "change_1w_pct": 0.45,
+    "as_of": "2026-10-16",
+    "change_1w_pct": 0.42,
     "deposits": [
       {
         "breakeven_headroom_pct": 7.71,
-        "days_to_maturity": 82,
-        "net_interest_try": 503.01,
+        "days_to_maturity": 75,
+        "net_interest_try": 855.12,
         "ticker": "TL-ISBANK",
         "usdtry_at_entry": 50.3,
         "usdtry_breakeven": 54.1796,
-        "usdtry_used_pct": -24.7,
-        "value_try": 60503.01,
-        "value_usd": 1226.21
+        "usdtry_used_pct": -20.0,
+        "value_try": 60855.12,
+        "value_usd": 1228.79
       }
     ],
-    "usdtry": 49.34148025512695
+    "usdtry": 49.52439880371094
   },
   "macro": {
     "key_rates": {
-      "cpi_yoy": 3.35,
+      "cpi_yoy": 3.72,
       "fed_funds": 3.88,
-      "us10y": 5.28
+      "us10y": 5.19
     },
-    "risk_note": "VIX 15 — normal aralikta.",
+    "risk_note": "VIX 16 — normal aralikta.",
     "upcoming": [
       {
-        "date": "2026-10-14",
-        "days": 5,
-        "detail": "enflasyon",
-        "kind": "makro",
-        "ticker": null,
-        "title": "TUFE (CPI)"
-      },
-      {
-        "date": "2026-10-15",
-        "days": 6,
-        "detail": "enflasyon",
-        "kind": "makro",
-        "ticker": null,
-        "title": "URFE (PPI)"
-      },
-      {
         "date": "2026-10-16",
-        "days": 7,
+        "days": 0,
         "detail": "uretim",
         "kind": "makro",
         "ticker": null,
@@ -53,7 +37,7 @@
       },
       {
         "date": "2026-10-27",
-        "days": 18,
+        "days": 11,
         "detail": "talep",
         "kind": "makro",
         "ticker": null,
@@ -61,7 +45,7 @@
       },
       {
         "date": "2026-10-29",
-        "days": 20,
+        "days": 13,
         "detail": "buyume",
         "kind": "makro",
         "ticker": null,
@@ -69,7 +53,7 @@
       },
       {
         "date": "2026-11-06",
-        "days": 28,
+        "days": 21,
         "detail": "isgucu",
         "kind": "makro",
         "ticker": null,
@@ -77,7 +61,7 @@
       },
       {
         "date": "2026-11-10",
-        "days": 32,
+        "days": 25,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -85,7 +69,7 @@
       },
       {
         "date": "2026-11-13",
-        "days": 35,
+        "days": 28,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -93,15 +77,31 @@
       },
       {
         "date": "2026-11-17",
-        "days": 39,
+        "days": 32,
         "detail": "uretim",
         "kind": "makro",
         "ticker": null,
         "title": "Sanayi uretimi"
       },
       {
+        "date": "2026-11-24",
+        "days": 39,
+        "detail": "talep",
+        "kind": "makro",
+        "ticker": null,
+        "title": "Perakende satislar"
+      },
+      {
+        "date": "2026-11-25",
+        "days": 40,
+        "detail": "buyume",
+        "kind": "makro",
+        "ticker": null,
+        "title": "GSYH (GDP)"
+      },
+      {
         "date": "2027-01-26",
-        "days": 109,
+        "days": 102,
         "detail": null,
         "kind": "bilanco",
         "ticker": "EAT",
@@ -109,19 +109,19 @@
       },
       {
         "date": "2027-01-27",
-        "days": 110,
+        "days": 103,
         "detail": null,
         "kind": "bilanco",
         "ticker": "DECK",
         "title": "DECK bilanco"
       },
       {
-        "date": "2027-02-01",
-        "days": 115,
+        "date": "2027-01-27",
+        "days": 103,
         "detail": null,
         "kind": "bilanco",
-        "ticker": "CRUS",
-        "title": "CRUS bilanco"
+        "ticker": "RMD",
+        "title": "RMD bilanco"
       }
     ]
   },
@@ -192,6 +192,7 @@
       "HLF",
       "HQY",
       "HRMY",
+      "HSTM",
       "HUBS",
       "IDT",
       "INCY",
@@ -199,6 +200,7 @@
       "JKHY",
       "KAI",
       "KFY",
+      "KRP",
       "KTB",
       "LEVI",
       "LMAT",
@@ -236,53 +238,81 @@
         "headline": {
           "ev_ebit": {
             "color": "red",
-            "own_5y_pct": 0.0,
-            "pct_basis": "sector",
-            "sector_pct": 72.2,
-            "value": 55.46
+            "own_5y_pct": null,
+            "pct_basis": "universe",
+            "sector_pct": 43.3,
+            "value": 18.69
           },
           "fcf_yield_ev": {
+            "color": "green",
+            "own_5y_pct": 27.3,
+            "pct_basis": "universe",
+            "sector_pct": 85.3,
+            "value": 9.58
+          },
+          "roic": {
             "color": "yellow",
             "own_5y_pct": null,
+            "pct_basis": "universe",
+            "sector_pct": 19.8,
+            "value": 8.1
+          }
+        },
+        "name": "Kimbell Royalty Partners, LP",
+        "score": 53.3,
+        "ticker": "KRP"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "red",
+            "own_5y_pct": 45.5,
             "pct_basis": "sector",
-            "sector_pct": 68.2,
-            "value": 5.18
+            "sector_pct": 46.3,
+            "value": 35.66
+          },
+          "fcf_yield_ev": {
+            "color": "green",
+            "own_5y_pct": 0.0,
+            "pct_basis": "sector",
+            "sector_pct": 61.7,
+            "value": 6.48
           },
           "roic": {
             "color": "red",
             "own_5y_pct": null,
             "pct_basis": "sector",
-            "sector_pct": 27.8,
-            "value": 5.19
+            "sector_pct": 21.7,
+            "value": 6.83
           }
         },
-        "name": "VERACYTE, INC.",
-        "score": 59.1,
-        "ticker": "VCYT"
+        "name": "HEALTHSTREAM INC",
+        "score": 48.1,
+        "ticker": "HSTM"
       }
     ],
     "first_report": false,
     "left": []
   },
   "portfolio": {
-    "pnl_pct": 1.4,
+    "pnl_pct": 1.14,
     "position_count": 4,
-    "value_usd": 2421.68
+    "value_usd": 2415.99
   },
   "scan": {
-    "cycle": 9,
-    "data_missing": 66,
-    "done": 900,
-    "eliminated": 759,
-    "last_finalized": "2026-10-08",
-    "pct": 23.6,
-    "retry_queue": 66,
-    "survivors": 75,
+    "cycle": 11,
+    "data_missing": 166,
+    "done": 2700,
+    "eliminated": 2282,
+    "last_finalized": "2026-10-14",
+    "pct": 70.8,
+    "retry_queue": 166,
+    "survivors": 252,
     "total": 3812
   },
   "slice_drift": [],
   "source": "weekly",
   "triggered_breakers": [],
   "upcoming_earnings": [],
-  "week_of": "2026-10-05"
+  "week_of": "2026-10-12"
 }
