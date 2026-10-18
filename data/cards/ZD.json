@@ -3,7 +3,7 @@
     "analyst_count": 6,
     "buy": 3,
     "hold": 3,
-    "recommendation": "none",
+    "recommendation": "buy",
     "sell": 0,
     "source": "yfinance",
     "target_high": 75.0,
@@ -11,7 +11,7 @@
     "target_median": 62.0,
     "upside_to_median": 8.486436298562294
   },
-  "as_of": "2026-10-16",
+  "as_of": "2026-10-18",
   "calendar": {
     "estimated": true,
     "next_earnings": "2026-11-06"
@@ -69,7 +69,7 @@
     "z_unreliable": false,
     "z_unreliable_reason": null
   },
-  "generated_at": "2026-10-16T23:50:16+00:00",
+  "generated_at": "2026-10-18T23:26:45+00:00",
   "insider": {
     "form4_count": 16,
     "last_form4": "2026-08-20",
@@ -81,14 +81,14 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 60.8,
+      "sector_pct": 61.0,
       "value": 8.26
     },
     "beneish_m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 61.6,
+      "sector_pct": 61.8,
       "value": -2.53
     },
     "cash_conversion": {
@@ -102,14 +102,14 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 57.1,
+      "sector_pct": 56.8,
       "value": 2.16
     },
     "earnings_yield": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 95.5,
+      "sector_pct": 95.8,
       "value": 14.99
     },
     "ebitda_margin": {
@@ -123,7 +123,7 @@
       "color": "green",
       "own_5y_pct": 0.0,
       "pct_basis": "universe",
-      "sector_pct": 4.7,
+      "sector_pct": 4.4,
       "value": 6.67
     },
     "ev_ebitda": {
@@ -144,14 +144,14 @@
       "color": "green",
       "own_5y_pct": 9.1,
       "pct_basis": "universe",
-      "sector_pct": 5.1,
+      "sector_pct": 5.4,
       "value": 0.85
     },
     "fcf_margin": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 68.5,
+      "sector_pct": 68.8,
       "value": 22.02
     },
     "fcf_margin_change_3y": {
@@ -179,7 +179,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 93.9,
+      "sector_pct": 94.2,
       "value": 85.01
     },
     "gross_margin_change_3y": {
@@ -193,7 +193,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 34.4,
+      "sector_pct": 34.6,
       "value": 0.31
     },
     "implied_growth": {
@@ -242,7 +242,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 41.2,
+      "sector_pct": 41.8,
       "value": 12.73
     },
     "operating_margin_change_3y": {
@@ -256,7 +256,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 12.6,
+      "sector_pct": 12.3,
       "value": 5.51
     },
     "pe": {
@@ -291,21 +291,21 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 74.0,
+      "sector_pct": 72.0,
       "value": 10.8
     },
     "return_12m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 81.7,
+      "sector_pct": 83.7,
       "value": 54.75
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 70.3,
+      "sector_pct": 71.7,
       "value": 20.19
     },
     "rev_cagr_3y": {
@@ -319,7 +319,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 26.1,
+      "sector_pct": 25.8,
       "value": 7.8
     },
     "roic": {
@@ -439,8 +439,8 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "percentile": 61.6,
-          "scaled": 38.4,
+          "percentile": 61.8,
+          "scaled": 38.2,
           "weight": 0.2
         },
         "cash_conversion": {
@@ -465,13 +465,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 64.4,
-          "scaled": 64.4,
+          "percentile": 61.0,
+          "scaled": 61.0,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 74.0,
-          "scaled": 74.0,
+          "percentile": 72.0,
+          "scaled": 72.0,
           "weight": 0.4
         }
       },
@@ -481,18 +481,18 @@
     "quality": {
       "components": {
         "fcf_margin": {
-          "percentile": 68.5,
-          "scaled": 68.5,
+          "percentile": 68.8,
+          "scaled": 68.8,
           "weight": 0.15
         },
         "gross_margin": {
-          "percentile": 93.9,
-          "scaled": 93.9,
+          "percentile": 94.2,
+          "scaled": 94.2,
           "weight": 0.2
         },
         "gross_profitability": {
-          "percentile": 34.4,
-          "scaled": 34.4,
+          "percentile": 34.6,
+          "scaled": 34.6,
           "weight": 0.2
         },
         "roic": {
@@ -512,13 +512,13 @@
     "safety": {
       "components": {
         "altman_z": {
-          "percentile": 60.8,
-          "scaled": 60.8,
+          "percentile": 61.0,
+          "scaled": 61.0,
           "weight": 0.3
         },
         "current_ratio": {
-          "percentile": 57.1,
-          "scaled": 57.1,
+          "percentile": 56.8,
+          "scaled": 56.8,
           "weight": 0.2
         },
         "interest_coverage": {
@@ -538,13 +538,13 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 95.5,
-          "scaled": 95.5,
+          "percentile": 95.8,
+          "scaled": 95.8,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 4.7,
-          "scaled": 95.3,
+          "percentile": 4.4,
+          "scaled": 95.6,
           "weight": 0.3
         },
         "ev_gross_profit": {
@@ -553,8 +553,8 @@
           "weight": 0.2
         },
         "ev_sales": {
-          "percentile": 5.1,
-          "scaled": 94.9,
+          "percentile": 5.4,
+          "scaled": 94.6,
           "weight": 0.15
         },
         "fcf_yield_ev": {
@@ -610,11 +610,11 @@
       "value": 1.0
     },
     "earnings_quality": 21.2,
-    "momentum": 68.3,
-    "quality": 51.1,
+    "momentum": 65.4,
+    "quality": 51.2,
     "safety": 58.3,
-    "total": 64.9,
-    "value": 96.8,
+    "total": 64.8,
+    "value": 96.9,
     "weight_coverage": 0.75
   },
   "sector": "Iletisim",
