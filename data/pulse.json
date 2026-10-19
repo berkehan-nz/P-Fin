@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-10-18",
+  "as_of": "2026-10-19",
   "calendar": {
     "recent": [
       {
@@ -102,25 +102,11 @@
         "title": "GSYH (GDP)"
       },
       {
-        "date": "2027-01-26",
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "EAT",
-        "title": "EAT bilanco"
-      },
-      {
         "date": "2027-01-27",
         "detail": null,
         "kind": "bilanco",
         "ticker": "DECK",
         "title": "DECK bilanco"
-      },
-      {
-        "date": "2027-01-27",
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "RMD",
-        "title": "RMD bilanco"
       },
       {
         "date": "2027-02-01",
@@ -135,6 +121,13 @@
         "kind": "bilanco",
         "ticker": "NSSC",
         "title": "NSSC bilanco"
+      },
+      {
+        "date": "2027-02-03",
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "GFF",
+        "title": "GFF bilanco"
       },
       {
         "date": "2027-02-03",
@@ -170,10 +163,17 @@
         "kind": "bilanco",
         "ticker": "PINS",
         "title": "PINS bilanco"
+      },
+      {
+        "date": "2027-02-16",
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "LOPE",
+        "title": "LOPE bilanco"
       }
     ]
   },
-  "generated_at": "2026-10-18T23:02:12+00:00",
+  "generated_at": "2026-10-19T01:07:06+00:00",
   "market": [
     {
       "as_of": "2026-10-16",
@@ -344,13 +344,12 @@
       "value": 6204.23
     },
     {
-      "as_of": "2026-10-16",
-      "change_1d_pct": 1.39,
-      "change_5d_pct": -5.38,
+      "as_of": "2026-10-19",
+      "change_1d_pct": -1.68,
+      "change_5d_pct": -6.96,
       "group": "Hisse",
       "label": "Nikkei 225",
       "series": [
-        66215.3438,
         64325.6406,
         64214.4805,
         65020.9414,
@@ -379,11 +378,12 @@
         67777.5234,
         67744.2891,
         64425.9492,
-        65324.2891
+        65324.2891,
+        64229.75
       ],
       "symbol": "^N225",
       "unit": "puan",
-      "value": 65324.2891
+      "value": 64229.75
     },
     {
       "as_of": "2026-10-16",
@@ -513,8 +513,8 @@
     },
     {
       "as_of": "2026-10-18",
-      "change_1d_pct": 0.08,
-      "change_5d_pct": -0.64,
+      "change_1d_pct": -0.0,
+      "change_5d_pct": -0.72,
       "group": "Kur",
       "label": "Dolar endeksi",
       "series": [
@@ -547,16 +547,16 @@
         102.55,
         102.0,
         101.84,
-        101.926
+        101.838
       ],
       "symbol": "DX-Y.NYB",
       "unit": "puan",
-      "value": 101.926
+      "value": 101.838
     },
     {
       "as_of": "2026-10-19",
-      "change_1d_pct": 0.02,
-      "change_5d_pct": 0.1,
+      "change_1d_pct": 0.16,
+      "change_5d_pct": 0.23,
       "group": "Kur",
       "label": "EUR/USD",
       "series": [
@@ -589,16 +589,16 @@
         1.1204,
         1.1195,
         1.1213,
-        1.1216
+        1.1231
       ],
       "symbol": "EURUSD=X",
       "unit": "kur",
-      "value": 1.1216
+      "value": 1.1231
     },
     {
       "as_of": "2026-10-19",
-      "change_1d_pct": -0.0,
-      "change_5d_pct": 0.38,
+      "change_1d_pct": -0.03,
+      "change_5d_pct": 0.35,
       "group": "Kur",
       "label": "USD/TRY",
       "series": [
@@ -631,16 +631,16 @@
         49.342,
         49.4052,
         49.5235,
-        49.5216
+        49.5096
       ],
       "symbol": "TRY=X",
       "unit": "kur",
-      "value": 49.5216
+      "value": 49.5096
     },
     {
       "as_of": "2026-10-18",
-      "change_1d_pct": -3.11,
-      "change_5d_pct": 4.82,
+      "change_1d_pct": -3.77,
+      "change_5d_pct": 4.11,
       "group": "Emtia",
       "label": "Brent/WTI ham",
       "series": [
@@ -673,16 +673,16 @@
         95.09,
         97.97,
         101.41,
-        98.26
+        97.59
       ],
       "symbol": "CL=F",
       "unit": "USD",
-      "value": 98.26
+      "value": 97.59
     },
     {
       "as_of": "2026-10-18",
-      "change_1d_pct": 0.37,
-      "change_5d_pct": 0.15,
+      "change_1d_pct": 0.29,
+      "change_5d_pct": 0.07,
       "group": "Emtia",
       "label": "Altin",
       "series": [
@@ -715,16 +715,16 @@
         4107.8999,
         4170.1001,
         4181.1001,
-        4196.7002
+        4193.3999
       ],
       "symbol": "GC=F",
       "unit": "USD",
-      "value": 4196.7002
+      "value": 4193.3999
     },
     {
-      "as_of": "2026-10-18",
-      "change_1d_pct": 0.32,
-      "change_5d_pct": -1.75,
+      "as_of": "2026-10-19",
+      "change_1d_pct": 1.15,
+      "change_5d_pct": -0.94,
       "group": "Kripto",
       "label": "Bitcoin",
       "series": [
@@ -757,11 +757,11 @@
         82141.4609,
         81500.8047,
         81382.1484,
-        81642.0938
+        82315.0625
       ],
       "symbol": "BTC-USD",
       "unit": "USD",
-      "value": 81642.0938
+      "value": 82315.0625
     }
   ],
   "news": [
@@ -778,6 +778,13 @@
       "source": "Benzinga",
       "ticker": "DECK",
       "url": "https://finnhub.io/api/news?id=5c78bcce8cd0cc2226cc7783c6eead9b62cb211292a3c27b37fb45d52b6b91ab"
+    },
+    {
+      "date": "2026-10-18",
+      "headline": "Incyte to Highlight Key Oncology Data Presentations at the European Society for Medical Oncology (ESMO) Congress 2026",
+      "source": "Yahoo",
+      "ticker": "INCY",
+      "url": "https://finnhub.io/api/news?id=93a8c9119aaa67ffa3172ec07711b3b51ab2b33c5e500d92b0e633bb72ab4416"
     },
     {
       "date": "2026-10-18",
@@ -900,24 +907,10 @@
     },
     {
       "date": "2026-10-16",
-      "headline": "Raymond James Upgrades Brinker International to Strong Buy, Lowers Price Target to $260",
-      "source": "Benzinga",
-      "ticker": "EAT",
-      "url": "https://finnhub.io/api/news?id=ecaea6c9c4b1a7823946510dceecc22859e960d5b5c0cb61dfaf5ec5f48360a4"
-    },
-    {
-      "date": "2026-10-16",
-      "headline": "Workday downgraded, Fox Corp. upgraded: Wall Street's top analyst calls",
+      "headline": "1 of Wall Street’s Favorite Stocks Worth Your Attention and 2 We Turn Down",
       "source": "Yahoo",
-      "ticker": "EAT",
-      "url": "https://finnhub.io/api/news?id=1ff15b93ea07f194c85563ea67c54d1939dd6933cb937671998b1e9556ed7fb0"
-    },
-    {
-      "date": "2026-10-16",
-      "headline": "Brinker International, Inc. (EAT) is Attracting Investor Attention: Here is What You Should Know",
-      "source": "Yahoo",
-      "ticker": "EAT",
-      "url": "https://finnhub.io/api/news?id=eafd76917f3634b3a5dfafa6d21e47dc5d73d75f858aee9667939c5b114a0bb6"
+      "ticker": "GFF",
+      "url": "https://finnhub.io/api/news?id=dbdd4429ec67b114601c9d10849f3054d2903990a0b6c523393cc00f2f108abb"
     },
     {
       "date": "2026-10-16",
@@ -1002,48 +995,6 @@
       "source": "SeekingAlpha",
       "ticker": "SGOV",
       "url": "https://finnhub.io/api/news?id=65af7b0b5793c27fdaec88f5aacb94f1adfbce029188819583960a96b5a5d104"
-    },
-    {
-      "date": "2026-10-15",
-      "headline": "Mamdani Administration Sues CarGurus For Deceiving New Yorkers With AI Chatbot, Hidden Junk Fees",
-      "source": "Benzinga",
-      "ticker": "CARG",
-      "url": "https://finnhub.io/api/news?id=afcfcbbeb8ab2beb607cd9668c3d0d768e6fb860f9a7c5971018448305aab739"
-    },
-    {
-      "date": "2026-10-15",
-      "headline": "CarGurus (NASDAQ:CARG) Is a Lynch-Style Growth-at-a-Reasonable-Price Stock",
-      "source": "ChartMill",
-      "ticker": "CARG",
-      "url": "https://finnhub.io/api/news?id=d6df5cabe961b37d001d4e5a4ce7f3e1ec9afdd415928e3a99a29de5cca6f421"
-    },
-    {
-      "date": "2026-10-15",
-      "headline": "Scotiabank Initiates Coverage On Chord Energy with Sector Outperform Rating, Announces Price Target of $192",
-      "source": "Benzinga",
-      "ticker": "CHRD",
-      "url": "https://finnhub.io/api/news?id=88abdb2ea803486433402b863e0420de82d8fe0af8ed8457a22b9e04ef46e230"
-    },
-    {
-      "date": "2026-10-15",
-      "headline": "Morgan Stanley Maintains Overweight on Chord Energy, Raises Price Target to $178",
-      "source": "Benzinga",
-      "ticker": "CHRD",
-      "url": "https://finnhub.io/api/news?id=d701b8b0cf32a91c897def5a8391b05c984f06f4f1c1bbcb09351e1ee49245a9"
-    },
-    {
-      "date": "2026-10-15",
-      "headline": "Japan Is Putting Up to $21 Billion Into New GlobalFoundries Chip Plants in New York",
-      "source": "Yahoo",
-      "ticker": "CRUS",
-      "url": "https://finnhub.io/api/news?id=56a4e9bf2335359d9bd2e4e997f7e62f9b47774ce1da0181c469a113dc447e56"
-    },
-    {
-      "date": "2026-10-15",
-      "headline": "Dell downgraded, Texas Roadhouse upgraded: Wall Street's top analyst calls",
-      "source": "Yahoo",
-      "ticker": "CRUS",
-      "url": "https://finnhub.io/api/news?id=028f28e68ac18cb2c45a2e8927474faea25309e4e94e934a36a25a40252b7044"
     }
   ],
   "risk_note": "VIX 20 — normal aralikta.",
