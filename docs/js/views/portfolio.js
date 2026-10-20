@@ -64,10 +64,15 @@ window.ViewPortfolio = (function () {
       const s = port.summary || {};
       return `<div class="kpis">${kpi('Değer', F.money(s.portfolio_value_usd), F.esc(F.moneyTry(s.portfolio_value_try)))}</div>`;
     }
-    return `<div class="kpis">
+    const added = perf.added_usd > 0 && F.isNum(perf.initial_usd)
+      ? `ilk ${F.money(perf.initial_usd, { digits: 0 })} + eklenen ${F.money(perf.added_usd, { digits: 0 })}`
+      : (perf.contributions || []).length === 1 ? 'ilk sermaye' : '';
+    return `<div class="kpis four">
       ${kpi('Değer', F.money(perf.value_usd), F.esc(`${F.moneyTry(perf.value_try)} · ${F.date(perf.as_of)}`))}
-      ${kpi('Başlangıçtan', F.signedMoney(perf.return_usd), F.esc(`${F.pct(perf.return_pct)} · TL bazında ${F.pct(perf.return_try_pct)}`), F.changeClass(perf.return_pct))}
-      ${kpi('Bugün', F.signedMoney(perf.day_change_usd), F.esc(F.pct(perf.day_change_pct)), F.changeClass(perf.day_change_pct))}
+      ${F.isNum(perf.invested_usd) ? kpi('Yatırdığın', F.money(perf.invested_usd), F.esc(added)) : ''}
+      ${kpi('Kazanç', F.signedMoney(perf.return_usd), F.esc(`${F.pct(perf.return_pct)} · TL bazında ${F.pct(perf.return_try_pct)}`), F.changeClass(perf.return_pct))}
+      ${kpi('Bugün', F.signedMoney(perf.day_change_usd), F.esc(`${F.pct(perf.day_change_pct)}${perf.day_added_usd > 0
+        ? ` · ${F.signedMoney(perf.day_added_usd)} giriş hariç` : ''}`), F.changeClass(perf.day_change_pct))}
     </div>`;
   }
 
@@ -85,7 +90,7 @@ window.ViewPortfolio = (function () {
     const tranches = (raw.planned_tranches || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
     const trancheRows = tranches.map((t) => `<li>
         <span class="when ${t.done ? '' : 'soon'}">${t.done ? 'yapıldı' : F.esc(F.days(F.daysUntil(t.date)))}</span>
-        <span class="what">${F.esc(t.ticker || '')} alımı · ${F.esc(F.money(t.amount_usd))}${t.note ? `<span class="sub">${F.esc(F.tr(t.note))}</span>` : ''}</span>
+        <span class="what">${F.esc(t.ticker || '')} alımı · ${F.esc(F.trancheAmount(t))}${t.note ? `<span class="sub">${F.esc(F.tr(t.note))}</span>` : ''}</span>
         <span class="date">${F.esc(F.date(t.date))}</span></li>`).join('');
 
     const items = [
@@ -118,10 +123,7 @@ window.ViewPortfolio = (function () {
   }
 
   function actionTitle(a, port) {
-    if (a.kind === 'vade') {
-      const t = ((port.positions || []).find((p) => p.tl_deposit) || {}).tl_deposit || {};
-      return `TL mevduat vadesi${t.bank ? ` · ${t.bank}` : ''} — yenileme kararı`;
-    }
+    if (a.kind === 'vade') return `${F.depositLabel(a, port)} vadesi — yenileme kararı`;
     if (a.kind === 'faz') {
       const m = /Faz\s*(\d)/.exec(a.title || '');
       const ph = ((App.thresholds.portfolio || {}).phases || []).find((p) => m && p.key === `faz${m[1]}`);
@@ -185,11 +187,17 @@ window.ViewPortfolio = (function () {
           fee: p.exit_fees_usd, amount: F.money((p.shares || 0) * (p.exit_price || 0) - (p.exit_fees_usd || 0)), note: '' });
       }
     });
-    (raw.cash_flows || []).forEach((c) => rows.push({ date: c.date, ticker: 'Nakit', kind: c.amount_usd >= 0 ? 'Giriş' : 'Çıkış',
-      amount: F.signedMoney(c.amount_usd), note: c.note || '' }));
+    // TL ile gelen para (amount_try) da giriştir; eskiden "Çıkış" ve tutarsız görünüyordu.
+    (raw.cash_flows || []).forEach((c) => {
+      const tl = F.isNum(c.amount_try);
+      const v = tl ? c.amount_try : c.amount_usd;
+      rows.push({ date: c.date, ticker: tl ? 'TL' : 'Nakit', kind: v >= 0 ? 'Para girişi' : 'Para çıkışı',
+        amount: tl ? `${v >= 0 ? '+' : F.MINUS}${F.moneyTry(Math.abs(v))}` : F.signedMoney(v), note: '' });
+    });
     rows.sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
-    return `<div class="h2row"><h2>İşlem günlüğü</h2><button id="addTrade" class="primary">+ İşlem ekle</button></div>
+    return `${contributions(port)}
+      <div class="h2row"><h2>İşlem günlüğü</h2><button id="addTrade" class="primary">+ İşlem ekle</button></div>
       <div class="card flush"><div class="table-wrap"><table class="tbl stackable">
       <thead><tr><th>İşlem</th><th class="r">Adet</th><th class="r">Fiyat</th>
         <th class="r">Ücret</th><th class="r">Tutar</th></tr></thead>
@@ -201,6 +209,34 @@ window.ViewPortfolio = (function () {
         <td class="r" data-label="Tutar">${F.esc(r.amount)}</td></tr>`).join('')}</tbody></table></div></div>
       <p class="small muted" style="margin-top:8px">Midas'ın API'si yok; işlemler <code>data/portfolio.json</code>
         dosyasına elle ya da sohbetteki Claude ile (record_position) girilir.</p>`;
+  }
+
+  /* PARA GİRİŞLERİ — portföye dışarıdan konan para. Değer = bunların
+     toplamı + kazanç. Alım-satım burada yok: o para zaten portföyün içinde. */
+  function contributions(port) {
+    const perf = port.performance || {};
+    const list = perf.contributions || [];
+    if (!list.length) return '';
+    let cum = 0;
+    const rows = list.map((c) => {
+      cum += c.usd || 0;
+      const what = c.initial ? 'İlk sermaye' : 'Para girişi';
+      const src = F.isNum(c.try) ? `${F.moneyTry(c.try)} · kur ${F.num(c.usdtry, 4)}` : '';
+      return `<tr>
+        <td class="lead" data-label=""><b>${F.esc(what)}</b><span class="sub">${F.esc(F.date(c.date))}${src ? ` · ${F.esc(src)}` : ''}</span></td>
+        <td class="r" data-label="Tutar">${F.esc(c.initial ? F.money(c.usd) : F.signedMoney(c.usd))}</td>
+        <td class="r" data-label="Toplam">${F.esc(F.money(cum))}</td></tr>`;
+    }).join('');
+    const gain = F.isNum(perf.return_usd) ? `<tr class="muted-row">
+        <td class="lead" data-label=""><b>Kazanç</b><span class="sub">piyasa, faiz, kur, dağıtım</span></td>
+        <td class="r ${F.changeClass(perf.return_pct)}" data-label="Tutar">${F.esc(F.signedMoney(perf.return_usd))}</td>
+        <td class="r" data-label="Değer"><b>${F.esc(F.money(perf.value_usd))}</b></td></tr>` : '';
+    return `<h2>Para girişleri</h2>
+      <div class="card flush"><div class="table-wrap"><table class="tbl stackable">
+      <thead><tr><th>Kaynak</th><th class="r">Tutar</th><th class="r">Toplam</th></tr></thead>
+      <tbody>${rows}${gain}</tbody></table></div></div>
+      <p class="small muted" style="margin-top:8px">Değer = yatırdığın para + kazanç. Para girişi kazanç sayılmaz;
+        Bugün grafiğinde kesik çizgiyle işaretlenir.</p>`;
   }
 
   /* --------------------------------------------- işlem ekleme formu */

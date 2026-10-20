@@ -263,3 +263,59 @@ class TestTryInjection:
         rows = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
         perf = H.performance(rows[:2], d)
         assert perf["invested_usd"] == pytest.approx(1600.0)
+
+
+class TestContributionsVsGrowth:
+    """Pano "para ekledim" ile "portfoy buyudu"yu ayri gostermeli."""
+
+    def _rows(self, d):
+        ps, divs, fx = series()
+        return H.annotate_flows(H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx), d)
+
+    def test_each_row_carries_invested_capital(self):
+        rows = self._rows(TestTryInjection()._with_second_deposit())
+        assert [r["invested_usd"] for r in rows] == [1600.0, 1600.0, 2600.0, 2600.0]
+
+    def test_only_the_flow_day_is_marked(self):
+        rows = self._rows(TestTryInjection()._with_second_deposit())
+        assert rows[2]["added_usd"] == 1000.0
+        assert rows[2]["added_try"] == 50000.0
+        assert all("added_usd" not in r for i, r in enumerate(rows) if i != 2)
+
+    def test_gain_is_unchanged_by_new_money(self):
+        """Deger - yatirilan: giris olsa da olmasa da ayni kazanc."""
+        a = self._rows(base_data())
+        b = self._rows(TestTryInjection()._with_second_deposit())
+        for i in (0, 1):
+            assert b[i]["total_usd"] - b[i]["invested_usd"] == pytest.approx(
+                a[i]["total_usd"] - a[i]["invested_usd"], abs=0.01)
+        # 2. gun yeni mevduat ilk gununu yasiyor (faiz 0): kazanc farki yok.
+        assert b[2]["total_usd"] - b[2]["invested_usd"] == pytest.approx(
+            a[2]["total_usd"] - a[2]["invested_usd"], abs=0.01)
+
+    def test_performance_splits_initial_added_and_gain(self):
+        d = TestTryInjection()._with_second_deposit()
+        rows = self._rows(d)
+        perf = H.performance(rows[:3], d)
+        assert perf["initial_usd"] == pytest.approx(1600.0)
+        assert perf["added_usd"] == pytest.approx(1000.0)
+        assert perf["day_added_usd"] == pytest.approx(1000.0)
+        assert perf["return_usd"] == pytest.approx(
+            perf["value_usd"] - perf["initial_usd"] - perf["added_usd"], abs=0.01)
+        c = perf["contributions"]
+        assert [x["initial"] for x in c] == [True, False]
+        assert c[1] == {"date": DAYS[2], "usd": 1000.0, "try": 50000.0, "usdtry": 50.0,
+                        "initial": False, "note": None}
+
+    def test_no_flow_day_reports_zero_added(self):
+        d = TestTryInjection()._with_second_deposit()
+        perf = H.performance(self._rows(d), d)
+        assert perf["day_added_usd"] == 0.0
+
+    def test_kept_old_rows_are_annotated_too(self):
+        """Birlestirmede korunan eski tam satir da yatirilan alanini almali."""
+        d = TestTryInjection()._with_second_deposit()
+        ps, divs, fx = series()
+        old = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
+        rows = H.annotate_flows(H.merge(old, []), d)
+        assert rows[3]["invested_usd"] == 2600.0

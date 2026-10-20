@@ -363,7 +363,7 @@ def write_portfolio_state(quotes: dict, bench: dict, ctx: dict, *,
 
     rows = history.rebuild(data, price_series=price_series, dividends=divs,
                            fx_series=fx.get("series") or [])
-    merged = history.merge(history.load(), rows)
+    merged = history.annotate_flows(history.merge(history.load(), rows), data)
     history.write(merged)
     perf = history.performance(merged, data)
 

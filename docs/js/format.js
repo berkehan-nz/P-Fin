@@ -352,6 +352,25 @@ window.Fmt = (function () {
     return badge(action, 'decision');
   }
 
+  /* Planlı alım tutarı. TL ile planlanan parça (vadede SGOV'a geçiş) TL
+     yazılır; dolar karşılığı bugünkü kurla tahmindir, "≈" ile. */
+  function trancheAmount(t) {
+    if (!t) return '';
+    if (isNum(t.amount_try)) {
+      return `${moneyTry(t.amount_try)}${isNum(t.amount_usd) ? ` (≈ ${money(t.amount_usd, { digits: 0 })})` : ''}`;
+    }
+    return isNum(t.amount_usd) ? money(t.amount_usd) : '';
+  }
+
+  /* Birden çok mevduat aynı bankada olabilir: banka + anaparayla ayrılır. */
+  function depositLabel(a, port) {
+    const tl = ((port && port.positions) || []).filter((p) => p.tl_deposit);
+    const p = tl.find((x) => a && x.ticker === a.ticker) || tl[0];
+    const t = (p && p.tl_deposit) || {};
+    const parts = [t.bank, tl.length > 1 && isNum(t.principal_try) ? moneyTry(t.principal_try) : ''].filter(Boolean);
+    return `TL mevduat${parts.length ? ` (${parts.join(', ')})` : ''}`;
+  }
+
   function trackLabel(track) {
     return { A: 'Kârlı', B: 'Büyüyen', both: 'Kârlı ve büyüyen' }[track] || '';
   }
@@ -361,6 +380,6 @@ window.Fmt = (function () {
     pct, share, delta, changeClass, pnlClass, date, dateTime, days, daysUntil, hoursSince,
     sinceLabel, tr, sliceLabel, phaseLabel, pctText, metricValue, colorFor, status,
     statusText, label, plain, sentence, percentileSentence, ownHistorySentence, esc, badge,
-    decisionBadge, trackLabel,
+    decisionBadge, trackLabel, trancheAmount, depositLabel,
   };
 })();

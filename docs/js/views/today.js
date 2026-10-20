@@ -2,7 +2,10 @@
  *
  * Yukarıdan aşağıya ve başka hiçbir şey yok:
  *   1. Durum bandı (yalnızca gerekirse): fiyat eski / tez kırıcı / Cuma raporu
- *   2. Değer, bugün, başlangıçtan; içinde grafik ve tek satır kıyas
+ *   2. Değer = yatırdığın para + kazanç, bugün; içinde grafik ve tek satır kıyas.
+ *      Para girişi kazanç değildir: grafik varsayılan olarak KAZANCI çizer
+ *      (değer − yatırılan; girişte sıçramaz), giriş günü kesik çizgiyle
+ *      işaretlenir. "Değer" düğmesi ham portföy değerine döner.
  *   3. Pozisyonlar (satıra dokun → ayrıntı)
  *   4. Dilimler (tek çubuk; yalnızca bant dışı olan yazıyla)
  *   5. Bu hafta (30 gün ufuk, en fazla 3 madde)
@@ -110,21 +113,37 @@ window.ViewToday = (function () {
       ${extra ? `<div class="x">${extra}</div>` : ''}</div>`;
   }
 
+  /* Değer = yatırdığın para + kazanç. Para girişi "Bugün"e de "Kazanç"a
+     da girmez; ayrı kutuda, kaynağıyla (ilk sermaye + sonradan eklenen). */
   function hero(port, perf) {
+    const added = perf.day_added_usd > 0
+      ? `${F.esc(F.signedMoney(perf.day_added_usd))} para girişi hariç` : '';
     const today = F.isNum(perf.day_change_usd)
-      ? fig('Bugün', perf.day_change_usd, perf.day_change_pct)
+      ? fig('Bugün', perf.day_change_usd, perf.day_change_pct, added)
       : '';
-    const tlPart = F.isNum(perf.return_try_pct) ? `TL bazında ${F.esc(F.pct(perf.return_try_pct))} · ` : '';
-    const since = fig('Başlangıçtan', perf.return_usd, perf.return_pct,
-      `${tlPart}${F.esc(perf.days)} gün`);
+    const tlPart = F.isNum(perf.return_try_pct) ? ` · TL bazında ${F.esc(F.pct(perf.return_try_pct))}` : '';
+    const since = fig('Kazanç', perf.return_usd, perf.return_pct,
+      `${F.esc(perf.days)} günde${tlPart}`);
     return `<div class="hero">
       <div>
         <div class="hero-label">Portföy · ${F.esc(F.date(perf.as_of))}</div>
         <div class="hero-value">${F.esc(F.money(perf.value_usd))}</div>
         <div class="hero-sub">${F.esc(F.moneyTry(perf.value_try))} · kur ${F.esc(F.num(perf.usdtry, 2))}</div>
       </div>
-      <div class="hero-figs">${today}${since}</div>
+      <div class="hero-figs" title="Değer = yatırdığın para + kazanç">${today}${since}${invested(perf)}</div>
     </div>`;
+  }
+
+  function invested(perf) {
+    if (!F.isNum(perf.invested_usd)) return '';
+    const n = (perf.contributions || []).length;
+    const extra = perf.added_usd > 0 && F.isNum(perf.initial_usd)
+      ? `ilk ${F.esc(F.money(perf.initial_usd, { digits: 0 }))} + eklenen ${F.esc(F.money(perf.added_usd, { digits: 0 }))}`
+      : n === 1 ? 'ilk sermaye' : '';
+    return `<div class="fig"><div class="k">Yatırdığın</div>
+      <div class="v">${F.esc(F.money(perf.invested_usd))}</div>
+      ${n ? `<div class="p"><a href="#/portfoy/islemler">${F.esc(n)} para girişi</a></div>` : ''}
+      ${extra ? `<div class="x">${extra}</div>` : ''}</div>`;
   }
 
   function heroNotStarted(port, perf) {
@@ -156,39 +175,76 @@ window.ViewToday = (function () {
   }
 
   /* ----------------------------------------------------------- grafik */
+  /* İki taban:
+       Kazanç  değer − o güne kadar yatırılan. Para girişi bu çizgiyi
+               oynatmaz; kıyas da aynı biçimde (kıyas − yatırılan) çizilir.
+       Değer   ham portföy değeri; girişte iki çizgi birlikte sıçrar.
+     Her ikisinde giriş günü kesik çizgiyle işaretlenir. */
   function chart(rows, perf) {
     const host = $('todayChart');
     if (!host || rows.length < 2) return;
+    const son = rows.slice(-60);
+    const canGain = son.every((r) => F.isNum(r.invested_usd));
     let sel = DataLayer.prefs.get('ovBench', 'tl');
     if (!BENCH[sel]) sel = 'tl';
-    const son = rows.slice(-60);
+    let basis = canGain ? DataLayer.prefs.get('ovBasis', 'kazanc') : 'deger';
+    if (basis !== 'deger' && basis !== 'kazanc') basis = 'kazanc';
+
+    const marks = son.map((r, i) => ({ r, i })).filter(({ r }) => r.added_usd > 0).map(({ r, i }) => ({
+      i,
+      label: `+${F.isNum(r.added_try) ? F.moneyTry(r.added_try) : F.money(r.added_usd, { digits: 0 })} giriş`,
+      tip: `Para girişi ${F.signedMoney(r.added_usd)}${F.isNum(r.added_try) ? ` (${F.moneyTry(r.added_try)})` : ''} · kazanç değil`,
+    }));
+    const seg = (name, items, cur) => `<div class="seg" role="group" aria-label="${F.esc(name)}">${items.map(([k, v]) =>
+      `<button data-${name === 'Taban' ? 'basis' : 'b'}="${k}" aria-pressed="${k === cur}">${F.esc(v)}</button>`).join('')}</div>`;
+
     host.innerHTML = `<div class="chart-head">
         <span class="small muted">${son.length} işlem günü${F.isNum(perf.return_pct)
           ? ` · ${F.esc(F.pct(perf.return_pct))}` : ''}</span>
-        <div class="seg" role="group" aria-label="Kıyas seçimi">${Object.entries(BENCH).map(([k, v]) =>
-          `<button data-b="${k}" aria-pressed="${k === sel}">${F.esc(v.short)}</button>`).join('')}</div>
+        <div class="chart-ctl">
+          ${canGain ? seg('Taban', [['kazanc', 'Kazanç'], ['deger', 'Değer']], basis) : ''}
+          ${seg('Kıyas', Object.entries(BENCH).map(([k, v]) => [k, v.short]), sel)}
+        </div>
       </div><div id="todayPlot"></div>`;
 
     const draw = () => {
       const bm = BENCH[sel];
+      const gain = basis === 'kazanc';
+      const less = (v, r) => (F.isNum(v) ? (gain ? v - r.invested_usd : v) : null);
       Charts.compare($('todayPlot'), {
         dates: son.map((r) => r.date),
-        focus: { role: 'focus', label: 'Portföy', short: 'Portföy', values: son.map((r) => r.total_usd) },
+        focus: { role: 'focus', label: gain ? 'Portföy kazancı' : 'Portföy', short: 'Portföy',
+                 values: son.map((r) => less(r.total_usd, r)) },
         context: { role: 'context', label: bm.label, short: bm.short,
-                   values: son.map((r) => (r.benchmarks || {})[bm.key]) },
-        fmt: (v) => F.money(v),
-        fmtTick: (v) => F.money(v, { digits: 0 }),
+                   values: son.map((r) => less((r.benchmarks || {})[bm.key], r)) },
+        fmt: (v) => (gain ? F.signedMoney(v) : F.money(v)),
+        fmtTick: (v) => (gain ? F.signedMoney(v, 0) : F.money(v, { digits: 0 })),
         fmtDate: F.date,
         diff: (a, c) => (F.isNum(a) && F.isNum(c) ? `Fark ${F.signedMoney(a - c)}` : ''),
-        height: 160,
-        bandPct: 2,
-        aria: `Portföy değeri ve ${bm.label} kıyası`,
+        tipExtra: (i) => {
+          const r = son[i];
+          return F.isNum(r.invested_usd)
+            ? `Değer ${F.money(r.total_usd)} = yatırılan ${F.money(r.invested_usd)} ${
+              r.total_usd >= r.invested_usd ? '+' : F.MINUS} ${F.money(Math.abs(r.total_usd - r.invested_usd))}` : '';
+        },
+        zero: gain,
+        bandPct: gain ? 0 : 2,
+        marks,
+        height: marks.length ? 174 : 160,
+        aria: gain ? `Portföy kazancı (değer eksi yatırılan para) ve ${bm.label} kıyası`
+          : `Portföy değeri ve ${bm.label} kıyası`,
       });
     };
     host.querySelectorAll('[data-b]').forEach((btn) => btn.addEventListener('click', () => {
       sel = btn.dataset.b;
       DataLayer.prefs.set('ovBench', sel);
       host.querySelectorAll('[data-b]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.b === sel)));
+      draw();
+    }));
+    host.querySelectorAll('[data-basis]').forEach((btn) => btn.addEventListener('click', () => {
+      basis = btn.dataset.basis;
+      DataLayer.prefs.set('ovBasis', basis);
+      host.querySelectorAll('[data-basis]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.basis === basis)));
       draw();
     }));
     draw();
@@ -359,11 +415,8 @@ window.ViewToday = (function () {
 
   /* --------------------------------------------------------- bu hafta */
   function actionTitle(a, port) {
-    if (a.kind === 'alim') return `${a.ticker || ''} alımı${F.isNum(a.amount_usd) ? ` · ${F.money(a.amount_usd)}` : ''}`;
-    if (a.kind === 'vade') {
-      const t = ((port.positions || []).find((p) => p.tl_deposit) || {}).tl_deposit || {};
-      return `TL mevduat vadesi${t.bank ? ` · ${t.bank}` : ''} — yenileme kararı`;
-    }
+    if (a.kind === 'alim') return `${a.ticker || ''} alımı${F.trancheAmount(a) ? ` · ${F.trancheAmount(a)}` : ''}`;
+    if (a.kind === 'vade') return `${F.depositLabel(a, port)} vadesi — yenileme kararı`;
     if (a.kind === 'faz') {
       const m = /Faz\s*(\d)/.exec(a.title || '');
       const ph = ((App.thresholds.portfolio || {}).phases || []).find((p) => m && p.key === `faz${m[1]}`);

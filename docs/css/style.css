@@ -246,6 +246,7 @@ details.fold > .fold-body { padding: 0 16px 16px; }
               padding-top: 10px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
 .chart-head { display: flex; justify-content: space-between; align-items: center; gap: 10px;
               flex-wrap: wrap; margin: 14px 0 4px; }
+.chart-ctl { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* Kıyas grafiği — çizgi 2px, ızgara kıl payı ve düz, uç noktalarda yüzey
    renginde halka. Yazılar veri rengini giymez. */
@@ -267,6 +268,14 @@ details.fold > .fold-body { padding: 0 16px 16px; }
 .cmp-dot-focus { fill: var(--accent); }
 .cmp-dot-context { fill: var(--neutral); }
 .cmp-cross { stroke: var(--text-3); stroke-width: 1; }
+/* Kazanç çizgisi ile sıfır arası alan; rengi yön bildirmez, sıfır çizgisi bildirir. */
+.cmp-fill { fill: var(--accent); opacity: .10; }
+.cmp-zero { stroke: var(--text-3); stroke-width: 1; }
+.cmp-tip-extra { margin-top: 4px; color: var(--text-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cmp-mark { stroke: var(--text-3); stroke-width: 1; stroke-dasharray: 3 3; }
+.cmp-mark-label { fill: var(--text-2); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.k-mark { display: inline-block; width: 0; height: 12px; border-left: 1px dashed var(--text-3); margin: 0 6px 0 7px; }
+.cmp-tip-mark { display: flex; align-items: center; gap: 0; margin-top: 4px; color: var(--text-2); white-space: nowrap; }
 .cmp-tip { position: absolute; z-index: 5; pointer-events: none; min-width: 150px; background: var(--surface-2);
            border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 7px 10px;
            font-size: var(--fs-label); box-shadow: var(--shadow-lg); }
@@ -310,6 +319,7 @@ details.fold > .fold-body { padding: 0 16px 16px; }
 
 /* ============================================================= PORTFÖY */
 .kpis { display: grid; gap: var(--gap); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kpis.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .kpi-v { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; margin: 2px 0; }
 .tbl tr.current td { background: var(--accent-bg); }
 .agenda.criteria li { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
@@ -461,7 +471,9 @@ html.locked body > *:not(#authGate) { display: none !important; }
   main { padding: 14px 16px calc(var(--bottomnav-h) + 16px + env(safe-area-inset-bottom)); }
   select, input, textarea, button { font-size: 16px; }
   .card { padding: 12px; }
-  .hero-figs { justify-content: flex-start; }
+  /* Bugün · Kazanç · Yatırdığın yan yana: değer = yatırdığın + kazanç. */
+  .hero-figs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 12px; align-items: start; }
+  .hero-figs .fig .v { font-size: 18px; }
 
   /* Tablo → kart listesi. Her satır bir blok, hücreler etiketli. */
   table.tbl.stackable thead { display: none; }
@@ -499,8 +511,8 @@ html.locked body > *:not(#authGate) { display: none !important; }
   .clist li .why { grid-column: 1 / -1; margin-top: -4px; }
   .list-head .whyh { display: none; }
   .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .kpis { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .kpis .card:first-child { grid-column: 1 / -1; }
+  .kpis, .kpis.four { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpis:not(.four) .card:first-child { grid-column: 1 / -1; }
   .form-grid { grid-template-columns: 1fr; }
   .modal-backdrop { place-items: end center; padding: 0; }
   .modal { width: 100%; max-height: 92vh; border-radius: var(--radius) var(--radius) 0 0;

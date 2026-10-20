@@ -137,13 +137,39 @@ def _injection_details(data: dict) -> list[dict]:
         return []
     _rate, _w, entry_fx = _tl_terms(data)
     out = [{"date": start, "usd": cash_on(data, start, before_trades=True),
-            "fx": entry_fx, "try": None}]
+            "fx": entry_fx, "try": None, "note": None}]
     for f in data.get("cash_flows") or []:
         d = str(f.get("date") or "")[:10]
         if d and d > start:
             out.append({"date": d, "usd": _flow_usd(f), "fx": num(f.get("usdtry")),
-                        "try": num(f.get("amount_try"))})
-    return out
+                        "try": num(f.get("amount_try")), "note": f.get("note")})
+    return sorted(out, key=lambda x: x["date"])
+
+
+def annotate_flows(rows: list[dict], data: dict) -> list[dict]:
+    """Her satira o gune kadar YATIRILAN parayi ve o gun gelen girisi yazar.
+
+    "Para ekledim" ile "portfoy buyudu" ayni grafikte ayni sicrama gibi
+    gorunuyordu (15 Ekim: 100.000 TL giris). Satirdaki ``invested_usd``
+    ile ``total_usd`` arasindaki fark o gunku kazanctir; ``added_usd``
+    (varsa ``added_try``) giris gununu isaretler. Birlestirmeden SONRA
+    cagrilir: korunan eski satirlar da ayni alanlari tasir.
+    """
+    details = _injection_details(data)
+    prev = None
+    for r in rows:
+        day = r["date"]
+        r["invested_usd"] = round(sum(x["usd"] for x in details if x["date"] <= day), 2)
+        new = [x for x in details[1:] if (prev is None or prev < x["date"]) and x["date"] <= day]
+        r.pop("added_usd", None)
+        r.pop("added_try", None)
+        if new:
+            r["added_usd"] = round(sum(x["usd"] for x in new), 2)
+            tl = [x["try"] for x in new if x["try"] is not None]
+            if tl:
+                r["added_try"] = round(sum(tl), 2)
+        prev = day
+    return rows
 
 
 # --------------------------------------------------------------------------
@@ -352,7 +378,8 @@ def performance(rows: list[dict], data: dict) -> dict:
     today = today_iso()
     inc = injections(data)
     invested = sum(a for _, a in inc)
-    base = {"inception": start, "invested_usd": round(invested, 2)}
+    base = {"inception": start, "invested_usd": round(invested, 2),
+            "contributions": _contributions(_injection_details(data))}
 
     if not start or start > today or not rows:
         return {**base, "status": "baslamadi",
@@ -366,6 +393,7 @@ def performance(rows: list[dict], data: dict) -> dict:
     # giren para henuz fiyatlanmamis bir satira yazilirsa sahte kayip olur.
     details = [x for x in _injection_details(data) if x["date"] <= last["date"]]
     invested = sum(x["usd"] for x in details)
+    added_total = sum(x["usd"] for x in details[1:])
 
     # Dis nakit girisi (maas, havale) portfoyu "kazandirmaz": gunluk
     # degisimden dusulur. Alim-satim nakdi pozisyona tasir, toplami
@@ -387,6 +415,10 @@ def performance(rows: list[dict], data: dict) -> dict:
     return {
         **base,
         "invested_usd": round(invested, 2),
+        # Deger = ilk sermaye + sonradan eklenen para + kazanc.
+        "initial_usd": round(details[0]["usd"], 2) if details else None,
+        "added_usd": round(added_total, 2),
+        "contributions": _contributions(details),
         "status": "aktif",
         "as_of": last["date"],
         "days": _days(start, today),
@@ -394,6 +426,8 @@ def performance(rows: list[dict], data: dict) -> dict:
         "value_try": last.get("total_try"),
         "usdtry": last.get("usdtry"),
         "day_change_usd": round(day_chg, 2) if day_chg is not None else None,
+        # Son gunde gelen para: gunluk degisimden DUSULDU, ayrica gosterilir.
+        "day_added_usd": round(added, 2) if added else 0.0,
         "day_change_pct": round(day_chg / prev["total_usd"] * 100, 2)
         if (day_chg is not None and prev["total_usd"]) else None,
         "prev_date": prev["date"] if prev else None,
@@ -410,6 +444,14 @@ def performance(rows: list[dict], data: dict) -> dict:
         "complete": last.get("complete", False),
         "missing": last.get("missing", []),
     }
+
+
+def _contributions(details: list[dict]) -> list[dict]:
+    """Pano icin para girisleri: ilki baslangic sermayesi, sonrakiler eklenen para."""
+    return [{"date": x["date"], "usd": round(x["usd"], 2),
+             "try": round(x["try"], 2) if x["try"] is not None else None,
+             "usdtry": x["fx"], "initial": i == 0, "note": x.get("note")}
+            for i, x in enumerate(details)]
 
 
 def positions_day(prev: dict | None, last: dict) -> dict:
