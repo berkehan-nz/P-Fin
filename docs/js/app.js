@@ -3,25 +3,29 @@
  * localStorage yalnızca GÖRÜNÜM TERCİHİ tutar (tema, liste/kart, seçili
  * kıyas). Veri asla burada saklanmaz; tek doğru kaynak repodaki JSON'lardır.
  *
- * Rotalar: #/bugun · #/portfoy[/plan|pozisyonlar|islemler|haftalik] ·
- * #/adaylar · #/piyasa · #/huni · #/sirket/<SEMBOL>. Eski bağlantılar
- * (#/overview, #/company/X, #/weekly ...) aynı yere gider.
+ * Rotalar: #/ozet · #/plan · #/hareketler[/haftalik] — menüdeki üç sekme.
+ * Menüde olmayan araştırma ekranları: #/adaylar · #/piyasa · #/huni ·
+ * #/sirket/<SEMBOL>. Eski bağlantılar (#/bugun, #/portfoy/plan,
+ * #/portfoy/islemler, #/overview, #/weekly ...) karşılık gelen yere gider.
  */
 window.App = (function () {
   'use strict';
 
   const ROUTES = {
-    bugun:   { screen: 'today',      view: () => ViewToday.render() },
-    portfoy: { screen: 'portfolio',  view: (arg) => ViewPortfolio.render(arg) },
-    adaylar: { screen: 'candidates', view: () => ViewCandidates.render() },
-    piyasa:  { screen: 'market',     view: () => ViewMarket.render() },
-    huni:    { screen: 'funnel',     view: () => ViewFunnel.render() },
-    sirket:  { screen: 'company',    view: (arg) => ViewCompany.render(String(arg || '').toUpperCase()) },
+    ozet:       { screen: 'today',      view: () => ViewToday.render() },
+    plan:       { screen: 'plan',       view: () => ViewPlan.render() },
+    hareketler: { screen: 'portfolio',  view: (arg) => ViewPortfolio.render(arg) },
+    adaylar:    { screen: 'candidates', view: () => ViewCandidates.render() },
+    piyasa:     { screen: 'market',     view: () => ViewMarket.render() },
+    huni:       { screen: 'funnel',     view: () => ViewFunnel.render() },
+    sirket:     { screen: 'company',    view: (arg) => ViewCompany.render(String(arg || '').toUpperCase()) },
   };
   const ALIASES = {
-    overview: ['bugun'], portfolio: ['portfoy'], candidates: ['adaylar'],
-    funnel: ['huni'], market: ['piyasa'], weekly: ['portfoy', 'haftalik'], company: ['sirket'],
+    bugun: ['ozet'], overview: ['ozet'], candidates: ['adaylar'],
+    funnel: ['huni'], market: ['piyasa'], weekly: ['hareketler', 'haftalik'], company: ['sirket'],
   };
+  // Eski "Portföy" sekmesinin alt sekmeleri yeni yerlerine.
+  const PORTFOY = { plan: ['plan'], pozisyonlar: ['ozet'], islemler: ['hareketler'], haftalik: ['hareketler', 'haftalik'] };
 
   const api = { thresholds: {} };
 
@@ -51,12 +55,13 @@ window.App = (function () {
     // Sayfa içi çapa ('#metrikler') rota değildir.
     if (hash && hash[0] !== '/') return null;
     let [name, arg] = hash.replace(/^\//, '').split('/');
+    if (name === 'portfoy' || name === 'portfolio') [name, arg] = PORTFOY[arg] || ['ozet'];
     if (ALIASES[name]) {
       const [n, a] = ALIASES[name];
       name = n;
       arg = arg || a;
     }
-    if (!ROUTES[name]) name = 'bugun';
+    if (!ROUTES[name]) name = 'ozet';
     return { name, arg };
   }
 

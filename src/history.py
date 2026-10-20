@@ -33,6 +33,8 @@ Komisyonlar kiyaslara yansitilmaz; fark birkac dolar.
 
 from __future__ import annotations
 
+import hashlib
+import json
 from datetime import date
 
 from . import portfolio as pf
@@ -137,13 +139,39 @@ def _injection_details(data: dict) -> list[dict]:
         return []
     _rate, _w, entry_fx = _tl_terms(data)
     out = [{"date": start, "usd": cash_on(data, start, before_trades=True),
-            "fx": entry_fx, "try": None}]
+            "fx": entry_fx, "try": None, "note": None}]
     for f in data.get("cash_flows") or []:
         d = str(f.get("date") or "")[:10]
         if d and d > start:
             out.append({"date": d, "usd": _flow_usd(f), "fx": num(f.get("usdtry")),
-                        "try": num(f.get("amount_try"))})
-    return out
+                        "try": num(f.get("amount_try")), "note": f.get("note")})
+    return sorted(out, key=lambda x: x["date"])
+
+
+def annotate_flows(rows: list[dict], data: dict) -> list[dict]:
+    """Her satira o gune kadar YATIRILAN parayi ve o gun gelen girisi yazar.
+
+    "Para ekledim" ile "portfoy buyudu" ayni grafikte ayni sicrama gibi
+    gorunuyordu (15 Ekim: 100.000 TL giris). Satirdaki ``invested_usd``
+    ile ``total_usd`` arasindaki fark o gunku kazanctir; ``added_usd``
+    (varsa ``added_try``) giris gununu isaretler. Birlestirmeden SONRA
+    cagrilir: korunan eski satirlar da ayni alanlari tasir.
+    """
+    details = _injection_details(data)
+    prev = None
+    for r in rows:
+        day = r["date"]
+        r["invested_usd"] = round(sum(x["usd"] for x in details if x["date"] <= day), 2)
+        new = [x for x in details[1:] if (prev is None or prev < x["date"]) and x["date"] <= day]
+        r.pop("added_usd", None)
+        r.pop("added_try", None)
+        if new:
+            r["added_usd"] = round(sum(x["usd"] for x in new), 2)
+            tl = [x["try"] for x in new if x["try"] is not None]
+            if tl:
+                r["added_try"] = round(sum(tl), 2)
+        prev = day
+    return rows
 
 
 # --------------------------------------------------------------------------
@@ -317,24 +345,50 @@ def trading_days(data: dict, price_series: dict, fx_series: list,
         last_fx = fx_days[-1]
         if last_fx > max(days) and date.fromisoformat(last_fx).weekday() < 5:
             days.add(last_fx)
+        # Kur kaynagi bugunun ilk fiyatini henuz yazmadiysa da bugunun satiri
+        # olur (dunku kur, bugunun faizi). Pozisyon tablosu TL mevduati
+        # BUGUNE kadar tahakkuk ettirir; satir yoksa ust toplam bir gunluk
+        # faiz kadar (160.000 TL'de ~2,6 $) tablodan ayrisiyordu.
+        if upto > max(days) and date.fromisoformat(upto).weekday() < 5:
+            days.add(upto)
     return sorted(d for d in days if start <= d <= upto)
+
+
+def inputs_key(data: dict) -> str:
+    """Satirin hangi portfoy kaydiyla hesaplandigi (pozisyonlar, nakit, girisler)."""
+    payload = {k: data.get(k) for k in ("positions", "closed", "cash_usd", "cash_flows")}
+    blob = json.dumps(payload, sort_keys=True, ensure_ascii=False, default=str)
+    return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
 
 
 def rebuild(data: dict, *, price_series: dict, dividends: dict,
             fx_series: list, upto: str | None = None) -> list[dict]:
     rows = []
+    key = inputs_key(data)
     for day in trading_days(data, price_series, fx_series, upto):
         row = value_on(data, day, price_series=price_series, dividends=dividends,
                        fx_series=fx_series)
         row["benchmarks"] = benchmarks_on(data, day, price_series=price_series,
                                           dividends=dividends, fx_series=fx_series)
+        row["inputs"] = key
         rows.append(row)
     return rows
 
 
 def merge(old_rows: list[dict], new_rows: list[dict]) -> list[dict]:
-    """Yeni satirlari eskilerle birlestirir. EKSIK yeni satir, TAM eskiyi ezmez."""
-    by_day = {r["date"]: r for r in old_rows or [] if r.get("date")}
+    """Yeni satirlari eskilerle birlestirir. EKSIK yeni satir, TAM eskiyi ezmez.
+
+    ESKI PORTFOYLE HESAPLANMIS satir ise hic korunmaz. 20 Ekim 2026: sabah
+    kosusu bugunun satirini (kurun bugunu) TL-ISBANK-2 kaydindan ONCE yazdi;
+    kayittan sonraki kosuda kur serisi bugunu icermeyince eski satir "yeni
+    araligin disinda" diye korundu ve son satir oldu: 100.000 TL'lik mevduat
+    toplamdan dustu, pano -2.025 $ "gunluk kayip" gosterdi. Satirin
+    ``inputs`` izi bugunku kayitla uyusmuyorsa satir guvenilmezdir; yeniden
+    hesaplanamadiysa bosluk, yanlis sayidan iyidir.
+    """
+    key = next((r.get("inputs") for r in new_rows or [] if r.get("inputs")), None)
+    by_day = {r["date"]: r for r in old_rows or []
+              if r.get("date") and (key is None or r.get("inputs") == key)}
     for r in new_rows:
         old = by_day.get(r["date"])
         if r.get("complete"):
@@ -352,7 +406,8 @@ def performance(rows: list[dict], data: dict) -> dict:
     today = today_iso()
     inc = injections(data)
     invested = sum(a for _, a in inc)
-    base = {"inception": start, "invested_usd": round(invested, 2)}
+    base = {"inception": start, "invested_usd": round(invested, 2),
+            "contributions": _contributions(_injection_details(data))}
 
     if not start or start > today or not rows:
         return {**base, "status": "baslamadi",
@@ -366,6 +421,7 @@ def performance(rows: list[dict], data: dict) -> dict:
     # giren para henuz fiyatlanmamis bir satira yazilirsa sahte kayip olur.
     details = [x for x in _injection_details(data) if x["date"] <= last["date"]]
     invested = sum(x["usd"] for x in details)
+    added_total = sum(x["usd"] for x in details[1:])
 
     # Dis nakit girisi (maas, havale) portfoyu "kazandirmaz": gunluk
     # degisimden dusulur. Alim-satim nakdi pozisyona tasir, toplami
@@ -387,6 +443,10 @@ def performance(rows: list[dict], data: dict) -> dict:
     return {
         **base,
         "invested_usd": round(invested, 2),
+        # Deger = ilk sermaye + sonradan eklenen para + kazanc.
+        "initial_usd": round(details[0]["usd"], 2) if details else None,
+        "added_usd": round(added_total, 2),
+        "contributions": _contributions(details),
         "status": "aktif",
         "as_of": last["date"],
         "days": _days(start, today),
@@ -394,6 +454,8 @@ def performance(rows: list[dict], data: dict) -> dict:
         "value_try": last.get("total_try"),
         "usdtry": last.get("usdtry"),
         "day_change_usd": round(day_chg, 2) if day_chg is not None else None,
+        # Son gunde gelen para: gunluk degisimden DUSULDU, ayrica gosterilir.
+        "day_added_usd": round(added, 2) if added else 0.0,
         "day_change_pct": round(day_chg / prev["total_usd"] * 100, 2)
         if (day_chg is not None and prev["total_usd"]) else None,
         "prev_date": prev["date"] if prev else None,
@@ -410,6 +472,14 @@ def performance(rows: list[dict], data: dict) -> dict:
         "complete": last.get("complete", False),
         "missing": last.get("missing", []),
     }
+
+
+def _contributions(details: list[dict]) -> list[dict]:
+    """Pano icin para girisleri: ilki baslangic sermayesi, sonrakiler eklenen para."""
+    return [{"date": x["date"], "usd": round(x["usd"], 2),
+             "try": round(x["try"], 2) if x["try"] is not None else None,
+             "usdtry": x["fx"], "initial": i == 0, "note": x.get("note")}
+            for i, x in enumerate(details)]
 
 
 def positions_day(prev: dict | None, last: dict) -> dict:

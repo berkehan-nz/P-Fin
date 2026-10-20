@@ -352,8 +352,8 @@ Her kosu  →  kuyruktan en fazla 300 sirket  →  Asama 0, 1, 2 (sirket bazli)
   300 rahat sigiyor. Butce olmadan bu artis tehlikeliydi; butce oldugu
   icin guvenli.
 - **~3.800 sembol**, kosu basina ~300 ve gunde ~6 kosu ile tur basina
-  yaklasik 2 gun. Dashboard'un Huni ekraninda kuyrugun eridigini canli
-  gorursun.
+  yaklasik 2 gun. Dashboard'un Huni ekraninda (sayfa altindaki Arastirma
+  baglantisi) kuyrugun eridigini canli gorursun.
 - **Asama 0-2 partide calisir** cunku sirket bazlidir, komsuya ihtiyac duymaz.
 - **Asama 3-4 tur sonunda calisir** cunku goreli ucuzluk ve sektor yuzdelikleri
   havuzun tamamini gerektirir.
@@ -401,7 +401,7 @@ sinyali kacirirsin, ya da her dalgalanmaya tepki verip islem maliyetini
 tezin getirisinden buyutursun.
 
 Bu yuzden haftada bir, sabit bir liste (`data/weekly.json`, panoda
-**Cuma raporu** sekmesi). Bolumler EYLEM SIRASINA gore dizilir:
+Hareketler › **Cuma raporu**). Bolumler EYLEM SIRASINA gore dizilir:
 
 | # | Bolum | Neden bu sirada |
 |---|---|---|
@@ -465,6 +465,22 @@ Dashboard `data/` klasorunu su sirayla arar: `../data` → `./data` →
 edilsin calisir, ama `/ (root)` en dogrusudur (veri repoda tek kopya kalir).
 
 Adres: `https://berkehan-nz.github.io/P-Fin/docs/`
+
+### Pano ekranlari
+
+Panonun asil isi Berke'nin kendi finansal durumunu takip etmesi ve planini
+kurmasi. Menude yalnizca uc sekme var:
+
+| Sekme | Soru | Icerik |
+|---|---|---|
+| **Ozet** (`#/ozet`) | Param ne durumda? | Toplam varlik = yatirdigin para + kazanc; bugun; kazanc grafigi (para girisi kesik cizgiyle isaretli, kazanc sayilmaz); ture gore varliklar; siradaki adimlar |
+| **Plan** (`#/plan`) | Stratejim ne, sirada ne var? | Hedef dagilim (simdi / hedef / dolar farki); siradaki adimlar ve vade kararlari; **kur senaryosu** (vadede USD/TRY kac olursa mevduat dolarda ne eder, dolarda kalsaydin ne olurdu); yol haritasi (fazlar); alternatiflerle kiyas |
+| **Hareketler** (`#/hareketler`) | Ne kaydettim? | Para girisleri; islem gunlugu + islem ekleme; ayrintili varlik tablosu; Cuma raporu (`#/hareketler/haftalik`) |
+
+Arastirma ekranlari (hisse adaylari `#/adaylar`, piyasa `#/piyasa`, tarama
+hunisi `#/huni`, sirket `#/sirket/<SEMBOL>`) menude yok; sayfa altindaki
+"Arastirma" baglantisindan ve Plan'daki "hisse adaylari" baglantisindan
+acilir. Eski baglantilar (`#/bugun`, `#/portfoy/...`) yeni yerlerine gider.
 
 ---
 

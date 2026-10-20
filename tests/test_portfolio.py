@@ -580,3 +580,15 @@ class TestTwoDeposits:
         assert a["amount_usd_estimated"] is True
         # Kur yoksa dolar tutari uydurulmaz.
         assert P.upcoming_actions(data, [], [], usdtry=None)[0]["amount_usd"] is None
+
+
+class TestHeadroomFromNow:
+    def test_headroom_is_measured_from_todays_rate(self):
+        """Guvenli pay: kurun BUGUNDEN basa basa kadar yukselebilecegi yuzde."""
+        pos = {"principal_try": 60000.0, "annual_rate_pct": 36.0, "withholding_pct": 17.5,
+               "start_date": "2026-09-29", "maturity_date": "2026-12-30",
+               "usdtry_at_entry": 50.3}
+        out = portfolio.tl_deposit_value(pos, 49.5229, as_of="2026-10-20")
+        assert out["usdtry_breakeven"] == pytest.approx(54.0655, abs=0.0001)
+        assert out["headroom_from_now_pct"] == pytest.approx(9.17, abs=0.01)
+        assert out["breakeven_headroom_pct"] == pytest.approx(7.49, abs=0.01)

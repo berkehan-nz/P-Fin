@@ -130,7 +130,13 @@ window.Charts = (function () {
    * taşarsa eksen genişler.
    *
    * Lejant her zaman var; uç noktada kısa ad. İpucu klavyeyle de açılır
-   * (ok tuşları). Etiketler textContent ile yazılır. */
+   * (ok tuşları). Etiketler textContent ile yazılır.
+   *
+   * zero: eksen sıfırı içerir, sıfır çizgisi belirgin, odak çizgisi ile
+   *       sıfır arası hafifçe boyanır (kazanç grafiği: alan = kazanç).
+   * marks: [{ i, label, tip }] — para girişi günleri. Dikey kesik çizgi +
+   *       üstte kısa etiket; ipucunda ayrı satır.
+   * tipExtra(i): ipucuna eklenecek düz metin (o günün değer/yatırılan ayrımı). */
   function compare(host, cfg) {
     const { dates, focus, context } = cfg;
     const fmt = cfg.fmt || ((v) => String(v));
@@ -172,11 +178,15 @@ window.Charts = (function () {
       const W = Math.max(Math.round(plot.clientWidth), 240);
       if (W === lastW) return;
       lastW = W;
-      const padL = 60, padR = 44, padT = 10, padB = 22;
+      // Giriş işaretlerinin etiketi veri alanının ÜSTÜNDEKİ şeritte: çizgilerle çakışmaz.
+      const hasMarks = (cfg.marks || []).some((m) => m.i >= 0 && m.i < n);
+      const padL = 60, padR = 44, padT = hasMarks ? 24 : 10, padB = 22;
       const all = series.flatMap((s) => s.values.filter(isNum));
       const ref = focus.values[lastOf(focus.values)] || all[all.length - 1] || 1;
       let lo = Math.min(...all, ref * (1 - band / 100));
       let hi = Math.max(...all, ref * (1 + band / 100));
+      if (cfg.zero) { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
+      if (hi === lo) { hi += 1; lo -= 1; }
       const step = niceStep((hi - lo) / 3);
       lo = Math.floor(lo / step) * step;
       hi = Math.ceil(hi / step) * step;
@@ -202,6 +212,31 @@ window.Charts = (function () {
       const lines = [...series].reverse().map((s) => `<path d="${path(s.values)}"
           class="${s.role === 'focus' ? 'cmp-focus' : 'cmp-context'}"/>`).join('');
 
+      // Odak çizgisi ile sıfır arası: ardışık değerli günler boyunca.
+      let area = '';
+      if (cfg.zero) {
+        let run = [];
+        const flush = () => {
+          if (run.length > 1) {
+            const top = run.map((i) => `${f1(x(i))},${f1(y(focus.values[i]))}`);
+            area += `<polygon points="${top.join(' ')} ${f1(x(run[run.length - 1]))},${f1(y(0))} ${
+              f1(x(run[0]))},${f1(y(0))}" class="cmp-fill"/>`;
+          }
+          run = [];
+        };
+        for (let i = 0; i < n; i++) { if (isNum(focus.values[i])) run.push(i); else flush(); }
+        flush();
+        area += `<line x1="${padL}" x2="${W - padR}" y1="${f1(y(0))}" y2="${f1(y(0))}" class="cmp-zero"/>`;
+      }
+
+      const marks = (cfg.marks || []).filter((m) => m.i >= 0 && m.i < n).map((m) => {
+        const mx = x(m.i);
+        const right = mx > W - padR - 70;
+        return `<line x1="${f1(mx)}" x2="${f1(mx)}" y1="${padT - 8}" y2="${H - padB}" class="cmp-mark"/>
+          <text x="${f1(right ? mx - 5 : mx + 5)}" y="${padT - 11}" text-anchor="${right ? 'end' : 'start'}"
+            class="cmp-mark-label">${esc(m.label)}</text>`;
+      }).join('');
+
       const ends = series.map((s) => ({ s, i: lastOf(s.values) })).filter((e) => e.i >= 0);
       const topKey = ends.length === 2
         ? (ends[0].s.values[ends[0].i] >= ends[1].s.values[ends[1].i] ? 0 : 1) : 0;
@@ -221,7 +256,7 @@ window.Charts = (function () {
 
       plot.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" tabindex="0"
           role="img" aria-label="${esc(cfg.aria || 'Portföy değeri grafiği')}">
-        ${grid}${lines}${endMarks}${xl}
+        ${grid}${area}${marks}${lines}${endMarks}${xl}
         <g class="cmp-hover" visibility="hidden">
           <line class="cmp-cross" y1="${padT}" y2="${H - padB}"/>
           ${series.map((s) => `<circle r="4" class="${s.role === 'focus'
@@ -260,6 +295,14 @@ window.Charts = (function () {
           const txt = cfg.diff(focus.values[cur], context.values[cur]);
           if (txt) tip.append(make('div', 'cmp-tip-diff', txt));
         }
+        const extra = cfg.tipExtra ? cfg.tipExtra(cur) : '';
+        if (extra) tip.append(make('div', 'cmp-tip-extra', extra));
+        (cfg.marks || []).filter((m) => m.i === cur && m.tip).forEach((m) => {
+          const row = make('div', 'cmp-tip-mark');
+          row.append(make('i', 'k-mark'));
+          row.append(make('span', null, m.tip));
+          tip.append(row);
+        });
         tip.hidden = false;
         const tw = tip.offsetWidth;
         tip.style.left = `${cx + 12 + tw > W ? Math.max(0, cx - 12 - tw) : cx + 12}px`;

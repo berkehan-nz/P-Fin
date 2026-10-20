@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>P-Fin</title>
-<meta name="description" content="P-Fin — portföy, aday tarama ve piyasa takibi">
+<meta name="description" content="P-Fin — kişisel portföy takibi ve plan">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -18,12 +18,13 @@
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">P-Fin</div>
+    <!-- Üç sekme: durum, strateji, kayıt. Araştırma ekranları (Adaylar,
+         Piyasa, Huni, Şirket) menüde yok; sayfa altındaki bağlantıdan ve
+         Plan'daki "hisse adayları" bağlantısından açılır. -->
     <nav class="tabs" id="tabs" aria-label="Ana bölümler">
-      <a href="#/bugun" data-screen="today">Bugün</a>
-      <a href="#/portfoy" data-screen="portfolio">Portföy</a>
-      <a href="#/adaylar" data-screen="candidates">Adaylar</a>
-      <a href="#/piyasa" data-screen="market">Piyasa</a>
-      <a href="#/huni" data-screen="funnel">Huni</a>
+      <a href="#/ozet" data-screen="today">Özet</a>
+      <a href="#/plan" data-screen="plan">Plan</a>
+      <a href="#/hareketler" data-screen="portfolio">Hareketler</a>
     </nav>
     <div class="topbar-tools">
       <button id="lockBtn" class="ghost icon-btn" title="Kilitle" aria-label="Kilitle" hidden>🔒</button>
@@ -35,11 +36,15 @@
 <main>
   <div id="loadError"></div>
   <section class="screen" id="screen-today"><div id="todayBody"></div></section>
+  <section class="screen" id="screen-plan"><div id="planBody"></div></section>
   <section class="screen" id="screen-portfolio"><div id="portfolioBody"></div></section>
   <section class="screen" id="screen-candidates"><div id="candidatesBody"></div></section>
   <section class="screen" id="screen-market"><div id="marketBody"></div></section>
   <section class="screen" id="screen-funnel"><div id="funnelBody"></div></section>
   <section class="screen" id="screen-company"><div id="companyBody"></div></section>
+  <footer class="research" aria-label="Araştırma">
+    Araştırma: <a href="#/adaylar">Hisse adayları</a> · <a href="#/piyasa">Piyasa</a> · <a href="#/huni">Tarama hunisi</a>
+  </footer>
 </main>
 
 <div id="modalRoot"></div>
@@ -49,6 +54,7 @@
 <script src="js/format.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/views/today.js"></script>
+<script src="js/views/plan.js"></script>
 <script src="js/views/portfolio.js"></script>
 <script src="js/views/weekly.js"></script>
 <script src="js/views/candidates.js"></script>

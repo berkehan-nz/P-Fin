@@ -133,6 +133,34 @@ class TestMerge:
         merged = H.merge(old, new)
         assert [r["date"] for r in merged] == ["2026-09-29", "2026-09-30"]
 
+    def test_row_from_an_older_portfolio_is_dropped(self):
+        """20 Ekim: yeni mevduattan once yazilan bugunun satiri, yeniden
+        hesaplanamayinca son satir kalip mevduati toplamdan dusurmemeli."""
+        ps, divs, fx = series()
+        old = H.rebuild(base_data(), price_series=ps, dividends=divs, fx_series=fx)
+        d = TestTryInjection()._with_second_deposit()
+        new = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx, upto=DAYS[2])
+        merged = H.merge(old, new)
+        assert [r["date"] for r in merged] == DAYS[:3]
+        assert "TL-Y" in merged[-1]["positions"]
+
+    def test_same_portfolio_keeps_rows_outside_new_range(self):
+        ps, divs, fx = series()
+        d = base_data()
+        old = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
+        new = H.rebuild(copy.deepcopy(d), price_series=ps, dividends=divs, fx_series=fx,
+                        upto=DAYS[2])
+        assert [r["date"] for r in H.merge(old, new)] == DAYS
+
+    def test_rows_without_a_key_are_dropped_once_keys_exist(self):
+        """Ilk kosu: izsiz eski satirlar yeniden hesaplanmadiysa atilir."""
+        ps, divs, fx = series()
+        d = base_data()
+        old = [{k: v for k, v in r.items() if k != "inputs"}
+               for r in H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)]
+        new = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx, upto=DAYS[2])
+        assert [r["date"] for r in H.merge(old, new)] == DAYS[:3]
+
     def test_missing_price_makes_row_unusable(self):
         ps, divs, fx = series()
         ps["SGOV"] = ps["SGOV"][:0]          # SGOV fiyati hic yok
@@ -219,6 +247,17 @@ class TestFxDayBeforeUsOpen:
         assert rows[-1]["positions"]["SGOV"]["price"] == 99.70   # dunku kapanis
         assert rows[-1]["usdtry"] == 51.0
 
+    def test_today_has_a_row_even_before_the_first_fx_print(self):
+        """Kur kaynagi bugunu henuz yazmadi: satir yine olur (dunku kur,
+        bugunun faizi) ki ust toplam pozisyon tablosuyla ayni olsun."""
+        ps, divs, fx = series()
+        rows = H.rebuild(base_data(), price_series=ps, dividends=divs,
+                         fx_series=fx, upto="2026-10-05")
+        assert rows[-1]["date"] == "2026-10-05"
+        assert rows[-1]["usdtry"] == 50.0
+        tl = rows[-1]["positions"]["TL-X"]
+        assert tl["accrued_net_try"] == pytest.approx(50000 * 0.365 * 6 / 365, abs=0.01)
+
     def test_weekend_fx_quote_adds_no_row(self):
         ps, divs, fx = series()
         fx = fx + [("2026-10-03", 51.0)]          # cumartesi
@@ -263,3 +302,59 @@ class TestTryInjection:
         rows = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
         perf = H.performance(rows[:2], d)
         assert perf["invested_usd"] == pytest.approx(1600.0)
+
+
+class TestContributionsVsGrowth:
+    """Pano "para ekledim" ile "portfoy buyudu"yu ayri gostermeli."""
+
+    def _rows(self, d):
+        ps, divs, fx = series()
+        return H.annotate_flows(H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx), d)
+
+    def test_each_row_carries_invested_capital(self):
+        rows = self._rows(TestTryInjection()._with_second_deposit())
+        assert [r["invested_usd"] for r in rows] == [1600.0, 1600.0, 2600.0, 2600.0]
+
+    def test_only_the_flow_day_is_marked(self):
+        rows = self._rows(TestTryInjection()._with_second_deposit())
+        assert rows[2]["added_usd"] == 1000.0
+        assert rows[2]["added_try"] == 50000.0
+        assert all("added_usd" not in r for i, r in enumerate(rows) if i != 2)
+
+    def test_gain_is_unchanged_by_new_money(self):
+        """Deger - yatirilan: giris olsa da olmasa da ayni kazanc."""
+        a = self._rows(base_data())
+        b = self._rows(TestTryInjection()._with_second_deposit())
+        for i in (0, 1):
+            assert b[i]["total_usd"] - b[i]["invested_usd"] == pytest.approx(
+                a[i]["total_usd"] - a[i]["invested_usd"], abs=0.01)
+        # 2. gun yeni mevduat ilk gununu yasiyor (faiz 0): kazanc farki yok.
+        assert b[2]["total_usd"] - b[2]["invested_usd"] == pytest.approx(
+            a[2]["total_usd"] - a[2]["invested_usd"], abs=0.01)
+
+    def test_performance_splits_initial_added_and_gain(self):
+        d = TestTryInjection()._with_second_deposit()
+        rows = self._rows(d)
+        perf = H.performance(rows[:3], d)
+        assert perf["initial_usd"] == pytest.approx(1600.0)
+        assert perf["added_usd"] == pytest.approx(1000.0)
+        assert perf["day_added_usd"] == pytest.approx(1000.0)
+        assert perf["return_usd"] == pytest.approx(
+            perf["value_usd"] - perf["initial_usd"] - perf["added_usd"], abs=0.01)
+        c = perf["contributions"]
+        assert [x["initial"] for x in c] == [True, False]
+        assert c[1] == {"date": DAYS[2], "usd": 1000.0, "try": 50000.0, "usdtry": 50.0,
+                        "initial": False, "note": None}
+
+    def test_no_flow_day_reports_zero_added(self):
+        d = TestTryInjection()._with_second_deposit()
+        perf = H.performance(self._rows(d), d)
+        assert perf["day_added_usd"] == 0.0
+
+    def test_kept_old_rows_are_annotated_too(self):
+        """Birlestirmede korunan eski tam satir da yatirilan alanini almali."""
+        d = TestTryInjection()._with_second_deposit()
+        ps, divs, fx = series()
+        old = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
+        rows = H.annotate_flows(H.merge(old, []), d)
+        assert rows[3]["invested_usd"] == 2600.0
