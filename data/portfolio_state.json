@@ -1,7 +1,9 @@
 {
   "actions": [
     {
+      "amount_try": null,
       "amount_usd": 149.0,
+      "amount_usd_estimated": false,
       "date": "2026-10-30",
       "days": 10,
       "kind": "alim",
@@ -10,38 +12,51 @@
       "title": "QQQM parcasi — $149"
     },
     {
-      "date": "2026-11-16",
-      "days": 27,
-      "kind": "faz",
-      "note": "hedef: Motor (tek hisse) %25, Cekirdek ETF %30, SGOV (nakit capasi) %10, TL mevduat %35",
-      "title": "Faz 1 — ilk hisseler basliyor"
-    },
-    {
-      "criteria": [
-        {
-          "detail": "politika faizi ve enflasyon girilmedi",
-          "key": "reel_faiz",
-          "label": "Politika faizi enflasyonun ustunde",
-          "status": "gray"
-        },
-        {
-          "detail": "son 91 gunde %5.1",
-          "key": "kur_temposu",
-          "label": "Kur temposu ceyrekte %7'nin altinda",
-          "status": "green"
-        },
-        {
-          "detail": "bilgi girilmedi",
-          "key": "erken_secim",
-          "label": "Erken secim tarihi kesinlesmemis",
-          "status": "gray"
-        }
-      ],
+      "criteria": [],
       "date": "2026-12-30",
       "days": 71,
       "kind": "vade",
       "note": "yenileme karari",
-      "title": "TL mevduat vadesi (İş Bankası)"
+      "ticker": "TL-ISBANK",
+      "title": "TL mevduat vadesi (İş Bankası, 60.000 TL)"
+    },
+    {
+      "amount_try": 64491.62,
+      "amount_usd": 1302.26,
+      "amount_usd_estimated": true,
+      "date": "2026-12-30",
+      "days": 71,
+      "kind": "alim",
+      "note": "TL-ISBANK vadesi: yenile ya da Midas'a cevir — 3 kriter",
+      "ticker": "SGOV",
+      "title": "SGOV parcasi — 64.492 TL"
+    },
+    {
+      "criteria": [],
+      "date": "2027-01-15",
+      "days": 87,
+      "kind": "vade",
+      "note": "yenileme karari",
+      "ticker": "TL-ISBANK-2",
+      "title": "TL mevduat vadesi (İş Bankası, 100.000 TL)"
+    },
+    {
+      "amount_try": 107486.03,
+      "amount_usd": 2170.43,
+      "amount_usd_estimated": true,
+      "date": "2027-01-15",
+      "days": 87,
+      "kind": "alim",
+      "note": "TL-ISBANK-2 vadesi: yenile ya da Midas'a cevir — 3 kriter",
+      "ticker": "SGOV",
+      "title": "SGOV parcasi — 107.486 TL"
+    },
+    {
+      "date": "2027-01-15",
+      "days": 87,
+      "kind": "faz",
+      "note": "hedef: Motor (tek hisse) %25, Cekirdek ETF %30, SGOV (nakit capasi) %10, TL mevduat %35",
+      "title": "Faz 1 — ilk hisseler basliyor"
     },
     {
       "date": "2027-03-01",
@@ -84,13 +99,13 @@
       "all_tl_usd": 2468.03
     },
     "complete": true,
-    "day_change_pct": -0.01,
-    "day_change_usd": -0.27,
+    "day_change_pct": -45.63,
+    "day_change_usd": -2025.51,
     "days": 21,
     "inception": "2026-09-29",
-    "invested_usd": 2390.35,
+    "invested_usd": 4414.29,
     "missing": [],
-    "peak_value_usd": 2430.11,
+    "peak_value_usd": 4441.54,
     "positions_day": {
       "QQQM": {
         "pct": 0.0,
@@ -101,8 +116,8 @@
         "usd": 0.0
       },
       "TL-ISBANK": {
-        "pct": -0.02,
-        "usd": -0.27
+        "pct": 0.03,
+        "usd": 0.33
       },
       "VOO": {
         "pct": 0.0,
@@ -110,9 +125,9 @@
       }
     },
     "prev_date": "2026-10-19",
-    "return_pct": 0.96,
-    "return_try_pct": -0.49,
-    "return_usd": 23.05,
+    "return_pct": -45.33,
+    "return_try_pct": -45.67,
+    "return_usd": -2000.89,
     "status": "aktif",
     "usdtry": 49.5745,
     "value_try": 119643.1,
@@ -128,6 +143,90 @@
       "bank": "İş Bankası",
       "broker": "İş Bankası",
       "change_1d_pct": null,
+      "cost_usd": 2023.94,
+      "days_to_review": 87,
+      "dividends_usd": 0.0,
+      "entry_date": "2026-10-15",
+      "entry_price": 0.0,
+      "fees_usd": 0.0,
+      "holding_days": 5,
+      "maturity_date": "2027-01-15",
+      "next_earnings": null,
+      "notes": "Ikinci 92 gunluk mevduat. Bankadan dogrudan TL ile acildi (Midas cevrimi yok). Banka ekrani: net faiz 7.486,03 TL, vade sonu 107.486,03 TL. Yenileme karari 15 Oca 2027, ilk mevduatla ayni uc kriter.",
+      "pnl_pct": 0.17,
+      "pnl_usd": 3.54,
+      "price": null,
+      "price_as_of": null,
+      "principal_try": 100000.0,
+      "review_date": "2027-01-15",
+      "sector": "",
+      "shares": 0.0,
+      "slice": "tl",
+      "start_date": "2026-10-15",
+      "started": true,
+      "status": "OPEN",
+      "target_price": 0.0,
+      "thesis_breakers": [],
+      "ticker": "TL-ISBANK-2",
+      "tl_deposit": {
+        "annual_rate_pct": 36.0,
+        "bank": "İş Bankası",
+        "breakeven_headroom_pct": 7.49,
+        "breakeven_vs_sgov_headroom_pct": 6.39,
+        "daily_net_interest_try": 81.37,
+        "days_to_maturity": 87,
+        "elapsed_days": 5,
+        "entry_rate_suspect": false,
+        "entry_vs_market_pct": 0.01,
+        "gross_interest_try": 493.15,
+        "matured": false,
+        "maturity_date": "2027-01-15",
+        "net_interest_try": 406.85,
+        "net_interest_usd": 8.22,
+        "principal_try": 100000.0,
+        "start_date": "2026-10-15",
+        "tbill_pct_used": 4.08,
+        "term_days": 92,
+        "usdtry_at_entry": 49.4086,
+        "usdtry_breakeven": 53.1073,
+        "usdtry_breakeven_vs_sgov": 52.5668,
+        "usdtry_market_at_start": 49.4052,
+        "usdtry_now": 49.52289962768555,
+        "usdtry_used_pct": 3.1,
+        "value_try": 100406.85,
+        "value_try_at_maturity": 107486.03,
+        "value_usd": 2027.48,
+        "withholding_pct": 17.5,
+        "withholding_try": 86.3
+      },
+      "type": "GERCEK",
+      "upside_to_target_pct": null,
+      "usdtry_at_entry": 49.4086,
+      "value_usd": 2027.48,
+      "vs_benchmark": {
+        "kucuk_deger": {
+          "benchmark_return_pct": null,
+          "excess_pct": null
+        },
+        "nasdaq100": {
+          "benchmark_return_pct": -1.32,
+          "excess_pct": 1.49
+        },
+        "sp500": {
+          "benchmark_return_pct": -0.69,
+          "excess_pct": 0.86
+        }
+      },
+      "weight_pct": 45.65,
+      "withholding_confirmed": true,
+      "withholding_pct": 17.5
+    },
+    {
+      "annual_rate_pct": 36.0,
+      "asset_class": "TL_DEPOSIT",
+      "bank": "İş Bankası",
+      "broker": "İş Bankası",
+      "change_1d_pct": null,
       "cost_usd": 1192.84,
       "days_to_review": 71,
       "dividends_usd": 0.0,
@@ -137,9 +236,9 @@
       "holding_days": 21,
       "maturity_date": "2026-12-30",
       "next_earnings": null,
-      "notes": "Berke'nin tezi: kur tutuluyor, faiz inmiyor. USD->TRY cevrimi Midas'ta 50,3 kurundan. Stopaj orani teyit edilecek.",
-      "pnl_pct": 3.25,
-      "pnl_usd": 38.77,
+      "notes": "Berke'nin tezi: kur tutuluyor, faiz inmiyor. USD->TRY cevrimi Midas'ta 50,3 kurundan. Stopaj %17,5 (banka ekranindan teyit, 15 Eki 2026).",
+      "pnl_pct": 3.3,
+      "pnl_usd": 39.42,
       "price": null,
       "price_as_of": null,
       "principal_try": 60000.0,
@@ -156,9 +255,9 @@
       "tl_deposit": {
         "annual_rate_pct": 36.0,
         "bank": "İş Bankası",
-        "breakeven_headroom_pct": 7.71,
-        "breakeven_vs_sgov_headroom_pct": 6.62,
-        "daily_net_interest_try": 50.3,
+        "breakeven_headroom_pct": 7.49,
+        "breakeven_vs_sgov_headroom_pct": 6.39,
+        "daily_net_interest_try": 48.82,
         "days_to_maturity": 71,
         "elapsed_days": 21,
         "entry_rate_suspect": true,
@@ -166,28 +265,28 @@
         "gross_interest_try": 1242.74,
         "matured": false,
         "maturity_date": "2026-12-30",
-        "net_interest_try": 1056.33,
-        "net_interest_usd": 21.31,
+        "net_interest_try": 1025.26,
+        "net_interest_usd": 20.7,
         "principal_try": 60000.0,
         "start_date": "2026-09-29",
         "tbill_pct_used": 4.08,
         "term_days": 92,
         "usdtry_at_entry": 50.3,
-        "usdtry_breakeven": 54.1796,
-        "usdtry_breakeven_vs_sgov": 53.6281,
+        "usdtry_breakeven": 54.0655,
+        "usdtry_breakeven_vs_sgov": 53.5151,
         "usdtry_market_at_start": 48.9962,
-        "usdtry_now": 49.574501037597656,
-        "usdtry_used_pct": -18.7,
-        "value_try": 61056.33,
-        "value_try_at_maturity": 64627.73,
-        "value_usd": 1231.61,
-        "withholding_pct": 15.0,
-        "withholding_try": 186.41
+        "usdtry_now": 49.52289962768555,
+        "usdtry_used_pct": -20.6,
+        "value_try": 61025.26,
+        "value_try_at_maturity": 64491.62,
+        "value_usd": 1232.26,
+        "withholding_pct": 17.5,
+        "withholding_try": 217.48
       },
       "type": "GERCEK",
       "upside_to_target_pct": null,
       "usdtry_at_entry": 50.3,
-      "value_usd": 1231.61,
+      "value_usd": 1232.26,
       "vs_benchmark": {
         "kucuk_deger": {
           "benchmark_return_pct": null,
@@ -195,16 +294,16 @@
         },
         "nasdaq100": {
           "benchmark_return_pct": -2.65,
-          "excess_pct": 5.9
+          "excess_pct": 5.95
         },
         "sp500": {
           "benchmark_return_pct": 0.3,
-          "excess_pct": 2.95
+          "excess_pct": 3.0
         }
       },
-      "weight_pct": 51.03,
-      "withholding_confirmed": false,
-      "withholding_pct": 15.0
+      "weight_pct": 27.74,
+      "withholding_confirmed": true,
+      "withholding_pct": 17.5
     },
     {
       "asset_class": "ETF",
@@ -249,7 +348,7 @@
           "excess_pct": -0.66
         }
       },
-      "weight_pct": 20.9
+      "weight_pct": 11.36
     },
     {
       "asset_class": "ETF",
@@ -294,7 +393,7 @@
           "excess_pct": -3.78
         }
       },
-      "weight_pct": 12.26
+      "weight_pct": 6.66
     },
     {
       "asset_class": "ETF",
@@ -339,43 +438,43 @@
           "excess_pct": -1.66
         }
       },
-      "weight_pct": 9.63
+      "weight_pct": 5.24
     }
   ],
-  "priced_at": "2026-10-20T06:32:19+00:00",
+  "priced_at": "2026-10-20T07:59:07+00:00",
   "source": "manual+prices",
   "summary": {
     "cash_usd": 149.04,
-    "cost_usd": 2241.31,
-    "equity_value_usd": 2264.36,
+    "cost_usd": 4265.25,
+    "equity_value_usd": 4292.49,
     "fx": {
-      "as_of": "2026-10-20",
-      "change_1w_pct": 0.48,
+      "as_of": "2026-10-19",
+      "change_1w_pct": 0.38,
       "pair": "USDTRY",
-      "rate": 49.574501037597656,
+      "rate": 49.52289962768555,
       "source": "stooq/yfinance"
     },
     "fx_pace": {
-      "as_of": "2026-10-20",
-      "change_quarter_pct": 5.07,
-      "change_since_entry_pct": -1.44,
+      "as_of": "2026-10-19",
+      "change_quarter_pct": 5.05,
+      "change_since_entry_pct": -0.43,
       "color": "yellow",
-      "rate": 49.574501037597656,
+      "rate": 49.52289962768555,
       "window_days": 91
     },
     "largest_position_pct": null,
-    "peak_value_usd": 2430.11,
+    "peak_value_usd": 4441.54,
     "phase": {
-      "end": "2026-11-16",
+      "end": "2027-01-15",
       "key": "faz0",
       "label": "Faz 0 — hazirlik",
       "start": "2026-09-01"
     },
-    "pnl_pct": 1.03,
-    "pnl_usd": 23.05,
-    "portfolio_value_try": 119643.25,
-    "portfolio_value_usd": 2413.4,
-    "position_count": 4,
+    "pnl_pct": 0.64,
+    "pnl_usd": 27.24,
+    "portfolio_value_try": 219957.59,
+    "portfolio_value_usd": 4441.53,
+    "position_count": 5,
     "sector_mix_pct": {},
     "slices": [
       {
@@ -388,34 +487,34 @@
         "value_usd": 0.0
       },
       {
-        "actual_pct": 21.89,
-        "drift_pp": -5.11,
+        "actual_pct": 11.89,
+        "drift_pp": -3.11,
         "label": "Cekirdek ETF",
-        "off_target": true,
+        "off_target": false,
         "slice": "cekirdek_etf",
-        "target_pct": 27.0,
+        "target_pct": 15.0,
         "value_usd": 528.3
       },
       {
-        "actual_pct": 20.9,
-        "drift_pp": -2.1,
+        "actual_pct": 11.36,
+        "drift_pp": 1.36,
         "label": "SGOV (nakit capasi)",
         "off_target": false,
         "slice": "sgov",
-        "target_pct": 23.0,
+        "target_pct": 10.0,
         "value_usd": 504.45
       },
       {
-        "actual_pct": 51.03,
-        "drift_pp": 1.03,
+        "actual_pct": 73.39,
+        "drift_pp": 3.39,
         "label": "TL mevduat",
         "off_target": false,
         "slice": "tl",
-        "target_pct": 50.0,
-        "value_usd": 1231.61
+        "target_pct": 70.0,
+        "value_usd": 3259.74
       },
       {
-        "actual_pct": 6.18,
+        "actual_pct": 3.36,
         "drift_pp": null,
         "label": "Nakit (USD)",
         "note": "planli alimlar icin bekliyor; sapma hesabina girmez",
@@ -429,12 +528,13 @@
     "tbill_pct": 4.08,
     "vs_benchmark": {
       "kucuk_deger": null,
-      "nasdaq100": 3.74,
-      "sp500": 0.79
+      "nasdaq100": 2.69,
+      "sp500": 0.84
     }
   },
   "tl_renewal": {
-    "criteria": [
+    "criteria": [],
+    "criteria_all": [
       {
         "detail": "politika faizi ve enflasyon girilmedi",
         "key": "reel_faiz",
@@ -442,7 +542,7 @@
         "status": "gray"
       },
       {
-        "detail": "son 91 gunde %5.1",
+        "detail": "son 91 gunde %5.0",
         "key": "kur_temposu",
         "label": "Kur temposu ceyrekte %7'nin altinda",
         "status": "green"
@@ -454,15 +554,34 @@
         "status": "gray"
       }
     ],
-    "maturity_date": "2026-12-30"
+    "maturities": [
+      {
+        "bank": "İş Bankası",
+        "days": 71,
+        "maturity_date": "2026-12-30",
+        "principal_try": 60000.0,
+        "show_criteria": false,
+        "ticker": "TL-ISBANK",
+        "usdtry_breakeven": 54.0655,
+        "usdtry_breakeven_vs_sgov": 53.5151,
+        "value_try_at_maturity": 64491.62
+      },
+      {
+        "bank": "İş Bankası",
+        "days": 87,
+        "maturity_date": "2027-01-15",
+        "principal_try": 100000.0,
+        "show_criteria": false,
+        "ticker": "TL-ISBANK-2",
+        "usdtry_breakeven": 53.1073,
+        "usdtry_breakeven_vs_sgov": 52.5668,
+        "value_try_at_maturity": 107486.03
+      }
+    ],
+    "maturity_date": "2026-12-30",
+    "show_criteria_days": 14
   },
   "warnings": [
-    {
-      "level": "medium",
-      "message": "Cekirdek ETF: %21.9 (hedef %27, 5.1 puan altinda)",
-      "ticker": "",
-      "type": "dilim_sapmasi"
-    },
     {
       "level": "medium",
       "message": "TL-ISBANK giris kuru 50.3, baslangic gunu piyasa kuru 48.9962 (%+2.7). Kayit dogru mu? Fark ilk gun dogrudan kar/zarar olarak gorunur.",
