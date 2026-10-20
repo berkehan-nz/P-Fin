@@ -133,6 +133,34 @@ class TestMerge:
         merged = H.merge(old, new)
         assert [r["date"] for r in merged] == ["2026-09-29", "2026-09-30"]
 
+    def test_row_from_an_older_portfolio_is_dropped(self):
+        """20 Ekim: yeni mevduattan once yazilan bugunun satiri, yeniden
+        hesaplanamayinca son satir kalip mevduati toplamdan dusurmemeli."""
+        ps, divs, fx = series()
+        old = H.rebuild(base_data(), price_series=ps, dividends=divs, fx_series=fx)
+        d = TestTryInjection()._with_second_deposit()
+        new = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx, upto=DAYS[2])
+        merged = H.merge(old, new)
+        assert [r["date"] for r in merged] == DAYS[:3]
+        assert "TL-Y" in merged[-1]["positions"]
+
+    def test_same_portfolio_keeps_rows_outside_new_range(self):
+        ps, divs, fx = series()
+        d = base_data()
+        old = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)
+        new = H.rebuild(copy.deepcopy(d), price_series=ps, dividends=divs, fx_series=fx,
+                        upto=DAYS[2])
+        assert [r["date"] for r in H.merge(old, new)] == DAYS
+
+    def test_rows_without_a_key_are_dropped_once_keys_exist(self):
+        """Ilk kosu: izsiz eski satirlar yeniden hesaplanmadiysa atilir."""
+        ps, divs, fx = series()
+        d = base_data()
+        old = [{k: v for k, v in r.items() if k != "inputs"}
+               for r in H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx)]
+        new = H.rebuild(d, price_series=ps, dividends=divs, fx_series=fx, upto=DAYS[2])
+        assert [r["date"] for r in H.merge(old, new)] == DAYS[:3]
+
     def test_missing_price_makes_row_unusable(self):
         ps, divs, fx = series()
         ps["SGOV"] = ps["SGOV"][:0]          # SGOV fiyati hic yok

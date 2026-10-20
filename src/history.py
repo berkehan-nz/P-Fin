@@ -33,6 +33,8 @@ Komisyonlar kiyaslara yansitilmaz; fark birkac dolar.
 
 from __future__ import annotations
 
+import hashlib
+import json
 from datetime import date
 
 from . import portfolio as pf
@@ -346,21 +348,41 @@ def trading_days(data: dict, price_series: dict, fx_series: list,
     return sorted(d for d in days if start <= d <= upto)
 
 
+def inputs_key(data: dict) -> str:
+    """Satirin hangi portfoy kaydiyla hesaplandigi (pozisyonlar, nakit, girisler)."""
+    payload = {k: data.get(k) for k in ("positions", "closed", "cash_usd", "cash_flows")}
+    blob = json.dumps(payload, sort_keys=True, ensure_ascii=False, default=str)
+    return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:12]
+
+
 def rebuild(data: dict, *, price_series: dict, dividends: dict,
             fx_series: list, upto: str | None = None) -> list[dict]:
     rows = []
+    key = inputs_key(data)
     for day in trading_days(data, price_series, fx_series, upto):
         row = value_on(data, day, price_series=price_series, dividends=dividends,
                        fx_series=fx_series)
         row["benchmarks"] = benchmarks_on(data, day, price_series=price_series,
                                           dividends=dividends, fx_series=fx_series)
+        row["inputs"] = key
         rows.append(row)
     return rows
 
 
 def merge(old_rows: list[dict], new_rows: list[dict]) -> list[dict]:
-    """Yeni satirlari eskilerle birlestirir. EKSIK yeni satir, TAM eskiyi ezmez."""
-    by_day = {r["date"]: r for r in old_rows or [] if r.get("date")}
+    """Yeni satirlari eskilerle birlestirir. EKSIK yeni satir, TAM eskiyi ezmez.
+
+    ESKI PORTFOYLE HESAPLANMIS satir ise hic korunmaz. 20 Ekim 2026: sabah
+    kosusu bugunun satirini (kurun bugunu) TL-ISBANK-2 kaydindan ONCE yazdi;
+    kayittan sonraki kosuda kur serisi bugunu icermeyince eski satir "yeni
+    araligin disinda" diye korundu ve son satir oldu: 100.000 TL'lik mevduat
+    toplamdan dustu, pano -2.025 $ "gunluk kayip" gosterdi. Satirin
+    ``inputs`` izi bugunku kayitla uyusmuyorsa satir guvenilmezdir; yeniden
+    hesaplanamadiysa bosluk, yanlis sayidan iyidir.
+    """
+    key = next((r.get("inputs") for r in new_rows or [] if r.get("inputs")), None)
+    by_day = {r["date"]: r for r in old_rows or []
+              if r.get("date") and (key is None or r.get("inputs") == key)}
     for r in new_rows:
         old = by_day.get(r["date"])
         if r.get("complete"):
