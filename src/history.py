@@ -88,6 +88,19 @@ def inception(data: dict) -> str | None:
     return min(days) if days else None
 
 
+def _flow_usd(flow: dict) -> float:
+    """Dis nakit hareketinin dolar karsiligi.
+
+    TL olarak gelen sermaye (bankadan dogrudan acilan mevduat) ``amount_try``
+    ve o gunun ``usdtry`` kuruyla yazilir; dolar tutari elle sabitlenmez.
+    """
+    usd = num(flow.get("amount_usd"))
+    if usd is not None:
+        return usd
+    amount_try, fx = num(flow.get("amount_try")), num(flow.get("usdtry"))
+    return amount_try / fx if amount_try is not None and fx else 0.0
+
+
 def cash_on(data: dict, day: str, *, before_trades: bool = False) -> float:
     """``day`` gunu kapanistaki nakit (``before_trades``: o gunun islemlerinden once).
 
@@ -103,20 +116,33 @@ def cash_on(data: dict, day: str, *, before_trades: bool = False) -> float:
             cash -= _proceeds(p)
     for f in data.get("cash_flows") or []:
         if after(str(f.get("date") or "")[:10]):
-            cash -= num(f.get("amount_usd")) or 0.0
+            cash -= _flow_usd(f)
     return cash
 
 
 def injections(data: dict) -> list[tuple[str, float]]:
     """Sermaye girisleri: baslangic sermayesi + sonraki dis nakit girisleri."""
+    return [(x["date"], x["usd"]) for x in _injection_details(data)]
+
+
+def _injection_details(data: dict) -> list[dict]:
+    """Girisler + her birinin kuru ve (varsa) TL tutari.
+
+    Ilk sermayenin kuru Berke'nin ilk mevduat cevrim kurudur (Midas 50,3);
+    sonraki TL girislerinde kendi kurlari (bankanin gunluk kuru) kullanilir.
+    Kur yoksa ``fx`` None kalir ve cagiran o gunun piyasa kuruna duser.
+    """
     start = inception(data)
     if not start:
         return []
-    out = [(start, cash_on(data, start, before_trades=True))]
+    _rate, _w, entry_fx = _tl_terms(data)
+    out = [{"date": start, "usd": cash_on(data, start, before_trades=True),
+            "fx": entry_fx, "try": None}]
     for f in data.get("cash_flows") or []:
         d = str(f.get("date") or "")[:10]
         if d and d > start:
-            out.append((d, num(f.get("amount_usd")) or 0.0))
+            out.append({"date": d, "usd": _flow_usd(f), "fx": num(f.get("usdtry")),
+                        "try": num(f.get("amount_try"))})
     return out
 
 
@@ -242,10 +268,10 @@ def benchmarks_on(data: dict, day: str, *, price_series: dict, dividends: dict,
                   fx_series: list) -> dict:
     """Ayni sermaye ayni gun: SGOV'da, QQQ'da ya da TL mevduatta olsaydi."""
     fx_now = _on_or_before(fx_series, day)
-    rate, withholding, entry_fx = _tl_terms(data)
-    inc = injections(data)
+    rate, withholding, _entry_fx = _tl_terms(data)
     out = {"all_sgov_usd": 0.0, "all_qqq_usd": 0.0, "all_tl_usd": 0.0}
-    for i, (t0, amount) in enumerate(inc):
+    for inj in _injection_details(data):
+        t0, amount = inj["date"], inj["usd"]
         if t0 > day:
             continue
         for key, sym in (("all_sgov_usd", BENCH_SGOV), ("all_qqq_usd", BENCH_QQQ)):
@@ -253,8 +279,8 @@ def benchmarks_on(data: dict, day: str, *, price_series: dict, dividends: dict,
             out[key] = None if (g is None or out[key] is None) else out[key] + amount * g
 
         # TL: ilk sermaye Berke'nin gercek cevrim kurundan (Midas 50,3),
-        # sonraki girisler o gunun kurundan cevrilir.
-        fx0 = entry_fx if (i == 0 and entry_fx) else _on_or_before(fx_series, t0)
+        # sonraki girisler kendi kurlarindan, yoksa o gunun piyasa kurundan.
+        fx0 = inj["fx"] or _on_or_before(fx_series, t0)
         if not fx0 or not fx_now or out["all_tl_usd"] is None:
             out["all_tl_usd"] = None
             continue
@@ -336,15 +362,21 @@ def performance(rows: list[dict], data: dict) -> dict:
     last = rows[-1]
     prev = rows[-2] if len(rows) >= 2 else None
     total = last["total_usd"]
+    # Getiri yalnizca son satirin gunune kadar gelen sermayeye gore: bugun
+    # giren para henuz fiyatlanmamis bir satira yazilirsa sahte kayip olur.
+    details = [x for x in _injection_details(data) if x["date"] <= last["date"]]
+    invested = sum(x["usd"] for x in details)
 
     # Dis nakit girisi (maas, havale) portfoyu "kazandirmaz": gunluk
     # degisimden dusulur. Alim-satim nakdi pozisyona tasir, toplami
     # degistirmez (komisyon haric — o gercek bir maliyet).
     added = sum(a for d, a in inc[1:] if prev and prev["date"] < d <= last["date"])
     day_chg = (total - prev["total_usd"] - added) if prev else None
-    rate, _w, entry_fx = _tl_terms(data)
-    invested_try = sum(a * (entry_fx if (i == 0 and entry_fx) else (last.get("usdtry") or 0))
-                       for i, (_d, a) in enumerate(inc))
+    # TL bazinda yatirilan: TL olarak gelen sermaye kendi tutariyla, digerleri
+    # giris kuruyla (yoksa son kurla) cevrilir.
+    invested_try = sum(x["try"] if x["try"] is not None
+                       else x["usd"] * (x["fx"] or last.get("usdtry") or 0)
+                       for x in details)
 
     b = last.get("benchmarks") or {}
 
@@ -354,6 +386,7 @@ def performance(rows: list[dict], data: dict) -> dict:
 
     return {
         **base,
+        "invested_usd": round(invested, 2),
         "status": "aktif",
         "as_of": last["date"],
         "days": _days(start, today),

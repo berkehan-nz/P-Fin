@@ -1,6 +1,13 @@
 {
-  "as_of": "2026-09-28",
-  "cash_flows": [],
+  "as_of": "2026-10-15",
+  "cash_flows": [
+    {
+      "date": "2026-10-15",
+      "amount_try": 100000.0,
+      "usdtry": 49.4086,
+      "note": "TL-ISBANK-2 icin bankadan dogrudan TL (portfoy disi yeni sermaye)"
+    }
+  ],
   "cash_usd": 149.04,
   "closed": [],
   "planned_tranches": [
@@ -10,6 +17,20 @@
       "done": false,
       "note": "ikinci parca",
       "ticker": "QQQM"
+    },
+    {
+      "ticker": "SGOV",
+      "amount_try": 64491.62,
+      "date": "2026-12-30",
+      "done": false,
+      "note": "TL-ISBANK vadesi: yenile ya da Midas'a cevir — 3 kriter"
+    },
+    {
+      "ticker": "SGOV",
+      "amount_try": 107486.03,
+      "date": "2027-01-15",
+      "done": false,
+      "note": "TL-ISBANK-2 vadesi: yenile ya da Midas'a cevir — 3 kriter"
     }
   ],
   "positions": [
@@ -22,7 +43,7 @@
       "entry_price": 0.0,
       "fees_usd": 0.0,
       "maturity_date": "2026-12-30",
-      "notes": "Berke'nin tezi: kur tutuluyor, faiz inmiyor. USD->TRY cevrimi Midas'ta 50,3 kurundan. Stopaj orani teyit edilecek.",
+      "notes": "Berke'nin tezi: kur tutuluyor, faiz inmiyor. USD->TRY cevrimi Midas'ta 50,3 kurundan. Stopaj %17,5 (banka ekranindan teyit, 15 Eki 2026).",
       "principal_try": 60000.0,
       "review_date": "2026-12-30",
       "shares": 0.0,
@@ -34,8 +55,32 @@
       "ticker": "TL-ISBANK",
       "type": "GERCEK",
       "usdtry_at_entry": 50.3,
-      "withholding_confirmed": false,
-      "withholding_pct": 15.0
+      "withholding_confirmed": true,
+      "withholding_pct": 17.5
+    },
+    {
+      "asset_class": "TL_DEPOSIT",
+      "ticker": "TL-ISBANK-2",
+      "type": "GERCEK",
+      "bank": "İş Bankası",
+      "broker": "İş Bankası",
+      "principal_try": 100000.0,
+      "annual_rate_pct": 36.0,
+      "withholding_pct": 17.5,
+      "withholding_confirmed": true,
+      "start_date": "2026-10-15",
+      "entry_date": "2026-10-15",
+      "maturity_date": "2027-01-15",
+      "review_date": "2027-01-15",
+      "usdtry_at_entry": 49.4086,
+      "entry_price": 0.0,
+      "shares": 0.0,
+      "fees_usd": 0.0,
+      "target_price": 0.0,
+      "slice": "tl",
+      "status": "OPEN",
+      "thesis_breakers": [],
+      "notes": "Ikinci 92 gunluk mevduat. Bankadan dogrudan TL ile acildi (Midas cevrimi yok). Banka ekrani: net faiz 7.486,03 TL, vade sonu 107.486,03 TL. Yenileme karari 15 Oca 2027, ilk mevduatla ayni uc kriter."
     },
     {
       "asset_class": "ETF",

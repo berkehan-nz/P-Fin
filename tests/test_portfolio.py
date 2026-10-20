@@ -263,18 +263,29 @@ class TestSlices:
         assert r["summary"]["slices"]                      # ozet yine uretilir
         assert not any(w["type"] == "dilim_sapmasi" for w in r["warnings"])
 
-    def test_every_phase_sums_to_100(self):
+    def test_phase_targets_never_exceed_100(self):
+        """Nakit hedef disidir; toplam 100'u gecmemeli. Faz 0 (15 Eki 2026
+        karari) bilincli olarak 95: kalan 5 puan planli alimlarin nakdi."""
         from src.config import PORTFOLIO
 
         for ph in PORTFOLIO["phases"]:
-            assert sum(ph["targets"].values()) == 100, ph["key"]
+            assert 0 < sum(ph["targets"].values()) <= 100, ph["key"]
+
+    def test_phases_do_not_overlap(self):
+        """Ust uste binen fazlarda tarih iki fazla eslesir; sinirlar bitisik olmali."""
+        from src.config import PORTFOLIO
+
+        ph = PORTFOLIO["phases"]
+        for a, b in zip(ph, ph[1:]):
+            assert a["end"] == b["start"], (a["key"], b["key"])
 
     def test_phase_is_chosen_by_date(self, monkeypatch):
         from src import portfolio as P
 
         monkeypatch.setitem(P.PORTFOLIO, "active_phase", None)
         assert P.active_phase("2026-10-01")["key"] == "faz0"
-        assert P.active_phase("2026-11-16")["key"] == "faz1"   # sinir gunu yeni faz
+        assert P.active_phase("2026-12-30")["key"] == "faz0"   # faz0 ikinci vadeye uzadi
+        assert P.active_phase("2027-01-15")["key"] == "faz1"   # sinir gunu yeni faz
         assert P.active_phase("2027-06-01")["key"] == "faz2"
 
     def test_forced_phase_ignores_date(self, monkeypatch):
@@ -482,3 +493,90 @@ class TestTlEntryRate:
         write(sample, [dep], cash=0.0)
         r = P.compute({}, fx=self._fx(40.0))      # kur cok farkli olsa bile
         assert r["positions"][0]["value_usd"] == pytest.approx(60000 / 50.0)
+
+
+class TestTwoDeposits:
+    """15 Eki 2026: ikinci 92 gunluk mevduat, stopaj %17,5 (banka ekrani)."""
+
+    FIRST = {"ticker": "TL-ISBANK", "asset_class": "TL_DEPOSIT", "bank": "İş Bankası",
+             "principal_try": 60000.0, "annual_rate_pct": 36.0, "withholding_pct": 17.5,
+             "start_date": "2026-09-29", "entry_date": "2026-09-29",
+             "maturity_date": "2026-12-30", "usdtry_at_entry": 50.3, "slice": "tl"}
+    SECOND = {"ticker": "TL-ISBANK-2", "asset_class": "TL_DEPOSIT", "bank": "İş Bankası",
+              "principal_try": 100000.0, "annual_rate_pct": 36.0, "withholding_pct": 17.5,
+              "start_date": "2026-10-15", "entry_date": "2026-10-15",
+              "maturity_date": "2027-01-15", "usdtry_at_entry": 49.4086, "slice": "tl"}
+
+    def test_net_interest_with_17_5_withholding_matches_bank_screen(self):
+        from src import portfolio as P
+
+        v = P.tl_deposit_value(self.SECOND, 49.41, as_of="2027-01-15")
+        # 100000 x 0,36 x 92/365 x 0,825
+        assert v["term_days"] == 92
+        assert v["net_interest_try"] == pytest.approx(7486.03, abs=0.05)
+        assert v["value_try_at_maturity"] == pytest.approx(107486.03, abs=0.05)
+        assert v["usdtry_breakeven"] == pytest.approx(53.11, abs=0.005)
+
+    def test_first_deposit_after_withholding_fix(self):
+        from src import portfolio as P
+
+        v = P.tl_deposit_value(self.FIRST, 49.41, as_of="2026-12-30")
+        assert v["net_interest_try"] == pytest.approx(4491.62, abs=0.05)
+        assert v["value_try_at_maturity"] == pytest.approx(64491.62, abs=0.05)
+        assert v["usdtry_breakeven"] == pytest.approx(54.07, abs=0.005)
+
+    def test_default_withholding_is_17_5(self):
+        from src import portfolio as P
+
+        pos = {k: v for k, v in self.SECOND.items() if k != "withholding_pct"}
+        v = P.tl_deposit_value(pos, 49.41, as_of="2027-01-15")
+        assert v["withholding_pct"] == 17.5
+
+    def test_both_deposits_land_in_tl_slice(self):
+        from src import portfolio as P
+
+        positions = [{"ticker": "A", "slice": "tl", "value_usd": 1200.0},
+                     {"ticker": "B", "slice": "tl", "value_usd": 2000.0},
+                     {"ticker": "SGOV", "slice": "sgov", "value_usd": 800.0}]
+        sl = {s["slice"]: s for s in P.slice_summary(positions, 0.0, 4000.0, P.active_phase("2026-10-15"))}
+        assert sl["tl"]["value_usd"] == 3200.0
+        assert sl["tl"]["actual_pct"] == 80.0
+
+    def test_effective_entry_rate_weights_by_principal(self):
+        from src import portfolio as P
+
+        rate = P.effective_entry_rate([self.FIRST, self.SECOND])
+        # 160.000 TL / (60.000/50,3 + 100.000/49,4086) $
+        assert rate == pytest.approx(160000 / (60000 / 50.3 + 100000 / 49.4086), abs=1e-3)
+
+    def test_each_maturity_is_its_own_action_and_criteria_wait(self, monkeypatch):
+        from src import portfolio as P
+
+        monkeypatch.setattr(P, "today_iso", lambda: "2026-10-15")
+        tl = [{**self.FIRST}, {**self.SECOND}]
+        crit = [{"key": "reel_faiz", "status": "gray"}]
+        acts = [a for a in P.upcoming_actions({"planned_tranches": []}, tl, crit) if a["kind"] == "vade"]
+        assert [a["date"] for a in acts] == ["2026-12-30", "2027-01-15"]
+        assert acts[0]["title"] != acts[1]["title"]          # ayni banka, anapara ile ayrilir
+        assert all(a["criteria"] == [] for a in acts)         # 14 gunden uzak
+
+        monkeypatch.setattr(P, "today_iso", lambda: "2026-12-20")
+        acts = [a for a in P.upcoming_actions({"planned_tranches": []}, tl, crit) if a["kind"] == "vade"]
+        assert acts[0]["criteria"] == crit                     # 10 gun kala
+        assert acts[1]["criteria"] == []                       # 26 gun kala
+        ren = P.tl_renewal_summary(tl, crit)
+        assert ren["maturity_date"] == "2026-12-30" and ren["criteria"] == crit
+        assert len(ren["maturities"]) == 2
+
+    def test_try_tranche_gets_usd_at_todays_rate(self, monkeypatch):
+        from src import portfolio as P
+
+        monkeypatch.setattr(P, "today_iso", lambda: "2026-10-15")
+        data = {"planned_tranches": [
+            {"ticker": "SGOV", "amount_try": 64491.62, "date": "2026-12-30", "done": False}]}
+        a = P.upcoming_actions(data, [], [], usdtry=50.0)[0]
+        assert a["amount_try"] == 64491.62
+        assert a["amount_usd"] == pytest.approx(1289.83, abs=0.01)
+        assert a["amount_usd_estimated"] is True
+        # Kur yoksa dolar tutari uydurulmaz.
+        assert P.upcoming_actions(data, [], [], usdtry=None)[0]["amount_usd"] is None
