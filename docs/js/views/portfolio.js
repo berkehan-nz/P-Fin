@@ -1,51 +1,43 @@
-/* PORTFÖY — plan ve geçmiş.
+/* HAREKETLER — kayıt defteri.
  *
- * "Bugün" ekranı anlık durumu gösterir; burası planı ve kaydı tutar:
- *   Plan         faz zaman çizgisi, planlı alımlar, sıradaki işler,
- *                TL mevduat yenileme koşulları
- *   Pozisyonlar  hisse/ETF ve TL mevduat ayrı tablolarda
- *   İşlemler     işlem günlüğü + işlem ekleme formu
- *   Haftalık     Cuma raporu
- * Üstteki üç sayı Bugün ekranındakiyle birebir aynı biçimdedir.
+ *   Para girişleri  dışarıdan konan para; değer = bunların toplamı + kazanç
+ *   İşlem günlüğü   alım, satış, mevduat, TL girişi + işlem ekleme formu
+ *   Varlık tablosu  tüm pozisyonlar ayrıntılı (katlanmış)
+ *   Cuma raporu     #/hareketler/haftalik
+ * Kayıtla ilgili uyarılar (giriş kuru şüphesi gibi) burada gösterilir.
  */
 window.ViewPortfolio = (function () {
   'use strict';
   const $ = (id) => document.getElementById(id);
   const F = Fmt;
-  const TABS = [['plan', 'Plan'], ['pozisyonlar', 'Pozisyonlar'], ['islemler', 'İşlemler'], ['haftalik', 'Haftalık']];
 
   async function render(arg) {
-    const tab = TABS.some(([k]) => k === arg) ? arg : DataLayer.prefs.get('portfolioTab', 'plan');
-    DataLayer.prefs.set('portfolioTab', tab);
     const [port, raw, weekly] = await Promise.all([
       DataLayer.portfolio(), DataLayer.portfolioRaw(), DataLayer.weekly(),
     ]);
-    const perf = port.performance || {};
-    const open = (port.positions || []).filter((p) => p.status !== 'CLOSED');
 
-    const body = {
-      plan: () => plan(port, raw),
-      pozisyonlar: () => positions(port),
-      islemler: () => trades(port, raw),
-      haftalik: () => ViewWeekly.html(weekly, port),
-    }[tab]();
+    if (arg === 'haftalik') {
+      $('portfolioBody').innerHTML = `
+        <div class="page-head"><h1>Cuma raporu</h1><a class="sub" href="#/hareketler">← Hareketler</a></div>
+        ${ViewWeekly.html(weekly, port)}`;
+      return;
+    }
 
     $('portfolioBody').innerHTML = `
-      <div class="page-head"><h1>Portföy</h1>
-        <span class="sub">${open.length} pozisyon + nakit · ${F.esc(F.phaseLabel((port.summary || {}).phase))}</span></div>
+      <div class="page-head"><h1>Hareketler</h1>
+        <span class="sub">para girişleri ve işlemler</span></div>
       ${warnings(port)}
-      ${kpis(port, perf)}
-      <div class="subtabs" role="tablist">${TABS.map(([k, l]) =>
-        `<button role="tab" aria-selected="${k === tab}" data-tab="${k}">${l}</button>`).join('')}</div>
-      <div id="portfolioTab">${body}</div>`;
+      ${contributions(port)}
+      ${trades(port, raw)}
+      ${positions(port)}
+      ${weekly && weekly.as_of ? `<p class="small" style="margin-top:16px"><a href="#/hareketler/haftalik">Cuma raporu · ${F.esc(F.date(weekly.as_of))} →</a></p>` : ''}`;
 
-    document.querySelectorAll('#portfolioBody [data-tab]').forEach((b) =>
-      b.addEventListener('click', () => App.go(`portfoy/${b.dataset.tab}`)));
     const add = $('addTrade');
     if (add) add.addEventListener('click', openAddTrade);
   }
 
-  /* Bugün ekranına girmeyen uyarılar (giriş kuru, eksik veri...) burada. */
+  /* Kayıtla ilgili uyarılar (giriş kuru, eksik veri...). Dağılım
+     uyarıları Plan'da, alım hatırlatmaları Özet'te. */
   function warnings(port) {
     const shown = ['dilim_sapmasi', 'kademeli_alim'];
     return (port.warnings || []).filter((w) => !shown.includes(w.type)).map((w) =>
@@ -53,120 +45,32 @@ window.ViewPortfolio = (function () {
         <span>${F.esc(F.tr(w.message))}</span></div>`).join('');
   }
 
-  function kpi(label, main, sub, cls) {
-    return `<div class="card"><div class="label">${F.esc(label)}</div>
-      <div class="kpi-v ${cls || ''}">${F.esc(main)}</div>
-      ${sub ? `<div class="small ${cls || 'muted'}">${sub}</div>` : ''}</div>`;
-  }
-
-  function kpis(port, perf) {
-    if (perf.status !== 'aktif') {
-      const s = port.summary || {};
-      return `<div class="kpis">${kpi('Değer', F.money(s.portfolio_value_usd), F.esc(F.moneyTry(s.portfolio_value_try)))}</div>`;
-    }
-    const added = perf.added_usd > 0 && F.isNum(perf.initial_usd)
-      ? `ilk ${F.money(perf.initial_usd, { digits: 0 })} + eklenen ${F.money(perf.added_usd, { digits: 0 })}`
-      : (perf.contributions || []).length === 1 ? 'ilk sermaye' : '';
-    return `<div class="kpis four">
-      ${kpi('Değer', F.money(perf.value_usd), F.esc(`${F.moneyTry(perf.value_try)} · ${F.date(perf.as_of)}`))}
-      ${F.isNum(perf.invested_usd) ? kpi('Yatırdığın', F.money(perf.invested_usd), F.esc(added)) : ''}
-      ${kpi('Kazanç', F.signedMoney(perf.return_usd), F.esc(`${F.pct(perf.return_pct)} · TL bazında ${F.pct(perf.return_try_pct)}`), F.changeClass(perf.return_pct))}
-      ${kpi('Bugün', F.signedMoney(perf.day_change_usd), F.esc(`${F.pct(perf.day_change_pct)}${perf.day_added_usd > 0
-        ? ` · ${F.signedMoney(perf.day_added_usd)} giriş hariç` : ''}`), F.changeClass(perf.day_change_pct))}
-    </div>`;
-  }
-
-  /* -------------------------------------------------------------- plan */
-  function plan(port, raw) {
-    const phases = ((App.thresholds.portfolio || {}).phases) || [];
-    const cur = ((port.summary || {}).phase || {}).key;
-    const slices = ['motor', 'cekirdek_etf', 'sgov', 'tl'];
-    const phaseRows = phases.map((ph) => `<tr${ph.key === cur ? ' class="current"' : ''}>
-        <td class="lead" data-label=""><b>${F.esc(F.phaseLabel(ph))}</b>${ph.key === cur ? ' ' + F.badge('şu an') : ''}
-          <span class="sub">${F.esc(F.date(ph.start))}${ph.end ? ` – ${F.esc(F.date(ph.end))}` : ' →'}</span></td>
-        ${slices.map((k) => `<td class="r" data-label="${F.esc(F.sliceLabel(k))}">${F.esc(F.share((ph.targets || {})[k], 0))}</td>`).join('')}
-      </tr>`).join('');
-
-    const tranches = (raw.planned_tranches || []).slice().sort((a, b) => String(a.date).localeCompare(String(b.date)));
-    const trancheRows = tranches.map((t) => `<li>
-        <span class="when ${t.done ? '' : 'soon'}">${t.done ? 'yapıldı' : F.esc(F.days(F.daysUntil(t.date)))}</span>
-        <span class="what">${F.esc(t.ticker || '')} alımı · ${F.esc(F.trancheAmount(t))}${t.note ? `<span class="sub">${F.esc(F.tr(t.note))}</span>` : ''}</span>
-        <span class="date">${F.esc(F.date(t.date))}</span></li>`).join('');
-
-    const items = [
-      ...(port.actions || []).filter((a) => a.kind !== 'alim').map((a) => ({ days: a.days, date: a.date, title: actionTitle(a, port) })),
-      ...(port.calendar || []).map((e) => ({ days: e.days, date: e.end && e.end !== e.date ? `${e.date}|${e.end}` : e.date, title: F.tr(e.title) })),
-    ].filter((x) => F.isNum(x.days)).sort((a, b) => a.days - b.days);
-
-    const crit = ((port.tl_renewal || {}).criteria) || [];
-    const critRows = crit.map((c) => {
-      const b = c.status === 'green' ? F.badge('✓ sağlanıyor')
-        : c.status === 'red' ? F.badge('✗ sağlanmıyor', 'bad')
-        : '<span class="pending">girilmedi</span>';
-      return `<li><span class="what">${F.esc(F.tr(c.label))}<span class="sub">${F.esc(F.tr(c.detail || ''))}</span></span><span>${b}</span></li>`;
+  /* PARA GİRİŞLERİ — portföye dışarıdan konan para. Değer = bunların
+     toplamı + kazanç. Alım-satım burada yok: o para zaten portföyün içinde. */
+  function contributions(port) {
+    const perf = port.performance || {};
+    const list = perf.contributions || [];
+    if (!list.length) return '';
+    let cum = 0;
+    const rows = list.map((c) => {
+      cum += c.usd || 0;
+      const what = c.initial ? 'İlk sermaye' : 'Para girişi';
+      const src = F.isNum(c.try) ? `${F.moneyTry(c.try)} · kur ${F.num(c.usdtry, 4)}` : '';
+      return `<tr>
+        <td class="lead" data-label=""><b>${F.esc(what)}</b><span class="sub">${F.esc(F.date(c.date))}${src ? ` · ${F.esc(src)}` : ''}</span></td>
+        <td class="r" data-label="Tutar">${F.esc(c.initial ? F.money(c.usd) : F.signedMoney(c.usd))}</td>
+        <td class="r" data-label="Toplam">${F.esc(F.money(cum))}</td></tr>`;
     }).join('');
-
-    return `
-      <h2>Fazlar ve hedef ağırlıklar</h2>
+    const gain = F.isNum(perf.return_usd) ? `<tr class="muted-row">
+        <td class="lead" data-label=""><b>Kazanç</b><span class="sub">piyasa, faiz, kur, dağıtım</span></td>
+        <td class="r ${F.changeClass(perf.return_pct)}" data-label="Tutar">${F.esc(F.signedMoney(perf.return_usd))}</td>
+        <td class="r" data-label="Değer"><b>${F.esc(F.money(perf.value_usd))}</b></td></tr>` : '';
+    return `<h2>Para girişleri</h2>
       <div class="card flush"><div class="table-wrap"><table class="tbl stackable">
-        <thead><tr><th>Faz</th>${slices.map((k) => `<th class="r">${F.esc(F.sliceLabel(k))}</th>`).join('')}</tr></thead>
-        <tbody>${phaseRows}</tbody></table></div></div>
-      ${trancheRows ? `<h2>Planlı alımlar</h2><div class="card"><ul class="agenda compact">${trancheRows}</ul></div>` : ''}
-      ${items.length ? `<h2>Sıradaki işler</h2><div class="card"><ul class="agenda compact">${items.map((x) => {
-        const [d1, d2] = String(x.date).split('|');
-        return `<li><span class="when ${x.days <= 7 ? 'soon' : ''}">${F.esc(F.days(x.days))}</span>
-          <span class="what">${F.esc(x.title)}</span>
-          <span class="date">${F.esc(F.date(d1))}${d2 ? `–${F.esc(F.date(d2))}` : ''}</span></li>`; }).join('')}</ul></div>` : ''}
-      ${critRows ? `<h2>TL mevduat yenileme koşulları</h2><div class="card">
-        <p class="small muted">Vade ${F.esc(F.date((port.tl_renewal || {}).maturity_date))}. Üçü de sağlanıyorsa tez ayakta: yenile.</p>
-        <ul class="agenda criteria">${critRows}</ul></div>` : ''}`;
-  }
-
-  function actionTitle(a, port) {
-    if (a.kind === 'vade') return `${F.depositLabel(a, port)} vadesi — yenileme kararı`;
-    if (a.kind === 'faz') {
-      const m = /Faz\s*(\d)/.exec(a.title || '');
-      const ph = ((App.thresholds.portfolio || {}).phases || []).find((p) => m && p.key === `faz${m[1]}`);
-      return ph ? `${F.phaseLabel(ph)} başlıyor` : F.tr(a.title);
-    }
-    return F.tr(a.title);
-  }
-
-  /* -------------------------------------------------------- pozisyonlar */
-  function positions(port) {
-    const open = (port.positions || []).filter((p) => p.status !== 'CLOSED');
-    const etf = open.filter((p) => !p.tl_deposit).sort((a, b) => (b.value_usd || 0) - (a.value_usd || 0));
-    const tl = open.filter((p) => p.tl_deposit);
-    const pnl = (p) => (p.started ? `<span class="${F.changeClass(p.pnl_pct)}">${F.esc(F.signedMoney(p.pnl_usd))}</span>` : '<span class="pending">başlamadı</span>');
-    const pnlp = (p) => (p.started ? `<span class="${F.changeClass(p.pnl_pct)}">${F.esc(F.pct(p.pnl_pct))}</span>` : '');
-
-    const etfTable = etf.length ? `<h2>Hisse ve ETF</h2><div class="card flush"><div class="table-wrap">
-      <table class="tbl stackable"><thead><tr><th>Sembol</th><th class="r">Adet</th><th class="r">Maliyet</th>
-        <th class="r">Fiyat</th><th class="r">Değer</th><th class="r">K/Z</th><th class="r">K/Z %</th><th class="r">Ağırlık</th></tr></thead>
-      <tbody>${etf.map((p) => `<tr>
-        <td class="lead" data-label=""><b>${F.esc(p.ticker)}</b><span class="sub">${F.esc(F.sliceLabel(p.slice))} · ${F.esc(F.date(p.entry_date))}</span></td>
-        <td class="r" data-label="Adet">${F.esc(F.num(p.shares, p.shares % 1 ? 2 : 0))}</td>
-        <td class="r" data-label="Maliyet">${F.esc(F.money(p.cost_usd))}</td>
-        <td class="r" data-label="Fiyat">${F.esc(F.money(p.price))}</td>
-        <td class="r" data-label="Değer">${F.esc(F.money(p.value_usd))}</td>
-        <td class="r" data-label="K/Z">${pnl(p)}</td>
-        <td class="r" data-label="K/Z %">${pnlp(p)}</td>
-        <td class="r" data-label="Ağırlık">${F.esc(F.share(p.weight_pct))}</td></tr>`).join('')}</tbody></table></div></div>` : '';
-
-    const tlTable = tl.length ? `<h2>TL mevduat</h2><div class="card flush"><div class="table-wrap">
-      <table class="tbl stackable"><thead><tr><th>Banka</th><th class="r">Anapara</th><th class="r">Faiz</th>
-        <th class="r">Biriken net</th><th class="r">Vade</th><th class="r">Başa baş kur</th><th class="r">Güvenli pay</th></tr></thead>
-      <tbody>${tl.map((p) => { const t = p.tl_deposit; return `<tr>
-        <td class="lead" data-label=""><b>${F.esc(t.bank || p.ticker)}</b><span class="sub">${F.esc(F.money(p.value_usd))} · kur ${F.esc(F.num(t.usdtry_now, 2))}</span></td>
-        <td class="r" data-label="Anapara">${F.esc(F.moneyTry(t.principal_try))}</td>
-        <td class="r" data-label="Faiz">%${F.esc(F.num(t.annual_rate_pct, 1))}<span class="sub">stopaj %${F.esc(F.num(t.withholding_pct, 0))}${p.withholding_confirmed === false ? ' · teyit bekliyor' : ''}</span></td>
-        <td class="r" data-label="Biriken net">${F.esc(F.moneyTry(t.net_interest_try))}<span class="sub">${F.esc(F.money(t.net_interest_usd))}</span></td>
-        <td class="r" data-label="Vade">${F.esc(F.date(t.maturity_date))}<span class="sub">${F.esc(t.days_to_maturity)} gün</span></td>
-        <td class="r" data-label="Başa baş kur">${F.esc(F.num(t.usdtry_breakeven, 2))}${F.isNum(t.usdtry_breakeven_vs_sgov) ? `<span class="sub">SGOV'a göre ${F.esc(F.num(t.usdtry_breakeven_vs_sgov, 2))}</span>` : ''}</td>
-        <td class="r" data-label="Güvenli pay">${F.esc(F.share(t.breakeven_headroom_pct))}</td></tr>`; }).join('')}</tbody></table></div></div>
-      <p class="small muted" style="margin-top:8px">Başa baş kur: vadede USD/TRY bunun üstündeysen mevduat dolar bazında zarar ettirir.
-        Güvenli pay: kurun bugünden oraya kadar yükselebileceği yüzde.</p>` : '';
-    return etfTable + tlTable;
+      <thead><tr><th>Kaynak</th><th class="r">Tutar</th><th class="r">Toplam</th></tr></thead>
+      <tbody>${rows}${gain}</tbody></table></div></div>
+      <p class="small muted" style="margin-top:8px">Değer = yatırdığın para + kazanç. Para girişi kazanç sayılmaz;
+        Özet grafiğinde kesik çizgiyle işaretlenir.</p>`;
   }
 
   /* ---------------------------------------------------------- işlemler */
@@ -196,8 +100,7 @@ window.ViewPortfolio = (function () {
     });
     rows.sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
-    return `${contributions(port)}
-      <div class="h2row"><h2>İşlem günlüğü</h2><button id="addTrade" class="primary">+ İşlem ekle</button></div>
+    return `<div class="h2row"><h2>İşlem günlüğü</h2><button id="addTrade" class="primary">+ İşlem ekle</button></div>
       <div class="card flush"><div class="table-wrap"><table class="tbl stackable">
       <thead><tr><th>İşlem</th><th class="r">Adet</th><th class="r">Fiyat</th>
         <th class="r">Ücret</th><th class="r">Tutar</th></tr></thead>
@@ -211,32 +114,42 @@ window.ViewPortfolio = (function () {
         dosyasına elle ya da sohbetteki Claude ile (record_position) girilir.</p>`;
   }
 
-  /* PARA GİRİŞLERİ — portföye dışarıdan konan para. Değer = bunların
-     toplamı + kazanç. Alım-satım burada yok: o para zaten portföyün içinde. */
-  function contributions(port) {
-    const perf = port.performance || {};
-    const list = perf.contributions || [];
-    if (!list.length) return '';
-    let cum = 0;
-    const rows = list.map((c) => {
-      cum += c.usd || 0;
-      const what = c.initial ? 'İlk sermaye' : 'Para girişi';
-      const src = F.isNum(c.try) ? `${F.moneyTry(c.try)} · kur ${F.num(c.usdtry, 4)}` : '';
-      return `<tr>
-        <td class="lead" data-label=""><b>${F.esc(what)}</b><span class="sub">${F.esc(F.date(c.date))}${src ? ` · ${F.esc(src)}` : ''}</span></td>
-        <td class="r" data-label="Tutar">${F.esc(c.initial ? F.money(c.usd) : F.signedMoney(c.usd))}</td>
-        <td class="r" data-label="Toplam">${F.esc(F.money(cum))}</td></tr>`;
-    }).join('');
-    const gain = F.isNum(perf.return_usd) ? `<tr class="muted-row">
-        <td class="lead" data-label=""><b>Kazanç</b><span class="sub">piyasa, faiz, kur, dağıtım</span></td>
-        <td class="r ${F.changeClass(perf.return_pct)}" data-label="Tutar">${F.esc(F.signedMoney(perf.return_usd))}</td>
-        <td class="r" data-label="Değer"><b>${F.esc(F.money(perf.value_usd))}</b></td></tr>` : '';
-    return `<h2>Para girişleri</h2>
-      <div class="card flush"><div class="table-wrap"><table class="tbl stackable">
-      <thead><tr><th>Kaynak</th><th class="r">Tutar</th><th class="r">Toplam</th></tr></thead>
-      <tbody>${rows}${gain}</tbody></table></div></div>
-      <p class="small muted" style="margin-top:8px">Değer = yatırdığın para + kazanç. Para girişi kazanç sayılmaz;
-        Bugün grafiğinde kesik çizgiyle işaretlenir.</p>`;
+  /* ------------------------------------------------- varlık tablosu */
+  /* Özet'teki gruplu liste günlük bakış için; burası tüm ayrıntı (katlı). */
+  function positions(port) {
+    const open = (port.positions || []).filter((p) => p.status !== 'CLOSED');
+    const etf = open.filter((p) => !p.tl_deposit).sort((a, b) => (b.value_usd || 0) - (a.value_usd || 0));
+    const tl = open.filter((p) => p.tl_deposit);
+    if (!open.length) return '';
+    const pnl = (p) => (p.started ? `<span class="${F.changeClass(p.pnl_pct)}">${F.esc(F.signedMoney(p.pnl_usd))}</span>
+      <span class="sub ${F.changeClass(p.pnl_pct)}">${F.esc(F.pct(p.pnl_pct))}</span>` : '<span class="pending">başlamadı</span>');
+
+    const etfTable = etf.length ? `<h3>Fonlar</h3><div class="table-wrap">
+      <table class="tbl stackable"><thead><tr><th>Sembol</th><th class="r">Adet</th><th class="r">Maliyet</th>
+        <th class="r">Fiyat</th><th class="r">Değer</th><th class="r">Kazanç</th></tr></thead>
+      <tbody>${etf.map((p) => `<tr>
+        <td class="lead" data-label=""><b>${F.esc(p.ticker)}</b><span class="sub">${F.esc(F.sliceLabel(p.slice))} · ${F.esc(F.date(p.entry_date))}</span></td>
+        <td class="r" data-label="Adet">${F.esc(F.num(p.shares, p.shares % 1 ? 2 : 0))}</td>
+        <td class="r" data-label="Maliyet">${F.esc(F.money(p.cost_usd))}</td>
+        <td class="r" data-label="Fiyat">${F.esc(F.money(p.price))}</td>
+        <td class="r" data-label="Değer">${F.esc(F.money(p.value_usd))}</td>
+        <td class="r" data-label="Kazanç">${pnl(p)}</td></tr>`).join('')}</tbody></table></div>` : '';
+
+    const tlTable = tl.length ? `<h3>TL mevduat</h3><div class="table-wrap">
+      <table class="tbl stackable"><thead><tr><th>Banka</th><th class="r">Anapara</th><th class="r">Faiz</th>
+        <th class="r">Biriken net</th><th class="r">Vade</th><th class="r">Başa baş kur</th></tr></thead>
+      <tbody>${tl.map((p) => { const t = p.tl_deposit; return `<tr>
+        <td class="lead" data-label=""><b>${F.esc(t.bank || p.ticker)}</b><span class="sub">${F.esc(F.money(p.value_usd))} · giriş kuru ${F.esc(F.num(t.usdtry_at_entry, 2))}</span></td>
+        <td class="r" data-label="Anapara">${F.esc(F.moneyTry(t.principal_try))}</td>
+        <td class="r" data-label="Faiz">${F.esc(F.rate(t.annual_rate_pct))}<span class="sub">stopaj ${F.esc(F.rate(t.withholding_pct))}${p.withholding_confirmed === false ? ' · teyit bekliyor' : ''}</span></td>
+        <td class="r" data-label="Biriken net">${F.esc(F.moneyTry(t.net_interest_try))}<span class="sub">${F.esc(F.money(t.net_interest_usd))}</span></td>
+        <td class="r" data-label="Vade">${F.esc(F.date(t.maturity_date))}<span class="sub">${F.esc(t.days_to_maturity)} gün</span></td>
+        <td class="r" data-label="Başa baş kur">${F.esc(F.num(t.usdtry_breakeven, 2))}${F.isNum(t.headroom_from_now_pct)
+          ? `<span class="sub">bugünden ${F.esc(F.share(t.headroom_from_now_pct))} yukarıda</span>` : ''}</td></tr>`; }).join('')}</tbody></table></div>
+      <p class="small muted" style="margin-top:8px">Başa baş kur: vadede USD/TRY bunun üstündeyse mevduat dolar bazında zarar ettirir.</p>` : '';
+
+    return `<details class="fold"><summary>Varlık tablosu<span class="count">${open.length} pozisyon</span></summary>
+      <div class="fold-body">${etfTable}${tlTable}</div></details>`;
   }
 
   /* --------------------------------------------- işlem ekleme formu */

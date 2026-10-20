@@ -218,11 +218,26 @@ window.Fmt = (function () {
   }
 
   /* Dilim ve faz adları: anahtardan, veriden bağımsız. */
+  /* Dilim adları sade Türkçe; ne işe yaradığı ikinci satırda (sliceHint). */
   const SLICE = {
-    motor: 'Motor (tek hisse)', cekirdek_etf: 'Çekirdek ETF', sgov: 'SGOV',
+    motor: 'Tek hisseler', cekirdek_etf: 'Endeks fonları', sgov: 'Dolar faizi',
     tl: 'TL mevduat', nakit: 'Nakit',
   };
+  const SLICE_HINT = {
+    motor: 'seçilmiş şirket hisseleri · Faz 1\'de başlar',
+    cekirdek_etf: 'QQQM, VOO · uzun vadeli çekirdek',
+    sgov: 'SGOV · ABD hazine bonosu fonu',
+    tl: 'faiz yüksek, kur riski var',
+    nakit: 'dolar · planlı alımlar için bekliyor',
+  };
   function sliceLabel(key, fallback) { return SLICE[key] || tr(fallback || key); }
+  function sliceHint(key) { return SLICE_HINT[key] || ''; }
+
+  /* Oran: tam sayıysa ondalıksız (%36), değilse bir ondalık (%17,5). */
+  function rate(v) {
+    if (!isNum(v)) return '';
+    return `%${num(v, Math.abs(v % 1) > 1e-9 ? 1 : 0)}`;
+  }
 
   const PHASE = { faz0: 'Faz 0 · hazırlık', faz1: 'Faz 1 · ilk hisseler', faz2: 'Faz 2 · tam motor' };
   function phaseLabel(ph) { return (ph && PHASE[ph.key]) || tr((ph && ph.label) || ''); }
@@ -380,6 +395,6 @@ window.Fmt = (function () {
     pct, share, delta, changeClass, pnlClass, date, dateTime, days, daysUntil, hoursSince,
     sinceLabel, tr, sliceLabel, phaseLabel, pctText, metricValue, colorFor, status,
     statusText, label, plain, sentence, percentileSentence, ownHistorySentence, esc, badge,
-    decisionBadge, trackLabel, trancheAmount, depositLabel,
+    decisionBadge, trackLabel, trancheAmount, depositLabel, sliceHint, rate,
   };
 })();
