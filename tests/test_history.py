@@ -247,6 +247,17 @@ class TestFxDayBeforeUsOpen:
         assert rows[-1]["positions"]["SGOV"]["price"] == 99.70   # dunku kapanis
         assert rows[-1]["usdtry"] == 51.0
 
+    def test_today_has_a_row_even_before_the_first_fx_print(self):
+        """Kur kaynagi bugunu henuz yazmadi: satir yine olur (dunku kur,
+        bugunun faizi) ki ust toplam pozisyon tablosuyla ayni olsun."""
+        ps, divs, fx = series()
+        rows = H.rebuild(base_data(), price_series=ps, dividends=divs,
+                         fx_series=fx, upto="2026-10-05")
+        assert rows[-1]["date"] == "2026-10-05"
+        assert rows[-1]["usdtry"] == 50.0
+        tl = rows[-1]["positions"]["TL-X"]
+        assert tl["accrued_net_try"] == pytest.approx(50000 * 0.365 * 6 / 365, abs=0.01)
+
     def test_weekend_fx_quote_adds_no_row(self):
         ps, divs, fx = series()
         fx = fx + [("2026-10-03", 51.0)]          # cumartesi

@@ -345,6 +345,12 @@ def trading_days(data: dict, price_series: dict, fx_series: list,
         last_fx = fx_days[-1]
         if last_fx > max(days) and date.fromisoformat(last_fx).weekday() < 5:
             days.add(last_fx)
+        # Kur kaynagi bugunun ilk fiyatini henuz yazmadiysa da bugunun satiri
+        # olur (dunku kur, bugunun faizi). Pozisyon tablosu TL mevduati
+        # BUGUNE kadar tahakkuk ettirir; satir yoksa ust toplam bir gunluk
+        # faiz kadar (160.000 TL'de ~2,6 $) tablodan ayrisiyordu.
+        if upto > max(days) and date.fromisoformat(upto).weekday() < 5:
+            days.add(upto)
     return sorted(d for d in days if start <= d <= upto)
 
 

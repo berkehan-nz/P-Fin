@@ -243,6 +243,11 @@ def tl_deposit_value(position: dict, usdtry: float | None, *,
         be = at_maturity_try / usd_at_entry
         out["usdtry_breakeven"] = round(be, 4)
         out["breakeven_headroom_pct"] = round((be / entry_fx - 1) * 100, 2)
+        # Panodaki "guvenli pay": kurun BUGUNDEN basa basa kadar yukselebilecegi
+        # yuzde. Giris kurundan olcen yukaridaki alan iki mevduatta ayni
+        # (vade getirisi) cikiyordu ve "bugunku kur" yanina yanlis okunuyordu.
+        if usdtry:
+            out["headroom_from_now_pct"] = round((be / usdtry - 1) * 100, 2)
         if usdtry and be != entry_fx:
             out["usdtry_used_pct"] = round((usdtry - entry_fx) / (be - entry_fx) * 100, 1)
 
