@@ -1,6 +1,7 @@
 {
   "analyst": {
     "analyst_count": 6,
+    "as_of": "2026-10-23",
     "buy": 4,
     "hold": 1,
     "recommendation": "none",
@@ -9,15 +10,14 @@
     "target_high": 70.0,
     "target_low": 45.0,
     "target_median": 60.5,
-    "upside_to_median": 32.61727312582201
+    "upside_to_median": 32.61727623083151
   },
-  "as_of": "2026-10-23",
+  "as_of": "2026-10-24",
   "calendar": {
     "estimated": true,
     "next_earnings": "2026-11-04"
   },
   "capped_for_scoring": {},
-  "change_1d_pct": 1.06,
   "data_quality": {
     "issue_count": 2,
     "issues": [
@@ -76,7 +76,7 @@
     "z_unreliable": true,
     "z_unreliable_reason": "Ertelenmis gelir kisa vadeli yukumlulugun buyuk kismi ve sirket net nakit pozisyonunda — Z'' abonelik modelinde yaniltici. Faiz karsilama ve FCF/borc ile degerlendir."
   },
-  "generated_at": "2026-10-21T15:28:08+00:00",
+  "generated_at": "2026-10-24T00:56:55+00:00",
   "insider": {
     "form4_count": 40,
     "last_form4": "2026-09-30",
@@ -151,7 +151,7 @@
       "color": "green",
       "own_5y_pct": 72.7,
       "pct_basis": "sector",
-      "sector_pct": 36.1,
+      "sector_pct": 30.6,
       "value": 3.73
     },
     "fcf_margin": {
@@ -263,7 +263,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 80.6,
+      "sector_pct": 82.4,
       "value": 33.95
     },
     "pe": {
@@ -271,7 +271,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 35.1,
-      "value": 31.74
+      "value": 31.75
     },
     "peg": {
       "color": "yellow",
@@ -298,21 +298,21 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 2.8,
+      "sector_pct": 4.7,
       "value": -23.27
     },
     "return_12m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 89.6,
+      "sector_pct": 85.8,
       "value": 41.81
     },
     "return_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 2.8,
+      "sector_pct": 4.7,
       "value": -15.13
     },
     "rev_cagr_3y": {
@@ -390,6 +390,12 @@
   "net_debt_musd": -959.27,
   "news": [
     {
+      "date": "2026-10-23",
+      "headline": "3 software stocks with competitive advantages",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=bfdf7d7c336cd9666c1f816f5c3a3288f62be6a4cadd2f72843b7a71a9a76a14"
+    },
+    {
       "date": "2026-10-21",
       "headline": "CLEAR To Announce Third Quarter 2026 Financial Results On November 4, 2026",
       "source": "Yahoo",
@@ -430,18 +436,12 @@
       "headline": "Is Most-Watched Stock CLEAR Secure, Inc. (YOU) Worth Betting on Now?",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=631b978d64da8d8a0a7762da8bac8d2ab97814cc03f63e0474be4226bc975745"
-    },
-    {
-      "date": "2026-10-13",
-      "headline": "Clear Secure (YOU) Increases Despite Market Slip: Here's What You Need to Know",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=354c1150009777e0c52b827450c4891e92273fb94c410a30cea592f9a1b9b324"
     }
   ],
   "overrides": [],
   "percentile_pool": {
     "sector": 54,
-    "universe": 350
+    "universe": 349
   },
   "price": 45.62,
   "price_as_of": "2026-10-22",
@@ -450,7 +450,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 3735.5,
     "fcf_ttm_musd": 508.4,
-    "implied_growth_pct": -6.696248212172064,
+    "implied_growth_pct": -6.7,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -483,13 +483,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 8.3,
-          "scaled": 8.3,
+          "percentile": 6.5,
+          "scaled": 6.5,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 2.8,
-          "scaled": 2.8,
+          "percentile": 4.7,
+          "scaled": 4.7,
           "weight": 0.4
         }
       },
@@ -567,8 +567,8 @@
           "percentile": null
         },
         "ev_sales": {
-          "percentile": 36.1,
-          "scaled": 63.9,
+          "percentile": 30.6,
+          "scaled": 69.4,
           "weight": 0.15
         },
         "fcf_yield_ev": {
@@ -629,11 +629,11 @@
       "value": 0.8
     },
     "earnings_quality": 57.7,
-    "momentum": 6.1,
+    "momentum": 5.8,
     "quality": 98.1,
     "safety": 56.7,
-    "total": 61.2,
-    "value": 87.1,
+    "total": 61.4,
+    "value": 88.1,
     "weight_coverage": 0.8
   },
   "sector": "Yazilim ve programlama",
@@ -827,7 +827,7 @@
     "why_cheap_diagnosis": "TSA YÜZ TANIMA KORKUSU (Ağu 2026 zirvesinden -%36)",
     "why_cheap_rationale": "ATH 69,07 $ (5 Ağu 2026) sonrası 44 $'a düşüş; short ~%12. Kendi tarihine göre orta-yüksek çarpan (EV/FAVÖK ~18-19x, P/FCF ~12x)."
   },
-  "story_age_days": 43,
+  "story_age_days": 44,
   "ticker": "YOU",
   "track": "both",
   "ttm": {
