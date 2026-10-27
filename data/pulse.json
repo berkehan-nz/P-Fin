@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-10-26",
+  "as_of": "2026-10-27",
   "calendar": {
     "recent": [
       {
@@ -108,34 +108,6 @@
         "title": "TUFE (CPI)"
       },
       {
-        "date": "2027-02-03",
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "GFF",
-        "title": "GFF bilanco"
-      },
-      {
-        "date": "2027-02-03",
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "LPG",
-        "title": "LPG bilanco"
-      },
-      {
-        "date": "2027-02-03",
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "MITK",
-        "title": "MITK bilanco"
-      },
-      {
-        "date": "2027-02-08",
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "MNTN",
-        "title": "MNTN bilanco"
-      },
-      {
         "date": "2027-02-10",
         "detail": null,
         "kind": "bilanco",
@@ -211,10 +183,17 @@
         "kind": "bilanco",
         "ticker": "NRDS",
         "title": "NRDS bilanco"
+      },
+      {
+        "date": "2027-02-24",
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "DV",
+        "title": "DV bilanco"
       }
     ]
   },
-  "generated_at": "2026-10-26T22:37:12+00:00",
+  "generated_at": "2026-10-27T02:01:01+00:00",
   "market": [
     {
       "as_of": "2026-10-26",
@@ -385,14 +364,12 @@
       "value": 6116.23
     },
     {
-      "as_of": "2026-10-26",
-      "change_1d_pct": -0.34,
-      "change_5d_pct": -4.03,
+      "as_of": "2026-10-27",
+      "change_1d_pct": 2.05,
+      "change_5d_pct": -0.95,
       "group": "Hisse",
       "label": "Nikkei 225",
       "series": [
-        65269.3281,
-        65142.7812,
         65270.9492,
         64011.3398,
         63492.9883,
@@ -420,20 +397,21 @@
         64075.4219,
         64621.2383,
         62907.8398,
-        62693.1602
+        62693.1602,
+        62189.6484,
+        63465.7188
       ],
       "symbol": "^N225",
       "unit": "puan",
-      "value": 62693.1602
+      "value": 63465.7188
     },
     {
       "as_of": "2026-10-26",
-      "change_1d_pct": -0.92,
-      "change_5d_pct": -5.16,
+      "change_1d_pct": 0.31,
+      "change_5d_pct": -2.43,
       "group": "Hisse",
       "label": "BIST 100",
       "series": [
-        14235.7998,
         13892.2998,
         13122.5996,
         13509.7998,
@@ -462,11 +440,12 @@
         11797.7002,
         11577.0996,
         11220.4004,
-        11117.0
+        11117.0,
+        11152.0
       ],
       "symbol": "XU100.IS",
       "unit": "puan",
-      "value": 11117.0
+      "value": 11152.0
     },
     {
       "as_of": "2026-10-26",
@@ -554,8 +533,8 @@
     },
     {
       "as_of": "2026-10-26",
-      "change_1d_pct": 0.22,
-      "change_5d_pct": 0.05,
+      "change_1d_pct": 0.26,
+      "change_5d_pct": 0.09,
       "group": "Kur",
       "label": "Dolar endeksi",
       "series": [
@@ -588,20 +567,19 @@
         101.78,
         101.61,
         101.81,
-        102.03
+        102.073
       ],
       "symbol": "DX-Y.NYB",
       "unit": "puan",
-      "value": 102.03
+      "value": 102.073
     },
     {
-      "as_of": "2026-10-26",
+      "as_of": "2026-10-27",
       "change_1d_pct": -0.4,
-      "change_5d_pct": -0.43,
+      "change_5d_pct": -0.38,
       "group": "Kur",
       "label": "EUR/USD",
       "series": [
-        1.1549,
         1.1538,
         1.147,
         1.1476,
@@ -630,20 +608,20 @@
         1.1227,
         1.1235,
         1.1221,
-        1.1177
+        1.1218,
+        1.1173
       ],
       "symbol": "EURUSD=X",
       "unit": "kur",
-      "value": 1.1177
+      "value": 1.1173
     },
     {
-      "as_of": "2026-10-26",
-      "change_1d_pct": 0.09,
-      "change_5d_pct": 0.51,
+      "as_of": "2026-10-27",
+      "change_1d_pct": 0.08,
+      "change_5d_pct": 0.43,
       "group": "Kur",
       "label": "USD/TRY",
       "series": [
-        48.6243,
         48.6551,
         48.6673,
         48.7762,
@@ -672,16 +650,17 @@
         49.5843,
         49.6225,
         49.7307,
-        49.7748
+        49.7388,
+        49.7806
       ],
       "symbol": "TRY=X",
       "unit": "kur",
-      "value": 49.7748
+      "value": 49.7806
     },
     {
       "as_of": "2026-10-26",
-      "change_1d_pct": -1.84,
-      "change_5d_pct": -2.21,
+      "change_1d_pct": -2.3,
+      "change_5d_pct": -2.67,
       "group": "Emtia",
       "label": "Brent/WTI ham",
       "series": [
@@ -714,16 +693,16 @@
         97.15,
         99.47,
         103.27,
-        101.37
+        100.89
       ],
       "symbol": "CL=F",
       "unit": "USD",
-      "value": 101.37
+      "value": 100.89
     },
     {
       "as_of": "2026-10-26",
-      "change_1d_pct": 0.51,
-      "change_5d_pct": -3.17,
+      "change_1d_pct": 0.5,
+      "change_5d_pct": -3.18,
       "group": "Emtia",
       "label": "Altin",
       "series": [
@@ -756,16 +735,16 @@
         4150.0,
         4060.3999,
         4007.8999,
-        4028.2
+        4027.8
       ],
       "symbol": "GC=F",
       "unit": "USD",
-      "value": 4028.2
+      "value": 4027.8
     },
     {
-      "as_of": "2026-10-26",
-      "change_1d_pct": -0.24,
-      "change_5d_pct": -4.98,
+      "as_of": "2026-10-27",
+      "change_1d_pct": -0.11,
+      "change_5d_pct": -4.85,
       "group": "Kripto",
       "label": "Bitcoin",
       "series": [
@@ -798,11 +777,11 @@
         81074.1875,
         80790.8359,
         80024.0078,
-        79829.9922
+        79938.6875
       ],
       "symbol": "BTC-USD",
       "unit": "USD",
-      "value": 79829.9922
+      "value": 79938.6875
     }
   ],
   "news": [
@@ -913,6 +892,27 @@
     },
     {
       "date": "2026-10-26",
+      "headline": "BHC Q3 Earnings Preview: Here's What You Should Know",
+      "source": "Yahoo",
+      "ticker": "HRMY",
+      "url": "https://finnhub.io/api/news?id=4e46a0e6db0ca66685a362dfc0a8fde4e37b264e110896e42a90a4e16de6c6a2"
+    },
+    {
+      "date": "2026-10-26",
+      "headline": "TNGX Stock Falls 16% Despite Positive Pancreatic Cancer Study Data",
+      "source": "Yahoo",
+      "ticker": "HRMY",
+      "url": "https://finnhub.io/api/news?id=674d88da306b3ecf502f1b50e13824b35202100f955d1ef29d78b1098647a8ca"
+    },
+    {
+      "date": "2026-10-26",
+      "headline": "RDY Q2 Earnings & Revenues Miss Estimates as Lenalidomide Sales Fall",
+      "source": "Yahoo",
+      "ticker": "HRMY",
+      "url": "https://finnhub.io/api/news?id=493bad6541977179861ea86bfddbd98d6f48f9a8a0c12eabb90476fa85eb721b"
+    },
+    {
+      "date": "2026-10-26",
       "headline": "NAPCO Security Technologies to Announce Fiscal First Quarter 2027 Results Monday, November 2, 2026",
       "source": "Yahoo",
       "ticker": "NSSC",
@@ -938,6 +938,20 @@
       "source": "Yahoo",
       "ticker": "PINS",
       "url": "https://finnhub.io/api/news?id=091e53f23e5401e51fb51f5ff810304502aa4c06d2bb45738b67adfe533ad3c5"
+    },
+    {
+      "date": "2026-10-26",
+      "headline": "Forget QQQ: The Company Behind It Runs the Same Index for $30 Less a Year on a $100K Balance",
+      "source": "Yahoo",
+      "ticker": "QQQM",
+      "url": "https://finnhub.io/api/news?id=34115c35d40208c08a6c19ee3462734afc260810c2122b4d2d8b6cf4e4439201"
+    },
+    {
+      "date": "2026-10-26",
+      "headline": "Anthropic S-1 Registration Dominates, Leads Nasdaq Higher",
+      "source": "SeekingAlpha",
+      "ticker": "QQQM",
+      "url": "https://finnhub.io/api/news?id=cedbf48b450d86ed15c6049f114ecd25170def171dcdbefbec25c6875036410f"
     },
     {
       "date": "2026-10-26",
@@ -1008,48 +1022,6 @@
       "source": "Yahoo",
       "ticker": "UPBD",
       "url": "https://finnhub.io/api/news?id=268bcd157cf933672d31406ec4ca3e67bc2ae542a1cba51b65450386788f98f1"
-    },
-    {
-      "date": "2026-10-23",
-      "headline": "Imperial Oil shares are trading lower after the company reported worse-than-expected Q4 sales results.",
-      "source": "Benzinga",
-      "ticker": "CHRD",
-      "url": "https://finnhub.io/api/news?id=1f714709ab7ddf7f6cb7144cca446464e468587349f49f9b62558fa0d4ae9f57"
-    },
-    {
-      "date": "2026-10-23",
-      "headline": "Top restaurant stocks to watch, according to Raymond James",
-      "source": "Yahoo",
-      "ticker": "EAT",
-      "url": "https://finnhub.io/api/news?id=9d9216ffe7dafbcf52c1a45fab3f4f0d5fa01951a5a3c6910d7ada373b59e211"
-    },
-    {
-      "date": "2026-10-23",
-      "headline": "SOLV Wins FDA Clearance to Combine Restrata Matrix With V.A.C.Therapy",
-      "source": "Yahoo",
-      "ticker": "GMED",
-      "url": "https://finnhub.io/api/news?id=60bfde29fdfa5b7c383de4767773c4fba28b5601800e4b300e2440a3f35e5050"
-    },
-    {
-      "date": "2026-10-23",
-      "headline": "Logitech Launches ‘Chain Reaction’ to Accelerate Supply Chain Decarbonization towards 2030 Climate Goals",
-      "source": "Yahoo",
-      "ticker": "LOGI",
-      "url": "https://finnhub.io/api/news?id=b0156c46cce58d7ae26cf77a1448f2d036cfa62f43c99b7cef8293b09472854f"
-    },
-    {
-      "date": "2026-10-23",
-      "headline": "2 Russell 2000 stocks on our buy list and 1 we question",
-      "source": "Yahoo",
-      "ticker": "NRDS",
-      "url": "https://finnhub.io/api/news?id=af3548f3b4e79e1e60704ab0a498d67b75ce98175ccb148cd97fedaa021c6bad"
-    },
-    {
-      "date": "2026-10-23",
-      "headline": "Perdoceo Education (NASDAQ:PRDO): Strong Growth Paired With Quality Technical Setup",
-      "source": "ChartMill",
-      "ticker": "PRDO",
-      "url": "https://finnhub.io/api/news?id=3739a6a524db1e8e0fd78b4251511b55d8908f1f01a4334f40de59d952bffa30"
     }
   ],
   "risk_note": "VIX 18 — normal aralikta.",
