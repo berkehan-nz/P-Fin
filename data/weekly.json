@@ -1,62 +1,46 @@
 {
   "action_required": 0,
-  "as_of": "2026-10-23",
+  "as_of": "2026-10-30",
   "fx": {
-    "as_of": "2026-10-23",
-    "change_1w_pct": 0.42,
+    "as_of": "2026-10-30",
+    "change_1w_pct": 0.43,
     "deposits": [
       {
         "breakeven_headroom_pct": 7.49,
-        "days_to_maturity": 84,
-        "net_interest_try": 650.96,
+        "days_to_maturity": 77,
+        "net_interest_try": 1220.55,
         "ticker": "TL-ISBANK-2",
         "usdtry_at_entry": 49.4086,
         "usdtry_breakeven": 53.1073,
-        "usdtry_used_pct": 8.8,
-        "value_try": 100650.96,
-        "value_usd": 2023.8
+        "usdtry_used_pct": 14.6,
+        "value_try": 101220.55,
+        "value_usd": 2026.56
       },
       {
         "breakeven_headroom_pct": 7.49,
-        "days_to_maturity": 68,
-        "net_interest_try": 1171.73,
+        "days_to_maturity": 61,
+        "net_interest_try": 1513.48,
         "ticker": "TL-ISBANK",
         "usdtry_at_entry": 50.3,
         "usdtry_breakeven": 54.0655,
-        "usdtry_used_pct": -15.0,
-        "value_try": 61171.73,
-        "value_usd": 1229.99
+        "usdtry_used_pct": -9.4,
+        "value_try": 61513.48,
+        "value_usd": 1231.58
       }
     ],
-    "usdtry": 49.73360061645508
+    "usdtry": 49.94688034057617
   },
   "macro": {
     "key_rates": {
       "cpi_yoy": 3.72,
       "fed_funds": 3.88,
-      "us10y": 5.13
+      "us10y": 5.05
     },
     "risk_note": "VIX 19 — normal aralikta.",
     "upcoming": [
       {
-        "date": "2026-10-27",
-        "days": 4,
-        "detail": "talep",
-        "kind": "makro",
-        "ticker": null,
-        "title": "Perakende satislar"
-      },
-      {
-        "date": "2026-10-29",
-        "days": 6,
-        "detail": "buyume",
-        "kind": "makro",
-        "ticker": null,
-        "title": "GSYH (GDP)"
-      },
-      {
         "date": "2026-11-06",
-        "days": 14,
+        "days": 7,
         "detail": "isgucu",
         "kind": "makro",
         "ticker": null,
@@ -64,7 +48,7 @@
       },
       {
         "date": "2026-11-10",
-        "days": 18,
+        "days": 11,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -72,7 +56,7 @@
       },
       {
         "date": "2026-11-13",
-        "days": 21,
+        "days": 14,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -80,7 +64,7 @@
       },
       {
         "date": "2026-11-17",
-        "days": 25,
+        "days": 18,
         "detail": "uretim",
         "kind": "makro",
         "ticker": null,
@@ -88,7 +72,7 @@
       },
       {
         "date": "2026-11-24",
-        "days": 32,
+        "days": 25,
         "detail": "talep",
         "kind": "makro",
         "ticker": null,
@@ -96,7 +80,7 @@
       },
       {
         "date": "2026-11-25",
-        "days": 33,
+        "days": 26,
         "detail": "buyume",
         "kind": "makro",
         "ticker": null,
@@ -104,35 +88,51 @@
       },
       {
         "date": "2026-12-04",
-        "days": 42,
+        "days": 35,
         "detail": "isgucu",
         "kind": "makro",
         "ticker": null,
         "title": "Istihdam raporu"
       },
       {
-        "date": "2027-02-01",
-        "days": 101,
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "CRUS",
-        "title": "CRUS bilanco"
+        "date": "2026-12-10",
+        "days": 41,
+        "detail": "enflasyon",
+        "kind": "makro",
+        "ticker": null,
+        "title": "TUFE (CPI)"
       },
       {
-        "date": "2027-02-01",
-        "days": 101,
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "NSSC",
-        "title": "NSSC bilanco"
-      },
-      {
-        "date": "2027-02-03",
+        "date": "2027-02-10",
         "days": 103,
         "detail": null,
         "kind": "bilanco",
-        "ticker": "GFF",
-        "title": "GFF bilanco"
+        "ticker": "CART",
+        "title": "CART bilanco"
+      },
+      {
+        "date": "2027-02-10",
+        "days": 103,
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "PINS",
+        "title": "PINS bilanco"
+      },
+      {
+        "date": "2027-02-16",
+        "days": 109,
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "LOPE",
+        "title": "LOPE bilanco"
+      },
+      {
+        "date": "2027-02-17",
+        "days": 110,
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "CARG",
+        "title": "CARG bilanco"
       }
     ]
   },
@@ -148,6 +148,7 @@
       "ALH",
       "ALLE",
       "ANAB",
+      "APPF",
       "AR",
       "ARHS",
       "AUPH",
@@ -157,6 +158,7 @@
       "BILL",
       "BKE",
       "BL",
+      "BOOT",
       "BOX",
       "BR",
       "BRBR",
@@ -213,6 +215,7 @@
       "JKHY",
       "KAI",
       "KFY",
+      "KLIC",
       "KRP",
       "KTB",
       "LEVI",
@@ -225,6 +228,7 @@
       "MITK",
       "MQ",
       "MSA",
+      "MWA",
       "MYE",
       "NBIX",
       "NRDS",
@@ -251,110 +255,138 @@
       {
         "headline": {
           "ev_ebit": {
-            "color": "green",
-            "own_5y_pct": 45.5,
-            "pct_basis": "universe",
-            "sector_pct": 5.9,
-            "value": 7.02
+            "color": "red",
+            "own_5y_pct": 0.0,
+            "pct_basis": "sector",
+            "sector_pct": 46.4,
+            "value": 29.11
           },
           "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 0.0,
-            "pct_basis": "universe",
-            "sector_pct": 82.9,
-            "value": 8.88
+            "color": "red",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 37.9,
+            "value": 2.64
           },
           "roic": {
             "color": "green",
             "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 55.3,
-            "value": 18.52
+            "pct_basis": "sector",
+            "sector_pct": 74.1,
+            "value": 25.43
           }
         },
-        "name": "DORIAN LPG LTD.",
-        "score": 65.5,
-        "ticker": "LPG"
+        "name": "KULICKE & SOFFA INDUSTRIES INC",
+        "score": 61.8,
+        "ticker": "KLIC"
       },
       {
         "headline": {
           "ev_ebit": {
+            "color": "yellow",
+            "own_5y_pct": 0.0,
+            "pct_basis": "sector",
+            "sector_pct": 0.0,
+            "value": 12.23
+          },
+          "fcf_yield_ev": {
+            "color": "yellow",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 87.5,
+            "value": 4.89
+          },
+          "roic": {
+            "color": "green",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 81.2,
+            "value": 20.93
+          }
+        },
+        "name": "Mueller Water Products, Inc.",
+        "score": 59.1,
+        "ticker": "MWA"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "red",
+            "own_5y_pct": 37.5,
+            "pct_basis": "sector",
+            "sector_pct": 31.2,
+            "value": 34.72
+          },
+          "fcf_yield_ev": {
+            "color": "yellow",
+            "own_5y_pct": 66.7,
+            "pct_basis": "sector",
+            "sector_pct": 16.7,
+            "value": 3.36
+          },
+          "roic": {
+            "color": "green",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 72.2,
+            "value": 50.45
+          }
+        },
+        "name": "APPFOLIO INC",
+        "score": 56.4,
+        "ticker": "APPF"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "green",
+            "own_5y_pct": 16.7,
+            "pct_basis": "universe",
+            "sector_pct": 17.1,
+            "value": 11.43
+          },
+          "fcf_yield_ev": {
             "color": "yellow",
             "own_5y_pct": 50.0,
             "pct_basis": "universe",
-            "sector_pct": 29.5,
-            "value": 14.38
-          },
-          "fcf_yield_ev": {
-            "color": "yellow",
-            "own_5y_pct": 41.7,
-            "pct_basis": "universe",
-            "sector_pct": 65.6,
-            "value": 5.09
+            "sector_pct": 39.4,
+            "value": 3.32
           },
           "roic": {
             "color": "green",
             "own_5y_pct": null,
             "pct_basis": "universe",
-            "sector_pct": 52.3,
-            "value": 17.38
+            "sector_pct": 58.3,
+            "value": 19.54
           }
         },
-        "name": "BRADY CORP",
-        "score": 61.2,
-        "ticker": "BRC"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "yellow",
-            "own_5y_pct": 0.0,
-            "pct_basis": "sector",
-            "sector_pct": 27.8,
-            "value": 17.87
-          },
-          "fcf_yield_ev": {
-            "color": "yellow",
-            "own_5y_pct": 91.7,
-            "pct_basis": "sector",
-            "sector_pct": 83.3,
-            "value": 5.42
-          },
-          "roic": {
-            "color": "green",
-            "own_5y_pct": null,
-            "pct_basis": "sector",
-            "sector_pct": 38.9,
-            "value": 20.68
-          }
-        },
-        "name": "GRACO INC",
-        "score": 57.8,
-        "ticker": "GGG"
+        "name": "Boot Barn Holdings, Inc.",
+        "score": 54.0,
+        "ticker": "BOOT"
       }
     ],
     "first_report": false,
     "left": []
   },
   "portfolio": {
-    "pnl_pct": 0.35,
+    "pnl_pct": 0.61,
     "position_count": 5,
-    "value_usd": 4429.32
+    "value_usd": 4440.18
   },
   "scan": {
-    "cycle": 14,
-    "data_missing": 168,
-    "done": 2700,
-    "eliminated": 2283,
-    "last_finalized": "2026-10-21",
-    "pct": 70.8,
-    "retry_queue": 168,
-    "survivors": 249,
-    "total": 3812
+    "cycle": 17,
+    "data_missing": 94,
+    "done": 1500,
+    "eliminated": 1269,
+    "last_finalized": "2026-10-29",
+    "pct": 39.4,
+    "retry_queue": 94,
+    "survivors": 137,
+    "total": 3806
   },
   "slice_drift": [],
   "source": "weekly",
   "triggered_breakers": [],
   "upcoming_earnings": [],
-  "week_of": "2026-10-19"
+  "week_of": "2026-10-26"
 }
