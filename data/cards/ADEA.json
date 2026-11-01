@@ -9,15 +9,14 @@
     "target_high": 50.0,
     "target_low": 39.0,
     "target_median": 41.5,
-    "upside_to_median": 84.6906987093903
+    "upside_to_median": 93.47318659168637
   },
-  "as_of": "2026-10-30",
+  "as_of": "2026-11-01",
   "calendar": {
     "estimated": false,
     "next_earnings": "2027-02-22"
   },
   "capped_for_scoring": {},
-  "change_1d_pct": -1.23,
   "data_quality": {
     "issue_count": 1,
     "issues": [
@@ -43,7 +42,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 2726.9,
+  "enterprise_value_musd": 2614.4,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -59,36 +58,39 @@
     ],
     "data_basis": "mixed",
     "is_manual": false,
-    "kill_reason": "Ima edilen buyume %5.5 > izin verilen %5.3 (gerceklesen %0.3)",
+    "kill_reason": null,
     "one_off_earnings": false,
     "passed_stages": [
       0,
       1,
-      2
+      2,
+      3
     ],
     "rev_growth_organic_suspect": false,
     "roic_method": "a",
-    "stage1_missing": [],
+    "stage1_missing": [
+      "gross_margin"
+    ],
     "warnings": [
       "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (operating_income, net_income, cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
     ],
-    "would_fail_at": 3,
+    "would_fail_at": null,
     "z_unreliable": false,
     "z_unreliable_reason": null
   },
-  "generated_at": "2026-10-29T06:05:18+00:00",
+  "generated_at": "2026-11-01T06:29:32+00:00",
   "insider": {
     "form4_count": 12,
     "last_form4": "2026-10-21",
     "window_days": 180
   },
-  "market_cap_musd": 2478.0,
+  "market_cap_musd": 2365.5,
   "metrics": {
     "altman_z": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 45.3,
+      "sector_pct": 45.8,
       "value": 7.06
     },
     "beneish_m": {
@@ -102,22 +104,22 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 44.4,
+      "sector_pct": 44.5,
       "value": 1.42
     },
     "current_ratio": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 79.0,
+      "sector_pct": 79.7,
       "value": 3.25
     },
     "earnings_yield": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 73.3,
-      "value": 6.42
+      "sector_pct": 77.2,
+      "value": 6.69
     },
     "ebitda_margin": {
       "color": "gray",
@@ -128,17 +130,17 @@
     },
     "ev_ebit": {
       "color": "yellow",
-      "own_5y_pct": 62.5,
+      "own_5y_pct": 37.5,
       "pct_basis": "universe",
-      "sector_pct": 28.2,
-      "value": 15.58
+      "sector_pct": 24.1,
+      "value": 14.94
     },
     "ev_ebitda": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 46.0,
-      "value": 15.42
+      "sector_pct": 42.2,
+      "value": 14.78
     },
     "ev_gross_profit": {
       "color": "gray",
@@ -149,10 +151,10 @@
     },
     "ev_sales": {
       "color": "yellow",
-      "own_5y_pct": 81.8,
+      "own_5y_pct": 72.7,
       "pct_basis": "universe",
-      "sector_pct": 80.9,
-      "value": 5.79
+      "sector_pct": 79.5,
+      "value": 5.55
     },
     "fcf_margin": {
       "color": "green",
@@ -172,15 +174,15 @@
       "color": "yellow",
       "own_5y_pct": 28.6,
       "pct_basis": "universe",
-      "sector_pct": 65.3,
-      "value": 5.73
+      "sector_pct": 67.8,
+      "value": 5.98
     },
     "fcf_yield_mcap": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 69.1,
-      "value": 6.31
+      "sector_pct": 72.1,
+      "value": 6.61
     },
     "gross_margin": {
       "color": "gray",
@@ -208,20 +210,20 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 5.31
+      "value": 4.74
     },
     "implied_vs_actual_growth": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 15.61
+      "value": 14.07
     },
     "interest_coverage": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 22.7,
+      "sector_pct": 22.5,
       "value": 4.85
     },
     "maturity_wall_2y": {
@@ -242,14 +244,14 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 76.6,
+      "sector_pct": 76.5,
       "value": 1.41
     },
     "operating_margin": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 93.3,
+      "sector_pct": 93.7,
       "value": 37.17
     },
     "operating_margin_change_3y": {
@@ -260,31 +262,31 @@
       "value": 2.29
     },
     "pct_off_52w_high": {
-      "color": "yellow",
+      "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 79.9,
-      "value": 34.57
+      "sector_pct": 85.2,
+      "value": 37.54
     },
     "pe": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 38.2,
-      "value": 22.3
+      "sector_pct": 33.0,
+      "value": 21.3
     },
     "peg": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 0.92
+      "value": 0.87
     },
     "piotroski_f": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 87.7,
+      "sector_pct": 87.9,
       "value": 8.0
     },
     "rel_strength_12m": {
@@ -292,28 +294,28 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 13.71
+      "value": 13.27
     },
     "rel_strength_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 6.0,
-      "value": -36.58
+      "sector_pct": 4.0,
+      "value": -37.42
     },
     "return_12m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 68.7,
-      "value": 26.73
+      "sector_pct": 60.9,
+      "value": 21.88
     },
     "return_6m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 7.5,
-      "value": -29.45
+      "sector_pct": 2.9,
+      "value": -35.0
     },
     "rev_cagr_3y": {
       "color": "red",
@@ -326,7 +328,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 89.6,
+      "sector_pct": 89.0,
       "value": 24.35
     },
     "roic": {
@@ -340,7 +342,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 91.6,
+      "sector_pct": 91.1,
       "value": 57.54
     },
     "rule_of_40_ebitda": {
@@ -361,34 +363,40 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 65.7,
+      "sector_pct": 64.9,
       "value": 0.24
     },
     "sbc_to_revenue": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 84.1,
+      "sector_pct": 83.9,
       "value": 7.85
     },
     "share_count_change_1y": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 54.9,
+      "sector_pct": 55.1,
       "value": -0.28
     },
     "sloan_accruals": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "universe",
-      "sector_pct": 52.5,
+      "sector_pct": 53.3,
       "value": -0.01
     }
   },
   "name": "Adeia Inc.",
   "net_debt_musd": 248.93,
   "news": [
+    {
+      "date": "2026-10-30",
+      "headline": "Paramount Global Says Nickelodeon Added Spin Master's Unicorn Academy and Vida the Vet to July Lineup, Marking US Linear Debuts on Nickelodeon and Nick Jr.",
+      "source": "Benzinga",
+      "url": "https://finnhub.io/api/news?id=216ac7290878078c87a7ce44230c5c214af4cc7777b101993f53c53a200a6b9f"
+    },
     {
       "date": "2026-10-29",
       "headline": "Roku, Google, Tubi, LG Electronics, Sony Pictures, and Many More Leading Streaming Executives to Gather in California for Parks Associates' Ninth Annual Future of Video",
@@ -430,27 +438,21 @@
       "headline": "What Gave IBM Stock Its Edge Over Cognizant?",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=6295291b53466b5a5bf5b26ecb83a18e04059ffe7d2ee263c473b6b0ae5e6a75"
-    },
-    {
-      "date": "2026-10-19",
-      "headline": "Adeia to Release Third Quarter 2026 Financial Results on November 2, 2026",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=c6bd0bc06372fc5dc00f2ff07fbe6b584e8367f310492eaba31a51ecb4a4ff6e"
     }
   ],
   "overrides": [],
   "percentile_pool": {
     "sector": 7,
-    "universe": 349
+    "universe": 351
   },
-  "price": 22.47,
-  "price_as_of": "2026-10-29",
+  "price": 21.45,
+  "price_as_of": "2026-10-30",
   "reverse_dcf": {
     "actual_growth_pct": 0.34,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 2726.9,
+    "enterprise_value_musd": 2614.4,
     "fcf_ttm_musd": 156.3,
-    "implied_growth_pct": 5.309007244312683,
+    "implied_growth_pct": 4.74,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -462,18 +464,18 @@
           "percentile": null
         },
         "cash_conversion": {
-          "percentile": 44.4,
-          "scaled": 44.4,
+          "percentile": 44.5,
+          "scaled": 44.5,
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 87.7,
-          "scaled": 87.7,
+          "percentile": 87.9,
+          "scaled": 87.9,
           "weight": 0.25
         },
         "sloan_accruals": {
-          "percentile": 52.5,
-          "scaled": 47.5,
+          "percentile": 53.3,
+          "scaled": 46.7,
           "weight": 0.25
         }
       },
@@ -483,13 +485,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 29.5,
-          "scaled": 29.5,
+          "percentile": 8.8,
+          "scaled": 8.8,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 6.0,
-          "scaled": 6.0,
+          "percentile": 4.0,
+          "scaled": 4.0,
           "weight": 0.4
         }
       },
@@ -517,8 +519,8 @@
           "weight": 0.3
         },
         "rule_of_40": {
-          "percentile": 91.6,
-          "scaled": 91.6,
+          "percentile": 91.1,
+          "scaled": 91.1,
           "weight": 0.15
         }
       },
@@ -528,23 +530,23 @@
     "safety": {
       "components": {
         "altman_z": {
-          "percentile": 45.3,
-          "scaled": 45.3,
+          "percentile": 45.8,
+          "scaled": 45.8,
           "weight": 0.3
         },
         "current_ratio": {
-          "percentile": 79.0,
-          "scaled": 79.0,
+          "percentile": 79.7,
+          "scaled": 79.7,
           "weight": 0.2
         },
         "interest_coverage": {
-          "percentile": 22.7,
-          "scaled": 22.7,
+          "percentile": 22.5,
+          "scaled": 22.5,
           "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 76.6,
-          "scaled": 23.4,
+          "percentile": 76.5,
+          "scaled": 23.5,
           "weight": 0.3
         }
       },
@@ -554,13 +556,13 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 73.3,
-          "scaled": 73.3,
+          "percentile": 77.2,
+          "scaled": 77.2,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 28.2,
-          "scaled": 71.8,
+          "percentile": 24.1,
+          "scaled": 75.9,
           "weight": 0.3
         },
         "ev_gross_profit": {
@@ -568,13 +570,13 @@
           "percentile": null
         },
         "ev_sales": {
-          "percentile": 80.9,
-          "scaled": 19.1,
+          "percentile": 79.5,
+          "scaled": 20.5,
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 65.3,
-          "scaled": 65.3,
+          "percentile": 67.8,
+          "scaled": 67.8,
           "weight": 0.25
         }
       },
@@ -626,12 +628,12 @@
       "safety": 1.0,
       "value": 0.8
     },
-    "earnings_quality": 58.9,
-    "momentum": 20.1,
-    "quality": 71.6,
-    "safety": 40.9,
-    "total": 50.0,
-    "value": 60.1,
+    "earnings_quality": 58.8,
+    "momentum": 6.9,
+    "quality": 71.4,
+    "safety": 41.2,
+    "total": 49.9,
+    "value": 63.1,
     "weight_coverage": 0.85
   },
   "sector": "Iletisim",
@@ -680,66 +682,66 @@
       "2026-06-30"
     ],
     "price_sparkline": [
-      33.0,
-      27.825,
-      27.42,
-      31.84,
-      31.72,
-      27.4,
-      26.41,
-      26.86,
+      33.63,
+      29.16,
+      29.53,
+      31.18,
+      31.48,
+      26.42,
+      26.36,
       28.25,
-      26.71,
-      30.66,
-      32.36,
-      31.55,
-      32.62,
-      32.34,
-      31.38,
-      31.81,
-      30.06,
-      30.82,
-      32.93,
-      29.19,
-      28.39,
+      27.2,
+      28.61,
+      32.05,
       28.98,
-      27.94,
-      25.9,
-      26.21,
-      27.28,
-      25.95,
-      25.15,
-      25.4,
-      31.21,
-      28.31,
-      27.86,
-      28.11,
-      29.83,
-      28.02,
-      26.96,
-      26.28,
-      26.22,
-      25.23,
-      24.98,
-      26.5,
-      26.79,
-      26.71,
-      24.9,
-      24.92,
-      25.53,
-      25.01,
-      24.92,
-      25.6,
-      25.74,
-      24.6,
-      24.115,
-      23.21,
-      21.61,
-      21.05,
-      22.56,
-      21.21,
-      22.7,
-      22.47
+      30.53,
+      31.92,
+      31.8,
+      31.81,
+      30.39,
+      30.38,
+      33.0,
+      32.05,
+      29.33,
+      28.58,
+      27.68,
+      27.67,
+      25.38,
+      27.92,
+      26.91,
+      26.07,
+      23.16,
+      26.65,
+      29.91,
+      28.23,
+      27.72,
+      28.69,
+      29.67,
+      27.49,
+      26.25,
+      27.13,
+      25.72,
+      24.37,
+      25.46,
+      27.2,
+      26.305,
+      24.66,
+      24.97,
+      24.82,
+      25.83,
+      25.48,
+      24.72,
+      25.34,
+      26.07,
+      24.31,
+      23.89,
+      23.13,
+      21.74,
+      21.3,
+      21.27,
+      21.43,
+      22.75,
+      21.45
     ],
     "quarters": [
       "2023-09",
@@ -825,7 +827,7 @@
     "why_cheap_diagnosis": "İHMAL + patent uçurumu korkusu (kısmen oynandı)",
     "why_cheap_rationale": "'Pay-TV ölüyor' tezi 2025'te forward F/K'yı ~10x'e çekmişti; Disney/Google yenilemeleri ve yarı iletken çeşitlenmesi ile 1 yılda +%83, forward F/K ~18x. Kendi tarihine göre artık orta-üst bant."
   },
-  "story_age_days": 50,
+  "story_age_days": 52,
   "ticker": "ADEA",
   "track": "A",
   "ttm": {
