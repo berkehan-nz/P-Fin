@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-01",
+  "as_of": "2026-11-02",
   "candidates": [
     {
       "as_of": "2026-11-01",
@@ -7781,6 +7781,147 @@
       "warning_count": 1,
       "warnings": [
         "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (operating_income, net_income). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
+      ],
+      "why_cheap": ""
+    },
+    {
+      "as_of": "2026-11-02",
+      "claude_verdict": "",
+      "core": {
+        "fcf_yield_ev": 5.73,
+        "gross_margin": 49.24,
+        "net_debt_to_ebitda": 0.05,
+        "piotroski_f": 6.0,
+        "rev_growth_ttm": 5.74,
+        "roic": 21.41
+      },
+      "data_quality": "iyi",
+      "decision": "",
+      "flags": {
+        "is_manual": false,
+        "one_off_earnings": false,
+        "rev_growth_organic_suspect": false,
+        "z_unreliable": false
+      },
+      "headline": {
+        "ev_ebit": {
+          "color": "yellow",
+          "own_5y_pct": 41.7,
+          "pct_basis": "universe",
+          "sector_pct": 32.0,
+          "value": 16.17
+        },
+        "fcf_yield_ev": {
+          "color": "yellow",
+          "own_5y_pct": 100.0,
+          "pct_basis": "universe",
+          "sector_pct": 68.4,
+          "value": 5.73
+        },
+        "roic": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "universe",
+          "sector_pct": 66.5,
+          "value": 21.41
+        }
+      },
+      "low_coverage_blocks": {},
+      "market_cap_musd": 2081.0,
+      "name": "ENERPAC TOOL GROUP CORP",
+      "percentile_pool": {
+        "sector": 6,
+        "universe": 103
+      },
+      "price": 40.56,
+      "price_as_of": "2026-10-30",
+      "scores": {
+        "catalyst": null,
+        "coverage_factors": {
+          "earnings_quality": 1.0,
+          "momentum": 1.0,
+          "quality": 1.0,
+          "safety": 0.8,
+          "value": 1.0
+        },
+        "earnings_quality": 53.3,
+        "momentum": 67.9,
+        "quality": 54.4,
+        "safety": 63.8,
+        "total": 59.2,
+        "value": 61.4,
+        "weight_coverage": 0.72
+      },
+      "sector": "Makine ve bilgisayar donanimi",
+      "source": "funnel",
+      "sparkline": [
+        34.67,
+        35.77,
+        35.52,
+        34.41,
+        34.66,
+        33.13,
+        34.19,
+        34.76,
+        33.81,
+        32.93,
+        33.02,
+        33.45,
+        35.04,
+        35.05,
+        35.59,
+        36.6,
+        35.38,
+        37.07,
+        35.49,
+        34.94,
+        35.21,
+        36.46,
+        34.75,
+        34.47,
+        34.61,
+        33.93,
+        34.34,
+        34.88,
+        36.33,
+        35.74,
+        36.97,
+        37.72,
+        37.26,
+        36.91,
+        37.08,
+        36.74,
+        37.25,
+        37.3,
+        37.61,
+        36.63,
+        36.94,
+        37.03,
+        35.4,
+        34.49,
+        35.84,
+        35.36,
+        35.77,
+        35.7,
+        35.33,
+        34.97,
+        36.02,
+        35.08,
+        34.93,
+        35.22,
+        35.07,
+        35.56,
+        35.63,
+        35.29,
+        35.7,
+        40.56
+      ],
+      "story_age_days": null,
+      "ticker": "EPAC",
+      "track": "A",
+      "warning_count": 1,
+      "warnings": [
+        "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
       ],
       "why_cheap": ""
     },
@@ -16413,7 +16554,7 @@
     }
   ],
   "counts": {
-    "funnel": 116,
+    "funnel": 117,
     "manual": 0,
     "seed": 36
   },
@@ -16421,12 +16562,12 @@
   "partial": {
     "cycle": 18,
     "is_partial": true,
-    "last_batch_at": "2026-11-01T23:00:54+00:00",
-    "pct": 23.6,
-    "ranked": 25,
-    "remaining": 2906,
-    "scanned": 900,
-    "survivors": 74,
+    "last_batch_at": "2026-11-02T02:40:58+00:00",
+    "pct": 31.5,
+    "ranked": 36,
+    "remaining": 2606,
+    "scanned": 1200,
+    "survivors": 103,
     "universe": 3806
   },
   "seed": [
