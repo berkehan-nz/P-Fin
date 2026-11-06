@@ -3,6 +3,22 @@
   "calendar": {
     "recent": [
       {
+        "date": "2026-11-05",
+        "detail": "Onemli olay bildirimi",
+        "kind": "sec",
+        "ticker": "INSW",
+        "title": "INSW · 8-K",
+        "url": "https://www.sec.gov/Archives/edgar/data/1679049/000110465926123058/tm2629068d1_8k.htm"
+      },
+      {
+        "date": "2026-11-05",
+        "detail": "Ceyreklik rapor",
+        "kind": "sec",
+        "ticker": "INSW",
+        "title": "INSW · 10-Q",
+        "url": "https://www.sec.gov/Archives/edgar/data/1679049/000110465926123078/insw-20260930x10q.htm"
+      },
+      {
         "date": "2026-11-04",
         "detail": "Onemli olay bildirimi",
         "kind": "sec",
@@ -22,22 +38,6 @@
         "date": "2026-11-04",
         "detail": "Onemli olay bildirimi",
         "kind": "sec",
-        "ticker": "HUBS",
-        "title": "HUBS · 8-K",
-        "url": "https://www.sec.gov/Archives/edgar/data/1404655/000119312526447249/hubs-20261104.htm"
-      },
-      {
-        "date": "2026-11-04",
-        "detail": "Ceyreklik rapor",
-        "kind": "sec",
-        "ticker": "HUBS",
-        "title": "HUBS · 10-Q",
-        "url": "https://www.sec.gov/Archives/edgar/data/1404655/000119312526447363/hubs-20260930.htm"
-      },
-      {
-        "date": "2026-11-04",
-        "detail": "Onemli olay bildirimi",
-        "kind": "sec",
         "ticker": "EPAC",
         "title": "EPAC · 8-K",
         "url": "https://www.sec.gov/Archives/edgar/data/6955/000114036126041888/ef20084875_8k.htm"
@@ -49,6 +49,14 @@
         "ticker": "CHRD",
         "title": "CHRD · 8-K",
         "url": "https://www.sec.gov/Archives/edgar/data/1486159/000148615926000046/oas-20261104.htm"
+      },
+      {
+        "date": "2026-11-03",
+        "detail": "Onemli olay bildirimi",
+        "kind": "sec",
+        "ticker": "INSW",
+        "title": "INSW · 8-K",
+        "url": "https://www.sec.gov/Archives/edgar/data/1679049/000110465926121663/tm2628788d1_8k.htm"
       },
       {
         "date": "2026-11-02",
@@ -193,14 +201,6 @@
         "ticker": "LOGI",
         "title": "LOGI · 10-Q",
         "url": "https://www.sec.gov/Archives/edgar/data/1032975/000103297526000063/logi-20260930.htm"
-      },
-      {
-        "date": "2026-10-28",
-        "detail": "Onemli olay bildirimi",
-        "kind": "sec",
-        "ticker": "EPAC",
-        "title": "EPAC · 8-K",
-        "url": "https://www.sec.gov/Archives/edgar/data/6955/000117184326006921/f8k_102826.htm"
       }
     ],
     "source": "fred+finnhub+sec",
@@ -337,15 +337,22 @@
         "kind": "bilanco",
         "ticker": "DV",
         "title": "DV bilanco"
+      },
+      {
+        "date": "2027-02-24",
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "INSW",
+        "title": "INSW bilanco"
       }
     ]
   },
-  "generated_at": "2026-11-06T14:58:16+00:00",
+  "generated_at": "2026-11-06T20:51:31+00:00",
   "market": [
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": 0.94,
-      "change_5d_pct": -2.08,
+      "change_1d_pct": 0.42,
+      "change_5d_pct": -2.57,
       "group": "Hisse",
       "label": "S&P 500",
       "series": [
@@ -378,16 +385,16 @@
         7568.9199,
         7688.6201,
         7353.73,
-        7422.5601
+        7384.8999
       ],
       "symbol": "^GSPC",
       "unit": "puan",
-      "value": 7422.5601
+      "value": 7384.8999
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": 1.72,
-      "change_5d_pct": -2.77,
+      "change_1d_pct": 1.18,
+      "change_5d_pct": -3.28,
       "group": "Hisse",
       "label": "Nasdaq",
       "series": [
@@ -420,16 +427,16 @@
         25372.0098,
         25736.5098,
         24315.0,
-        24732.666
+        24601.4316
       ],
       "symbol": "^IXIC",
       "unit": "puan",
-      "value": 24732.666
+      "value": 24601.4316
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": 0.09,
-      "change_5d_pct": -2.83,
+      "change_1d_pct": 1.14,
+      "change_5d_pct": -1.81,
       "group": "Hisse",
       "label": "Russell 2000",
       "series": [
@@ -462,16 +469,16 @@
         2812.45,
         2856.95,
         2729.8899,
-        2732.2214
+        2761.0383
       ],
       "symbol": "^RUT",
       "unit": "puan",
-      "value": 2732.2214
+      "value": 2761.0383
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": -1.39,
-      "change_5d_pct": 0.22,
+      "change_1d_pct": -0.98,
+      "change_5d_pct": 0.64,
       "group": "Hisse",
       "label": "Euro Stoxx 50",
       "series": [
@@ -504,19 +511,20 @@
         6144.5601,
         6265.71,
         6231.54,
-        6145.02
+        6170.4902
       ],
       "symbol": "^STOXX50E",
       "unit": "puan",
-      "value": 6145.02
+      "value": 6170.4902
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": -5.96,
-      "change_5d_pct": -11.17,
+      "change_1d_pct": -1.79,
+      "change_5d_pct": -4.5,
       "group": "Hisse",
       "label": "Nikkei 225",
       "series": [
+        65018.9492,
         65513.9883,
         66364.2031,
         65877.6172,
@@ -545,12 +553,11 @@
         63290.1094,
         63081.8594,
         62188.6289,
-        61077.8984,
-        57434.7695
+        61077.8984
       ],
       "symbol": "^N225",
       "unit": "puan",
-      "value": 57434.7695
+      "value": 61077.8984
     },
     {
       "as_of": "2026-11-06",
@@ -588,16 +595,16 @@
         11023.5996,
         11478.0996,
         11333.2998,
-        11482.4404
+        11482.5996
       ],
       "symbol": "XU100.IS",
       "unit": "puan",
-      "value": 11482.4404
+      "value": 11482.5996
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": -11.67,
-      "change_5d_pct": 28.17,
+      "change_1d_pct": -13.63,
+      "change_5d_pct": 25.33,
       "group": "Risk",
       "label": "VIX (korku)",
       "series": [
@@ -630,16 +637,16 @@
         20.83,
         16.61,
         28.18,
-        24.89
+        24.34
       ],
       "symbol": "^VIX",
       "unit": "puan",
-      "value": 24.89
+      "value": 24.34
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": 0.85,
-      "change_5d_pct": -1.03,
+      "change_1d_pct": 0.45,
+      "change_5d_pct": -1.42,
       "group": "Faiz",
       "label": "ABD 10 yillik",
       "series": [
@@ -672,16 +679,16 @@
         4.952,
         4.894,
         4.837,
-        4.878
+        4.859
       ],
       "symbol": "^TNX",
       "unit": "%",
-      "value": 4.878
+      "value": 4.859
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": 0.68,
-      "change_5d_pct": 0.35,
+      "change_1d_pct": 0.74,
+      "change_5d_pct": 0.42,
       "group": "Kur",
       "label": "Dolar endeksi",
       "series": [
@@ -714,16 +721,16 @@
         101.87,
         101.51,
         101.55,
-        102.24
+        102.306
       ],
       "symbol": "DX-Y.NYB",
       "unit": "puan",
-      "value": 102.24
+      "value": 102.306
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": -0.73,
-      "change_5d_pct": -0.26,
+      "change_1d_pct": -0.85,
+      "change_5d_pct": -0.39,
       "group": "Kur",
       "label": "EUR/USD",
       "series": [
@@ -756,16 +763,16 @@
         1.1192,
         1.1207,
         1.1235,
-        1.1153
+        1.114
       ],
       "symbol": "EURUSD=X",
       "unit": "kur",
-      "value": 1.1153
+      "value": 1.114
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": 0.23,
-      "change_5d_pct": 0.42,
+      "change_1d_pct": 0.22,
+      "change_5d_pct": 0.41,
       "group": "Kur",
       "label": "USD/TRY",
       "series": [
@@ -798,16 +805,16 @@
         49.9873,
         50.0102,
         50.0376,
-        50.1526
+        50.1493
       ],
       "symbol": "TRY=X",
       "unit": "kur",
-      "value": 50.1526
+      "value": 50.1493
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": 0.07,
-      "change_5d_pct": -13.0,
+      "change_1d_pct": 0.3,
+      "change_5d_pct": -12.8,
       "group": "Emtia",
       "label": "Brent/WTI ham",
       "series": [
@@ -840,16 +847,16 @@
         96.09,
         88.12,
         90.52,
-        90.58
+        90.79
       ],
       "symbol": "CL=F",
       "unit": "USD",
-      "value": 90.58
+      "value": 90.79
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": -1.46,
-      "change_5d_pct": 3.96,
+      "change_1d_pct": -0.98,
+      "change_5d_pct": 4.47,
       "group": "Emtia",
       "label": "Altin",
       "series": [
@@ -882,16 +889,16 @@
         3940.3999,
         4073.0,
         4113.5,
-        4053.3999
+        4073.0
       ],
       "symbol": "GC=F",
       "unit": "USD",
-      "value": 4053.3999
+      "value": 4073.0
     },
     {
       "as_of": "2026-11-06",
-      "change_1d_pct": -0.87,
-      "change_5d_pct": -3.79,
+      "change_1d_pct": -0.24,
+      "change_5d_pct": -3.18,
       "group": "Kripto",
       "label": "Bitcoin",
       "series": [
@@ -924,11 +931,11 @@
         77345.0469,
         80405.2891,
         75942.125,
-        75280.7891
+        75760.5469
       ],
       "symbol": "BTC-USD",
       "unit": "USD",
-      "value": 75280.7891
+      "value": 75760.5469
     }
   ],
   "news": [
@@ -955,6 +962,20 @@
     },
     {
       "date": "2026-11-06",
+      "headline": "CRGY Stock After Q3 Earnings: Is More Upside on the Horizon?",
+      "source": "Yahoo",
+      "ticker": "CHRD",
+      "url": "https://finnhub.io/api/news?id=5de9933086f8e39cbe2c32929d07c4e34a16920d8e3ab933c0dd0317e2c0d150"
+    },
+    {
+      "date": "2026-11-06",
+      "headline": "Chord Energy (CHRD) Could Be 27% Below Fair Value After Q3 Earnings",
+      "source": "Yahoo",
+      "ticker": "CHRD",
+      "url": "https://finnhub.io/api/news?id=58fcab8c499ab27bd37e1e405987438e8af89f6eb52062cf189a3c18d1a9c354"
+    },
+    {
+      "date": "2026-11-06",
       "headline": "Wells Fargo Maintains Overweight on Chord Energy, Lowers Price Target to $173",
       "source": "Benzinga",
       "ticker": "CHRD",
@@ -962,10 +983,17 @@
     },
     {
       "date": "2026-11-06",
-      "headline": "Chord Energy Corp (CHRD) (Q3 2026) Earnings Call Highlights: $442 Million Free Cash Flow, 17% ...",
+      "headline": "Micron Stock Is the Cheapest Right Now -- Here's Why",
       "source": "Yahoo",
-      "ticker": "CHRD",
-      "url": "https://finnhub.io/api/news?id=193bbd1f29951c03e77550c42b18e44c8249230265b1dcf8ad4d93ab7c5eb47b"
+      "ticker": "CRUS",
+      "url": "https://finnhub.io/api/news?id=3702387b7bbdcfc00f4cea2907e7ca013d6d5a613d78f1b30ad0b350d590effd"
+    },
+    {
+      "date": "2026-11-06",
+      "headline": "Do Options Traders Know Something About Deckers Outdoor We Don't?",
+      "source": "Yahoo",
+      "ticker": "DECK",
+      "url": "https://finnhub.io/api/news?id=d4ff3716cc4bdf1fc4eb44206abccef8768d788e40c5c14d1152d7ee05b29621"
     },
     {
       "date": "2026-11-06",
@@ -983,31 +1011,38 @@
     },
     {
       "date": "2026-11-06",
-      "headline": "Needham Maintains Buy on Globus Medical, Lowers Price Target to $100",
-      "source": "Benzinga",
-      "ticker": "GMED",
-      "url": "https://finnhub.io/api/news?id=24066e63a3ef44ba7c0e65a260a24711190aa62dd0e9385be0a5b7229ab23e5b"
-    },
-    {
-      "date": "2026-11-06",
-      "headline": "This Strategic Education Analyst Is No Longer Bullish; Here Are Top 5 Downgrades For Friday",
-      "source": "Benzinga",
-      "ticker": "GMED",
-      "url": "https://finnhub.io/api/news?id=393c53399056db94d43630612ac3ea61ab8f82913e6246c40a67697a1dd9b6d3"
-    },
-    {
-      "date": "2026-11-06",
-      "headline": "Globus Medical (GMED) Q3 2026 Earnings Call Transcript",
+      "headline": "HIMS' Q3 Earnings: Can Weight Loss Momentum Drive Performance?",
       "source": "Yahoo",
       "ticker": "GMED",
-      "url": "https://finnhub.io/api/news?id=4b45d46e226ac3b969f8da955c98a47ea3bb317aaadb5920ff6cf95f9e944b7d"
+      "url": "https://finnhub.io/api/news?id=4c7590b65a859c048824680cffdede3242804c6a226e16b5d046b089b1f905d4"
     },
     {
       "date": "2026-11-06",
-      "headline": "HubSpot: 3 Key Takeaways for Long-Term Investors",
+      "headline": "Reasons to Add HealthEquity Stock to Your Portfolio for Now",
       "source": "Yahoo",
-      "ticker": "HUBS",
-      "url": "https://finnhub.io/api/news?id=ab990a0443c70ed5ada78d7613888e5bd56451a8fc6d56fa8d1049a195b36e9f"
+      "ticker": "GMED",
+      "url": "https://finnhub.io/api/news?id=9ffbdd3046d95a092d9cf531e4ca7d7902df7c84f407b1f673353e3c5499cb4a"
+    },
+    {
+      "date": "2026-11-06",
+      "headline": "SOLV Q3 Earnings Beat Estimates Despite ERP-Related Revenues Decline",
+      "source": "Yahoo",
+      "ticker": "GMED",
+      "url": "https://finnhub.io/api/news?id=1d90c6753032608e22aa9e9d1a641a5bb3ba45fa449bff61e1b10b3f98bf9bce"
+    },
+    {
+      "date": "2026-11-06",
+      "headline": "International Seaways, Inc. (INSW) Q3 2026 Earnings Call Transcript",
+      "source": "SeekingAlpha",
+      "ticker": "INSW",
+      "url": "https://finnhub.io/api/news?id=b171f3797b1a41b8ece0eeb94528714ea51e6fb53e187923f40bf10a403f00fa"
+    },
+    {
+      "date": "2026-11-06",
+      "headline": "International Seaways Inc (INSW) Q3 2026 Earnings Call Highlights: Record $344 Million Net ...",
+      "source": "Yahoo",
+      "ticker": "INSW",
+      "url": "https://finnhub.io/api/news?id=942b18500d7edb32d8f01f34c7afc5d2359adc6aa0033796ff95bcbfc2ad6ced"
     },
     {
       "date": "2026-11-06",
@@ -1032,17 +1067,17 @@
     },
     {
       "date": "2026-11-06",
+      "headline": "NerdWallet, Inc. (NRDS) Q3 2026 Earnings Call Transcript",
+      "source": "SeekingAlpha",
+      "ticker": "NRDS",
+      "url": "https://finnhub.io/api/news?id=59d757f0f6b9ac808ea8401799715f43ac9e0cc898acfdd9fb4116628b308ce2"
+    },
+    {
+      "date": "2026-11-06",
       "headline": "DraftKings Posts Downbeat Q3 Results, Joins Atlassian, Natera And Other Big Stocks Moving Lower In Friday’s Pre-Market Session",
       "source": "Benzinga",
       "ticker": "NRDS",
       "url": "https://finnhub.io/api/news?id=e405cfc8a0c96beb47ba5c6844abeedd9c119814a4e45cc3a5672d557969b2de"
-    },
-    {
-      "date": "2026-11-06",
-      "headline": "Nerdwallet Inc (NRDS) (Q3 2026) Earnings Call Highlights: Revenue Miss, Auto Insurance Woes, ...",
-      "source": "Yahoo",
-      "ticker": "NRDS",
-      "url": "https://finnhub.io/api/news?id=33e31b89d8fc4dd97132be30e2ffa38617c9e18eeb510fd0e371e012d2d34d88"
     },
     {
       "date": "2026-11-06",
@@ -1067,10 +1102,31 @@
     },
     {
       "date": "2026-11-06",
+      "headline": "Perdoceo Education Corporation (PRDO) Q3 2026 Earnings Call Prepared Remarks Transcript",
+      "source": "SeekingAlpha",
+      "ticker": "PRDO",
+      "url": "https://finnhub.io/api/news?id=3f84a516486c7fa816c5e2046de3020385849f0a7cddab0422544a8df3a5ba2f"
+    },
+    {
+      "date": "2026-11-06",
+      "headline": "October Jobs Report: Bad News May Finally Be Bad News",
+      "source": "SeekingAlpha",
+      "ticker": "QQQM",
+      "url": "https://finnhub.io/api/news?id=f79ce4688b4ffecad72cd7cae313ac33ea8c9f9703248ad59cc7c95c0c6db8c3"
+    },
+    {
+      "date": "2026-11-06",
       "headline": "Chart Of The Day: Now, That's What I Call A Fake-Out",
       "source": "SeekingAlpha",
       "ticker": "QQQM",
       "url": "https://finnhub.io/api/news?id=7d4dc6e1cfd29e500fd1886a81c5615e7ff98dfbe034b42e93cdba3ecea8cf1a"
+    },
+    {
+      "date": "2026-11-06",
+      "headline": "Robust U.S. Jobs Market Boosts December Rate Hike Chances",
+      "source": "SeekingAlpha",
+      "ticker": "SGOV",
+      "url": "https://finnhub.io/api/news?id=cdbf73f14492a3d44558e4244e42e1108caa46abaff4984cf00a33eff060e4cb"
     },
     {
       "date": "2026-11-06",
@@ -1088,24 +1144,24 @@
     },
     {
       "date": "2026-11-06",
-      "headline": "October Jobs Report: Exceeding Job Growth Caps Off Tumultuous Trading Week",
-      "source": "SeekingAlpha",
+      "headline": "VOO Is Down 6% From Its High. Over the Past Year It's Up 10%. Which Number Should Investors Focus On?",
+      "source": "Yahoo",
       "ticker": "VOO",
-      "url": "https://finnhub.io/api/news?id=eed73d40936511cc92b72b6c6a0a358cef33a9c9d0835d842617e39f2cbdb5f9"
+      "url": "https://finnhub.io/api/news?id=d5d0d18a4677cd25727b5d33e7497fb26069c6076217f48842e6b1cb9d767ad4"
     },
     {
       "date": "2026-11-06",
-      "headline": "AI Bubble Burst: The 'House Of Cards' Is Collapsing",
+      "headline": "Top 20 S&P 500 Ranked By PEG Ratio After Massive Tech Route",
       "source": "SeekingAlpha",
       "ticker": "VOO",
-      "url": "https://finnhub.io/api/news?id=9422a40149f970b93ab5d4c671191dcde6bfbea4c40bb5f32fbaf196d9ad56c8"
+      "url": "https://finnhub.io/api/news?id=f896b8d63598a82fe40a4aab1f177a637fa12b0a556b1f8a8a135c768708d9e8"
     },
     {
       "date": "2026-11-06",
-      "headline": "AI Meets Politics: A New Test For Tech Stocks",
+      "headline": "MAGMA +2%, BATMANS -15%: The Market Got The Midterm Backwards",
       "source": "SeekingAlpha",
       "ticker": "VOO",
-      "url": "https://finnhub.io/api/news?id=39e46ea0a22942629062d3525159824b0d26906bb6aa911f626b62efda5a10c5"
+      "url": "https://finnhub.io/api/news?id=5ceb14fd166eb98d5f806fc82fdd8f51a0173f5089b48807979569a18bc5f0fa"
     },
     {
       "date": "2026-11-05",
@@ -1158,62 +1214,13 @@
     },
     {
       "date": "2026-11-05",
-      "headline": "Chord Energy (CHRD) Q3 2026 Earnings Call Transcript",
-      "source": "Yahoo",
-      "ticker": "CHRD",
-      "url": "https://finnhub.io/api/news?id=8eccfa9d8e421851129ff2aae2a93397f1c5426d8411750080bf3064c79a0713"
-    },
-    {
-      "date": "2026-11-05",
       "headline": "Cirrus Logic (CRUS) Q2 2027 Earnings Call Transcript",
       "source": "Yahoo",
       "ticker": "CRUS",
       "url": "https://finnhub.io/api/news?id=eddbb65c8cc42f986bafe4846160484d2b397b5c86e1b9772ca85ba5bfbdf504"
-    },
-    {
-      "date": "2026-11-05",
-      "headline": "Shares Flat on M/Com's New USB Receiver  - Analyst Blog",
-      "source": "Benzinga",
-      "ticker": "CRUS",
-      "url": "https://finnhub.io/api/news?id=8c2e43b293fc05f5e6494439e8535b3123714b42f1fbe23b9d999f147e92482a"
-    },
-    {
-      "date": "2026-11-05",
-      "headline": "Cirrus Logic, Inc. Q2 2027 Earnings Call Summary",
-      "source": "Yahoo",
-      "ticker": "CRUS",
-      "url": "https://finnhub.io/api/news?id=86e653d8016d54841abd784e17b700e543f7449310ce49076a5ff3d392851ae7"
-    },
-    {
-      "date": "2026-11-05",
-      "headline": "Argus Research Maintains Buy on Deckers Outdoor, Lowers Price Target to $102",
-      "source": "Benzinga",
-      "ticker": "DECK",
-      "url": "https://finnhub.io/api/news?id=9d65fddee1787087f153701cc9e9e93d7e0606753e2e807d2becad4536dd2a52"
-    },
-    {
-      "date": "2026-11-05",
-      "headline": "Deckers: Moderate Growth Could Be Enough For Achieving Attractive Returns At Current Valuation",
-      "source": "SeekingAlpha",
-      "ticker": "DECK",
-      "url": "https://finnhub.io/api/news?id=da5075cc1f3866199e5e3931d7179eedb9b784eb8a8237641debf09231c6654b"
-    },
-    {
-      "date": "2026-11-05",
-      "headline": "Docusign vs. Monday.com: Which Technology Stock Is a Better Buy for 2027?",
-      "source": "Yahoo",
-      "ticker": "DOCU",
-      "url": "https://finnhub.io/api/news?id=dc5fc348f7865558dc3b5986e30c445cc57d26fc56dc1db71f735f60cc26fad3"
-    },
-    {
-      "date": "2026-11-05",
-      "headline": "GC AI and Docusign Partner to Turn Agreements into Legal Intelligence",
-      "source": "Yahoo",
-      "ticker": "DOCU",
-      "url": "https://finnhub.io/api/news?id=4fa374461c601d8f4b37f086ee0fe66940a13733810d9bdaf456c18ce8192676"
     }
   ],
-  "risk_note": "VIX 25 — normal aralikta.",
+  "risk_note": "VIX 24 — normal aralikta.",
   "source": "yfinance+finnhub+fred+sec",
   "tracked_count": 28
 }
