@@ -1,23 +1,22 @@
 {
   "analyst": {
-    "analyst_count": 21,
+    "analyst_count": 20,
     "buy": 20,
     "hold": 3,
     "recommendation": "strong_buy",
     "sell": 0,
     "source": "yfinance",
     "target_high": 38.0,
-    "target_low": 19.0,
-    "target_median": 25.0,
-    "upside_to_median": 20.13455069678041
+    "target_low": 22.5,
+    "target_median": 27.0,
+    "upside_to_median": 30.37180682563756
   },
-  "as_of": "2026-11-06",
+  "as_of": "2026-11-08",
   "calendar": {
     "estimated": true,
     "next_earnings": "2027-02-03"
   },
   "capped_for_scoring": {},
-  "change_1d_pct": -2.57,
   "data_quality": {
     "issue_count": 1,
     "issues": [
@@ -33,7 +32,7 @@
     "analyst": "yfinance",
     "fundamentals": "sec_companyfacts",
     "news": "finnhub",
-    "period_end": "2026-06-30",
+    "period_end": "2026-09-30",
     "price": "yfinance",
     "shares": "seyreltilmis_agirlikli_ortalama"
   },
@@ -43,50 +42,54 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 5344.8,
+  "enterprise_value_musd": 5227.4,
   "exchange": "NYSE",
   "flags": {
     "annual_fallback_fields": [
+      "cfi",
       "cff",
       "shares_diluted",
       "shares_basic"
     ],
     "data_basis": "quarterly_ttm",
     "is_manual": false,
-    "kill_reason": "Hisse sayisi artisi %9.2 >= %5",
+    "kill_reason": null,
     "one_off_earnings": false,
     "passed_stages": [
-      0
+      0,
+      1,
+      2,
+      3
     ],
     "rev_growth_organic_suspect": false,
     "roic_method": "a",
     "stage1_missing": [],
     "warnings": [],
-    "would_fail_at": 1,
+    "would_fail_at": null,
     "z_unreliable": false,
     "z_unreliable_reason": null
   },
-  "generated_at": "2026-11-04T22:44:24+00:00",
+  "generated_at": "2026-11-08T07:35:35+00:00",
   "insider": {
     "form4_count": 28,
     "last_form4": "2026-10-09",
     "window_days": 180
   },
-  "market_cap_musd": 6177.5,
+  "market_cap_musd": 5932.8,
   "metrics": {
     "altman_z": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 70.6,
-      "value": 6.75
+      "sector_pct": 55.1,
+      "value": 5.97
     },
     "beneish_m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 15.4,
-      "value": -3.19
+      "sector_pct": 13.5,
+      "value": -3.24
     },
     "cash_conversion": {
       "color": "gray",
@@ -99,22 +102,22 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 81.5,
-      "value": 3.13
+      "sector_pct": 80.8,
+      "value": 2.8
     },
     "earnings_yield": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 11.1,
-      "value": -0.48
+      "sector_pct": 9.6,
+      "value": -0.37
     },
     "ebitda_margin": {
       "color": "gray",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -0.17
+      "value": 0.83
     },
     "ev_ebit": {
       "color": "gray",
@@ -124,81 +127,81 @@
       "value": null
     },
     "ev_ebitda": {
-      "color": "gray",
+      "color": "red",
       "own_5y_pct": null,
-      "pct_basis": "none",
-      "sector_pct": null,
-      "value": null
+      "pct_basis": "sector",
+      "sector_pct": 100.0,
+      "value": 427.39
     },
     "ev_gross_profit": {
       "color": "green",
-      "own_5y_pct": 18.2,
+      "own_5y_pct": 25.0,
       "pct_basis": "sector",
-      "sector_pct": 34.0,
-      "value": 5.21
+      "sector_pct": 27.5,
+      "value": 4.85
     },
     "ev_sales": {
       "color": "green",
-      "own_5y_pct": 18.2,
+      "own_5y_pct": 25.0,
       "pct_basis": "sector",
-      "sector_pct": 37.0,
-      "value": 3.85
+      "sector_pct": 28.8,
+      "value": 3.57
     },
     "fcf_margin": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 14.8,
-      "value": 18.21
+      "sector_pct": 9.6,
+      "value": 16.73
     },
     "fcf_margin_change_3y": {
       "color": "gray",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 26.54
+      "value": 25.06
     },
     "fcf_yield_ev": {
       "color": "yellow",
-      "own_5y_pct": 85.7,
+      "own_5y_pct": 75.0,
       "pct_basis": "sector",
-      "sector_pct": 42.6,
-      "value": 4.74
+      "sector_pct": 36.5,
+      "value": 4.69
     },
     "fcf_yield_mcap": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 33.3,
-      "value": 4.1
+      "sector_pct": 36.5,
+      "value": 4.13
     },
     "gross_margin": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 39.6,
-      "value": 73.79
+      "sector_pct": 41.2,
+      "value": 73.54
     },
     "gross_margin_change_3y": {
       "color": "gray",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 0.88
+      "value": 0.62
     },
     "gross_profitability": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 86.8,
-      "value": 0.74
+      "sector_pct": 90.2,
+      "value": 0.83
     },
     "implied_growth": {
-      "color": "green",
+      "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 7.88
+      "value": 8.01
     },
     "implied_vs_actual_growth": {
       "color": "green",
@@ -211,7 +214,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 81.7,
+      "sector_pct": 81.0,
       "value": 100.0
     },
     "maturity_wall_2y": {
@@ -226,55 +229,55 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -832.64
+      "value": -705.44
     },
     "net_debt_to_ebitda": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 67.0,
-      "value": 0.0
+      "sector_pct": 0.0,
+      "value": -57.68
     },
     "operating_margin": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 9.3,
-      "value": -1.86
+      "sector_pct": 9.6,
+      "value": -1.33
     },
     "operating_margin_change_3y": {
       "color": "gray",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 9.78
+      "value": 10.31
     },
     "pct_off_52w_high": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 83.3,
-      "value": 37.61
+      "sector_pct": 88.5,
+      "value": 37.91
     },
     "pe": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 97.9,
-      "value": 908.45
+      "value": 749.0
     },
     "peg": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 31.45
+      "value": 27.7
     },
     "piotroski_f": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 28.7,
+      "sector_pct": 23.1,
       "value": 5.0
     },
     "rel_strength_12m": {
@@ -282,103 +285,139 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -24.45
+      "value": -28.22
     },
     "rel_strength_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 11.3,
-      "value": 38.85
+      "sector_pct": 49.0,
+      "value": 43.91
     },
     "return_12m": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 18.9,
-      "value": -19.96
+      "sector_pct": 13.7,
+      "value": -22.95
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 5.7,
-      "value": 31.96
+      "sector_pct": 43.1,
+      "value": 36.16
     },
     "rev_cagr_3y": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 98.1,
+      "sector_pct": 98.0,
       "value": 37.69
     },
     "rev_growth_ttm": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.2,
-      "value": 28.89
+      "sector_pct": 96.1,
+      "value": 27.04
     },
     "roic": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 5.9,
-      "value": -12.2
+      "sector_pct": 4.1,
+      "value": -7.2
     },
     "rule_of_40": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 81.1,
-      "value": 47.1
+      "sector_pct": 70.6,
+      "value": 43.77
     },
     "rule_of_40_ebitda": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 28.71
+      "value": 27.87
     },
     "rule_of_40_gap": {
       "color": "gray",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -18.39
+      "value": -15.9
     },
     "sbc_to_fcf": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 90.7,
-      "value": 0.68
+      "sector_pct": 92.3,
+      "value": 0.71
     },
     "sbc_to_revenue": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 63.0,
-      "value": 12.34
+      "sector_pct": 59.6,
+      "value": 11.81
     },
     "share_count_change_1y": {
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 96.1,
+      "sector_pct": 95.9,
       "value": 9.22
     },
     "sloan_accruals": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 25.0,
-      "value": -0.16
+      "sector_pct": 18.0,
+      "value": -0.18
     }
   },
   "name": "Klaviyo, Inc.",
-  "net_debt_musd": -832.64,
+  "net_debt_musd": -705.44,
   "news": [
+    {
+      "date": "2026-11-08",
+      "headline": "Klaviyo (KVYO) Stock May Trade At A Discount As Revenue Guidance Rises",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=ccb2bcc7143efc24fd04904121a92cdc8917716a92194c6bb87863b3c2eca9e0"
+    },
+    {
+      "date": "2026-11-07",
+      "headline": "Klaviyo Q3 Earnings Call Highlights",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=ab73b08b366a4e55001d93daa524178cc9575388964a3ce8bf5e40a5ba6df20d"
+    },
+    {
+      "date": "2026-11-07",
+      "headline": "Klaviyo, Inc. 2026 Q3 - Results - Earnings Call Presentation",
+      "source": "SeekingAlpha",
+      "url": "https://finnhub.io/api/news?id=21a98b05e5d20675030dcc0752e8a97e78841819725f694fa18eb6997207a5dd"
+    },
+    {
+      "date": "2026-11-07",
+      "headline": "Is Earnings Beat Altering The Investment Case For Klaviyo (KVYO)?",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=d3742eb88c9d46c232fa6fefe953e2e919abae160453c2bb4dd4cfd74282b5b0"
+    },
+    {
+      "date": "2026-11-07",
+      "headline": "Klaviyo (KVYO) Could Be 21% Undervalued Following Earnings And A New Buyback",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=9ce020a90e926dba09ba689160ac6d577343619648b4a795655771ec7a1a527c"
+    },
+    {
+      "date": "2026-11-07",
+      "headline": "Why Is Klaviyo (KVYO) Raising Guidance And Starting A $300 Million Buyback?",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=b1d4e2e6b706e5488e89840531ec5c98413b643acf7e1f58aa8afaa454181c70"
+    },
     {
       "date": "2026-11-05",
       "headline": "Klaviyo (KVYO) Q3 2026 Earnings Call Transcript",
@@ -387,60 +426,24 @@
     },
     {
       "date": "2026-11-05",
-      "headline": "Klaviyo Inc (KVYO) (Q3 2026) Earnings Call Highlights: Revenue Surges 25% to $387 Million as AI ...",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=3ff752f0a111fbca9693e4aa8346d285c9a0feec6ce26313e0b6a8fe70819be9"
-    },
-    {
-      "date": "2026-11-05",
-      "headline": "Klaviyo, Inc. Reports Third Quarter 2026 Revenue of $387.2 million and Authorizes New $300 million Share Repurchase Program",
-      "source": "Fintel",
-      "url": "https://finnhub.io/api/news?id=e1ed908b0ea511ec2d32cd509beff3b4a83a3b20ca3f80addf64788ea91bbde4"
-    },
-    {
-      "date": "2026-11-04",
-      "headline": "Klaviyo, Inc. (KVYO) Q3 Earnings and Revenues Beat Estimates",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=e92cd18df5399aacd15d092405383e929fee911790aa6655ce6fde73b678696f"
-    },
-    {
-      "date": "2026-11-04",
-      "headline": "Klaviyo, Inc. (KVYO) Reports Q3 Earnings: What Key Metrics Have to Say",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=637bf82e87b0138d21d2c8125473c1318fe0a4ac900c13941bb137a9a9e722d2"
-    },
-    {
-      "date": "2026-11-04",
-      "headline": "Klaviyo Delivers Solid Q3 with Enterprise Growth, Multi-Product Strength, and Agent Traction",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=a053e72366d82da7a4aa9e0ab01c68aadf8c092c6ad2d609ae91d8fc7af444f9"
-    },
-    {
-      "date": "2026-11-04",
-      "headline": "Klaviyo Sees Q4 Sales $421.000M-$425.000M vs $422.441M Est",
+      "headline": "Barclays Maintains Overweight on Klaviyo, Raises Price Target to $23",
       "source": "Benzinga",
-      "url": "https://finnhub.io/api/news?id=aa2ae429b9c37c835db09b6d792053ff9a00b33840b3836ddf7efca2d05b51ae"
-    },
-    {
-      "date": "2026-11-04",
-      "headline": "Klaviyo Raises FY2026 Sales Guidance from $1.526B-$1.534B to $1.537B-$1.541B vs $1.531B Est",
-      "source": "Benzinga",
-      "url": "https://finnhub.io/api/news?id=4e30061d57f59f2554596181ff1b2d89b7df231b84a4456e3733ce5a1264f5c6"
+      "url": "https://finnhub.io/api/news?id=d5bc8ba499ec40f7c5fc1d2e95c39512935508a7fc05b4ce38b01016d376fb7f"
     }
   ],
   "overrides": [],
   "percentile_pool": {
-    "sector": 54,
-    "universe": 360
+    "sector": 52,
+    "universe": 363
   },
-  "price": 20.81,
-  "price_as_of": "2026-11-05",
+  "price": 20.71,
+  "price_as_of": "2026-11-06",
   "reverse_dcf": {
     "actual_growth_pct": 37.69,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 5344.8,
-    "fcf_ttm_musd": 253.1,
-    "implied_growth_pct": 7.884064899890833,
+    "enterprise_value_musd": 5227.4,
+    "fcf_ttm_musd": 245.3,
+    "implied_growth_pct": 8.01,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -448,8 +451,8 @@
     "earnings_quality": {
       "components": {
         "beneish_m": {
-          "percentile": 15.4,
-          "scaled": 84.6,
+          "percentile": 13.5,
+          "scaled": 86.5,
           "weight": 0.2
         },
         "cash_conversion": {
@@ -457,13 +460,13 @@
           "percentile": null
         },
         "piotroski_f": {
-          "percentile": 28.7,
-          "scaled": 28.7,
+          "percentile": 23.1,
+          "scaled": 23.1,
           "weight": 0.25
         },
         "sloan_accruals": {
-          "percentile": 25.0,
-          "scaled": 75.0,
+          "percentile": 18.0,
+          "scaled": 82.0,
           "weight": 0.25
         }
       },
@@ -473,13 +476,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 42.6,
-          "scaled": 42.6,
+          "percentile": 53.8,
+          "scaled": 53.8,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 11.3,
-          "scaled": 11.3,
+          "percentile": 49.0,
+          "scaled": 49.0,
           "weight": 0.4
         }
       },
@@ -489,28 +492,28 @@
     "quality": {
       "components": {
         "fcf_margin": {
-          "percentile": 14.8,
-          "scaled": 14.8,
+          "percentile": 9.6,
+          "scaled": 9.6,
           "weight": 0.15
         },
         "gross_margin": {
-          "percentile": 39.6,
-          "scaled": 39.6,
+          "percentile": 41.2,
+          "scaled": 41.2,
           "weight": 0.2
         },
         "gross_profitability": {
-          "percentile": 86.8,
-          "scaled": 86.8,
+          "percentile": 90.2,
+          "scaled": 90.2,
           "weight": 0.2
         },
         "roic": {
-          "percentile": 5.9,
-          "scaled": 5.9,
+          "percentile": 4.1,
+          "scaled": 4.1,
           "weight": 0.3
         },
         "rule_of_40": {
-          "percentile": 81.1,
-          "scaled": 81.1,
+          "percentile": 70.6,
+          "scaled": 70.6,
           "weight": 0.15
         }
       },
@@ -520,23 +523,23 @@
     "safety": {
       "components": {
         "altman_z": {
-          "percentile": 70.6,
-          "scaled": 70.6,
+          "percentile": 55.1,
+          "scaled": 55.1,
           "weight": 0.3
         },
         "current_ratio": {
-          "percentile": 81.5,
-          "scaled": 81.5,
+          "percentile": 80.8,
+          "scaled": 80.8,
           "weight": 0.2
         },
         "interest_coverage": {
-          "percentile": 81.7,
-          "scaled": 81.7,
+          "percentile": 81.0,
+          "scaled": 81.0,
           "weight": 0.2
         },
         "net_debt_to_ebitda": {
-          "percentile": 67.0,
-          "scaled": 33.0,
+          "percentile": 0.0,
+          "scaled": 100.0,
           "weight": 0.3
         }
       },
@@ -546,8 +549,8 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 11.1,
-          "scaled": 11.1,
+          "percentile": 9.6,
+          "scaled": 9.6,
           "weight": 0.1
         },
         "ev_ebit": {
@@ -555,18 +558,18 @@
           "percentile": null
         },
         "ev_gross_profit": {
-          "percentile": 34.0,
-          "scaled": 66.0,
+          "percentile": 27.5,
+          "scaled": 72.5,
           "weight": 0.2
         },
         "ev_sales": {
-          "percentile": 37.0,
-          "scaled": 63.0,
+          "percentile": 28.8,
+          "scaled": 71.2,
           "weight": 0.15
         },
         "fcf_yield_ev": {
-          "percentile": 42.6,
-          "scaled": 42.6,
+          "percentile": 36.5,
+          "scaled": 36.5,
           "weight": 0.25
         }
       },
@@ -577,17 +580,17 @@
   "score_internals": {
     "altman": {
       "components": {
-        "A": 0.49580650917626384,
-        "B": -0.6334226528697001,
-        "C": -0.018711587963608486,
-        "D": 2.3181963106353907
+        "A": 0.44276105461754434,
+        "B": -0.6768360237525359,
+        "C": -0.015106470758205303,
+        "D": 2.0200309388758875
       },
       "reason": null,
       "unreliable": false,
-      "z": 6.745897106892779
+      "z": 5.967544083182366
     },
     "beneish": {
-      "m": -3.191795837904494,
+      "m": -3.2434316928721394,
       "missing": []
     },
     "piotroski": {
@@ -616,19 +619,18 @@
       "safety": 1.0,
       "value": 0.7
     },
-    "earnings_quality": 61.2,
-    "momentum": 30.1,
-    "quality": 41.4,
-    "safety": 63.7,
-    "total": 52.8,
-    "value": 49.2,
+    "earnings_quality": 62.2,
+    "momentum": 51.9,
+    "quality": 39.5,
+    "safety": 78.9,
+    "total": 56.4,
+    "value": 50.4,
     "weight_coverage": 0.9
   },
   "sector": "Yazilim ve programlama",
   "series": {
     "basis": "quarterly",
     "fcf": [
-      23.647000000000002,
       null,
       24.923,
       40.131,
@@ -639,10 +641,10 @@
       52.486,
       90.694,
       22.613000000000003,
-      87.322
+      87.322,
+      44.674
     ],
     "gross_margin": [
-      66.54,
       77.67,
       78.6,
       77.38,
@@ -653,10 +655,10 @@
       75.51,
       72.17,
       75.11,
-      72.62
+      72.62,
+      74.22
     ],
     "period_ends": [
-      "2023-09-30",
       "2023-12-31",
       "2024-03-31",
       "2024-06-30",
@@ -667,72 +669,72 @@
       "2025-09-30",
       "2025-12-31",
       "2026-03-31",
-      "2026-06-30"
+      "2026-06-30",
+      "2026-09-30"
     ],
     "price_sparkline": [
-      15.21,
-      14.45,
-      14.34,
-      14.61,
-      15.11,
-      14.46,
-      14.74,
-      18.36,
-      15.69,
-      15.58,
-      14.78,
-      14.29,
-      14.0,
-      13.25,
-      13.49,
-      14.03,
-      14.93,
-      16.36,
-      17.0,
-      16.6,
-      16.91,
-      17.51,
-      17.67,
-      17.5,
-      15.67,
-      17.73,
-      19.37,
-      17.84,
-      19.1,
-      16.73,
-      18.36,
-      19.22,
-      17.54,
-      18.2,
-      18.33,
-      17.6,
-      19.61,
-      20.58,
-      19.76,
-      17.89,
-      16.13,
-      17.4,
-      16.23,
-      15.42,
-      15.87,
-      16.11,
-      15.4,
-      16.19,
-      16.7,
-      17.41,
-      17.32,
+      15.52,
+      14.24,
+      14.38,
+      14.7,
+      14.91,
+      14.21,
+      15.84,
       16.95,
-      18.09,
-      17.52,
-      20.19,
-      20.71,
-      20.55,
-      20.14,
-      21.33,
-      20.81
+      15.78,
+      15.22,
+      14.51,
+      14.21,
+      13.84,
+      12.86,
+      14.06,
+      14.9,
+      15.1,
+      16.9,
+      17.22,
+      17.16,
+      17.46,
+      17.63,
+      18.15,
+      16.2,
+      16.4,
+      18.89,
+      18.35,
+      18.1,
+      19.3,
+      16.62,
+      17.25,
+      18.49,
+      17.81,
+      18.11,
+      18.2,
+      17.79,
+      20.15,
+      20.64,
+      18.61,
+      16.27,
+      16.36,
+      16.98,
+      15.87,
+      15.82,
+      16.78,
+      15.8,
+      15.25,
+      15.71,
+      16.6,
+      17.57,
+      17.11,
+      17.01,
+      17.08,
+      19.61,
+      20.59,
+      20.18,
+      20.43,
+      21.8,
+      21.36,
+      20.71
     ],
     "quarters": [
-      "2023-09",
       "2023-12",
       "2024-03",
       "2024-06",
@@ -743,10 +745,10 @@
       "2025-09",
       "2025-12",
       "2026-03",
-      "2026-06"
+      "2026-06",
+      "2026-09"
     ],
     "revenue": [
-      175.807,
       201.618,
       209.993,
       222.213,
@@ -757,10 +759,10 @@
       310.88,
       350.195,
       358.005,
-      370.576
+      370.576,
+      387.207
     ],
     "share_count": [
-      240.125168,
       null,
       261.332411,
       265.293214,
@@ -771,10 +773,11 @@
       300.828017,
       null,
       305.801451,
-      296.851806
+      296.851806,
+      286.472066
     ]
   },
-  "shares_outstanding_m": 296.8518,
+  "shares_outstanding_m": 286.4721,
   "short_interest": {
     "avg_daily_volume": null,
     "date": null,
@@ -815,16 +818,16 @@
     "why_cheap_diagnosis": "GECICI_SOK + ILGISIZLIK",
     "why_cheap_rationale": "İki düşüş: Mayıs 2026 CFO ayrılığı (-%21-30) ve Ağustos 2026 marj kılavuzu (-%11). İkisinde de gelir beklentiyi aştı. Zirveden %51 aşağı. Marj baskısının sebebi bilinen: SMS operatör ücretleri, müşteriye yansıtma başladı."
   },
-  "story_age_days": 57,
+  "story_age_days": 59,
   "ticker": "KVYO",
   "track": "B",
   "ttm": {
-    "ebit_musd": -25.9,
-    "ebitda_musd": -2.4,
-    "fcf_musd": 253.1,
-    "gross_profit_musd": 1025.5,
-    "net_income_musd": 6.8,
-    "period_end": "2026-06-30",
-    "revenue_musd": 1389.7
+    "ebit_musd": -19.6,
+    "ebitda_musd": 12.2,
+    "fcf_musd": 245.3,
+    "gross_profit_musd": 1078.1,
+    "net_income_musd": 7.9,
+    "period_end": "2026-09-30",
+    "revenue_musd": 1466.0
   }
 }
