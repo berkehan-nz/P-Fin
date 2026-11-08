@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-07",
+  "as_of": "2026-11-08",
   "calendar": {
     "recent": [
       {
@@ -81,6 +81,14 @@
         "ticker": "GMED",
         "title": "GMED · 10-Q",
         "url": "https://www.sec.gov/Archives/edgar/data/1237831/000162828026071165/gmed-20260930.htm"
+      },
+      {
+        "date": "2026-11-05",
+        "detail": "Ceyreklik rapor",
+        "kind": "sec",
+        "ticker": "CHRD",
+        "title": "CHRD · 10-Q",
+        "url": "https://www.sec.gov/Archives/edgar/data/1486159/000148615926000047/chrd-20260930.htm"
       },
       {
         "date": "2026-11-05",
@@ -193,14 +201,6 @@
         "ticker": "CHRD",
         "title": "CHRD · 8-K",
         "url": "https://www.sec.gov/Archives/edgar/data/1486159/000148615926000046/oas-20261104.htm"
-      },
-      {
-        "date": "2026-11-03",
-        "detail": "Onemli olay bildirimi",
-        "kind": "sec",
-        "ticker": "INSW",
-        "title": "INSW · 8-K",
-        "url": "https://www.sec.gov/Archives/edgar/data/1679049/000110465926121663/tm2628788d1_8k.htm"
       }
     ],
     "source": "fred+finnhub+sec",
@@ -276,6 +276,13 @@
         "title": "Perakende satislar"
       },
       {
+        "date": "2026-12-23",
+        "detail": "buyume",
+        "kind": "makro",
+        "ticker": null,
+        "title": "GSYH (GDP)"
+      },
+      {
         "date": "2027-02-16",
         "detail": null,
         "kind": "bilanco",
@@ -347,7 +354,7 @@
       }
     ]
   },
-  "generated_at": "2026-11-07T22:40:50+00:00",
+  "generated_at": "2026-11-08T02:21:14+00:00",
   "market": [
     {
       "as_of": "2026-11-06",
@@ -770,13 +777,12 @@
       "value": 1.1228
     },
     {
-      "as_of": "2026-11-06",
-      "change_1d_pct": 0.23,
-      "change_5d_pct": 0.42,
+      "as_of": "2026-11-07",
+      "change_1d_pct": -0.04,
+      "change_5d_pct": 0.34,
       "group": "Kur",
       "label": "USD/TRY",
       "series": [
-        48.9714,
         48.9962,
         49.0081,
         49.028,
@@ -805,11 +811,12 @@
         49.9873,
         50.0102,
         50.0376,
-        50.1529
+        50.1529,
+        50.1343
       ],
       "symbol": "TRY=X",
       "unit": "kur",
-      "value": 50.1529
+      "value": 50.1343
     },
     {
       "as_of": "2026-11-06",
@@ -896,9 +903,9 @@
       "value": 4074.8999
     },
     {
-      "as_of": "2026-11-07",
-      "change_1d_pct": -0.11,
-      "change_5d_pct": -1.33,
+      "as_of": "2026-11-08",
+      "change_1d_pct": -0.19,
+      "change_5d_pct": -1.4,
       "group": "Kripto",
       "label": "Bitcoin",
       "series": [
@@ -931,14 +938,21 @@
         80405.2891,
         75942.125,
         75746.9297,
-        75661.2578
+        75603.8281
       ],
       "symbol": "BTC-USD",
       "unit": "USD",
-      "value": 75661.2578
+      "value": 75603.8281
     }
   ],
   "news": [
+    {
+      "date": "2026-11-08",
+      "headline": "Globus Medical Inc (GMED) Q3 2026 Earnings Call Highlights: Revenue Miss, Nevro Weakness and ...",
+      "source": "Yahoo",
+      "ticker": "GMED",
+      "url": "https://finnhub.io/api/news?id=3a7af25b85fe00bedfd7d6f39581fa0dc6ff712b8d3d68c7541cc585ba933703"
+    },
     {
       "date": "2026-11-07",
       "headline": "Is DoorDash (DASH) Undervalued Following Its New Lyft Partnership?",
@@ -1046,17 +1060,17 @@
     },
     {
       "date": "2026-11-07",
-      "headline": "Should You Buy Globus Medical Stock For Its Cash?",
-      "source": "Yahoo",
-      "ticker": "GMED",
-      "url": "https://finnhub.io/api/news?id=2fee9a8dc9a4d6612dfff696be8e2103f788455cc9fc62ced134fee22cac7aa5"
-    },
-    {
-      "date": "2026-11-07",
       "headline": "Harmony Biosciences (HRMY) Stock May Be Undervalued On Earnings Power",
       "source": "Yahoo",
       "ticker": "HRMY",
       "url": "https://finnhub.io/api/news?id=3435e2cf7fb1dd449a8dcd51b663015451c912167917c954236debc17434664e"
+    },
+    {
+      "date": "2026-11-07",
+      "headline": "What International Seaways (INSW) Said on Its Q3 Earnings Call",
+      "source": "Yahoo",
+      "ticker": "INSW",
+      "url": "https://finnhub.io/api/news?id=d67c98d4f24b104ae082223bd2dc22a1347e511345d7eaeffb174dd05b77cb1e"
     },
     {
       "date": "2026-11-07",
@@ -1071,6 +1085,20 @@
       "source": "SeekingAlpha",
       "ticker": "LPG",
       "url": "https://finnhub.io/api/news?id=f2cc332b520f8a1633993cda6e7de1d3ae7017a1c5835d198121a166b58a0d62"
+    },
+    {
+      "date": "2026-11-07",
+      "headline": "What MNTN (MNTN) Said on Its Q3 Earnings Call",
+      "source": "Yahoo",
+      "ticker": "MNTN",
+      "url": "https://finnhub.io/api/news?id=1b2e0a7b183beb7eb763c3d6c86a45906c3d6d3a62b9cbf395d1bc487a6d50ad"
+    },
+    {
+      "date": "2026-11-07",
+      "headline": "MNTN, Inc. 2026 Q3 - Results - Earnings Call Presentation",
+      "source": "SeekingAlpha",
+      "ticker": "MNTN",
+      "url": "https://finnhub.io/api/news?id=80794ce9b6d292d84c2b5cd6badb64f1fb45c258d6f89c141e01a9e6de431d6a"
     },
     {
       "date": "2026-11-07",
@@ -1158,13 +1186,6 @@
     },
     {
       "date": "2026-11-06",
-      "headline": "International Seaways Inc (INSW) Q3 2026 Earnings Call Highlights: Record $344 Million Net ...",
-      "source": "Yahoo",
-      "ticker": "INSW",
-      "url": "https://finnhub.io/api/news?id=942b18500d7edb32d8f01f34c7afc5d2359adc6aa0033796ff95bcbfc2ad6ced"
-    },
-    {
-      "date": "2026-11-06",
       "headline": "Corsair Gaming Q3 Earnings Call Highlights",
       "source": "Yahoo",
       "ticker": "LOGI",
@@ -1193,13 +1214,6 @@
     },
     {
       "date": "2026-11-06",
-      "headline": "Freedom Broker Maintains Buy on MNTN, Lowers Price Target to $9",
-      "source": "Benzinga",
-      "ticker": "MNTN",
-      "url": "https://finnhub.io/api/news?id=889b52a94fdb4d71b0a795166b9a76348e10710668665f75e7dcceb3392f3587"
-    },
-    {
-      "date": "2026-11-06",
       "headline": "Why NerdWallet Stock Crashed Today",
       "source": "Yahoo",
       "ticker": "NRDS",
@@ -1211,13 +1225,6 @@
       "source": "Benzinga",
       "ticker": "NRDS",
       "url": "https://finnhub.io/api/news?id=5a69943010366b6d8c4c25717c132439f2a78693ab04e4aec84c5ddaa1ad3ae1"
-    },
-    {
-      "date": "2026-11-06",
-      "headline": "NerdWallet (NRDS) Q3 2026 Earnings Call Transcript",
-      "source": "Yahoo",
-      "ticker": "NRDS",
-      "url": "https://finnhub.io/api/news?id=b6c447347dc945acb106c18bc04f6e559d86767bf211b9766182ef4b3f806687"
     }
   ],
   "risk_note": "VIX 26 — piyasa gergin. Dususler daha sert olur; pozisyon acmak icin acele etme.",
