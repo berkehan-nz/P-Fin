@@ -134,6 +134,22 @@
         "date": "2026-11-04",
         "detail": "Onemli olay bildirimi",
         "kind": "sec",
+        "ticker": "REPX",
+        "title": "REPX · 8-K",
+        "url": "https://www.sec.gov/Archives/edgar/data/1001614/000100161426000061/repx-20261029.htm"
+      },
+      {
+        "date": "2026-11-04",
+        "detail": "Ceyreklik rapor",
+        "kind": "sec",
+        "ticker": "REPX",
+        "title": "REPX · 10-Q",
+        "url": "https://www.sec.gov/Archives/edgar/data/1001614/000100161426000063/rep-20260930.htm"
+      },
+      {
+        "date": "2026-11-04",
+        "detail": "Onemli olay bildirimi",
+        "kind": "sec",
         "ticker": "MNTN",
         "title": "MNTN · 8-K",
         "url": "https://www.sec.gov/Archives/edgar/data/1891027/000189102726000100/mntn-20261101.htm"
@@ -185,22 +201,6 @@
         "ticker": "HUBS",
         "title": "HUBS · 10-Q",
         "url": "https://www.sec.gov/Archives/edgar/data/1404655/000119312526447363/hubs-20260930.htm"
-      },
-      {
-        "date": "2026-11-04",
-        "detail": "Onemli olay bildirimi",
-        "kind": "sec",
-        "ticker": "HRMY",
-        "title": "HRMY · 8-K",
-        "url": "https://www.sec.gov/Archives/edgar/data/1802665/000110465926122377/hrmy-20261104x8k.htm"
-      },
-      {
-        "date": "2026-11-04",
-        "detail": "Ceyreklik rapor",
-        "kind": "sec",
-        "ticker": "HRMY",
-        "title": "HRMY · 10-Q",
-        "url": "https://www.sec.gov/Archives/edgar/data/1802665/000110465926122390/hrmy-20260930x10q.htm"
       }
     ],
     "source": "fred+finnhub+sec",
@@ -316,10 +316,17 @@
         "kind": "bilanco",
         "ticker": "INSW",
         "title": "INSW bilanco"
+      },
+      {
+        "date": "2027-03-02",
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "REPX",
+        "title": "REPX bilanco"
       }
     ]
   },
-  "generated_at": "2026-11-11T02:46:05+00:00",
+  "generated_at": "2026-11-11T10:44:51+00:00",
   "market": [
     {
       "as_of": "2026-11-10",
@@ -399,11 +406,11 @@
         24315.0,
         24579.4297,
         25253.1406,
-        25065.875
+        25065.8691
       ],
       "symbol": "^IXIC",
       "unit": "puan",
-      "value": 25065.875
+      "value": 25065.8691
     },
     {
       "as_of": "2026-11-10",
@@ -441,20 +448,19 @@
         2729.8899,
         2754.1101,
         2840.8101,
-        2821.3755
+        2821.3799
       ],
       "symbol": "^RUT",
       "unit": "puan",
-      "value": 2821.3755
+      "value": 2821.3799
     },
     {
-      "as_of": "2026-11-10",
-      "change_1d_pct": 0.59,
-      "change_5d_pct": 2.98,
+      "as_of": "2026-11-11",
+      "change_1d_pct": 0.7,
+      "change_5d_pct": 1.69,
       "group": "Hisse",
       "label": "Euro Stoxx 50",
       "series": [
-        6269.02,
         6175.4502,
         6238.5,
         6242.1401,
@@ -483,16 +489,17 @@
         6231.54,
         6170.4902,
         6290.4502,
-        6327.8701
+        6327.8701,
+        6371.8501
       ],
       "symbol": "^STOXX50E",
       "unit": "puan",
-      "value": 6327.8701
+      "value": 6371.8501
     },
     {
       "as_of": "2026-11-11",
-      "change_1d_pct": 0.8,
-      "change_5d_pct": -2.0,
+      "change_1d_pct": 1.31,
+      "change_5d_pct": -1.51,
       "group": "Hisse",
       "label": "Nikkei 225",
       "series": [
@@ -525,20 +532,19 @@
         57434.7695,
         58775.5,
         60459.5781,
-        60942.4805
+        61248.5898
       ],
       "symbol": "^N225",
       "unit": "puan",
-      "value": 60942.4805
+      "value": 61248.5898
     },
     {
-      "as_of": "2026-11-10",
-      "change_1d_pct": -0.43,
-      "change_5d_pct": 5.79,
+      "as_of": "2026-11-11",
+      "change_1d_pct": 0.87,
+      "change_5d_pct": 2.48,
       "group": "Hisse",
       "label": "BIST 100",
       "series": [
-        12290.5996,
         11947.2002,
         12249.0,
         12270.2002,
@@ -567,20 +573,20 @@
         11333.2998,
         11482.5996,
         11712.7002,
-        11661.9004
+        11661.9004,
+        11763.04
       ],
       "symbol": "XU100.IS",
       "unit": "puan",
-      "value": 11661.9004
+      "value": 11763.04
     },
     {
-      "as_of": "2026-11-10",
-      "change_1d_pct": -2.31,
-      "change_5d_pct": -6.58,
+      "as_of": "2026-11-11",
+      "change_1d_pct": -4.42,
+      "change_5d_pct": 11.98,
       "group": "Risk",
       "label": "VIX (korku)",
       "series": [
-        16.34,
         16.39,
         15.31,
         15.52,
@@ -609,11 +615,12 @@
         28.18,
         25.64,
         19.92,
-        19.46
+        19.46,
+        18.6
       ],
       "symbol": "^VIX",
       "unit": "puan",
-      "value": 19.46
+      "value": 18.6
     },
     {
       "as_of": "2026-11-10",
@@ -658,13 +665,12 @@
       "value": 4.983
     },
     {
-      "as_of": "2026-11-10",
-      "change_1d_pct": 0.59,
-      "change_5d_pct": 0.37,
+      "as_of": "2026-11-11",
+      "change_1d_pct": 0.22,
+      "change_5d_pct": 0.93,
       "group": "Kur",
       "label": "Dolar endeksi",
       "series": [
-        101.45,
         102.1,
         101.93,
         102.17,
@@ -693,16 +699,17 @@
         101.55,
         102.3,
         101.65,
-        102.25
+        102.23,
+        102.458
       ],
       "symbol": "DX-Y.NYB",
       "unit": "puan",
-      "value": 102.25
+      "value": 102.458
     },
     {
       "as_of": "2026-11-11",
-      "change_1d_pct": -0.49,
-      "change_5d_pct": -0.36,
+      "change_1d_pct": -0.69,
+      "change_5d_pct": -0.56,
       "group": "Kur",
       "label": "EUR/USD",
       "series": [
@@ -735,15 +742,15 @@
         1.1228,
         1.1147,
         1.1222,
-        1.1167
+        1.1145
       ],
       "symbol": "EURUSD=X",
       "unit": "kur",
-      "value": 1.1167
+      "value": 1.1145
     },
     {
       "as_of": "2026-11-11",
-      "change_1d_pct": 0.02,
+      "change_1d_pct": 0.03,
       "change_5d_pct": 0.44,
       "group": "Kur",
       "label": "USD/TRY",
@@ -777,20 +784,19 @@
         50.1529,
         50.1233,
         50.2157,
-        50.2279
+        50.2289
       ],
       "symbol": "TRY=X",
       "unit": "kur",
-      "value": 50.2279
+      "value": 50.2289
     },
     {
-      "as_of": "2026-11-10",
-      "change_1d_pct": -0.24,
-      "change_5d_pct": -9.83,
+      "as_of": "2026-11-11",
+      "change_1d_pct": 1.44,
+      "change_5d_pct": -0.95,
       "group": "Emtia",
       "label": "Brent/WTI ham",
       "series": [
-        90.42,
         92.87,
         91.11,
         89.43,
@@ -819,20 +825,20 @@
         90.52,
         90.83,
         86.85,
-        86.64
+        86.04,
+        87.28
       ],
       "symbol": "CL=F",
       "unit": "USD",
-      "value": 86.64
+      "value": 87.28
     },
     {
-      "as_of": "2026-11-10",
-      "change_1d_pct": -1.46,
-      "change_5d_pct": 2.89,
+      "as_of": "2026-11-11",
+      "change_1d_pct": 0.69,
+      "change_5d_pct": -0.36,
       "group": "Emtia",
       "label": "Altin",
       "series": [
-        4186.7002,
         4202.2998,
         4162.2998,
         4156.7998,
@@ -861,20 +867,20 @@
         4113.5,
         4074.8999,
         4114.5,
-        4054.3
+        4030.2,
+        4058.2
       ],
       "symbol": "GC=F",
       "unit": "USD",
-      "value": 4054.3
+      "value": 4058.2
     },
     {
       "as_of": "2026-11-11",
-      "change_1d_pct": -2.07,
-      "change_5d_pct": -2.99,
+      "change_1d_pct": 0.3,
+      "change_5d_pct": -2.39,
       "group": "Kripto",
       "label": "Bitcoin",
       "series": [
-        81762.5625,
         83095.125,
         81562.4922,
         82141.4609,
@@ -903,14 +909,22 @@
         75747.5781,
         74584.6484,
         75223.1484,
-        73669.6094
+        73720.1172,
+        73938.9922
       ],
       "symbol": "BTC-USD",
       "unit": "USD",
-      "value": 73669.6094
+      "value": 73938.9922
     }
   ],
   "news": [
+    {
+      "date": "2026-11-11",
+      "headline": "NerdWallet: Insurance Issues And More Questions Than Answers",
+      "source": "SeekingAlpha",
+      "ticker": "NRDS",
+      "url": "https://finnhub.io/api/news?id=6108239a1ea1ebbeaf52f5480df9b2706fadf505f1bab02cc519537f38625b06"
+    },
     {
       "date": "2026-11-11",
       "headline": "What Should Snap Stock Holders Take From Its Third-Quarter Report?",
@@ -920,10 +934,31 @@
     },
     {
       "date": "2026-11-11",
-      "headline": "SPY Is Still a Unit Investment Trust. Here’s Why That Quirk Matters (and When It Doesn’t)",
-      "source": "Yahoo",
+      "headline": "Rates Spark: Back To A 5% 10Y UST On Inflation Fears",
+      "source": "SeekingAlpha",
+      "ticker": "SGOV",
+      "url": "https://finnhub.io/api/news?id=32a1bcd6daf18a49ef9c80478e70f7a9c6b39d5f7a6b2bdcacb485c5e9336897"
+    },
+    {
+      "date": "2026-11-11",
+      "headline": "Inflation Is Sticky, But This Isn't 2022 All Over Again",
+      "source": "SeekingAlpha",
+      "ticker": "SGOV",
+      "url": "https://finnhub.io/api/news?id=31bcb15ef2ac85eba24b93b47f3bc1f1a1e8e2c3bc5ef119d15a5317137e5c1e"
+    },
+    {
+      "date": "2026-11-11",
+      "headline": "October CPI: Broadening Price Pressures Keep Fed Tightening On Track",
+      "source": "SeekingAlpha",
+      "ticker": "SGOV",
+      "url": "https://finnhub.io/api/news?id=f99af996f86e39c324615a886b5c82e3cb920b581ee616f71cded5b0a97a8ae7"
+    },
+    {
+      "date": "2026-11-11",
+      "headline": "After The Midterms: What Washington's New Political Landscape Means For 2027",
+      "source": "SeekingAlpha",
       "ticker": "VOO",
-      "url": "https://finnhub.io/api/news?id=2f9c5ee9e77844f1861b818cf3085a6cead3cbc8735f652c209a8c77cecebc31"
+      "url": "https://finnhub.io/api/news?id=b265f7afea799808aafd408ab67df718380800c09c822cfa9303b1d45eb55ed2"
     },
     {
       "date": "2026-11-10",
@@ -1088,13 +1123,6 @@
     },
     {
       "date": "2026-11-10",
-      "headline": "Why NerdWallet (NRDS) shares are plunging today",
-      "source": "Yahoo",
-      "ticker": "NRDS",
-      "url": "https://finnhub.io/api/news?id=27d4377623fde7193b09dd5734837c3c91b78561ed3bd0eb32855cfe9b42bf60"
-    },
-    {
-      "date": "2026-11-10",
       "headline": "Prediction: Meta Stock’s Next Big Catalyst Could Be Just Around the Corner",
       "source": "Yahoo",
       "ticker": "PINS",
@@ -1136,34 +1164,6 @@
       "url": "https://finnhub.io/api/news?id=8722160def3d2b22f5655ce3013bea82c4f0462b71a7aa6df3feb454fc62392d"
     },
     {
-      "date": "2026-11-10",
-      "headline": "October CPI Just Made A December Rate Hike Certain",
-      "source": "SeekingAlpha",
-      "ticker": "SGOV",
-      "url": "https://finnhub.io/api/news?id=da84cf4859bf1f989cbfbb8f1f9dcf1e708e8e29cf07f4a8c23184ab340f273e"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "How Bonds Work: Everything You Need To Know",
-      "source": "SeekingAlpha",
-      "ticker": "SGOV",
-      "url": "https://finnhub.io/api/news?id=87e65e693da5b195cfaccda9bd9d78bc9dfba72514f70e2728bffc377424d126"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "3 Vanguard ETFs to Buy and Hold Forever",
-      "source": "Yahoo",
-      "ticker": "VOO",
-      "url": "https://finnhub.io/api/news?id=cb8597d98485d5812a83e55d48b24694a59743995b52d6568aaac93c01d4a72d"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "Inside The Consumer Price Index: October 2026",
-      "source": "SeekingAlpha",
-      "ticker": "VOO",
-      "url": "https://finnhub.io/api/news?id=7ac32fa927075b7da623ef3ab511fa01bbbc0a28c3750098a416405c30b4c7a6"
-    },
-    {
       "date": "2026-11-09",
       "headline": "Hubbell shares are trading lower. The company reported Q4 financial results.",
       "source": "Benzinga",
@@ -1190,6 +1190,13 @@
       "source": "Yahoo",
       "ticker": "DOCU",
       "url": "https://finnhub.io/api/news?id=7b0ea4ced0eece62199db389075f905a3624fce5740c568ad986420ba2cc58c9"
+    },
+    {
+      "date": "2026-11-09",
+      "headline": "Nordson Earnings Preview: Double-Digit Sales and Profit Growth Expected",
+      "source": "Benzinga",
+      "ticker": "EPAC",
+      "url": "https://finnhub.io/api/news?id=9874d3d6eb25a7b925bc218a386031f627aebe1a87e723046e287d2bc510f1a8"
     }
   ],
   "risk_note": "VIX 19 — normal aralikta.",
