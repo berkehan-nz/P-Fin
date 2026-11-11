@@ -3,21 +3,21 @@
     "analyst_count": 13,
     "buy": 0,
     "hold": 19,
-    "recommendation": "hold",
+    "recommendation": "none",
     "sell": 0,
     "source": "yfinance",
     "target_high": 48.0,
     "target_low": 47.5,
     "target_median": 47.5,
-    "upside_to_median": 3.081597222222232
+    "upside_to_median": 2.7249134948096776
   },
-  "as_of": "2026-11-10",
+  "as_of": "2026-11-11",
   "calendar": {
     "estimated": true,
     "next_earnings": "2026-12-09"
   },
   "capped_for_scoring": {},
-  "change_1d_pct": 0.63,
+  "change_1d_pct": 0.35,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -37,7 +37,7 @@
     "date": "",
     "rationale": ""
   },
-  "enterprise_value_musd": 5067.2,
+  "enterprise_value_musd": 5085.4,
   "exchange": "Nasdaq",
   "flags": {
     "annual_fallback_fields": [
@@ -75,7 +75,7 @@
     "last_form4": "2026-11-02",
     "window_days": 180
   },
-  "market_cap_musd": 5234.0,
+  "market_cap_musd": 5252.1,
   "metrics": {
     "altman_z": {
       "color": "yellow",
@@ -110,7 +110,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 1.9,
-      "value": -2.2
+      "value": -2.19
     },
     "ebitda_margin": {
       "color": "gray",
@@ -138,14 +138,14 @@
       "own_5y_pct": 63.6,
       "pct_basis": "sector",
       "sector_pct": 68.6,
-      "value": 9.16
+      "value": 9.19
     },
     "ev_sales": {
       "color": "yellow",
       "own_5y_pct": 54.5,
       "pct_basis": "sector",
       "sector_pct": 69.2,
-      "value": 6.07
+      "value": 6.1
     },
     "fcf_margin": {
       "color": "red",
@@ -201,14 +201,14 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 26.33
+      "value": 26.38
     },
     "implied_vs_actual_growth": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 0.95
+      "value": 0.96
     },
     "interest_coverage": {
       "color": "green",
@@ -257,7 +257,7 @@
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 7.7,
-      "value": 0.56
+      "value": 0.22
     },
     "pe": {
       "color": "gray",
@@ -285,28 +285,28 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 58.1
+      "value": 54.54
     },
     "rel_strength_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 100.0,
-      "value": 127.04
+      "value": 144.68
     },
     "return_12m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 92.2,
-      "value": 69.16
+      "value": 65.2
     },
     "return_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
       "sector_pct": 100.0,
-      "value": 122.29
+      "value": 140.08
     },
     "rev_cagr_3y": {
       "color": "green",
@@ -383,6 +383,12 @@
   "net_debt_musd": -166.77,
   "news": [
     {
+      "date": "2026-11-10",
+      "headline": "Salesforce Sinks as S&P Cuts Its Rating to A on Deals and a $25 Billion Buyback",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=a8c3c3452f87d4db50ba66fe1f21b78b2fbf5a266b169683b0335c86c63804d9"
+    },
+    {
       "date": "2026-11-09",
       "headline": "Quantum Computing Inc. (QUBT) Reports Q3 Loss, Beats Revenue Estimates",
       "source": "Yahoo",
@@ -423,12 +429,6 @@
       "headline": "Datadog Q3 Earnings & Revenues Surpass Estimates, Both Rise Y/Y",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=2dbcc9948231e939b07d1d310c2e83f7fe14b0f02c846c5f2721abc7d523ff6d"
-    },
-    {
-      "date": "2026-11-04",
-      "headline": "S&P cuts Salesforce to ’A’ on rising acquisition debt and buybacks",
-      "source": "Yahoo",
-      "url": "https://finnhub.io/api/news?id=a1f4e142d328498a09a3534c9f2f56d5d9c5ba948cec16ca2bf615fc60282601"
     }
   ],
   "overrides": [],
@@ -436,14 +436,14 @@
     "sector": 52,
     "universe": 363
   },
-  "price": 46.08,
-  "price_as_of": "2026-11-09",
+  "price": 46.24,
+  "price_as_of": "2026-11-10",
   "reverse_dcf": {
     "actual_growth_pct": 27.59,
     "discount_rate": 0.1,
-    "enterprise_value_musd": 5067.2,
+    "enterprise_value_musd": 5085.4,
     "fcf_ttm_musd": 61.9,
-    "implied_growth_pct": 26.327641524064237,
+    "implied_growth_pct": 26.377673220840446,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -676,66 +676,66 @@
       "2026-07-31"
     ],
     "price_sparkline": [
-      19.26,
-      19.87,
-      21.58,
-      22.82,
-      24.35,
-      23.36,
-      28.27,
-      23.56,
-      22.91,
-      22.19,
+      19.43,
+      20.87,
+      21.76,
+      23.41,
+      25.45,
+      25.63,
+      25.69,
+      23.14,
+      23.07,
       21.66,
-      21.73,
-      20.17,
-      19.26,
-      19.57,
-      20.97,
-      22.93,
-      24.15,
-      23.8,
-      25.13,
-      26.19,
+      21.66,
+      21.18,
+      20.06,
+      19.48,
+      21.02,
+      21.69,
+      23.81,
+      24.4,
+      24.84,
+      26.6,
       26.21,
-      24.28,
-      21.22,
-      23.51,
-      26.83,
-      24.92,
-      26.41,
-      25.71,
-      28.75,
-      29.87,
-      27.95,
-      30.65,
-      31.06,
-      30.8,
-      34.09,
-      34.04,
-      32.94,
-      30.31,
-      24.265,
-      25.6,
-      24.87,
-      24.43,
-      25.52,
-      24.67,
-      23.17,
-      25.1,
-      26.61,
+      26.5,
+      22.5,
+      21.76,
+      25.11,
+      25.06,
+      25.69,
+      26.22,
+      26.54,
+      28.22,
+      28.93,
+      29.12,
+      30.71,
+      31.44,
+      30.81,
+      34.53,
+      32.78,
+      33.25,
+      23.725,
+      23.94,
+      25.42,
+      24.93,
+      25.4,
+      25.87,
+      24.37,
+      23.15,
+      25.65,
+      26.34,
       28.46,
       29.06,
-      28.93,
-      30.38,
-      30.04,
-      45.68,
-      45.88,
-      45.78,
-      45.75,
+      28.25,
+      29.34,
+      45.57,
+      45.86,
+      45.84,
+      45.8,
+      45.67,
+      46.1,
       45.79,
-      45.81,
-      46.08
+      46.24
     ],
     "quarters": [
       "2023-10",
@@ -821,7 +821,7 @@
     "why_cheap_diagnosis": "GECICI_SOK — marj kılavuzu",
     "why_cheap_rationale": "Q2 FY27'de gelir, kâr ve yıllık öngörü beklentiyi aştı; hisse yalnızca Q3 EPS kılavuzunun konsensüsün %16 altında gelmesiyle bir günde %16 düştü. Bilanço bozulmadı, RPO %27 büyüyor."
   },
-  "story_age_days": 61,
+  "story_age_days": 62,
   "ticker": "BRZE",
   "track": "B",
   "ttm": {
