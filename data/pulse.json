@@ -19,14 +19,6 @@
         "url": "https://www.sec.gov/Archives/edgar/data/1819928/000110465926124574/tm2629362d1_8k.htm"
       },
       {
-        "date": "2026-11-06",
-        "detail": "Ceyreklik rapor",
-        "kind": "sec",
-        "ticker": "GNTX",
-        "title": "GNTX · 10-Q",
-        "url": "https://www.sec.gov/Archives/edgar/data/355811/000035581126000065/gntx-20260930.htm"
-      },
-      {
         "date": "2026-11-05",
         "detail": "Onemli olay bildirimi",
         "kind": "sec",
@@ -113,6 +105,14 @@
         "ticker": "CHRD",
         "title": "CHRD · 10-Q",
         "url": "https://www.sec.gov/Archives/edgar/data/1486159/000148615926000047/chrd-20260930.htm"
+      },
+      {
+        "date": "2026-11-05",
+        "detail": "Ceyreklik rapor",
+        "kind": "sec",
+        "ticker": "CART",
+        "title": "CART · 10-Q",
+        "url": "https://www.sec.gov/Archives/edgar/data/1579091/000157909126000055/cart-20260930.htm"
       },
       {
         "date": "2026-11-05",
@@ -326,7 +326,7 @@
       }
     ]
   },
-  "generated_at": "2026-11-12T01:29:28+00:00",
+  "generated_at": "2026-11-12T09:43:30+00:00",
   "market": [
     {
       "as_of": "2026-11-11",
@@ -448,21 +448,19 @@
         2754.1101,
         2840.8101,
         2821.3799,
-        2846.2625
+        2846.26
       ],
       "symbol": "^RUT",
       "unit": "puan",
-      "value": 2846.2625
+      "value": 2846.26
     },
     {
-      "as_of": "2026-11-10",
-      "change_1d_pct": 0.59,
-      "change_5d_pct": 2.98,
+      "as_of": "2026-11-12",
+      "change_1d_pct": 0.4,
+      "change_5d_pct": 3.01,
       "group": "Hisse",
       "label": "Euro Stoxx 50",
       "series": [
-        6269.02,
-        6175.4502,
         6238.5,
         6242.1401,
         6272.23,
@@ -490,20 +488,21 @@
         6231.54,
         6170.4902,
         6290.4502,
-        6327.8701
+        6327.8701,
+        6393.3901,
+        6419.1401
       ],
       "symbol": "^STOXX50E",
       "unit": "puan",
-      "value": 6327.8701
+      "value": 6419.1401
     },
     {
       "as_of": "2026-11-12",
-      "change_1d_pct": 1.6,
-      "change_5d_pct": -1.23,
+      "change_1d_pct": -0.7,
+      "change_5d_pct": -0.42,
       "group": "Hisse",
       "label": "Nikkei 225",
       "series": [
-        65481.2695,
         66753.7188,
         68956.7188,
         68309.4609,
@@ -532,21 +531,20 @@
         57434.7695,
         58775.5,
         60459.5781,
-        61424.1211
+        61248.5898,
+        60819.3594
       ],
       "symbol": "^N225",
       "unit": "puan",
-      "value": 61424.1211
+      "value": 60819.3594
     },
     {
-      "as_of": "2026-11-11",
-      "change_1d_pct": -0.43,
-      "change_5d_pct": 5.79,
+      "as_of": "2026-11-12",
+      "change_1d_pct": 1.51,
+      "change_5d_pct": 4.49,
       "group": "Hisse",
       "label": "BIST 100",
       "series": [
-        12290.5996,
-        11947.2002,
         12249.0,
         12270.2002,
         12443.9004,
@@ -574,20 +572,21 @@
         11333.2998,
         11482.5996,
         11712.7002,
-        11661.9004
+        11661.9004,
+        11666.4004,
+        11842.3496
       ],
       "symbol": "XU100.IS",
       "unit": "puan",
-      "value": 11661.9004
+      "value": 11842.3496
     },
     {
-      "as_of": "2026-11-11",
-      "change_1d_pct": -10.12,
-      "change_5d_pct": 5.3,
+      "as_of": "2026-11-12",
+      "change_1d_pct": 4.63,
+      "change_5d_pct": -35.06,
       "group": "Risk",
       "label": "VIX (korku)",
       "series": [
-        16.39,
         15.31,
         15.52,
         15.01,
@@ -616,11 +615,12 @@
         25.64,
         19.92,
         19.46,
-        17.49
+        17.49,
+        18.3
       ],
       "symbol": "^VIX",
       "unit": "puan",
-      "value": 17.49
+      "value": 18.3
     },
     {
       "as_of": "2026-11-11",
@@ -665,13 +665,12 @@
       "value": 4.998
     },
     {
-      "as_of": "2026-11-11",
-      "change_1d_pct": 0.6,
+      "as_of": "2026-11-12",
+      "change_1d_pct": -0.02,
       "change_5d_pct": 1.32,
       "group": "Kur",
       "label": "Dolar endeksi",
       "series": [
-        102.1,
         101.93,
         102.17,
         101.83,
@@ -700,11 +699,12 @@
         102.3,
         101.65,
         102.23,
-        102.848
+        102.91,
+        102.893
       ],
       "symbol": "DX-Y.NYB",
       "unit": "puan",
-      "value": 102.848
+      "value": 102.893
     },
     {
       "as_of": "2026-11-12",
@@ -750,7 +750,7 @@
     },
     {
       "as_of": "2026-11-12",
-      "change_1d_pct": 0.08,
+      "change_1d_pct": 0.09,
       "change_5d_pct": 0.43,
       "group": "Kur",
       "label": "USD/TRY",
@@ -784,20 +784,19 @@
         50.1233,
         50.2157,
         50.2096,
-        50.2521
+        50.2538
       ],
       "symbol": "TRY=X",
       "unit": "kur",
-      "value": 50.2521
+      "value": 50.2538
     },
     {
-      "as_of": "2026-11-11",
-      "change_1d_pct": -0.3,
-      "change_5d_pct": -2.66,
+      "as_of": "2026-11-12",
+      "change_1d_pct": -0.52,
+      "change_5d_pct": -4.9,
       "group": "Emtia",
       "label": "Brent/WTI ham",
       "series": [
-        92.87,
         91.11,
         89.43,
         89.44,
@@ -826,20 +825,20 @@
         90.83,
         86.85,
         86.04,
-        85.78
+        86.53,
+        86.08
       ],
       "symbol": "CL=F",
       "unit": "USD",
-      "value": 85.78
+      "value": 86.08
     },
     {
-      "as_of": "2026-11-11",
-      "change_1d_pct": -0.65,
-      "change_5d_pct": -1.69,
+      "as_of": "2026-11-12",
+      "change_1d_pct": -1.39,
+      "change_5d_pct": -4.1,
       "group": "Emtia",
       "label": "Altin",
       "series": [
-        4202.2998,
         4162.2998,
         4156.7998,
         4187.1001,
@@ -868,20 +867,20 @@
         4074.8999,
         4114.5,
         4030.2,
-        4004.0
+        4000.5,
+        3944.8
       ],
       "symbol": "GC=F",
       "unit": "USD",
-      "value": 4004.0
+      "value": 3944.8
     },
     {
       "as_of": "2026-11-12",
-      "change_1d_pct": -0.28,
-      "change_5d_pct": -2.95,
+      "change_1d_pct": -0.87,
+      "change_5d_pct": -3.21,
       "group": "Kripto",
       "label": "Bitcoin",
       "series": [
-        83095.125,
         81562.4922,
         82141.4609,
         81500.8047,
@@ -910,20 +909,56 @@
         74584.6484,
         75223.1484,
         73720.1172,
-        73514.3984
+        73964.4688,
+        73319.5312
       ],
       "symbol": "BTC-USD",
       "unit": "USD",
-      "value": 73514.3984
+      "value": 73319.5312
     }
   ],
   "news": [
     {
       "date": "2026-11-12",
-      "headline": "SPLV Lost $107,460 on $300,000 in the 2020 Crash, More Than VOO’s $102,030",
+      "headline": "Schwab's Dividend ETF Pays About 3%. Here's What $5,000 in It Could Be Worth by 2030.",
       "source": "Yahoo",
       "ticker": "VOO",
-      "url": "https://finnhub.io/api/news?id=6239b45759c5c21c77f70ec45d523a95f202e8f9fcbdcc806cf22ee79f8b6af8"
+      "url": "https://finnhub.io/api/news?id=467a428c4659628e48d057228a65ed8a22c138cb5a063ed19f204b60ea194a87"
+    },
+    {
+      "date": "2026-11-12",
+      "headline": "Speed Bumps? How Rate Spikes Shape U.S. Stock Valuations",
+      "source": "SeekingAlpha",
+      "ticker": "VOO",
+      "url": "https://finnhub.io/api/news?id=23cc3f3ba30b7e0142de6c22a314a8f5bde9d2a2d25e24df702a59864db3cf38"
+    },
+    {
+      "date": "2026-11-12",
+      "headline": "Interest Rates Rise In The Major Developed Economies Amid Stubbornly Elevated Inflation",
+      "source": "SeekingAlpha",
+      "ticker": "VOO",
+      "url": "https://finnhub.io/api/news?id=78e0341d91558bd73d1d00370089683c4bcf73d22f1d751a68be83ca8fe44aa6"
+    },
+    {
+      "date": "2026-11-11",
+      "headline": "34% Upside for DoorDash? MoffettNathanson Thinks So, and Here’s How",
+      "source": "Yahoo",
+      "ticker": "CART",
+      "url": "https://finnhub.io/api/news?id=284cc049633b250be94fc8b151049740f471590da99619cc7a44205244d61d6b"
+    },
+    {
+      "date": "2026-11-11",
+      "headline": "DoorDash-Instacart combination shines a spotlight on e-commerce pricing",
+      "source": "Yahoo",
+      "ticker": "CART",
+      "url": "https://finnhub.io/api/news?id=b6e96a7e6270392e02e1a75d84fca9a2f2912ee13a8991166cffe3e0283b81f4"
+    },
+    {
+      "date": "2026-11-11",
+      "headline": "Dollar General expands Instacart delivery to 20,000 US stores",
+      "source": "Yahoo",
+      "ticker": "CART",
+      "url": "https://finnhub.io/api/news?id=5598140a975e03bcf34181c28001bb79167d269474463d73b49d7524e7742b04"
     },
     {
       "date": "2026-11-11",
@@ -997,6 +1032,13 @@
     },
     {
       "date": "2026-11-11",
+      "headline": "Energy Shippers Report Their Quarters Amid Ongoing Tightness in the Global Tanker Market",
+      "source": "Yahoo",
+      "ticker": "LPG",
+      "url": "https://finnhub.io/api/news?id=80094d4edda514e013dbdebb453cee1713388c89b6605d215e8a1cb48030fa73"
+    },
+    {
+      "date": "2026-11-11",
       "headline": "NerdWallet: Insurance Issues And More Questions Than Answers",
       "source": "SeekingAlpha",
       "ticker": "NRDS",
@@ -1067,17 +1109,10 @@
     },
     {
       "date": "2026-11-11",
-      "headline": "He Thinks His $500,000 S&P 500 401(k) Protects Him From Big Losses. Just 10 Holdings Make Up Nearly 40% of the Fund. A 25% Drop Could Cost Him Almost $49,000",
-      "source": "Yahoo",
-      "ticker": "VOO",
-      "url": "https://finnhub.io/api/news?id=68be16cdebfb8d9d63052ca280aeb053880b0814e30c8ae1d50caba63ce71f73"
-    },
-    {
-      "date": "2026-11-11",
-      "headline": "History Says 1 Month Has Been the S&P 500's Most Reliable Since 1950. It's Only Weeks Away.",
-      "source": "Yahoo",
-      "ticker": "VOO",
-      "url": "https://finnhub.io/api/news?id=46398ff1fa752433f42d6e5e28887605d3143ed8bf37516f0a201c97a481496e"
+      "headline": "Top 3 Consumer Stocks That May Fall Off A Cliff This month",
+      "source": "Benzinga",
+      "ticker": "UPBD",
+      "url": "https://finnhub.io/api/news?id=f35d42b761317a732fbc8edeb6369e6fe6c3f236071441cdd0ba767ffcefd467"
     },
     {
       "date": "2026-11-10",
@@ -1162,44 +1197,9 @@
       "source": "Yahoo",
       "ticker": "GMED",
       "url": "https://finnhub.io/api/news?id=c4359c440c27bfd2bb9a9dfb1f6aef3d8d7daf2dc52704d4f65dbf616a8740ab"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "How this deodorant turned into a money printing machine",
-      "source": "Yahoo",
-      "ticker": "HUBS",
-      "url": "https://finnhub.io/api/news?id=8eecd945e15094b58b9db5d7ccd0f87831dd66baa4267b1fbf782b258ecc475b"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "Is Innoviva (INVA) Stock Undervalued Right Now?",
-      "source": "Yahoo",
-      "ticker": "INVA",
-      "url": "https://finnhub.io/api/news?id=ecb469640eb336dd8fbdd9a0317749e35ec45bdd96528f3af5ba6994508ed7a5"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "Logitech’s ‘Game Day’ Gives Employees a Dedicated Day Off",
-      "source": "Yahoo",
-      "ticker": "LOGI",
-      "url": "https://finnhub.io/api/news?id=7fa4cc7b6dfbc27ad48d25fa492365448d9629294f3f06afeae1c77f192b86b0"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "Citigroup Maintains Neutral on Nerdwallet, Lowers Price Target to $8.5",
-      "source": "Benzinga",
-      "ticker": "NRDS",
-      "url": "https://finnhub.io/api/news?id=1485d2a7714464ddf673d365ef00f6c739245f7b28f4e433f71a86808b1e4714"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "NerdWallet: 3 Key Takeaways for Long-Term Investors",
-      "source": "Yahoo",
-      "ticker": "NRDS",
-      "url": "https://finnhub.io/api/news?id=d1a0997b085c82715288c0dd876cb4fdd16572c80a0d23b8632c205c8dc5ecd6"
     }
   ],
-  "risk_note": "VIX 17 — normal aralikta.",
+  "risk_note": "VIX 18 — normal aralikta.",
   "source": "yfinance+finnhub+fred+sec",
   "tracked_count": 28
 }
