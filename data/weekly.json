@@ -1,62 +1,46 @@
 {
   "action_required": 0,
-  "as_of": "2026-11-06",
+  "as_of": "2026-11-13",
   "fx": {
-    "as_of": "2026-11-06",
-    "change_1w_pct": 0.41,
+    "as_of": "2026-11-13",
+    "change_1w_pct": 0.42,
     "deposits": [
       {
         "breakeven_headroom_pct": 7.49,
-        "days_to_maturity": 70,
-        "net_interest_try": 1790.14,
+        "days_to_maturity": 63,
+        "net_interest_try": 2359.73,
         "ticker": "TL-ISBANK-2",
         "usdtry_at_entry": 49.4086,
         "usdtry_breakeven": 53.1073,
-        "usdtry_used_pct": 19.9,
-        "value_try": 101790.14,
-        "value_usd": 2029.87
+        "usdtry_used_pct": 25.8,
+        "value_try": 102359.73,
+        "value_usd": 2032.41
       },
       {
         "breakeven_headroom_pct": 7.49,
-        "days_to_maturity": 54,
-        "net_interest_try": 1855.23,
+        "days_to_maturity": 47,
+        "net_interest_try": 2196.99,
         "ticker": "TL-ISBANK",
         "usdtry_at_entry": 50.3,
         "usdtry_breakeven": 54.0655,
-        "usdtry_used_pct": -4.1,
-        "value_try": 61855.23,
-        "value_usd": 1233.5
+        "usdtry_used_pct": 1.7,
+        "value_try": 62196.99,
+        "value_usd": 1234.95
       }
     ],
-    "usdtry": 50.14606857299805
+    "usdtry": 50.363800048828125
   },
   "macro": {
     "key_rates": {
       "cpi_yoy": 3.72,
       "fed_funds": 3.88,
-      "us10y": 4.9
+      "us10y": 4.98
     },
-    "risk_note": "VIX 28 — piyasa gergin. Dususler daha sert olur; pozisyon acmak icin acele etme.",
+    "risk_note": "VIX 19 — normal aralikta.",
     "upcoming": [
       {
-        "date": "2026-11-06",
-        "days": 0,
-        "detail": "isgucu",
-        "kind": "makro",
-        "ticker": null,
-        "title": "Istihdam raporu"
-      },
-      {
-        "date": "2026-11-10",
-        "days": 4,
-        "detail": "enflasyon",
-        "kind": "makro",
-        "ticker": null,
-        "title": "TUFE (CPI)"
-      },
-      {
         "date": "2026-11-13",
-        "days": 7,
+        "days": 0,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -64,7 +48,7 @@
       },
       {
         "date": "2026-11-17",
-        "days": 11,
+        "days": 4,
         "detail": "uretim",
         "kind": "makro",
         "ticker": null,
@@ -72,7 +56,7 @@
       },
       {
         "date": "2026-11-24",
-        "days": 18,
+        "days": 11,
         "detail": "talep",
         "kind": "makro",
         "ticker": null,
@@ -80,7 +64,7 @@
       },
       {
         "date": "2026-11-25",
-        "days": 19,
+        "days": 12,
         "detail": "buyume",
         "kind": "makro",
         "ticker": null,
@@ -88,7 +72,7 @@
       },
       {
         "date": "2026-12-04",
-        "days": 28,
+        "days": 21,
         "detail": "isgucu",
         "kind": "makro",
         "ticker": null,
@@ -96,7 +80,7 @@
       },
       {
         "date": "2026-12-10",
-        "days": 34,
+        "days": 27,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -104,7 +88,7 @@
       },
       {
         "date": "2026-12-15",
-        "days": 39,
+        "days": 32,
         "detail": "enflasyon",
         "kind": "makro",
         "ticker": null,
@@ -112,27 +96,43 @@
       },
       {
         "date": "2026-12-16",
-        "days": 40,
+        "days": 33,
         "detail": "uretim",
         "kind": "makro",
         "ticker": null,
         "title": "Sanayi uretimi"
       },
       {
-        "date": "2027-02-16",
+        "date": "2026-12-22",
+        "days": 39,
+        "detail": "talep",
+        "kind": "makro",
+        "ticker": null,
+        "title": "Perakende satislar"
+      },
+      {
+        "date": "2026-12-23",
+        "days": 40,
+        "detail": "buyume",
+        "kind": "makro",
+        "ticker": null,
+        "title": "GSYH (GDP)"
+      },
+      {
+        "date": "2027-02-22",
+        "days": 101,
+        "detail": null,
+        "kind": "bilanco",
+        "ticker": "GMED",
+        "title": "GMED bilanco"
+      },
+      {
+        "date": "2027-02-23",
         "days": 102,
         "detail": null,
         "kind": "bilanco",
-        "ticker": "LOPE",
-        "title": "LOPE bilanco"
-      },
-      {
-        "date": "2027-02-17",
-        "days": 103,
-        "detail": null,
-        "kind": "bilanco",
-        "ticker": "CARG",
-        "title": "CARG bilanco"
+        "ticker": "CHRD",
+        "title": "CHRD bilanco"
       }
     ]
   },
@@ -202,6 +202,7 @@
       "EXE",
       "FDS",
       "FET",
+      "FIVN",
       "FSLR",
       "FTV",
       "GDDY",
@@ -223,13 +224,16 @@
       "HSY",
       "HUBS",
       "IDT",
+      "IMAX",
       "INCY",
+      "INSW",
       "INVA",
       "JKHY",
       "KAI",
       "KFY",
       "KLIC",
       "KRP",
+      "KRT",
       "KTB",
       "LEVI",
       "LMAT",
@@ -237,10 +241,12 @@
       "LOPE",
       "LPG",
       "LZ",
+      "MATX",
       "MGY",
       "MITK",
       "MQ",
       "MSA",
+      "MUR",
       "MWA",
       "MYE",
       "NBIX",
@@ -252,10 +258,13 @@
       "PINS",
       "PODD",
       "PRDO",
+      "REPX",
       "RH",
+      "RMBS",
       "RMD",
       "SD",
       "SFM",
+      "SHOO",
       "SKYW",
       "SMP",
       "SPSC",
@@ -272,282 +281,58 @@
       {
         "headline": {
           "ev_ebit": {
-            "color": "yellow",
-            "own_5y_pct": 58.3,
+            "color": "green",
+            "own_5y_pct": 8.3,
             "pct_basis": "sector",
-            "sector_pct": 25.0,
-            "value": 15.61
+            "sector_pct": 7.7,
+            "value": 4.22
           },
           "fcf_yield_ev": {
-            "color": "yellow",
-            "own_5y_pct": 100.0,
+            "color": "green",
+            "own_5y_pct": 50.0,
             "pct_basis": "sector",
-            "sector_pct": 68.8,
-            "value": 5.93
+            "sector_pct": 82.4,
+            "value": 25.74
           },
           "roic": {
             "color": "green",
             "own_5y_pct": null,
             "pct_basis": "sector",
-            "sector_pct": 70.3,
-            "value": 21.41
+            "sector_pct": 96.4,
+            "value": 24.18
           }
         },
-        "name": "ENERPAC TOOL GROUP CORP",
-        "score": 68.5,
-        "ticker": "EPAC"
+        "name": "Riley Exploration Permian, Inc.",
+        "score": 73.1,
+        "ticker": "REPX"
       },
       {
         "headline": {
           "ev_ebit": {
-            "color": "yellow",
-            "own_5y_pct": 41.7,
-            "pct_basis": "universe",
-            "sector_pct": 34.6,
-            "value": 15.8
+            "color": "green",
+            "own_5y_pct": 8.3,
+            "pct_basis": "sector",
+            "sector_pct": 12.5,
+            "value": 5.19
           },
           "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 83.3,
-            "pct_basis": "universe",
-            "sector_pct": 74.3,
-            "value": 7.07
-          },
-          "roic": {
-            "color": "yellow",
-            "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 39.6,
-            "value": 12.96
-          }
-        },
-        "name": "CTS CORP",
-        "score": 60.7,
-        "ticker": "CTS"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "green",
-            "own_5y_pct": 16.7,
-            "pct_basis": "universe",
-            "sector_pct": 9.5,
-            "value": 8.93
-          },
-          "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 83.3,
-            "pct_basis": "sector",
-            "sector_pct": 75.0,
-            "value": 10.43
-          },
-          "roic": {
-            "color": "yellow",
-            "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 33.1,
-            "value": 10.3
-          }
-        },
-        "name": "STANDARD MOTOR PRODUCTS, INC.",
-        "score": 60.2,
-        "ticker": "SMP"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "green",
-            "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 13.3,
-            "value": 9.8
-          },
-          "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 75.0,
-            "pct_basis": "universe",
-            "sector_pct": 88.0,
-            "value": 10.7
-          },
-          "roic": {
-            "color": "yellow",
-            "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 20.5,
-            "value": 8.2
-          }
-        },
-        "name": "EXPAND ENERGY Corp",
-        "score": 59.2,
-        "ticker": "EXE"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "red",
-            "own_5y_pct": 0.0,
-            "pct_basis": "sector",
-            "sector_pct": 37.1,
-            "value": 18.44
-          },
-          "fcf_yield_ev": {
-            "color": "yellow",
-            "own_5y_pct": 37.5,
-            "pct_basis": "sector",
-            "sector_pct": 66.1,
-            "value": 4.66
-          },
-          "roic": {
-            "color": "green",
-            "own_5y_pct": null,
-            "pct_basis": "sector",
-            "sector_pct": 56.5,
-            "value": 16.14
-          }
-        },
-        "name": "Zurn Elkay Water Solutions Corp",
-        "score": 59.1,
-        "ticker": "ZWS"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "green",
-            "own_5y_pct": 0.0,
-            "pct_basis": "sector",
-            "sector_pct": 0.0,
-            "value": 6.81
-          },
-          "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 100.0,
-            "pct_basis": "sector",
-            "sector_pct": 88.0,
-            "value": 7.45
-          },
-          "roic": {
-            "color": "green",
-            "own_5y_pct": null,
-            "pct_basis": "sector",
-            "sector_pct": 71.4,
-            "value": 38.19
-          }
-        },
-        "name": "Sprouts Farmers Market, Inc.",
-        "score": 57.9,
-        "ticker": "SFM"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
             "color": "green",
             "own_5y_pct": 33.3,
-            "pct_basis": "universe",
-            "sector_pct": 26.2,
-            "value": 11.71
-          },
-          "fcf_yield_ev": {
-            "color": "yellow",
-            "own_5y_pct": 36.4,
-            "pct_basis": "universe",
-            "sector_pct": 61.4,
-            "value": 4.5
+            "pct_basis": "sector",
+            "sector_pct": 88.2,
+            "value": 14.25
           },
           "roic": {
             "color": "green",
             "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 43.2,
-            "value": 15.07
+            "pct_basis": "sector",
+            "sector_pct": 84.4,
+            "value": 31.82
           }
         },
-        "name": "Accel Entertainment, Inc.",
-        "score": 57.6,
-        "ticker": "ACEL"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "green",
-            "own_5y_pct": 8.3,
-            "pct_basis": "universe",
-            "sector_pct": 21.4,
-            "value": 8.93
-          },
-          "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 100.0,
-            "pct_basis": "universe",
-            "sector_pct": 88.6,
-            "value": 11.8
-          },
-          "roic": {
-            "color": "red",
-            "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 15.9,
-            "value": 6.02
-          }
-        },
-        "name": "Aptiv PLC",
-        "score": 56.9,
-        "ticker": "APTV"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "yellow",
-            "own_5y_pct": 0.0,
-            "pct_basis": "sector",
-            "sector_pct": 2.9,
-            "value": 15.79
-          },
-          "fcf_yield_ev": {
-            "color": "yellow",
-            "own_5y_pct": 0.0,
-            "pct_basis": "sector",
-            "sector_pct": 92.5,
-            "value": 5.33
-          },
-          "roic": {
-            "color": "red",
-            "own_5y_pct": null,
-            "pct_basis": "sector",
-            "sector_pct": 23.7,
-            "value": 6.22
-          }
-        },
-        "name": "Envista Holdings Corp",
-        "score": 55.2,
-        "ticker": "NVST"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "yellow",
-            "own_5y_pct": 25.0,
-            "pct_basis": "sector",
-            "sector_pct": 29.2,
-            "value": 13.52
-          },
-          "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 0.0,
-            "pct_basis": "sector",
-            "sector_pct": 87.5,
-            "value": 7.42
-          },
-          "roic": {
-            "color": "yellow",
-            "own_5y_pct": null,
-            "pct_basis": "sector",
-            "sector_pct": 4.2,
-            "value": 10.09
-          }
-        },
-        "name": "FORUM ENERGY TECHNOLOGIES, INC.",
-        "score": 53.2,
-        "ticker": "FET"
+        "name": "International Seaways, Inc.",
+        "score": 69.4,
+        "ticker": "INSW"
       },
       {
         "headline": {
@@ -555,163 +340,219 @@
             "color": "red",
             "own_5y_pct": 16.7,
             "pct_basis": "sector",
-            "sector_pct": 43.8,
-            "value": 26.2
+            "sector_pct": 21.9,
+            "value": 18.78
           },
           "fcf_yield_ev": {
             "color": "yellow",
-            "own_5y_pct": 8.3,
+            "own_5y_pct": null,
             "pct_basis": "sector",
-            "sector_pct": 85.0,
-            "value": 4.8
+            "sector_pct": 77.1,
+            "value": 4.88
           },
           "roic": {
+            "color": "green",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 95.6,
+            "value": 35.21
+          }
+        },
+        "name": "IMAX CORP",
+        "score": 63.2,
+        "ticker": "IMAX"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "red",
+            "own_5y_pct": 12.5,
+            "pct_basis": "sector",
+            "sector_pct": 54.0,
+            "value": 28.8
+          },
+          "fcf_yield_ev": {
+            "color": "yellow",
+            "own_5y_pct": 75.0,
+            "pct_basis": "sector",
+            "sector_pct": 66.0,
+            "value": 3.76
+          },
+          "roic": {
+            "color": "green",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 82.0,
+            "value": 37.96
+          }
+        },
+        "name": "RAMBUS INC",
+        "score": 62.4,
+        "ticker": "RMBS"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "yellow",
+            "own_5y_pct": 25.0,
+            "pct_basis": "sector",
+            "sector_pct": 33.3,
+            "value": 12.67
+          },
+          "fcf_yield_ev": {
             "color": "yellow",
             "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 25.0,
+            "value": 3.81
+          },
+          "roic": {
+            "color": "green",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 62.5,
+            "value": 16.78
+          }
+        },
+        "name": "STEVEN MADDEN, LTD.",
+        "score": 60.1,
+        "ticker": "SHOO"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "green",
+            "own_5y_pct": 25.0,
+            "pct_basis": "sector",
+            "sector_pct": 16.7,
+            "value": 11.55
+          },
+          "fcf_yield_ev": {
+            "color": "yellow",
+            "own_5y_pct": 0.0,
+            "pct_basis": "sector",
+            "sector_pct": 41.7,
+            "value": 4.82
+          },
+          "roic": {
+            "color": "green",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 75.0,
+            "value": 31.68
+          }
+        },
+        "name": "Karat Packaging Inc.",
+        "score": 57.8,
+        "ticker": "KRT"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "green",
+            "own_5y_pct": 50.0,
+            "pct_basis": "sector",
+            "sector_pct": 22.7,
+            "value": 10.34
+          },
+          "fcf_yield_ev": {
+            "color": "red",
+            "own_5y_pct": 0.0,
+            "pct_basis": "sector",
+            "sector_pct": 4.2,
+            "value": 2.4
+          },
+          "roic": {
+            "color": "green",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 50.0,
+            "value": 17.04
+          }
+        },
+        "name": "Matson, Inc.",
+        "score": 57.2,
+        "ticker": "MATX"
+      },
+      {
+        "headline": {
+          "ev_ebit": {
+            "color": "green",
+            "own_5y_pct": 16.7,
             "pct_basis": "sector",
             "sector_pct": 45.0,
-            "value": 8.45
+            "value": 7.73
+          },
+          "fcf_yield_ev": {
+            "color": "green",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 62.5,
+            "value": 19.97
+          },
+          "roic": {
+            "color": "yellow",
+            "own_5y_pct": null,
+            "pct_basis": "sector",
+            "sector_pct": 35.0,
+            "value": 9.58
           }
         },
-        "name": "Fortive Corp",
-        "score": 52.8,
-        "ticker": "FTV"
+        "name": "MURPHY OIL CORP",
+        "score": 56.5,
+        "ticker": "MUR"
       },
       {
         "headline": {
-          "ev_ebit": {
+          "ev_sales": {
+            "color": "green",
+            "own_5y_pct": 41.7,
+            "pct_basis": "universe",
+            "sector_pct": 25.7,
+            "value": 1.74
+          },
+          "rev_growth_ttm": {
+            "color": "yellow",
+            "own_5y_pct": null,
+            "pct_basis": "universe",
+            "sector_pct": 43.5,
+            "value": 10.1
+          },
+          "rule_of_40": {
             "color": "red",
-            "own_5y_pct": 8.3,
-            "pct_basis": "universe",
-            "sector_pct": 43.4,
-            "value": 18.19
-          },
-          "fcf_yield_ev": {
-            "color": "yellow",
-            "own_5y_pct": 100.0,
-            "pct_basis": "universe",
-            "sector_pct": 54.6,
-            "value": 4.31
-          },
-          "roic": {
-            "color": "green",
             "own_5y_pct": null,
             "pct_basis": "universe",
-            "sector_pct": 78.5,
-            "value": 26.65
+            "sector_pct": 44.9,
+            "value": 26.31
           }
         },
-        "name": "Celsius Holdings, Inc.",
-        "score": 51.6,
-        "ticker": "CELH"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "red",
-            "own_5y_pct": 25.0,
-            "pct_basis": "sector",
-            "sector_pct": 47.2,
-            "value": 45.82
-          },
-          "fcf_yield_ev": {
-            "color": "yellow",
-            "own_5y_pct": 100.0,
-            "pct_basis": "sector",
-            "sector_pct": 42.5,
-            "value": 4.17
-          },
-          "roic": {
-            "color": "yellow",
-            "own_5y_pct": null,
-            "pct_basis": "sector",
-            "sector_pct": 37.5,
-            "value": 9.06
-          }
-        },
-        "name": "Dynatrace, Inc.",
-        "score": 50.3,
-        "ticker": "DT"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "green",
-            "own_5y_pct": 25.0,
-            "pct_basis": "universe",
-            "sector_pct": 18.4,
-            "value": 10.42
-          },
-          "fcf_yield_ev": {
-            "color": "green",
-            "own_5y_pct": 8.3,
-            "pct_basis": "universe",
-            "sector_pct": 70.4,
-            "value": 6.19
-          },
-          "roic": {
-            "color": "green",
-            "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 64.6,
-            "value": 20.87
-          }
-        },
-        "name": "Cheniere Energy Partners, L.P.",
-        "score": 49.1,
-        "ticker": "CQP"
-      },
-      {
-        "headline": {
-          "ev_ebit": {
-            "color": "yellow",
-            "own_5y_pct": 8.3,
-            "pct_basis": "universe",
-            "sector_pct": 33.9,
-            "value": 16.91
-          },
-          "fcf_yield_ev": {
-            "color": "yellow",
-            "own_5y_pct": 100.0,
-            "pct_basis": "universe",
-            "sector_pct": 60.5,
-            "value": 4.93
-          },
-          "roic": {
-            "color": "green",
-            "own_5y_pct": null,
-            "pct_basis": "universe",
-            "sector_pct": 64.1,
-            "value": 22.16
-          }
-        },
-        "name": "HERSHEY CO",
-        "score": 47.1,
-        "ticker": "HSY"
+        "name": "Five9, Inc.",
+        "score": 52.1,
+        "ticker": "FIVN"
       }
     ],
     "first_report": false,
     "left": []
   },
   "portfolio": {
-    "pnl_pct": -0.24,
+    "pnl_pct": 0.45,
     "position_count": 5,
-    "value_usd": 4403.92
+    "value_usd": 4433.63
   },
   "scan": {
-    "cycle": 19,
-    "data_missing": 92,
-    "done": 1500,
-    "eliminated": 1257,
-    "last_finalized": "2026-11-04",
-    "pct": 39.5,
-    "retry_queue": 92,
-    "survivors": 151,
-    "total": 3793
+    "cycle": 21,
+    "data_missing": 75,
+    "done": 1200,
+    "eliminated": 1019,
+    "last_finalized": "2026-11-12",
+    "pct": 31.7,
+    "retry_queue": 75,
+    "survivors": 106,
+    "total": 3781
   },
   "slice_drift": [],
   "source": "weekly",
   "triggered_breakers": [],
   "upcoming_earnings": [],
-  "week_of": "2026-11-02"
+  "week_of": "2026-11-09"
 }
