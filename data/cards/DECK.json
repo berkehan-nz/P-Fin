@@ -9,7 +9,7 @@
     "target_high": 137.0,
     "target_low": 70.0,
     "target_median": 95.0,
-    "upside_to_median": 13.636363636363647
+    "upside_to_median": 13.63636571047049
   },
   "as_of": "2026-11-19",
   "calendar": {
@@ -26,7 +26,6 @@
       "used": 60.0
     }
   },
-  "change_1d_pct": 2.6,
   "data_quality": {
     "issue_count": 0,
     "issues": [],
@@ -79,9 +78,9 @@
     "z_unreliable": true,
     "z_unreliable_reason": "bilesen eksik"
   },
-  "generated_at": "2026-11-15T17:55:32+00:00",
+  "generated_at": "2026-11-19T22:22:12+00:00",
   "insider": {
-    "form4_count": 39,
+    "form4_count": 32,
     "last_form4": "2026-09-02",
     "window_days": 180
   },
@@ -105,7 +104,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 25.0,
+      "sector_pct": 35.0,
       "value": 1.12
     },
     "current_ratio": {
@@ -140,7 +139,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 15.4,
+      "sector_pct": 7.7,
       "value": 7.15
     },
     "ev_gross_profit": {
@@ -287,7 +286,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 69.2,
+      "sector_pct": 73.1,
       "value": 7.0
     },
     "rel_strength_12m": {
@@ -295,14 +294,14 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": -5.68
+      "value": -4.6
     },
     "rel_strength_6m": {
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 23.1,
-      "value": -7.38
+      "sector_pct": 7.7,
+      "value": -5.18
     },
     "return_12m": {
       "color": "yellow",
@@ -315,7 +314,7 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 23.1,
+      "sector_pct": 0.0,
       "value": -14.9
     },
     "rev_cagr_3y": {
@@ -385,13 +384,19 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 45.8,
+      "sector_pct": 37.5,
       "value": -0.01
     }
   },
   "name": "DECKERS OUTDOOR CORP",
   "net_debt_musd": -1209.72,
   "news": [
+    {
+      "date": "2026-11-19",
+      "headline": "Nike Sinks 5%, Dick’s Sporting Goods Down 5% as Analyst Flags Jordan Allocation Cuts of Up to 50%",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=3c1ee47cf2f28fb33ba8c74d4c114d594341e67773b317da009dc76ec00dcc9c"
+    },
     {
       "date": "2026-11-17",
       "headline": "Nike Sinks 7% as Investor Day Warns Fiscal 2028 Will Be a “Challenging Year Financially”",
@@ -433,18 +438,12 @@
       "headline": "Buy, Sell, or Hold? Tuesday’s Top Upgrades and Downgrades: Cloudflare, Deckers Outdoors, DraftKings, MongoDB, Nike, Oneok, Philip Morris International, Riot Platforms, Wix.com, and More",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=8c0e403d54f13a81bd3be0149efab9164e3023c1700591c38884145142a2219c"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "Freeport-McMoRan, State Street, Deckers Outdoor And More On CNBC’s ‘Final Trades’",
-      "source": "Benzinga",
-      "url": "https://finnhub.io/api/news?id=20a86c271ae1b0f1ae2b1db7d2ee4e47c11d32f700291d2b28b0f1d0fbd31468"
     }
   ],
   "overrides": [],
   "percentile_pool": {
     "sector": 13,
-    "universe": 366
+    "universe": 370
   },
   "price": 83.6,
   "price_as_of": "2026-11-18",
@@ -453,7 +452,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 9949.2,
     "fcf_ttm_musd": 1097.3,
-    "implied_growth_pct": -3.6914278511221297,
+    "implied_growth_pct": -3.69,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -466,18 +465,18 @@
           "weight": 0.2
         },
         "cash_conversion": {
-          "percentile": 25.0,
-          "scaled": 25.0,
+          "percentile": 35.0,
+          "scaled": 35.0,
           "weight": 0.3
         },
         "piotroski_f": {
-          "percentile": 69.2,
-          "scaled": 69.2,
+          "percentile": 73.1,
+          "scaled": 73.1,
           "weight": 0.25
         },
         "sloan_accruals": {
-          "percentile": 45.8,
-          "scaled": 54.2,
+          "percentile": 37.5,
+          "scaled": 62.5,
           "weight": 0.25
         }
       },
@@ -487,13 +486,13 @@
     "momentum": {
       "components": {
         "rel_strength_3m": {
-          "percentile": 53.8,
-          "scaled": 53.8,
+          "percentile": 46.2,
+          "scaled": 46.2,
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 23.1,
-          "scaled": 23.1,
+          "percentile": 7.7,
+          "scaled": 7.7,
           "weight": 0.4
         }
       },
@@ -633,11 +632,11 @@
       "safety": 0.7,
       "value": 1.0
     },
-    "earnings_quality": 39.6,
-    "momentum": 41.5,
+    "earnings_quality": 45.6,
+    "momentum": 30.8,
     "quality": 87.3,
     "safety": 92.8,
-    "total": 70.6,
+    "total": 70.7,
     "value": 81.9,
     "weight_coverage": 0.95
   },

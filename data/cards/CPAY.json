@@ -1,6 +1,7 @@
 {
   "analyst": {
     "analyst_count": 15,
+    "as_of": "2026-11-19",
     "buy": 13,
     "hold": 3,
     "recommendation": "buy",
@@ -9,7 +10,7 @@
     "target_high": 550.0,
     "target_low": 460.0,
     "target_median": 499.0,
-    "upside_to_median": 9.617327885418025
+    "upside_to_median": 9.617327591471781
   },
   "as_of": "2026-11-19",
   "calendar": {
@@ -17,7 +18,6 @@
     "next_earnings": "2027-02-04"
   },
   "capped_for_scoring": {},
-  "change_1d_pct": 0.64,
   "data_quality": {
     "issue_count": 2,
     "issues": [
@@ -88,13 +88,13 @@
     "z_unreliable": true,
     "z_unreliable_reason": "bilesen eksik"
   },
-  "generated_at": "2026-11-15T17:55:28+00:00",
+  "generated_at": "2026-11-19T22:22:08+00:00",
   "insider": {
-    "form4_count": 16,
+    "form4_count": 15,
     "last_form4": "2026-08-25",
     "window_days": 180
   },
-  "market_cap_musd": 29121.2,
+  "market_cap_musd": 29121.3,
   "metrics": {
     "altman_z": {
       "color": "gray",
@@ -128,7 +128,7 @@
       "color": "yellow",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 91.7,
+      "sector_pct": 100.0,
       "value": 5.35
     },
     "ebitda_margin": {
@@ -142,7 +142,7 @@
       "color": "red",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 8.3,
+      "sector_pct": 0.0,
       "value": 18.7
     },
     "ev_ebitda": {
@@ -275,7 +275,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 25.0,
+      "sector_pct": 41.7,
       "value": 5.07
     },
     "pe": {
@@ -304,14 +304,14 @@
       "own_5y_pct": null,
       "pct_basis": "none",
       "sector_pct": null,
-      "value": 56.78
+      "value": 57.86
     },
     "rel_strength_6m": {
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 50.0,
-      "value": 37.41
+      "sector_pct": 41.7,
+      "value": 39.61
     },
     "return_12m": {
       "color": "green",
@@ -324,7 +324,7 @@
       "color": "green",
       "own_5y_pct": null,
       "pct_basis": "sector",
-      "sector_pct": 50.0,
+      "sector_pct": 33.3,
       "value": 29.88
     },
     "rev_cagr_3y": {
@@ -402,6 +402,12 @@
   "net_debt_musd": 8160.12,
   "news": [
     {
+      "date": "2026-11-19",
+      "headline": "Corpay Cross-Border Named the Official FX Partner of Hull City A.F.C",
+      "source": "Yahoo",
+      "url": "https://finnhub.io/api/news?id=f5a5fc27e18f31a8d2f98d9d6bee894c6cd3312fc6b266dad51e3ed99e374c18"
+    },
+    {
       "date": "2026-11-17",
       "headline": "Nothing Bundt Cakes and Stored Value Solutions Launch Enhanced Gift Card Program",
       "source": "Yahoo",
@@ -442,18 +448,12 @@
       "headline": "What Corpay (CPAY) Said on Its Q3 Earnings Call",
       "source": "Yahoo",
       "url": "https://finnhub.io/api/news?id=2adf94cf7afc23d8e5b86733bae5407e135cd48fd98ad2e9581ce7202a6bfe20"
-    },
-    {
-      "date": "2026-11-10",
-      "headline": "Corpay, Inc. (CPAY) Presents at KBW Fintech Ecosystem Conference 2026 Transcript",
-      "source": "SeekingAlpha",
-      "url": "https://finnhub.io/api/news?id=096e607905fc9c5760fb470586e29e4578ada036b6e0deeacdd6c6b8f0459b46"
     }
   ],
   "overrides": [],
   "percentile_pool": {
     "sector": 12,
-    "universe": 366
+    "universe": 370
   },
   "price": 455.22,
   "price_as_of": "2026-11-18",
@@ -462,7 +462,7 @@
     "discount_rate": 0.1,
     "enterprise_value_musd": 37281.4,
     "fcf_ttm_musd": 1299.1,
-    "implied_growth_pct": 12.010228072059123,
+    "implied_growth_pct": 12.01,
     "projection_years": 10,
     "terminal_growth": 0.03
   },
@@ -500,8 +500,8 @@
           "weight": 0.6
         },
         "rel_strength_6m": {
-          "percentile": 50.0,
-          "scaled": 50.0,
+          "percentile": 41.7,
+          "scaled": 41.7,
           "weight": 0.4
         }
       },
@@ -565,13 +565,13 @@
     "value": {
       "components": {
         "earnings_yield": {
-          "percentile": 91.7,
-          "scaled": 91.7,
+          "percentile": 100.0,
+          "scaled": 100.0,
           "weight": 0.1
         },
         "ev_ebit": {
-          "percentile": 8.3,
-          "scaled": 91.7,
+          "percentile": 0.0,
+          "scaled": 100.0,
           "weight": 0.3
         },
         "ev_gross_profit": {
@@ -641,11 +641,11 @@
       "value": 0.8
     },
     "earnings_quality": 42.3,
-    "momentum": 50.0,
+    "momentum": 46.7,
     "quality": 55.7,
     "safety": 4.8,
-    "total": 37.7,
-    "value": 55.2,
+    "total": 38.6,
+    "value": 59.4,
     "weight_coverage": 0.81
   },
   "sector": "Diger is hizmetleri",
