@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-19",
+  "as_of": "2026-11-20",
   "candidates": [
     {
       "as_of": "2026-11-19",
@@ -16695,6 +16695,154 @@
       "why_cheap": ""
     },
     {
+      "as_of": "2026-11-20",
+      "claude_verdict": "",
+      "core": {
+        "fcf_yield_ev": 15.21,
+        "gross_margin": 32.62,
+        "net_debt_to_ebitda": null,
+        "piotroski_f": 2.0,
+        "rev_growth_ttm": 32.05,
+        "roic": -36.17
+      },
+      "data_quality": "iyi",
+      "decision": "",
+      "flags": {
+        "is_manual": false,
+        "one_off_earnings": true,
+        "rev_growth_organic_suspect": false,
+        "z_unreliable": true
+      },
+      "headline": {
+        "ev_sales": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "universe",
+          "sector_pct": 26.2,
+          "value": 1.19
+        },
+        "rev_growth_ttm": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "universe",
+          "sector_pct": 88.1,
+          "value": 32.05
+        },
+        "rule_of_40": {
+          "color": "green",
+          "own_5y_pct": null,
+          "pct_basis": "universe",
+          "sector_pct": 78.6,
+          "value": 50.09
+        }
+      },
+      "low_coverage_blocks": {
+        "earnings_quality": [
+          "beneish_m",
+          "cash_conversion"
+        ]
+      },
+      "market_cap_musd": 996.8,
+      "name": "Andersen Group Inc.",
+      "percentile_pool": {
+        "sector": 2,
+        "universe": 22
+      },
+      "price": 61.47,
+      "price_as_of": "2026-11-18",
+      "scores": {
+        "catalyst": null,
+        "coverage_factors": {
+          "earnings_quality": 0.5,
+          "momentum": 1.0,
+          "quality": 1.0,
+          "safety": 0.7,
+          "value": 0.7
+        },
+        "earnings_quality": 45.5,
+        "momentum": 90.5,
+        "quality": 37.7,
+        "safety": 19.6,
+        "total": 49.0,
+        "value": 68.8,
+        "weight_coverage": 0.58
+      },
+      "sector": "Diger is hizmetleri",
+      "source": "funnel",
+      "sparkline": [
+        38.13,
+        38.31,
+        38.31,
+        38.69,
+        36.87,
+        36.08,
+        36.87,
+        37.78,
+        37.5,
+        37.17,
+        37.47,
+        35.79,
+        37.93,
+        36.36,
+        40.51,
+        43.46,
+        41.97,
+        42.22,
+        44.45,
+        42.8,
+        43.37,
+        46.94,
+        46.08,
+        47.68,
+        49.75,
+        49.68,
+        48.47,
+        48.3,
+        49.0,
+        45.02,
+        49.99,
+        53.13,
+        55.72,
+        55.72,
+        57.45,
+        53.85,
+        53.19,
+        56.4,
+        54.82,
+        54.65,
+        53.95,
+        52.96,
+        55.47,
+        57.36,
+        56.0,
+        55.34,
+        56.82,
+        57.29,
+        58.27,
+        60.65,
+        63.54,
+        64.18,
+        62.93,
+        65.55,
+        65.68,
+        65.0,
+        65.77,
+        65.42,
+        62.85,
+        61.47
+      ],
+      "story_age_days": null,
+      "ticker": "ANDG",
+      "track": "B",
+      "warning_count": 3,
+      "warnings": [
+        "Net kar EBIT'e gore asiri yuksek veya vergi orani negatif — F/K tek seferlik kalemle sismis olabilir.",
+        "Ozkaynak negatif — Altman Z'' anlamsiz. Faiz karsilama ve FCF/toplam borc ile degerlendir.",
+        "Bazi kalemler ceyreklerden degil YILLIK tablodan geldi (operating_income, net_income, cfo, capex). Bu kalemlerde TTM, son mali yil demektir; ceyreklik grafikle toplami tutmayabilir."
+      ],
+      "why_cheap": ""
+    },
+    {
       "as_of": "2026-11-19",
       "claude_verdict": "",
       "core": {
@@ -20234,12 +20382,22 @@
     }
   ],
   "counts": {
-    "funnel": 143,
+    "funnel": 144,
     "manual": 0,
     "seed": 36
   },
   "manual": [],
-  "partial": null,
+  "partial": {
+    "cycle": 23,
+    "is_partial": true,
+    "last_batch_at": "2026-11-20T03:38:22+00:00",
+    "pct": 8.0,
+    "ranked": 7,
+    "remaining": 3470,
+    "scanned": 300,
+    "survivors": 22,
+    "universe": 3770
+  },
   "seed": [
     {
       "as_of": "2026-11-19",
