@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-20",
+  "as_of": "2026-11-21",
   "runs": [
     {
       "cycle": 2,
@@ -1790,139 +1790,6 @@
         },
         {
           "input": 116,
-          "name": "Puanlama",
-          "output": 50,
-          "stage": 4
-        }
-      ],
-      "thresholds_snapshot": {
-        "stage1": {
-          "gross_margin_min_pct": 30.0,
-          "high_growth_exemption_growth_max_pct": 150.0,
-          "high_growth_exemption_growth_pct": 25.0,
-          "high_growth_exemption_rule40_min": 40.0,
-          "kill_on_missing_data": false,
-          "net_debt_to_ebitda_max": 3.0,
-          "rev_growth_ttm_min_pct": 5.0,
-          "sbc_to_fcf_max": 1.0,
-          "share_count_growth_max_pct": 5.0,
-          "share_count_recent_decline_exempts": true
-        },
-        "stage2": {
-          "altman_z_min": 1.1,
-          "beneish_m_max": -1.78,
-          "cash_conversion_consecutive_years": 3,
-          "cash_conversion_min": 0.7,
-          "declining_years": 2,
-          "ipo_lockup_months": 12,
-          "maturity_wall_max": 1.0,
-          "piotroski_f_min_track_a": 4,
-          "z_deferred_revenue_share_of_current_liabilities": 0.4
-        },
-        "stage3": {
-          "implied_growth_absolute_headroom_pct": 5.0,
-          "implied_growth_vs_cagr_max_multiple": 1.5,
-          "track_a": {
-            "ev_ebit_own_5y_pct_max": 50.0,
-            "ev_ebit_sector_pct_max": 40.0,
-            "fcf_yield_min_pct": 4.0
-          },
-          "track_b": {
-            "ev_gross_profit_sector_pct_max": 40.0,
-            "ev_sales_own_5y_pct_max": 50.0
-          },
-          "track_b_operating_margin_pct": 5.0
-        }
-      }
-    },
-    {
-      "cycle": 16,
-      "date": "2026-10-27",
-      "kill_reasons": {
-        "30 gunluk ortalama dolar hacmi < 5M USD": 76,
-        "Biyoteknoloji; hasilat bilinmiyor": 39,
-        "Borsa disi/uygunsuz kotasyon (OTC)": 322,
-        "Borsa disi/uygunsuz kotasyon (TXSE)": 3,
-        "Brut marj %12.9 <= %30": 3,
-        "Brut marj %18.8 <= %30": 3,
-        "Brut marj %20.3 <= %30": 4,
-        "Brut marj %23.3 <= %30": 4,
-        "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; 40 Kurali hesaplanamadi)": 4,
-        "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; brut marj bilinmiyor; 40 Kurali hesaplanamadi)": 49,
-        "Fiyat < 5 USD": 75,
-        "Hasilat buyumesi %-0.1 <= %5": 4,
-        "Hasilat buyumesi %0.3 <= %5": 4,
-        "Hasilat buyumesi %0.7 <= %5": 6,
-        "Hasilat buyumesi %1.5 <= %5": 4,
-        "Hasilat buyumesi %2.4 <= %5": 4,
-        "Hasilat buyumesi %3.3 <= %5": 5,
-        "Hasilat buyumesi %3.6 <= %5": 4,
-        "Hasilat buyumesi %3.7 <= %5": 5,
-        "Hasilat buyumesi %4.9 <= %5": 5,
-        "Hasilatsiz biyoteknoloji": 26,
-        "Net borc/FAVOK 3.1 >= 3.0": 4,
-        "Net borc/FAVOK 3.2 >= 3.0": 5,
-        "Net borc/FAVOK 3.4 >= 3.0": 4,
-        "Net borc/FAVOK 3.5 >= 3.0": 4,
-        "Net borc/FAVOK 4.2 >= 3.0": 5,
-        "Piyasa degeri < 300M USD": 575,
-        "Piyasa degeri > 50000M USD": 112,
-        "Piyasa degeri hesaplanamadi": 9,
-        "SIC 6000-6799 (finans/gayrimenkul) haric": 8
-      },
-      "partial": true,
-      "scanned": 2100,
-      "sector_distribution": {
-        "Cesitli imalat": 1,
-        "Diger is hizmetleri": 1,
-        "Egitim": 2,
-        "Elektronik ve elektrikli ekipman": 3,
-        "Gida ve tutun": 1,
-        "Iletisim": 1,
-        "Is hizmetleri": 1,
-        "Kamu hizmetleri": 1,
-        "Kaucuk, plastik, cam": 1,
-        "Kimya ve ilac": 5,
-        "Madencilik": 4,
-        "Makine ve bilgisayar donanimi": 3,
-        "Metal": 1,
-        "Muhendislik ve arastirma": 1,
-        "Olcum ve tibbi cihaz": 3,
-        "Perakende": 3,
-        "Tekstil ve giyim": 2,
-        "Toptan ticaret": 1,
-        "Ulasim ekipmani": 1,
-        "Veri isleme ve sistem entegrasyonu": 4,
-        "Yazilim ve programlama": 10
-      },
-      "sector_quota_overflow": 0,
-      "stages": [
-        {
-          "input": 2100,
-          "name": "Evren",
-          "output": 855,
-          "stage": 0
-        },
-        {
-          "input": 855,
-          "name": "Sert filtreler",
-          "output": 209,
-          "stage": 1
-        },
-        {
-          "input": 209,
-          "name": "Tuzak eleme",
-          "output": 192,
-          "stage": 2
-        },
-        {
-          "input": 192,
-          "name": "Goreli ucuzluk",
-          "output": 72,
-          "stage": 3
-        },
-        {
-          "input": 72,
           "name": "Puanlama",
           "output": 50,
           "stage": 4
@@ -6612,6 +6479,137 @@
           "input": 30,
           "name": "Puanlama",
           "output": 30,
+          "stage": 4
+        }
+      ],
+      "thresholds_snapshot": {
+        "stage1": {
+          "gross_margin_min_pct": 30.0,
+          "high_growth_exemption_growth_max_pct": 150.0,
+          "high_growth_exemption_growth_pct": 25.0,
+          "high_growth_exemption_rule40_min": 40.0,
+          "kill_on_missing_data": false,
+          "net_debt_to_ebitda_max": 3.0,
+          "rev_growth_ttm_min_pct": 5.0,
+          "sbc_to_fcf_max": 1.0,
+          "share_count_growth_max_pct": 5.0,
+          "share_count_recent_decline_exempts": true
+        },
+        "stage2": {
+          "altman_z_min": 1.1,
+          "beneish_m_max": -1.78,
+          "cash_conversion_consecutive_years": 3,
+          "cash_conversion_min": 0.7,
+          "declining_years": 2,
+          "ipo_lockup_months": 12,
+          "maturity_wall_max": 1.0,
+          "piotroski_f_min_track_a": 4,
+          "z_deferred_revenue_share_of_current_liabilities": 0.4
+        },
+        "stage3": {
+          "implied_growth_absolute_headroom_pct": 5.0,
+          "implied_growth_vs_cagr_max_multiple": 1.5,
+          "track_a": {
+            "ev_ebit_own_5y_pct_max": 50.0,
+            "ev_ebit_sector_pct_max": 40.0,
+            "fcf_yield_min_pct": 4.0
+          },
+          "track_b": {
+            "ev_gross_profit_sector_pct_max": 40.0,
+            "ev_sales_own_5y_pct_max": 50.0
+          },
+          "track_b_operating_margin_pct": 5.0
+        }
+      }
+    },
+    {
+      "cycle": 23,
+      "date": "2026-11-21",
+      "kill_reasons": {
+        "30 gunluk ortalama dolar hacmi < 5M USD": 35,
+        "Biyoteknoloji; hasilat bilinmiyor": 22,
+        "Borsa disi/uygunsuz kotasyon (OTC)": 170,
+        "Borsa disi/uygunsuz kotasyon (TXSE)": 3,
+        "Brut marj %11.3 <= %30": 3,
+        "Brut marj %16.1 <= %30": 3,
+        "Brut marj %16.6 <= %30": 2,
+        "Brut marj %18.6 <= %30": 2,
+        "Brut marj %19.0 <= %30": 2,
+        "Brut marj %19.6 <= %30": 2,
+        "Brut marj %20.6 <= %30": 2,
+        "Brut marj %20.8 <= %30": 2,
+        "Brut marj %24.8 <= %30": 3,
+        "Brut marj %29.9 <= %30": 3,
+        "FCF negatif ve yuksek buyume istisnasi saglanmadi (buyume bilinmiyor; brut marj bilinmiyor; 40 Kurali hesaplanamadi)": 25,
+        "Fiyat < 5 USD": 42,
+        "Hasilat buyumesi %1.7 <= %5": 3,
+        "Hasilat buyumesi %2.0 <= %5": 3,
+        "Hasilat buyumesi %3.7 <= %5": 3,
+        "Hasilat buyumesi %4.7 <= %5": 3,
+        "Hasilat buyumesi %4.8 <= %5": 4,
+        "Hasilatsiz biyoteknoloji": 21,
+        "Hisse sayisi artisi %5.7 >= %5": 3,
+        "Net borc/FAVOK 3.5 >= 3.0": 3,
+        "Net borc/FAVOK 4.4 >= 3.0": 4,
+        "Piotroski F 3 < 4 (Kol A)": 5,
+        "Piyasa degeri < 300M USD": 349,
+        "Piyasa degeri > 50000M USD": 63,
+        "Piyasa degeri hesaplanamadi": 5,
+        "SIC 6000-6799 (finans/gayrimenkul) haric": 7
+      },
+      "partial": true,
+      "scanned": 1200,
+      "sector_distribution": {
+        "Cesitli hizmetler": 1,
+        "Cesitli imalat": 1,
+        "Diger is hizmetleri": 4,
+        "Egitim": 1,
+        "Elektronik ve elektrikli ekipman": 3,
+        "Gida ve tutun": 1,
+        "Iletisim": 1,
+        "Is hizmetleri": 1,
+        "Kamu hizmetleri": 2,
+        "Kaucuk, plastik, cam": 3,
+        "Kimya ve ilac": 5,
+        "Madencilik": 4,
+        "Makine ve bilgisayar donanimi": 2,
+        "Olcum ve tibbi cihaz": 1,
+        "Perakende": 5,
+        "Tekstil ve giyim": 1,
+        "Ulasim ekipmani": 1,
+        "Veri isleme ve sistem entegrasyonu": 1,
+        "Yazilim ve programlama": 10
+      },
+      "sector_quota_overflow": 0,
+      "stages": [
+        {
+          "input": 1200,
+          "name": "Evren",
+          "output": 483,
+          "stage": 0
+        },
+        {
+          "input": 483,
+          "name": "Sert filtreler",
+          "output": 125,
+          "stage": 1
+        },
+        {
+          "input": 125,
+          "name": "Tuzak eleme",
+          "output": 110,
+          "stage": 2
+        },
+        {
+          "input": 110,
+          "name": "Goreli ucuzluk",
+          "output": 48,
+          "stage": 3
+        },
+        {
+          "input": 48,
+          "name": "Puanlama",
+          "output": 48,
           "stage": 4
         }
       ],
